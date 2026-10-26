@@ -43,9 +43,16 @@ function ptsFor(cat,place,nb,sexe){
  if(Array.isArray(d))return d[place-1]??null;
  return (sexe==="messieurs"?d.messieurs[place-1]:d.dames[Math.min(place-1,24)])??null;
 }
+// Identifiant stable d'un résultat (synchronisation avec le compte, espace joueur)
+const SIM_CLE_VALIDE=/^[0-9A-Za-z-]{8,40}$/;
+function simNouvelleCle(){
+ try{if(typeof crypto!=="undefined"&&crypto.randomUUID)return crypto.randomUUID();}catch(e){}
+ return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,12);
+}
 function simNormaliser(liste){
  if(!Array.isArray(liste))return [];
  return liste.filter(r=>r&&ptsFor(r.cat,r.place,r.nb,r.sexe)!==null).map(r=>({
+  cle:typeof r.cle==="string"&&SIM_CLE_VALIDE.test(r.cle)?r.cle:simNouvelleCle(),
   cat:r.cat,place:r.place,nb:r.nb,sexe:r.sexe,date:simLireDate(r.date)?r.date:null
  }));
 }
@@ -58,4 +65,4 @@ function classementEstime(resultats,jour){
 }
 // Cuts en nombres : classement à partir duquel la catégorie est FERMÉE au joueur (mêmes valeurs que CUTS)
 const CUTS_NUM={P25:{messieurs:30000,dames:3000},P50:{messieurs:10000,dames:1000},P100:{messieurs:5000,dames:500},P250:{messieurs:1000,dames:100}};
-window.PA_BAREME={BAREME,TRANCHES,CUTS,CUTS_NUM,PLACE_LABEL,trancheIdx,ptsFor,simIso,simLireDate,simExpire,simNormaliser,classementEstime,SIM_KEY};
+window.PA_BAREME={BAREME,TRANCHES,CUTS,CUTS_NUM,PLACE_LABEL,trancheIdx,ptsFor,simIso,simLireDate,simExpire,simNormaliser,simNouvelleCle,SIM_CLE_VALIDE,classementEstime,SIM_KEY};

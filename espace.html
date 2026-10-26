@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mon espace joueur : objectifs, résultats et progression</title>
+<meta name="description" content="Ton espace joueur de padel : classement estimé, objectifs, résultats de tournois, progression et derniers matchs. Gardé sur ton appareil, et dans ton compte si tu es connecté.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://apprendre-padel.fr/espace.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padel Academy · apprendre-padel.fr">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://apprendre-padel.fr/espace.html">
+<meta property="og:title" content="Mon espace joueur : objectifs, résultats et progression">
+<meta property="og:description" content="Ton espace joueur de padel : classement estimé, objectifs, résultats de tournois, progression et derniers matchs. Gardé sur ton appareil, et dans ton compte si tu es connecté.">
+<meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Mon espace joueur", "item": "https://apprendre-padel.fr/espace.html"}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js" defer></script>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="espace.html" class="active">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<div class="banner"><img src="assets/img/photos/compte.webp" width="1600" height="650" alt="Raquette de padel et balle sur un terrain indoor" fetchpriority="high"></div>
+<section id="espace">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Mon espace · Joueur</p><h1>Mon espace joueur</h1></div>
+      <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. Tout marche sans compte ; connecté, tu retrouves tout sur tes autres appareils.</p>
+    </div>
+    <div id="esp-statut" class="esp-statut"></div>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <div class="acc-card mp" id="mon-padel">
+      <h2 class="mp-titre">Mon padel</h2>
+      <div class="mp-grille">
+        <div class="mp-bloc">
+          <h3>Classement estimé</h3>
+          <div id="mp-points"></div>
+          <div class="btns"><a class="btn ghost" href="bareme.html#b-form">Saisir mes résultats</a></div>
+        </div>
+        <div class="mp-bloc">
+          <h3>Mon rang et le prochain cut</h3>
+          <form class="mp-form-rang" id="mp-form-rang" novalidate>
+            <div><label for="mp-rang">Mon classement FFT</label><input type="number" id="mp-rang" name="mp-rang" min="1" max="500000" step="1" inputmode="numeric" placeholder="Ex. 4512"></div>
+            <fieldset><legend>Classement</legend>
+              <div class="tchips">
+                <label class="tchip"><input type="radio" name="mp-sexe" value="messieurs" checked><span>Messieurs</span></label>
+                <label class="tchip"><input type="radio" name="mp-sexe" value="dames"><span>Dames</span></label>
+              </div>
+            </fieldset>
+            <button type="submit" class="btn primary">Calculer</button>
+          </form>
+          <p class="acc-msg acc-err" id="mp-rang-msg" role="status" hidden></p>
+          <div id="mp-palier"></div>
+        </div>
+        <div class="mp-bloc">
+          <h3>Mes derniers matchs</h3>
+          <div id="mp-matchs"></div>
+          <div class="btns"><a class="btn ghost" href="score.html">Compter un match</a></div>
+        </div>
+        <div class="mp-bloc">
+          <h3>Mes prochains tournois</h3>
+          <div id="mp-favoris"></div>
+          <div class="btns"><a class="btn ghost" href="tournois.html">Voir les tournois</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="acc-card esp-carte" id="esp-bloc-objectifs">
+      <h2 class="esp-titre">Mes objectifs</h2>
+      <div id="esp-objectifs"></div>
+      <form class="esp-form" id="esp-form-objectif" novalidate>
+        <h3>Nouvel objectif</h3>
+        <div class="esp-ligne">
+          <div><label for="esp-type">Objectif</label><select id="esp-type" name="esp-type"><option value="points">Atteindre un total de points</option><option value="rang">Entrer dans le top</option><option value="victoires">Gagner des matchs</option><option value="tournois">Jouer des tournois</option></select></div>
+          <div><label for="esp-cible">Cible <span id="esp-unite"></span></label><input type="number" id="esp-cible" name="esp-cible" min="1" max="500000" step="1" inputmode="numeric" required></div>
+          <div><label for="esp-echeance">Échéance (facultatif)</label><input type="date" id="esp-echeance" name="esp-echeance"></div>
+        </div>
+        <p class="note" id="esp-aide-objectif"></p>
+        <button type="submit" class="btn primary">Ajouter l'objectif</button>
+      </form>
+    </div>
+    <div class="acc-card esp-carte" id="esp-bloc-resultats">
+      <h2 class="esp-titre">Mes résultats de tournois</h2>
+      <p class="esp-total"><b id="esp-total">0</b> points au classement estimé (12 meilleurs résultats sur 12 mois). <a href="bareme.html#b-form">Voir le barème</a></p>
+      <form class="esp-form" id="esp-form-resultat" novalidate>
+        <h3>Ajouter un résultat</h3>
+        <div class="esp-ligne">
+          <div><label for="esp-cat">Catégorie</label><select id="esp-cat" name="esp-cat"><option>P25</option><option>P50</option><option selected>P100</option><option>P250</option><option>P500</option><option>P1000</option><option>P2000</option><option>P3000</option></select></div>
+          <div><label for="esp-place">Place finale</label><input type="number" id="esp-place" name="esp-place" min="1" max="32" step="1" value="5" inputmode="numeric" required></div>
+          <div id="esp-champ-nb"><label for="esp-nb">Paires inscrites</label><input type="number" id="esp-nb" name="esp-nb" min="4" max="40" step="1" value="16" inputmode="numeric"></div>
+          <div><label for="esp-date">Date du tournoi</label><input type="date" id="esp-date" name="esp-date" required></div>
+        </div>
+        <fieldset id="esp-champ-sexe" hidden><legend>Tableau</legend><div class="tchips"><label class="tchip"><input type="radio" name="esp-sexe" value="messieurs" checked><span>Messieurs</span></label><label class="tchip"><input type="radio" name="esp-sexe" value="dames"><span>Dames</span></label></div></fieldset>
+        <button type="submit" class="btn primary">Ajouter le résultat</button>
+      </form>
+      <div id="esp-resultats"></div>
+      <p class="note">Même liste que le simulateur de la page Barème : un résultat ajouté ici y apparaît aussi.</p>
+    </div>
+    <div class="acc-card esp-carte" id="esp-bloc-progression">
+      <h2 class="esp-titre">Ma progression</h2>
+      <p class="acc-muted">Ton classement estimé à la fin de chaque mois, sur les 12 derniers mois.</p>
+      <div class="esp-graphe"><div id="esp-progression"></div><p class="esp-bulle" id="esp-bulle" role="status" hidden></p></div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/compte.js"></script>
+<script src="assets/js/bareme-donnees.js"></script>
+<script src="assets/js/score.js"></script>
+<script src="assets/js/favoris.js"></script>
+<script src="assets/js/joueur-sync.js"></script>
+<script src="assets/js/mon-padel.js"></script>
+<script src="assets/js/espace.js"></script>
+<script src="assets/js/nav.js"></script>
+<script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

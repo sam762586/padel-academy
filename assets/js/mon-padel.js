@@ -82,6 +82,7 @@ const MP_NB_MATCHS=5;
   try{localStorage.setItem(MP_CLE_RANG,JSON.stringify({rang,sexe,maj:new Date().toISOString()}));msg.hidden=true;}
   catch(err){msg.hidden=false;msg.textContent="Le stockage de cet appareil est indisponible : le rang ne sera pas gardé.";}
   rendreRang();
+  if(window.PA_JOUEUR)window.PA_JOUEUR.synchroniser();
  });
 
  /* ---------- 3. Derniers matchs du compteur et tendance ---------- */
@@ -176,6 +177,8 @@ const MP_NB_MATCHS=5;
 
  rendreClassement();rendreRang();rendreMatchs();rendreFavoris();
  if(window.PA_FAVORIS)window.PA_FAVORIS.onChange(()=>rendreFavoris());
+ // Espace joueur : résultats et rang synchronisés avec le compte (joueur-sync.js)
+ if(window.PA_JOUEUR)window.PA_JOUEUR.onChange(()=>{rendreClassement();rendreRang();});
  chargerMatchsCompte();
  if(window.PA_COMPTE&&window.PA_COMPTE.actif)window.PA_COMPTE.onChange(chargerMatchsCompte);
  // Retour sur l'onglet (après avoir saisi un résultat ou compté un match ailleurs) : on rafraîchit

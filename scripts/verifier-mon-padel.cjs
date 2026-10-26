@@ -1,4 +1,4 @@
-/* Vérification du tableau de bord « Mon padel » (compte.html) : calcul du classement estimé + page dans Edge à 390 px.
+/* Vérification du tableau de bord « Mon padel » (espace.html, anciennement compte.html) : calcul du classement estimé + page dans Edge à 390 px.
    Supabase n'est jamais contacté : le script du CDN est remplacé par un faux client.
    Lancer depuis la racine du site : node scripts/verifier-mon-padel.cjs */
 const assert=require('node:assert/strict');
@@ -80,7 +80,7 @@ function fauxSdk(matchCommun){
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));
   page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
-  await page.goto(base+'/compte.html');
+  await page.goto(base+'/espace.html');
   assert.match(await page.textContent('#mp-points'),/Aucun résultat saisi/);
   assert.match(await page.textContent('#mp-matchs'),/Aucun match/);
   assert.match(await page.textContent('#mp-favoris'),/Aucun tournoi/);
@@ -127,7 +127,7 @@ function fauxSdk(matchCommun){
   await ctx2.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page2=await ctx2.newPage();
   page2.on('pageerror',e=>erreurs.push(e.message));
-  await page2.goto(base+'/compte.html');
+  await page2.goto(base+'/espace.html');
   await page2.evaluate(h=>localStorage.setItem('pa-score-historique',JSON.stringify(h.slice(0,1))),historique);
   await page2.reload();
   await page2.waitForFunction(()=>document.querySelectorAll('#mp-matchs li').length===2);

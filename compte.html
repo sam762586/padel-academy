@@ -31,7 +31,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html" class="active">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="espace.html">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
 <div class="banner"><img src="assets/img/photos/compte.webp" width="1600" height="650" alt="Raquette de padel et balle sur un terrain indoor" fetchpriority="high"></div>
@@ -41,40 +41,10 @@
       <div><p class="eyebrow">Mon espace · Facultatif</p><h1>Mon compte</h1></div>
       <p>Ton tableau de bord « Mon padel » marche sans compte, avec ce qui est gardé sur cet appareil. Un compte te permet en plus de garder ton profil, tes résultats du quiz, ta progression et tes matchs d'un appareil à l'autre.</p>
     </div>
-    <div class="acc-card mp" id="mon-padel">
-      <h2 class="mp-titre">Mon padel</h2>
-      <div class="mp-grille">
-        <div class="mp-bloc">
-          <h3>Classement estimé</h3>
-          <div id="mp-points"></div>
-          <div class="btns"><a class="btn ghost" href="bareme.html#b-form">Saisir mes résultats</a></div>
-        </div>
-        <div class="mp-bloc">
-          <h3>Mon rang et le prochain cut</h3>
-          <form class="mp-form-rang" id="mp-form-rang" novalidate>
-            <div><label for="mp-rang">Mon classement FFT</label><input type="number" id="mp-rang" name="mp-rang" min="1" max="500000" step="1" inputmode="numeric" placeholder="Ex. 4512"></div>
-            <fieldset><legend>Classement</legend>
-              <div class="tchips">
-                <label class="tchip"><input type="radio" name="mp-sexe" value="messieurs" checked><span>Messieurs</span></label>
-                <label class="tchip"><input type="radio" name="mp-sexe" value="dames"><span>Dames</span></label>
-              </div>
-            </fieldset>
-            <button type="submit" class="btn primary">Calculer</button>
-          </form>
-          <p class="acc-msg acc-err" id="mp-rang-msg" role="status" hidden></p>
-          <div id="mp-palier"></div>
-        </div>
-        <div class="mp-bloc">
-          <h3>Mes derniers matchs</h3>
-          <div id="mp-matchs"></div>
-          <div class="btns"><a class="btn ghost" href="score.html">Compter un match</a></div>
-        </div>
-        <div class="mp-bloc">
-          <h3>Mes prochains tournois</h3>
-          <div id="mp-favoris"></div>
-          <div class="btns"><a class="btn ghost" href="tournois.html">Voir les tournois</a></div>
-        </div>
-      </div>
+    <div class="acc-card esp-lien-carte">
+      <h2 class="mp-titre">Mon espace joueur</h2>
+      <p>Classement estimé, objectifs, résultats de tournois, progression et derniers matchs : tout est dans ton espace joueur.</p>
+      <div class="btns"><a class="btn primary" href="espace.html">Ouvrir mon espace</a></div>
     </div>
     <p class="acc-msg" id="compte-msg" role="status">Chargement…</p>
     <div class="acc-card" id="compte-connexion" hidden>
@@ -155,9 +125,8 @@
 <script src="assets/js/partenaires.js"></script>
 <script src="assets/js/compte-page.js"></script>
 <script src="assets/js/bareme-donnees.js"></script>
-<script src="assets/js/score.js"></script>
 <script src="assets/js/favoris.js"></script>
-<script src="assets/js/mon-padel.js"></script>
+<script src="assets/js/joueur-sync.js"></script>
 <script src="assets/js/communaute-tournoi.js"></script>
 <script src="assets/js/nav.js"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

@@ -139,7 +139,7 @@ const CONFIG_ACTIVE=fs.readFileSync(path.join(__dirname,'..','assets/js/supabase
   ok('retrait depuis « Mes tournois » ; favori inconnu signalé, identifiant invalide ignoré');
   // Le tableau de bord du compte affiche le favori à venir
   await page.evaluate(i=>localStorage.setItem('pa-tournois-favoris',JSON.stringify([i])),id);
-  await page.goto(base+'/compte.html');
+  await page.goto(base+'/espace.html');
   await page.waitForFunction(()=>document.querySelectorAll('#mp-favoris li').length===1);
   assert.ok((await page.textContent('#mp-favoris')).includes(t.ville));
   ok('tableau de bord « Mon padel » : prochain tournoi favori affiché');

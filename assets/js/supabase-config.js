@@ -9,5 +9,6 @@ window.PA_SUPABASE = { url: "https://bvhfizdfgccrkhdfqzkf.supabase.co", anonKey:
 // Fonctions dont le SQL a été exécuté dans Supabase (voir supabase/LISEZMOI.md). Tant qu'un nom manque ici,
 // le site n'appelle pas les tables correspondantes (pas d'erreur 404 dans la console des visiteurs).
 //   "favoris"     : migrations 2026-10-26-favoris-01 à 03 (étoiles des tournois synchronisées avec le compte)
+//   "espace"      : migrations 2026-10-26-espace-01 à 06 (résultats, objectifs et rang synchronisés avec le compte)
 //   "communaute"  : migrations 2026-10-26-t4-*.sql (« J'y vais », annonces et avis sur les fiches tournois)
 window.PA_SUPABASE.activees = [];

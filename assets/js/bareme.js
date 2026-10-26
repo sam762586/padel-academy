@@ -78,7 +78,7 @@ function simRender(){
  document.getElementById("sim-count").textContent=`${kept.length} résultat${kept.length>1?'s':''} retenu${kept.length>1?'s':''} sur ${rows.length}`;
 }
 document.getElementById("sim-add").addEventListener("click",()=>{
- const resultat={cat:document.getElementById("b-cat").value,place:+document.getElementById("b-place").value,nb:+document.getElementById("b-nb").value,sexe:document.querySelector('input[name="b-sexe"]:checked').value,date:simDate.value};
+ const resultat={cle:simNouvelleCle(),cat:document.getElementById("b-cat").value,place:+document.getElementById("b-place").value,nb:+document.getElementById("b-nb").value,sexe:document.querySelector('input[name="b-sexe"]:checked').value,date:simDate.value};
  if(!simLireDate(resultat.date)||resultat.date>simIso(new Date())){simInfo("Choisis une date de tournoi valide, aujourd'hui ou dans le passé.");simDate.focus();return;}
  if(ptsFor(resultat.cat,resultat.place,resultat.nb,resultat.sexe)===null){simInfo("Cette place n'existe pas pour le tableau choisi.");return;}
  simInfo("");sim.push(resultat);simSauver();simRender();
