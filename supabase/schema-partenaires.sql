@@ -95,7 +95,7 @@ create table if not exists public.annonces (
   tournoi_categorie text check (tournoi_categorie is null or char_length(tournoi_categorie) <= 20),
   pseudo            text not null check (char_length(pseudo) between 1 and 30),
   niveau_declare    smallint check (niveau_declare between 1 and 4),
-  classement_p      text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P1500','P2000')),
+  classement_p      text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P2000','P3000')),
   cote              text not null default 'indifferent' check (cote in ('droite','gauche','indifferent')),
   sexe              text not null check (sexe in ('messieurs','dames','mixte')),
   message           text not null default '' check (char_length(message) <= 500),

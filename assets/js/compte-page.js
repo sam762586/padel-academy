@@ -3,7 +3,8 @@
 const NIVEAUX_QUIZ=[ // mêmes libellés exacts que dans quiz-niveau.js (palier 1 à 4)
  "Débutant · P25","Loisir · P100","Intermédiaire · P250","Avancé · P500 et +"
 ];
-const CLASSEMENTS_P=["P25","P50","P100","P250","P500","P1000","P1500","P2000"];
+// Catégories 2026/2027 : le P1500 est devenu P2000, l'ancien P2000 est devenu P3000
+const CLASSEMENTS_P=["P25","P50","P100","P250","P500","P1000","P2000","P3000"];
 const NB_SEMAINES_PLAN=8;
 
 (function(){

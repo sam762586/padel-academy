@@ -8,7 +8,7 @@ create table if not exists public.profiles (
   id             uuid primary key references auth.users(id) on delete cascade,
   pseudo         text check (pseudo is null or char_length(pseudo) <= 30),
   niveau_declare smallint check (niveau_declare between 1 and 4),
-  classement_p   text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P1500','P2000')),
+  classement_p   text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P2000','P3000')),
   cote           text check (cote in ('droite','gauche')),
   main           text check (main in ('droite','gauche')),
   club           text check (club is null or char_length(club) <= 80),

@@ -5,7 +5,7 @@ create table if not exists public.presences (
   user_id      uuid not null references auth.users(id) on delete cascade,
   tournoi_id   text not null check (tournoi_id ~ '^[0-9A-Za-z_-]{1,20}$'),
   pseudo       text not null check (char_length(pseudo) between 1 and 30),
-  classement_p text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P1500','P2000')),
+  classement_p text check (classement_p in ('P25','P50','P100','P250','P500','P1000','P2000','P3000')),
   created_at   timestamptz not null default now(),
   primary key (user_id, tournoi_id)
 );

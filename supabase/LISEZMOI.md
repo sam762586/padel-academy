@@ -41,7 +41,7 @@ Notes :
 
 # Validation des résultats du quiz
 
-Après le schéma initial, appliquer `supabase/migrations/20261026_validation_quiz.sql` dans le SQL Editor. Cette migration contrôle le score (0 à 30), sa cohérence avec le niveau et les réponses fournies. Elle ne supprime ni ne réécrit les résultats existants. La contrainte `NOT VALID` contrôle les nouvelles écritures ; les anciennes lignes sont à examiner avant validation globale. Cette migration doit aussi être appliquée sur une nouvelle base.
+Après le schéma initial, appliquer `supabase/migrations/2026-10-26-quiz-01-fonction-quiz-resultat-valide.sql` puis `2026-10-26-quiz-02-contrainte-quiz-resultat-coherent.sql` dans le SQL Editor. Cette migration contrôle le score (0 à 30), sa cohérence avec le niveau et les réponses fournies. Elle ne supprime ni ne réécrit les résultats existants. La contrainte `NOT VALID` contrôle les nouvelles écritures ; les anciennes lignes sont à examiner avant validation globale. Cette migration doit aussi être appliquée sur une nouvelle base.
 
 # Sauvegarde des matchs du compteur (score.html)
 
@@ -49,7 +49,7 @@ Le compteur fonctionne sans compte : les matchs restent sur l'appareil. Pour que
 
 # Favoris tournois (tournois.html)
 
-Les favoris ★ fonctionnent sans compte (gardés sur l'appareil). Pour qu'un joueur connecté les retrouve sur tous ses appareils, applique `supabase/migrations/20261026_favoris.sql` dans le SQL Editor (après `schema.sql`, relançable sans risque) : table `favoris` (clé : joueur + identifiant Ten'Up), RLS, 500 favoris maximum par joueur. Tant que ce n'est pas fait, la page Tournois affiche que les favoris ne sont pas synchronisés et les garde sur l'appareil. Suppression de compte : cascade, rien à changer.
+Les favoris ★ fonctionnent sans compte (gardés sur l'appareil). Pour qu'un joueur connecté les retrouve sur tous ses appareils, applique `supabase/migrations/2026-10-26-favoris-01-table.sql`, puis `-02-fonction-favoris-limite.sql` et `-03-trigger.sql` dans le SQL Editor (après `schema.sql`, relançable sans risque) : table `favoris` (clé : joueur + identifiant Ten'Up), RLS, 500 favoris maximum par joueur. Tant que ce n'est pas fait, la page Tournois affiche que les favoris ne sont pas synchronisés et les garde sur l'appareil. Suppression de compte : cascade, rien à changer.
 
 # Activer une fonction après avoir exécuté son SQL
 
@@ -59,7 +59,7 @@ Le site n'appelle une table que si son nom figure dans `window.PA_SUPABASE.activ
 window.PA_SUPABASE.activees = ["favoris", "communaute"];
 ```
 
-- `"favoris"` : `supabase/migrations/20261026_favoris.sql` (étoiles des tournois synchronisées avec le compte).
+- `"favoris"` : `supabase/migrations/2026-10-26-favoris-01-table.sql`, puis `-02-fonction-favoris-limite.sql` et `-03-trigger.sql` (étoiles des tournois synchronisées avec le compte).
 - `"communaute"` : les 12 fichiers `supabase/migrations/2026-10-26-t4-01-…` à `t4-12-…`, **dans l'ordre des numéros** (« J'y vais », annonces et avis sur les fiches tournois, modération des avis dans Mon compte).
 
 # Communauté sur les fiches tournois (T4)
@@ -71,3 +71,14 @@ Exécute les fichiers `2026-10-26-t4-01` à `t4-12` un par un dans le SQL Editor
 - `annonces` (existante) : le nombre d'annonces d'un tournoi est visible par tous via `nb_annonces_tournoi()`, le contenu reste réservé aux connectés.
 - `avis` : 3 questions + texte de 300 caractères maximum, filtré (`avis_texte_correct()` : pas de contact, pas d'insulte). Un avis par joueur et par tournoi, possible dès le premier jour du tournoi, visible par tous après la fin. 3 signalements de joueurs différents masquent l'avis (`signaler_avis()`) ; l'admin voit les avis signalés dans Mon compte et peut les masquer, les rétablir ou les supprimer (`admin_moderer_avis()`).
 - Suppression de compte : tout part en cascade.
+
+# Catégories P de la saison 2026/2027
+
+Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est devenu P3000. Exécute `2026-10-26-classements-01-profiles.sql` puis `2026-10-26-classements-02-annonces.sql` : les valeurs déjà saisies sont converties et la liste autorisée devient P25, P50, P100, P250, P500, P1000, P2000, P3000 (celle du formulaire de profil).
+
+# Ordre conseillé pour tout le SQL en attente (format `$fn$`, un objet par fichier)
+
+1. `2026-10-26-classements-01` et `-02` ;
+2. `2026-10-26-quiz-01` et `-02` ;
+3. `2026-10-26-favoris-01` à `-03`, puis ajoute `"favoris"` à `PA_SUPABASE.activees` ;
+4. `2026-10-26-t4-01` à `-12`, puis ajoute `"communaute"` à `PA_SUPABASE.activees`.
