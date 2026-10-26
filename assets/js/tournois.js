@@ -1,16 +1,24 @@
-/* TOURNOIS : liste filtrable alimentée par assets/data/tournois.js (window.TOURNOIS_DATA).
+/* TOURNOIS : liste filtrable alimentée par assets/data/tournois.json (généré par scripts/scrape-tenup.js).
+   En file:// (fetch impossible), repli sur la copie assets/data/tournois.js (window.TOURNOIS_DATA).
    Aucune donnée n'est insérée avec innerHTML : tout passe par textContent. */
 (function(){
  const racine=document.getElementById("tournois-app");
  if(!racine) return; // page sans bloc tournois : on ne fait rien
- const donnees=window.TOURNOIS_DATA;
  const messageVide=document.getElementById("tournois-vide");
- const contenu=document.getElementById("tournois-contenu");
- if(!donnees||!Array.isArray(donnees.tournois)){
-  // Données absentes (fichier pas encore généré) : message clair, rien d'autre
-  if(messageVide) messageVide.hidden=false;
-  return;
+ const vide=()=>{if(messageVide) messageVide.hidden=false;};
+ function repliScript(){
+  const s=document.createElement("script");s.src="assets/data/tournois.js";
+  s.onload=()=>window.TOURNOIS_DATA?demarrer(window.TOURNOIS_DATA):vide();
+  s.onerror=vide;document.body.appendChild(s);
  }
+ if(/^https?:$/.test(location.protocol)){
+  fetch("assets/data/tournois.json",{cache:"no-cache"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();})
+   .then(demarrer).catch(repliScript);
+ } else repliScript();
+
+function demarrer(donnees){
+ const contenu=document.getElementById("tournois-contenu");
+ if(!donnees||!Array.isArray(donnees.tournois)){ vide(); return; }
  if(messageVide) messageVide.hidden=true;
  contenu.hidden=false;
 
@@ -19,6 +27,9 @@
  const JOURS=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
  const SEXES=[["messieurs","Messieurs"],["dames","Dames"],["mixte","Mixte"]];
  const tournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
+ // Sexe : liste « sexes » (une entrée par épreuve), ou ancien champ « sexe »
+ const sexesDe=t=>Array.isArray(t.sexes)?t.sexes:(t.sexe?[t.sexe]:[]);
+ const epreuvesDe=t=>Array.isArray(t.epreuves)?t.epreuves:[];
 
  // ----- Outils de dates (ISO AAAA-MM-JJ, comparables comme du texte) -----
  const dateLocale=iso=>{const p=iso.split("-");return new Date(+p[0],+p[1]-1,+p[2]);};
@@ -79,6 +90,8 @@
  SEXES.forEach(s=>creerCase(zoneSexes,"sexe",s[0],s[1]));
  const optionToutes=document.createElement("option");optionToutes.value="";optionToutes.textContent="Toutes distances";
  selectDistance.appendChild(optionToutes);
+ // Filtre « inscriptions ouvertes » inutile si aucune date limite n'est connue (non publiée sans connexion)
+ if(!tournois.some(t=>t.limite_inscription)) caseOuvertes.closest("label").style.display="none";
  [20,40,60,80].forEach(n=>{const o=document.createElement("option");o.value=String(n);o.textContent="Jusqu'à "+n+" km";selectDistance.appendChild(o);});
 
  // ----- État des filtres, avec mémorisation (confort uniquement) -----
@@ -104,7 +117,7 @@
  // ----- Filtrage et rendu -----
  function correspond(t,etat){
   if(etat.categories.length&&!etat.categories.includes(t.categorie)) return false;
-  if(etat.sexes.length&&!etat.sexes.includes(t.sexe)) return false;
+  if(etat.sexes.length&&!sexesDe(t).some(s=>etat.sexes.includes(s))) return false;
   if(etat.distance&&t.distance_km!=null&&t.distance_km>+etat.distance) return false;
   const fin=t.date_fin||t.date_debut;
   if(etat.du&&fin<etat.du) return false;
@@ -127,9 +140,17 @@
   if(lieu) ajouterTexte(carte,"p","tlieu",lieu);
   const infos=document.createElement("ul");infos.className="tinfos";
   ajouterTexte(infos,"li","",formaterPeriode(t.date_debut,t.date_fin));
-  if(t.sexe) ajouterTexte(infos,"li","",t.sexe.charAt(0).toUpperCase()+t.sexe.slice(1));
-  if(t.distance_km!=null) ajouterTexte(infos,"li","","à "+t.distance_km+" km");
+  const sx=sexesDe(t);
+  if(sx.length){const txt=sx.join(" / ");ajouterTexte(infos,"li","",txt.charAt(0).toUpperCase()+txt.slice(1));}
+  if(t.distance_km!=null) ajouterTexte(infos,"li","","à "+String(t.distance_km).replace(".",",")+" km");
+  const tarifs=epreuvesDe(t).map(e=>e.tarif).filter(v=>typeof v==="number");
+  if(tarifs.length) ajouterTexte(infos,"li","",Math.min(...tarifs).toLocaleString("fr-FR",{minimumFractionDigits:0,maximumFractionDigits:2})+" € par joueur"+(tarifs.length>1&&Math.max(...tarifs)!==Math.min(...tarifs)?" (dès)":""));
+  const tableaux=epreuvesDe(t).map(e=>e.tableau).filter(Boolean);
+  if(tableaux.length) ajouterTexte(infos,"li","",Math.max(...tableaux)+" places");
   carte.appendChild(infos);
+  const cuts=[...new Set(epreuvesDe(t).map(e=>e.cut).filter(Boolean))];
+  if(cuts.length) ajouterTexte(carte,"p","tlimite",cuts.join(" · "));
+  if(t.commentaire) ajouterTexte(carte,"p","tlieu",t.commentaire.length>180?t.commentaire.slice(0,177)+"…":t.commentaire);
   if(t.limite_inscription){
    const reste=ecartJours(t.limite_inscription);
    if(reste<0) ajouterTexte(carte,"p","tlimite clos","Clôturé (inscriptions jusqu'au "+formaterJour(t.limite_inscription)+")");
@@ -162,4 +183,5 @@
   afficher();
  });
  afficher();
+}
 })();

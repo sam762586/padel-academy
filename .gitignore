@@ -5,3 +5,4 @@ Thumbs.db
 scripts/.env
 scripts/node_modules/
 scripts/debug/
+scripts/import/

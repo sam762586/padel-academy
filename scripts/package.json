@@ -4,7 +4,7 @@
   "description": "Outils hors site (non chargés par les pages). Le site reste sans dépendance npm.",
   "scripts": {
     "tournois": "node scrape-tenup.js",
-    "tournois:debug": "node scrape-tenup.js --headed --debug"
+    "tournois:debug": "node scrape-tenup.js --debug"
   },
   "devDependencies": {
     "playwright": "1.47.2"
