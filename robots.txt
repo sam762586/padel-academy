@@ -1,0 +1,9 @@
+# Padel Academy : apprendre-padel.fr
+User-agent: *
+Allow: /
+# Outils et configuration, sans intérêt pour les moteurs
+Disallow: /scripts/
+Disallow: /supabase/
+Disallow: /agents-a-installer/
+
+Sitemap: https://apprendre-padel.fr/sitemap.xml
