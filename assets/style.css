@@ -329,3 +329,29 @@ a.card.link:hover h4{color:var(--turf)}
 .tlimite.proche{color:var(--sand);font-weight:700}
 .tlimite.clos{color:var(--coral);font-weight:700}
 .tlien{margin-top:auto;padding-top:6px;color:var(--turf);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+
+/* ===== NAV MOBILE (hamburger) ===== */
+.nav-toggle{display:none;margin-left:auto;width:44px;height:44px;border:1px solid var(--line-2);border-radius:12px;background:var(--glass);cursor:pointer;padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.nav-toggle span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:transform .2s,opacity .2s}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+.nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media (max-width:860px){
+  .nav .wrap{flex-wrap:nowrap;min-height:60px}
+  .nav-toggle{display:flex}
+  .nav ul{display:none;position:absolute;left:0;right:0;top:100%;max-height:calc(100vh - 60px - env(safe-area-inset-top,0px));margin:0;padding:12px max(16px,env(safe-area-inset-left,0px)) 24px max(16px,env(safe-area-inset-right,0px));background:rgba(7,11,20,.97);border-bottom:1px solid var(--line);grid-template-columns:1fr 1fr;gap:4px 8px;overflow-y:auto;z-index:20;width:auto;box-shadow:0 30px 60px rgba(0,0,0,.6)}
+  .nav ul.open{display:grid}
+  .nav li:has(a.cta){grid-column:1 / -1}
+  .nav li a{font-size:1.05rem;padding:13px 14px;border-radius:12px;color:#fff}
+  .nav li a.active{background:var(--glass-2)}
+  .nav li a.cta{margin-top:10px;text-align:center}
+  body.nav-open{overflow:hidden}
+  /* page barème : plus de débordement */
+  .sel-grid>*{min-width:0}
+  form.quiz{min-width:0;max-width:100%;position:static}
+  .range output{min-width:0;font-size:1.3rem}
+  .vtag{font-size:1.3rem}
+  .results-head h3{font-size:1.4rem}
+  .hero h1{font-size:clamp(2.6rem,13vw,3.6rem)}
+  section{padding-block:56px}
+}
