@@ -165,21 +165,29 @@
  };
 
  // Matchs du compteur (score.html) : match = { config, points, fin, interrompu, score, vainqueur }
+ // Journal de l'espace joueur (migrations 2026-10-26-journal-*) : identifiant, partenaire, type, saisie manuelle
+ const journalActif=()=>((window.PA_SUPABASE||{}).activees||[]).includes("journal");
  compte.saveMatch=async function(match){
   if(!compte.user) return nonConnecte();
   const moteur=window.PA_SCORE;
-  if(!match||!moteur||!moteur.configValide(match.config)||!moteur.pointsValides(match.points)||!match.points.length||
+  const manuel=!!match&&match.saisie==="manuelle";
+  if(!match||!moteur||!moteur.configValide(match.config)||!moteur.pointsValides(match.points)||(!match.points.length&&!(manuel&&journalActif()))||
      !(match.vainqueur===0||match.vainqueur===1||match.vainqueur===null)||typeof match.score!=="string"||match.score.length>60||
      Number.isNaN(Date.parse(match.fin))){
    return {ok:false,message:"Ce match est invalide et n'a pas été enregistré."};
   }
   const c=match.config;
+  const ligne={user_id:compte.user.id,joue_le:match.fin,nom_a:c.nomA,nom_b:c.nomB,
+   format:{egalite:c.egalite,dernierSet:c.dernierSet,serveur:c.serveur},
+   points:match.points,score:match.score,vainqueur:match.vainqueur,interrompu:!!match.interrompu};
   try{
-   const {error}=await client.from("matchs").insert({
-    user_id:compte.user.id,joue_le:match.fin,nom_a:c.nomA,nom_b:c.nomB,
-    format:{egalite:c.egalite,dernierSet:c.dernierSet,serveur:c.serveur},
-    points:match.points,score:match.score,vainqueur:match.vainqueur,interrompu:!!match.interrompu
-   });
+   let requete;
+   if(journalActif()&&typeof match.cle==="string"&&/^[0-9A-Za-z-]{8,40}$/.test(match.cle)){
+    Object.assign(ligne,{cle:match.cle,partenaire:match.partenaire||null,type_match:match.type||null,saisie:manuel?"manuelle":"compteur"});
+    // Déjà dans le compte (même identifiant) : rien à faire
+    requete=client.from("matchs").upsert(ligne,{onConflict:"user_id,cle",ignoreDuplicates:true});
+   }else requete=client.from("matchs").insert(ligne);
+   const {error}=await requete;
    if(error){
     // Table absente : la migration n'a pas encore été appliquée dans Supabase
     if(error.code==="42P01"||error.code==="PGRST205") return {ok:false,message:"La sauvegarde des matchs n'est pas encore activée. Le match reste enregistré sur cet appareil."};
@@ -191,8 +199,9 @@
  compte.loadMatches=async function(limite=20){
   if(!compte.user) return nonConnecte();
   try{
-   const {data,error}=await client.from("matchs").select("id,joue_le,nom_a,nom_b,format,points,score,vainqueur,interrompu")
-    .eq("user_id",compte.user.id).order("joue_le",{ascending:false}).limit(Math.min(Math.max(1,limite|0),100));
+   const colonnes="id,joue_le,nom_a,nom_b,format,points,score,vainqueur,interrompu"+(journalActif()?",cle,partenaire,type_match,saisie":"");
+   const {data,error}=await client.from("matchs").select(colonnes)
+    .eq("user_id",compte.user.id).order("joue_le",{ascending:false}).limit(Math.min(Math.max(1,limite|0),500));
    if(error) return echec(error,"Impossible de charger tes matchs.");
    return {ok:true,matchs:data||[]};
   }catch(e){ return echec(e,"Impossible de charger tes matchs."); }
@@ -219,6 +228,16 @@
    if(error) return tableAbsente(error)?{ok:false,message:"La sauvegarde des favoris n'est pas encore activée."}:echec(error,"Impossible d'enregistrer ce favori.");
    return {ok:true};
   }catch(e){ return echec(e,"Impossible d'enregistrer ce favori."); }
+ };
+
+ compte.deleteMatch=async function(cle){
+  if(!compte.user) return nonConnecte();
+  if(typeof cle!=="string"||!/^[0-9A-Za-z-]{8,40}$/.test(cle)) return {ok:false,message:"Match invalide."};
+  try{
+   const {error}=await client.from("matchs").delete().eq("user_id",compte.user.id).eq("cle",cle);
+   if(error) return echec(error,"Impossible de supprimer ce match.");
+   return {ok:true};
+  }catch(e){ return echec(e,"Impossible de supprimer ce match."); }
  };
 
  // Suppression définitive (fonction SQL delete_my_account), puis fin de session locale

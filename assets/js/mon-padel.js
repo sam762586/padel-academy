@@ -88,11 +88,14 @@ const MP_NB_MATCHS=5;
  /* ---------- 3. Derniers matchs du compteur et tendance ---------- */
  let matchsServeur=[];
  function matchsFusionnes(){
+  // Espace joueur : le journal (journal.js) réunit déjà compteur, matchs saisis après coup et compte
+  if(window.PA_JOURNAL)return window.PA_JOURNAL.liste().map(m=>({fin:m.fin,nomA:m.partenaire?"Avec "+m.partenaire:"Nous",nomB:m.adversaires,score:m.score,vainqueur:m.vainqueur,interrompu:m.interrompu,
+   gagnes:m.pointsGagnes,total:m.pointsTotal}));
   const locaux=lireJSON(S.CLE_HISTORIQUE,[]);
   const liste=[];
   (Array.isArray(locaux)?locaux:[]).forEach(m=>{
    if(m&&S.configValide(m.config)&&S.pointsValides(m.points)&&!Number.isNaN(Date.parse(m.fin)))
-    liste.push({fin:m.fin,nomA:m.config.nomA,nomB:m.config.nomB,score:m.score||"",vainqueur:m.vainqueur,interrompu:!!m.interrompu,points:m.points});
+    liste.push({fin:m.fin,nomA:m.config.nomA,nomB:m.config.nomB,score:m.score||"",vainqueur:m.vainqueur,interrompu:!!m.interrompu,gagnes:m.points.filter(p=>p.g===0).length,total:m.points.length});
   });
   matchsServeur.forEach(m=>{
    if(!m||!S.pointsValides(m.points)||Number.isNaN(Date.parse(m.joue_le)))return;
@@ -100,12 +103,13 @@ const MP_NB_MATCHS=5;
    // (comparaison à la seconde : le format de date renvoyé par la base peut différer de celui de l'appareil)
    const seconde=d=>Math.floor(Date.parse(d)/1000);
    if(liste.some(x=>seconde(x.fin)===seconde(m.joue_le)&&x.score===m.score))return;
-   liste.push({fin:m.joue_le,nomA:m.nom_a,nomB:m.nom_b,score:m.score||"",vainqueur:m.vainqueur,interrompu:!!m.interrompu,points:m.points});
+   liste.push({fin:m.joue_le,nomA:m.nom_a,nomB:m.nom_b,score:m.score||"",vainqueur:m.vainqueur,interrompu:!!m.interrompu,gagnes:m.points.filter(p=>p&&p.g===0).length,total:m.points.length});
   });
   return liste.sort((a,b)=>Date.parse(b.fin)-Date.parse(a.fin));
  }
  // % de points gagnés par la paire 1 (toi)
- const pctPoints=m=>{const n=m.points.length;return n?Math.round(100*m.points.filter(p=>p.g===0).length/n):0;};
+ // null pour un match saisi après coup (pas de détail des points)
+ const pctPoints=m=>m.total?Math.round(100*m.gagnes/m.total):null;
  function rendreMatchs(){
   const zone=$("mp-matchs"),matchs=matchsFusionnes();zone.textContent="";
   if(!matchs.length){zone.append(el("p","acc-muted","Aucun match compté pour l'instant. Lance le compteur au prochain match : la paire 1, c'est toi."));return;}
@@ -114,9 +118,10 @@ const MP_NB_MATCHS=5;
   const resume=el("p","mp-tendance");
   resume.append(el("b","",`${victoires} victoire${victoires>1?"s":""} sur ${derniers.length}`)," dernier"+(derniers.length>1?"s":"")+" match"+(derniers.length>1?"s":""));
   // Tendance : % de points gagnés sur les 3 derniers matchs contre les 3 précédents
-  if(matchs.length>=4){
+  const comptes=matchs.filter(m=>pctPoints(m)!==null);
+  if(comptes.length>=4){
    const moyenne=l=>l.reduce((s,m)=>s+pctPoints(m),0)/l.length;
-   const recent=moyenne(matchs.slice(0,3)),avant=moyenne(matchs.slice(3,6)),ecart=Math.round(recent-avant);
+   const recent=moyenne(comptes.slice(0,3)),avant=moyenne(comptes.slice(3,6)),ecart=Math.round(recent-avant);
    const sens=ecart>=3?["hausse","↗ en progrès"]:ecart<=-3?["baisse","↘ en baisse"]:["stable","→ stable"];
    const t=el("span","mp-sens "+sens[0],sens[1]);
    t.title=`${Math.round(recent)} % de points gagnés sur les 3 derniers matchs, contre ${Math.round(avant)} % avant`;
@@ -132,14 +137,15 @@ const MP_NB_MATCHS=5;
    const texte=el("span","mp-match-texte");
    texte.append(el("span","mp-match-date",dateCourte(m.fin)),el("span","mp-match-noms",`${m.nomA} – ${m.nomB}`),el("span","mp-match-score",(m.score||"–")+(m.interrompu?" (arrêté)":"")));
    const pct=pctPoints(m);
-   const barre=el("span","mp-pct");barre.setAttribute("aria-label",`${pct} % des points gagnés`);
-   const rempli=el("span","mp-pct-rempli");rempli.style.width=pct+"%";barre.append(rempli);
-   li.append(badge,texte,barre,el("span","mp-pct-val",pct+" %"));
+   const barre=el("span","mp-pct");barre.setAttribute("aria-label",pct===null?"Points non comptés":`${pct} % des points gagnés`);
+   const rempli=el("span","mp-pct-rempli");rempli.style.width=(pct||0)+"%";barre.append(rempli);
+   li.append(badge,texte,barre,el("span","mp-pct-val",pct===null?"–":pct+" %"));
    liste.appendChild(li);
   });
   zone.appendChild(liste);
  }
  async function chargerMatchsCompte(){
+  if(window.PA_JOURNAL){rendreMatchs();return;} // le journal charge lui-même les matchs du compte
   const compte=window.PA_COMPTE;
   if(!compte||!compte.actif||typeof compte.loadMatches!=="function")return;
   await compte.ready;
@@ -179,6 +185,7 @@ const MP_NB_MATCHS=5;
  if(window.PA_FAVORIS)window.PA_FAVORIS.onChange(()=>rendreFavoris());
  // Espace joueur : résultats et rang synchronisés avec le compte (joueur-sync.js)
  if(window.PA_JOUEUR)window.PA_JOUEUR.onChange(()=>{rendreClassement();rendreRang();});
+ if(window.PA_JOURNAL)window.PA_JOURNAL.onChange(()=>rendreMatchs());
  chargerMatchsCompte();
  if(window.PA_COMPTE&&window.PA_COMPTE.actif)window.PA_COMPTE.onChange(chargerMatchsCompte);
  // Retour sur l'onglet (après avoir saisi un résultat ou compté un match ailleurs) : on rafraîchit

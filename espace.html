@@ -42,7 +42,7 @@
       <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. Tout marche sans compte ; connecté, tu retrouves tout sur tes autres appareils.</p>
     </div>
     <div id="esp-statut" class="esp-statut"></div>
-    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
     <div class="acc-card mp" id="mon-padel">
       <h2 class="mp-titre">Mon padel</h2>
       <div class="mp-grille">
@@ -92,6 +92,30 @@
         <button type="submit" class="btn primary">Ajouter l'objectif</button>
       </form>
     </div>
+    <div class="acc-card esp-carte" id="esp-bloc-matchs">
+      <h2 class="esp-titre">Mes matchs</h2>
+      <div class="tchips esp-periodes" role="radiogroup" aria-label="Période des statistiques">
+        <label class="tchip"><input type="radio" name="esp-periode" value="30"><span>30 jours</span></label>
+        <label class="tchip"><input type="radio" name="esp-periode" value="90" checked><span>3 mois</span></label>
+        <label class="tchip"><input type="radio" name="esp-periode" value="365"><span>12 mois</span></label>
+        <label class="tchip"><input type="radio" name="esp-periode" value="tout"><span>Tout</span></label>
+      </div>
+      <div id="esp-stats"></div>
+      <div id="esp-journal"></div>
+      <form class="esp-form" id="esp-form-match" novalidate>
+        <h3>Ajouter un match joué</h3>
+        <div class="esp-ligne">
+          <div><label for="esp-m-date">Date</label><input type="date" id="esp-m-date" name="esp-m-date" required></div>
+          <div><label for="esp-m-type">Type</label><select id="esp-m-type" name="esp-m-type"><option value="amical">Amical</option><option value="tournoi">Tournoi</option><option value="entrainement">Entraînement</option></select></div>
+          <div><label for="esp-m-partenaire">Partenaire (facultatif)</label><input type="text" id="esp-m-partenaire" name="esp-m-partenaire" maxlength="30" autocomplete="off"></div>
+          <div><label for="esp-m-adversaires">Adversaires (facultatif)</label><input type="text" id="esp-m-adversaires" name="esp-m-adversaires" maxlength="30" autocomplete="off"></div>
+          <div><label for="esp-m-score">Score (facultatif)</label><input type="text" id="esp-m-score" name="esp-m-score" maxlength="40" autocomplete="off" placeholder="Ex. 6-4 3-6 10-8" inputmode="text"></div>
+        </div>
+        <fieldset><legend>Résultat</legend><div class="tchips"><label class="tchip"><input type="radio" name="esp-m-resultat" value="0"><span>Victoire</span></label><label class="tchip"><input type="radio" name="esp-m-resultat" value="1"><span>Défaite</span></label></div></fieldset>
+        <button type="submit" class="btn primary">Ajouter le match</button>
+        <p class="note">Les matchs comptés avec le <a href="score.html">compteur</a> arrivent ici tout seuls. Pense à indiquer ton partenaire dans les réglages du compteur.</p>
+      </form>
+    </div>
     <div class="acc-card esp-carte" id="esp-bloc-resultats">
       <h2 class="esp-titre">Mes résultats de tournois</h2>
       <p class="esp-total"><b id="esp-total">0</b> points au classement estimé (12 meilleurs résultats sur 12 mois). <a href="bareme.html#b-form">Voir le barème</a></p>
@@ -130,6 +154,7 @@
 <script src="assets/js/score.js"></script>
 <script src="assets/js/favoris.js"></script>
 <script src="assets/js/joueur-sync.js"></script>
+<script src="assets/js/journal.js"></script>
 <script src="assets/js/mon-padel.js"></script>
 <script src="assets/js/espace.js"></script>
 <script src="assets/js/nav.js"></script>

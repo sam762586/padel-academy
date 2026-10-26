@@ -807,7 +807,7 @@ details.geste summary{color:var(--turf)}
 .esp-ligne>div{min-width:0}
 .esp-form label:not(.tchip),.esp-form legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
 .esp-form fieldset{border:0;margin:0;padding:0;min-width:0}
-.esp-form input[type=number],.esp-form input[type=date],.esp-form select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.esp-form input[type=text],.esp-form input[type=number],.esp-form input[type=date],.esp-form select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
 .esp-form input:focus-visible,.esp-form select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
 .esp-form .btn{min-height:48px;justify-self:start}
 .esp-form [hidden]{display:none}
@@ -838,3 +838,25 @@ details.geste summary{color:var(--turf)}
 .esp-donnees{margin-top:12px}
 .esp-donnees summary{cursor:pointer;color:var(--muted);min-height:40px;display:flex;align-items:center}
 .esp-lien-carte .btn{min-height:48px}
+.sc-noms+.sc-noms{margin-top:12px}
+
+/* Espace joueur : matchs */
+.esp-periodes{margin-bottom:14px}
+.esp-tuiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:10px;margin-bottom:12px}
+.esp-tuile{padding:12px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.esp-tuile b{display:block;font-family:var(--display);font-size:2rem;font-weight:900;line-height:1;color:var(--fg)}
+.esp-tuile span{color:var(--muted);font-size:.85rem}
+.esp-sous-titre{font-size:1.1rem;text-transform:uppercase;margin:18px 0 8px}
+.esp-types{color:var(--muted);margin:12px 0 0}
+.esp-types b{color:var(--fg)}
+.esp-journal{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.esp-journal li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2);font-size:.92rem}
+.esp-journal-texte{display:grid;min-width:0}
+.esp-journal-texte span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.esp-journal .x{min-width:40px;min-height:40px}
+.esp-journal .x,#esp-resultats .x{display:grid;place-items:center;background:transparent;border:1px solid var(--line-2);border-radius:10px;color:var(--muted);font-size:1rem;cursor:pointer}
+.esp-journal .x:hover,#esp-resultats .x:hover{border-color:var(--coral);color:var(--coral)}
+.esp-journal .x:focus-visible,#esp-resultats .x:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.esp-tbl-compact table{width:100%;min-width:0}
+.esp-tbl-compact th,.esp-tbl-compact td{padding:8px 10px;white-space:nowrap}
+.esp-tbl-compact td:first-child{white-space:normal}

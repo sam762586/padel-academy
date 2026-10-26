@@ -127,7 +127,12 @@ function scoreTexte(e){
  }
  return sets.join(" ");
 }
-window.PA_SCORE={MOTIFS:SC_MOTIFS,calculer,libellesPoints,situation,scoreTexte,configValide:scConfigValide,pointsValides:scPointsValides,CLE_HISTORIQUE:SC_CLE_HISTORIQUE};
+// Identifiant d'un match (journal de l'espace joueur : jamais copié deux fois dans le compte)
+function scNouvelleCle(){
+ try{if(typeof crypto!=="undefined"&&crypto.randomUUID)return crypto.randomUUID();}catch(e){}
+ return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,12);
+}
+window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoints,situation,scoreTexte,configValide:scConfigValide,pointsValides:scPointsValides,CLE_HISTORIQUE:SC_CLE_HISTORIQUE};
 
 /* ---------- Interface ---------- */
 (function(){
@@ -173,12 +178,16 @@ window.PA_SCORE={MOTIFS:SC_MOTIFS,calculer,libellesPoints,situation,scoreTexte,c
    serveur:f.elements["sc-serveur"].value==="1"?1:0,
    egalite:f.elements["sc-egalite"].value==="avantages"?"avantages":"decisif",
    dernierSet:f.elements["sc-dernier"].value==="set"?"set":"super",
+   // Journal de l'espace joueur : partenaire et type de match (facultatifs)
+   partenaire:f.elements["sc-partenaire"].value.trim().slice(0,30)||null,
+   type:["amical","tournoi","entrainement"].includes(f.elements["sc-type"].value)?f.elements["sc-type"].value:"amical",
   };
  }
  function remplirReglages(c){
   const f=formReglages;
   f.elements["sc-nom-a"].value=c.nomA;f.elements["sc-nom-b"].value=c.nomB;
   f.elements["sc-serveur"].value=String(c.serveur);f.elements["sc-egalite"].value=c.egalite;f.elements["sc-dernier"].value=c.dernierSet;
+  f.elements["sc-partenaire"].value=c.partenaire||"";f.elements["sc-type"].value=c.type||"amical";
  }
  // Noms affichés sur les choix « qui sert en premier » quand on tape les noms
  function majLibellesServeur(){
@@ -252,7 +261,8 @@ window.PA_SCORE={MOTIFS:SC_MOTIFS,calculer,libellesPoints,situation,scoreTexte,c
  /* --- Fin de match --- */
  function terminer(interrompu){
   const e=calculer(config,points);
-  const match={config,points:points.slice(),fin:new Date().toISOString(),interrompu:!!interrompu&&!e.fini,score:scoreTexte(e),vainqueur:e.fini?e.vainqueur:null};
+  const match={cle:scNouvelleCle(),config,points:points.slice(),fin:new Date().toISOString(),interrompu:!!interrompu&&!e.fini,score:scoreTexte(e),vainqueur:e.fini?e.vainqueur:null,
+   partenaire:config.partenaire||null,type:config.type||"amical",saisie:"compteur"};
   const historique=lireHistorique();
   historique.unshift(match);
   if(!ecrireJSON(SC_CLE_HISTORIQUE,historique.slice(0,SC_MAX_HISTORIQUE)))info("Le stockage de cet appareil est indisponible : ce match n'est pas gardé dans l'historique.",true);

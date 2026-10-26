@@ -83,9 +83,16 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 3. `2026-10-26-favoris-01` à `-03`, puis ajoute `"favoris"` à `PA_SUPABASE.activees` ;
 4. `2026-10-26-t4-01` à `-12`, puis ajoute `"communaute"` à `PA_SUPABASE.activees`.
 5. `2026-10-26-espace-01` à `-06`, puis ajoute `"espace"` à `PA_SUPABASE.activees`.
+6. `2026-10-26-journal-01` à `-03` (après `20261026_matchs.sql`, déjà exécuté), puis ajoute `"journal"` à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
 `2026-10-26-espace-01` à `-06` (après `classements-01`) : tables `resultats_tournois` (résultats du simulateur du barème) et `objectifs`, 300 lignes au maximum par joueur, et colonnes `rang_fft`, `rang_sexe`, `rang_maj` dans `profiles`. Chaque joueur ne voit que ses lignes (RLS). Ajoute ensuite `"espace"` à `PA_SUPABASE.activees`.
 
 Tant que ce n'est pas fait, l'espace joueur marche entièrement sur l'appareil. Une fois activé, `assets/js/joueur-sync.js` fusionne l'appareil et le compte à chaque visite de l'espace ou de Mon compte (fusion à trois voies : un ajout, une modification ou une suppression d'un côté est reporté de l'autre ; pour le rang, la saisie la plus récente gagne).
+
+# Journal de matchs (espace joueur)
+
+`2026-10-26-journal-01` à `-03` complètent la table `matchs` : identifiant `cle` (un match du téléphone n'est jamais copié deux fois ; les anciens matchs prennent leur `id`), `partenaire`, `type_match` (amical, tournoi, entraînement), `saisie` (compteur ou manuelle) ; la liste des points peut être vide pour un match saisi après coup. Ajoute ensuite `"journal"` à `PA_SUPABASE.activees`.
+
+Le compte sert d'archive : effacer l'historique du compteur sur un téléphone ne supprime rien dans le compte. Seule la suppression d'un match depuis le journal de l'espace joueur l'efface partout (mise en attente si le téléphone est hors connexion).

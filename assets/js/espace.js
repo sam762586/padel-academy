@@ -21,7 +21,6 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
  const aujourdhui=()=>B.simIso(new Date());
  function info(zone,texte,erreur){let p=zone.querySelector(":scope > .esp-msg");if(!p){p=el("p","acc-msg esp-msg");p.setAttribute("role","status");zone.appendChild(p);}p.textContent=texte||"";p.hidden=!texte;p.classList.toggle("acc-err",!!erreur);}
  const lireResultats=()=>B.simNormaliser(lire(B.SIM_KEY,[]));
- let matchsCompte=[];
 
  /* ---------- Statut de synchronisation ---------- */
  function rendreStatut(){
@@ -37,10 +36,9 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
  }
 
  /* ---------- Objectifs ---------- */
+ // Matchs du journal (compteur, saisis après coup, compte) joués depuis une date
  function matchsDepuis(jour){
-  const locaux=lire(S?S.CLE_HISTORIQUE:"pa-score-historique",[]);
-  const liste=(Array.isArray(locaux)?locaux:[]).filter(m=>m&&typeof m.fin==="string").map(m=>({fin:m.fin,score:m.score||"",vainqueur:m.vainqueur}));
-  matchsCompte.forEach(m=>{if(!liste.some(x=>Math.floor(Date.parse(x.fin)/1000)===Math.floor(Date.parse(m.joue_le)/1000)&&x.score===m.score))liste.push({fin:m.joue_le,score:m.score,vainqueur:m.vainqueur});});
+  const liste=window.PA_JOURNAL?window.PA_JOURNAL.liste():[];
   return liste.filter(m=>B.simIso(new Date(m.fin))>=jour);
  }
  // Avancement d'un objectif : { actuel (texte), part (0 à 1), atteint }
@@ -202,17 +200,94 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
   table.appendChild(corps);tbl.appendChild(table);details.appendChild(tbl);zone.appendChild(details);
  }
 
- function rendreTout(){rendreStatut();rendreObjectifs();rendreResultats();rendreProgression();}
+ /* ---------- Mes matchs : statistiques par période, par partenaire, par type, journal ---------- */
+ const JN=window.PA_JOURNAL;
+ let nbJournal=10;
+ const pourcent=(a,b)=>b?Math.round(100*a/b)+" %":"–";
+ function periode(){const v=(document.querySelector('input[name="esp-periode"]:checked')||{}).value||"90";return v==="tout"?null:Number(v);}
+ function rendreMatchs(){
+  const zoneS=$("esp-stats"),zoneJ=$("esp-journal");zoneS.textContent="";zoneJ.textContent="";
+  if(!JN)return;
+  const tous=JN.liste(),jours=periode();
+  const depuis=jours?Date.now()-jours*86400000:-Infinity;
+  const liste=tous.filter(m=>Date.parse(m.fin)>=depuis);
+  const joues=liste.filter(m=>m.vainqueur===0||m.vainqueur===1),v=joues.filter(m=>m.vainqueur===0).length,d=joues.length-v;
+  const comptes=liste.filter(m=>m.pointsTotal>0),pg=comptes.reduce((s,m)=>s+m.pointsGagnes,0),pt=comptes.reduce((s,m)=>s+m.pointsTotal,0);
+  if(JN.etat().texte)zoneS.append(el("p","acc-msg acc-err",JN.etat().texte));
+  if(!tous.length){zoneS.append(el("p","acc-muted","Aucun match pour l'instant. Compte ton prochain match avec le compteur, ou ajoute un match déjà joué ci-dessous."));}
+  else{
+   const tuiles=el("div","esp-tuiles");
+   const tuile=(valeur,libelle)=>{const t=el("div","esp-tuile");t.append(el("b","",valeur),el("span","",libelle));return t;};
+   tuiles.append(tuile(String(liste.length),"match"+(liste.length>1?"s":"")),tuile(v+" – "+d,"victoires – défaites"),tuile(pourcent(v,joues.length),"de victoires"),
+    tuile(pourcent(pg,pt),"des points gagnés"+(comptes.length&&comptes.length<liste.length?" ("+comptes.length+" match"+(comptes.length>1?"s":"")+" comptés)":"")));
+   zoneS.appendChild(tuiles);
+   // Par partenaire
+   const parPartenaire=new Map();
+   joues.forEach(m=>{const k=m.partenaire||"Partenaire non précisé";const x=parPartenaire.get(k)||{v:0,d:0};if(m.vainqueur===0)x.v++;else x.d++;parPartenaire.set(k,x);});
+   if(parPartenaire.size){
+    zoneS.appendChild(el("h3","esp-sous-titre","Par partenaire"));
+    const tbl=el("div","tbl esp-tbl-compact"),table=el("table"),corps=el("tbody");
+    table.innerHTML="<thead><tr><th scope=\"col\">Partenaire</th><th scope=\"col\">Matchs</th><th scope=\"col\">V – D</th><th scope=\"col\">%</th></tr></thead>";
+    [...parPartenaire.entries()].sort((a,b)=>(b[1].v+b[1].d)-(a[1].v+a[1].d)).forEach(([nom,x])=>{
+     const tr=corps.insertRow();[nom,String(x.v+x.d),x.v+" – "+x.d,pourcent(x.v,x.v+x.d)].forEach(t=>{tr.insertCell().textContent=t;});
+    });
+    table.appendChild(corps);tbl.appendChild(table);zoneS.appendChild(tbl);
+   }
+   // Par type de match
+   const parType=Object.keys(JN.TYPES).map(t=>{const l=joues.filter(m=>m.type===t);return [t,l.length,l.filter(m=>m.vainqueur===0).length];}).filter(x=>x[1]);
+   if(parType.length){
+    const p=el("p","esp-types");
+    parType.forEach(([t,n,vt],i)=>{if(i)p.append(" · ");p.append(el("b","",JN.TYPES[t])," "+n+" match"+(n>1?"s":"")+", "+pourcent(vt,n)+" de victoires");});
+    zoneS.appendChild(p);
+   }
+  }
+  // Journal
+  if(!liste.length){if(tous.length)zoneJ.append(el("p","acc-muted","Aucun match sur cette période."));return;}
+  zoneJ.appendChild(el("h3","esp-sous-titre","Journal"));
+  const ul=el("ul","esp-journal");
+  liste.slice(0,nbJournal).forEach(m=>{
+   const li=el("li");
+   const issue=m.vainqueur===0?["v","V","Victoire"]:m.vainqueur===1?["d","D","Défaite"]:["n","–","Match arrêté"];
+   const badge=el("span","mp-issue "+issue[0],issue[1]);badge.setAttribute("aria-label",issue[2]);
+   const texte=el("span","esp-journal-texte");
+   texte.append(el("span","mp-match-date",new Date(m.fin).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"})+(m.type?" · "+JN.TYPES[m.type]:"")),
+    el("span","",(m.partenaire?"Avec "+m.partenaire:"Partenaire non précisé")+" contre "+m.adversaires),
+    el("span","mp-match-score",(m.score||"Score non saisi")+(m.interrompu?" (arrêté)":"")));
+   li.append(badge,texte);
+   // Suppression partout ; un match déjà dans le compte ne peut l'être qu'avec le journal activé
+   if(!m.dansCompte||JN.actif()){
+    const b=el("button","x","✕");b.type="button";b.setAttribute("aria-label","Supprimer le match du "+new Date(m.fin).toLocaleDateString("fr-FR"));
+    b.addEventListener("click",()=>JN.supprimer(m.cle));li.appendChild(b);
+   }
+   ul.appendChild(li);
+  });
+  zoneJ.appendChild(ul);
+  if(liste.length>nbJournal){const b=el("button","btn ghost","Afficher plus ("+(liste.length-nbJournal)+")");b.type="button";b.addEventListener("click",()=>{nbJournal+=20;rendreMatchs();});zoneJ.appendChild(b);}
+ }
+ document.querySelectorAll('input[name="esp-periode"]').forEach(i=>i.addEventListener("change",()=>{nbJournal=10;rendreMatchs();}));
+ const formMatch=$("esp-form-match");
+ formMatch.elements["esp-m-date"].max=aujourdhui();formMatch.elements["esp-m-date"].value=aujourdhui();
+ formMatch.addEventListener("submit",e=>{
+  e.preventDefault();
+  const f=formMatch.elements,zone=formMatch.parentElement;
+  const date=f["esp-m-date"].value,res=(formMatch.querySelector('input[name="esp-m-resultat"]:checked')||{}).value;
+  const score=f["esp-m-score"].value.trim().replace(/\s+/g," ");
+  if(!B.simLireDate(date)||date>aujourdhui()){info(zone,"Choisis la date du match (aujourd'hui ou avant).",true);f["esp-m-date"].focus();return;}
+  if(res!=="0"&&res!=="1"){info(zone,"Indique si c'est une victoire ou une défaite.",true);return;}
+  if(score&&!/^[0-9\-\s\[\]()\/]{3,40}$/.test(score)){info(zone,"Score : des chiffres et des tirets seulement, par exemple 6-4 3-6 10-8.",true);f["esp-m-score"].focus();return;}
+  const r=JN.ajouterManuel({date,type:f["esp-m-type"].value,partenaire:f["esp-m-partenaire"].value.trim().slice(0,30)||null,adversaires:f["esp-m-adversaires"].value.trim().slice(0,30)||"Adversaires",vainqueur:Number(res),score});
+  if(!r.ok){info(zone,r.message,true);return;}
+  info(zone,"Match ajouté au journal.");
+  f["esp-m-score"].value="";f["esp-m-adversaires"].value="";formMatch.querySelectorAll('input[name="esp-m-resultat"]').forEach(i=>{i.checked=false;});
+ });
+
+ function rendreTout(){rendreStatut();rendreObjectifs();rendreMatchs();rendreResultats();rendreProgression();}
  J.onChange(rendreTout);
+ if(JN)JN.onChange(()=>{rendreObjectifs();rendreMatchs();});
  let minuterieTaille=null;
  window.addEventListener("resize",()=>{clearTimeout(minuterieTaille);minuterieTaille=setTimeout(rendreProgression,150);});
  const c=window.PA_COMPTE;
- async function chargerMatchs(){
-  if(!c||!c.actif||typeof c.loadMatches!=="function")return;
-  await c.ready;if(!c.user){matchsCompte=[];rendreTout();return;}
-  const r=await c.loadMatches(50);matchsCompte=r.ok?r.matchs:[];rendreTout();
- }
- if(c&&c.actif){c.onChange(()=>{rendreStatut();chargerMatchs();});chargerMatchs();}
+ if(c&&c.actif)c.onChange(()=>rendreStatut());
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)rendreTout();});
  majAideObjectif();majChampsResultat();rendreTout();
 })();
