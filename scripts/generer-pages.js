@@ -389,7 +389,7 @@ ${commentaire ? `<li><b>Mot de l'organisateur :</b> ${echapper(commentaire.lengt
 <section class="gen-bloc" aria-labelledby="gb-autour"><h2 id="gb-autour">Autour de ce tournoi</h2>
 <ul class="gen-liens"><li><a href="${pre}tournois/${t.dep}.html">Tous les tournois ${echapper(dansDep(t.dep))}</a></li>${region && t.categorie && CATEGORIES_REGION.includes(t.categorie) ? `<li><a href="${pre}tournois/${region.slug}/${t.categorie.toLowerCase()}.html">Tournois ${t.categorie} ${echapper(region.prep)} ${echapper(region.nom)}</a></li>` : ""}<li><a href="${pre}tournois.html">Carte de tous les tournois de France</a></li></ul>
 </section>`;
-  ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd, noindex: !indexer, scripts: ["assets/data/pages-tournois.js", "assets/js/favoris.js", "assets/js/fiche-tournoi.js"] }), { indexer });
+  ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd, noindex: !indexer, scripts: ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js", "assets/js/supabase-config.js", "assets/js/compte.js", "assets/data/pages-tournois.js", "assets/js/favoris.js", "assets/js/fiche-tournoi.js", "assets/js/communaute-tournoi.js"] }), { indexer });
 }
 
 /* ---------- Pages département ---------- */

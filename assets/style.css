@@ -757,3 +757,38 @@ details.geste summary{color:var(--turf)}
 .photo-row figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;background:linear-gradient(180deg,transparent,rgba(7,11,20,.9));color:#fff;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
 .photo-row a{text-decoration:none}
 @media (max-width:860px){.photo-row{grid-template-columns:repeat(2,1fr);gap:10px}}
+
+/* ===== Communauté sur la fiche tournoi (J'y vais, annonces, avis) ===== */
+#ft-communaute>div+div{margin-top:26px}
+.ct-titre{font-size:1.4rem;text-transform:uppercase;margin-bottom:8px}
+.ct-compte{margin:0 0 10px;color:var(--muted)}
+.ct-compte b{font-family:var(--display);font-size:2.2rem;font-weight:900;color:var(--fg);margin-right:6px}
+.ct-joueurs{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.ct-joueur{display:inline-flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1px solid var(--line-2);border-radius:999px;font-size:.9rem}
+.ct-joueur.moi{border-color:var(--turf)}
+.ct-initiale{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--turf);color:var(--accent-fg);font-weight:800}
+.ct-jyvais{background:var(--cat-p100);color:var(--cat-fg);border-color:var(--cat-p100);min-height:48px}
+.ct-jyvais[aria-pressed="true"]{background:transparent;color:var(--fg);border-color:var(--line-2)}
+.ct-annonces{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
+.ct-annonces li{padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass)}
+.ct-annonces p{margin:6px 0 0;color:var(--muted)}
+.ct-club{margin:0 0 14px}
+.ct-club b{color:var(--sand);font-size:1.15rem}
+.ct-avis{padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass);margin-bottom:10px}
+.ct-avis-tete{margin:0;color:var(--muted)}
+.ct-avis-tete b{color:var(--fg)}
+.ct-notes{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;font-size:.92rem}
+.ct-etoiles{color:var(--sand);letter-spacing:.1em}
+.ct-avis-texte{margin:8px 0 0}
+.ct-lien{background:none;border:0;padding:8px 0;min-height:40px;color:var(--sky);font:inherit;text-decoration:underline;cursor:pointer}
+.ct-signaler{margin-top:8px}
+.ct-signaler summary{cursor:pointer;color:var(--dim);min-height:40px;display:flex;align-items:center}
+.ct-signaler select{min-height:44px;margin:6px 8px 6px 0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:8px}
+.ct-form{display:grid;gap:12px;padding:16px;border:1px solid var(--line-2);border-radius:var(--r);margin-top:12px;max-width:640px}
+.ct-form h4{font-size:1.2rem;text-transform:uppercase}
+.ct-form fieldset{border:0;margin:0;padding:0;min-width:0}
+.ct-form legend,.ct-label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.ct-form textarea{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem;resize:vertical}
+.ct-charte{display:flex;gap:8px;align-items:flex-start}
+.ct-charte input{width:22px;height:22px;margin-top:2px}
+.ct-form .btn{min-height:48px;justify-self:start}

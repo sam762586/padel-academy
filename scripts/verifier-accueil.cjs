@@ -21,7 +21,7 @@ const serveur=http.createServer((req,res)=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const erreurs=[];
  try{
-  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   await ctx.route('https://data.geopf.fr/**',r=>r.abort());

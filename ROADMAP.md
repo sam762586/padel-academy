@@ -34,7 +34,7 @@
   - Emplacements vides prévus pour T4 (« Qui y va », annonces partenaires, avis).
   - Données structurées `SportsEvent` (nom, dates, lieu, organisateur), `BreadcrumbList`, meta description générée (« Tournoi de padel P100 à Rouen les 12-13 déc. 2026 : points, inscriptions, partenaires »).
 
-- [ ] **T3. Brancher le site sur les nouvelles pages** : chaque carte de `tournois.html` renvoie vers `tournoi/<id>.html` ; la nav « Tournois » renvoie vers la liste nationale ; la page d'accueil reçoit le bloc « Cette semaine près de chez toi » (5 tournois du département mémorisé, sinon carte de France cliquable). Supprime le détail en modale de tournois.html s'il fait doublon.
+- [x] **T3. Brancher le site sur les nouvelles pages** : chaque carte de `tournois.html` renvoie vers `tournoi/<id>.html` ; la nav « Tournois » renvoie vers la liste nationale ; la page d'accueil reçoit le bloc « Cette semaine près de chez toi » (5 tournois du département mémorisé, sinon carte de France cliquable). Supprime le détail en modale de tournois.html s'il fait doublon. ✅ 26/10/2026, commit 40af575.
 
 - [ ] **T4. Communauté sur la fiche** (SQL dans `supabase/migrations/`) :
   - « J'y vais » (table `presences` : user_id, tournoi_id, unique ; RLS lecture pour tous les connectés, écriture pour soi) ; affichage des pseudos + classement déclaré ; compteur visible même déconnecté (via une fonction `security definer` qui ne renvoie que le nombre).

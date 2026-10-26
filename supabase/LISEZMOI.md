@@ -50,3 +50,24 @@ Le compteur fonctionne sans compte : les matchs restent sur l'appareil. Pour que
 # Favoris tournois (tournois.html)
 
 Les favoris ★ fonctionnent sans compte (gardés sur l'appareil). Pour qu'un joueur connecté les retrouve sur tous ses appareils, applique `supabase/migrations/20261026_favoris.sql` dans le SQL Editor (après `schema.sql`, relançable sans risque) : table `favoris` (clé : joueur + identifiant Ten'Up), RLS, 500 favoris maximum par joueur. Tant que ce n'est pas fait, la page Tournois affiche que les favoris ne sont pas synchronisés et les garde sur l'appareil. Suppression de compte : cascade, rien à changer.
+
+# Activer une fonction après avoir exécuté son SQL
+
+Le site n'appelle une table que si son nom figure dans `window.PA_SUPABASE.activees` (fin de `assets/js/supabase-config.js`). Tant qu'il manque, rien n'est demandé à Supabase : pas d'erreur 404 dans la console des visiteurs. Après avoir exécuté le SQL d'une fonction, ajoute son nom puis publie :
+
+```js
+window.PA_SUPABASE.activees = ["favoris", "communaute"];
+```
+
+- `"favoris"` : `supabase/migrations/20261026_favoris.sql` (étoiles des tournois synchronisées avec le compte).
+- `"communaute"` : les 12 fichiers `supabase/migrations/2026-10-26-t4-01-…` à `t4-12-…`, **dans l'ordre des numéros** (« J'y vais », annonces et avis sur les fiches tournois, modération des avis dans Mon compte).
+
+# Communauté sur les fiches tournois (T4)
+
+Prérequis : `schema.sql` et `schema-partenaires.sql` déjà exécutés (fonctions `est_admin`, `message_sans_contact`, `accepter_charte`).
+Exécute les fichiers `2026-10-26-t4-01` à `t4-12` un par un dans le SQL Editor (un fichier = un objet ; les fonctions utilisent le tag `$fn$`). Ils sont relançables sans risque. Puis ajoute `"communaute"` à la liste ci-dessus.
+
+- `presences` : « J'y vais ». Lecture par les joueurs connectés ; le nombre est visible par tous via `nb_presences()`.
+- `annonces` (existante) : le nombre d'annonces d'un tournoi est visible par tous via `nb_annonces_tournoi()`, le contenu reste réservé aux connectés.
+- `avis` : 3 questions + texte de 300 caractères maximum, filtré (`avis_texte_correct()` : pas de contact, pas d'insulte). Un avis par joueur et par tournoi, possible dès le premier jour du tournoi, visible par tous après la fin. 3 signalements de joueurs différents masquent l'avis (`signaler_avis()`) ; l'admin voit les avis signalés dans Mon compte et peut les masquer, les rétablir ou les supprimer (`admin_moderer_avis()`).
+- Suppression de compte : tout part en cascade.

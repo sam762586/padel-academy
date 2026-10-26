@@ -78,6 +78,8 @@ const FAUX_SDK=`(function(){
  }};
 })();`;
 
+// Fonctions activées pour le test (sur le site, la liste de supabase-config.js est vide tant que le SQL n'est pas exécuté)
+const CONFIG_ACTIVE=fs.readFileSync(path.join(__dirname,'..','assets/js/supabase-config.js'),'utf8')+'\nwindow.PA_SUPABASE.activees=["favoris","communaute"];\n';
 (async()=>{
  ics();
  await new Promise(r=>serveur.listen(0,'127.0.0.1',r));
@@ -87,13 +89,14 @@ const FAUX_SDK=`(function(){
  const erreurs=[];
  const routes=async(ctx,sdk)=>{
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:sdk||'/* comptes inactifs */'}));
+  await ctx.route('**/assets/js/supabase-config.js',r=>r.fulfill({contentType:'text/javascript',body:CONFIG_ACTIVE}));
   await ctx.route('**/*.supabase.co/**',r=>r.abort());
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   await ctx.route('https://data.geopf.fr/**',r=>r.abort());
  };
  try{
   /* Sans compte */
-  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true});
+  const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true});
   await routes(ctx);
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));
@@ -143,7 +146,7 @@ const FAUX_SDK=`(function(){
   await ctx.close();
 
   /* Connecté (faux client) */
-  const ctx2=await browser.newContext({viewport:{width:1280,height:900}});
+  const ctx2=await browser.newContext({serviceWorkers:'block',viewport:{width:1280,height:900}});
   await routes(ctx2,FAUX_SDK);
   const p2=await ctx2.newPage();
   p2.on('pageerror',e=>erreurs.push(e.message));

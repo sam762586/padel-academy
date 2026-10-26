@@ -88,7 +88,7 @@ const serveur=http.createServer((req,res)=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const erreurs=[];
  try{
-  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true,geolocation:{latitude:49.44,longitude:1.1},permissions:['geolocation']});
+  const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true,geolocation:{latitude:49.44,longitude:1.1},permissions:['geolocation']});
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));

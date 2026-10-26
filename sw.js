@@ -4,7 +4,7 @@
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v8-pages-tournois";
+const CACHE = "pa-v9-communaute";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [

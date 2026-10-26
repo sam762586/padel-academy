@@ -23,7 +23,9 @@ const FAV_ID_VALIDE=/^[0-9A-Za-z_-]{1,20}$/;
  function prevenir(){ecouteurs.slice().forEach(f=>{try{f(ids.slice(),message);}catch(e){}});}
 
  const compte=()=>window.PA_COMPTE;
- const connecte=()=>{const c=compte();return !!(c&&c.actif&&c.user&&typeof c.loadFavoris==="function");};
+ // Synchronisation seulement si la table favoris existe (PA_SUPABASE.activees, supabase-config.js)
+ const active=()=>((window.PA_SUPABASE||{}).activees||[]).includes("favoris");
+ const connecte=()=>{const c=compte();return !!(active()&&c&&c.actif&&c.user&&typeof c.loadFavoris==="function");};
 
  /* Synchronisation : on vide la file d'attente, puis on reprend la liste du compte (+ ce qui reste en attente) */
  let enCours=false,relancer=false;
