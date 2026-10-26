@@ -355,3 +355,23 @@ a.card.link:hover h4{color:var(--turf)}
   .hero h1{font-size:clamp(2.6rem,13vw,3.6rem)}
   section{padding-block:56px}
 }
+
+/* TOURNOIS : zone, pagination */
+.tgroupe-large{grid-column:1 / -1}
+.tzone{display:grid;gap:12px}
+.tpanneau label{display:block}
+.tville{position:relative}
+.tsuggest{list-style:none;margin:6px 0 0;padding:4px;position:absolute;left:0;right:0;z-index:5;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-s);box-shadow:var(--shadow);max-height:260px;overflow-y:auto}
+.tsuggest button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--fg);font-family:var(--body);font-size:.95rem;padding:10px 12px;border-radius:8px;cursor:pointer}
+.tsuggest button:hover,.tsuggest button:focus-visible{background:var(--glass-2);outline:none}
+.tzone input[type=text]{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
+.tzone input[type=range]{width:100%;accent-color:var(--turf)}
+.tzone output{color:var(--sand);font-weight:800}
+.tzone .acc-msg{margin:0}
+.tbarre-btns{display:flex;gap:10px;flex-wrap:wrap}
+.tbarre-btns .btn[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+.tdetail{color:var(--dim);font-size:.8rem;margin-top:6px}
+.tdist{color:var(--turf)}
+.tplus:empty{display:none}
+.tplus{display:flex;flex-direction:column;gap:8px}
+.tplus-wrap{display:flex;justify-content:center;margin-top:20px}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tournois · Padel Academy</title>
-<meta name="description" content="Tournois de padel près de chez toi : filtre par catégorie, distance, date et inscriptions ouvertes.">
+<meta name="description" content="Tous les tournois de padel de France : choisis ton département, ta ville ou ta position, puis filtre par catégorie, sexe et date.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
@@ -20,22 +20,44 @@
 <section id="tournois">
   <div class="wrap" id="tournois-app">
     <div class="sec-head">
-      <div><p class="eyebrow">Compétition · Près de chez toi</p><h2 id="tournois-titre">Tournois de padel</h2></div>
+      <div><p class="eyebrow">Compétition · Toute la France</p><h2 id="tournois-titre">Tournois de padel en France</h2></div>
       <p><span id="tournois-maj"></span>Source : <a href="https://tenup.fft.fr/" target="_blank" rel="noopener"><span id="tournois-source">Ten'Up (FFT)</span></a>. Vérifie toujours les dates et les conditions sur la fiche du tournoi avant de t'inscrire.</p>
     </div>
     <p class="acc-msg" id="tournois-vide" role="status" hidden>Pas encore de tournois chargés. La liste sera disponible dès qu'elle aura été mise à jour. En attendant, tu peux chercher sur <a href="https://tenup.fft.fr/" target="_blank" rel="noopener">Ten'Up</a>.</p>
     <div id="tournois-contenu" hidden>
       <form class="tfiltres" id="tournois-filtres" novalidate>
+        <fieldset class="tgroupe tzone tgroupe-large">
+          <legend>Ta zone</legend>
+          <div class="tchips" role="radiogroup" aria-label="Mode de choix de la zone">
+            <label class="tchip"><input type="radio" name="zone-mode" value="france" checked><span>Toute la France</span></label>
+            <label class="tchip"><input type="radio" name="zone-mode" value="dep"><span>Département</span></label>
+            <label class="tchip"><input type="radio" name="zone-mode" value="ville"><span>Ville + rayon</span></label>
+            <label class="tchip"><input type="radio" name="zone-mode" value="moi"><span>Autour de moi</span></label>
+          </div>
+          <div class="tpanneau" id="zone-panneau-dep" hidden>
+            <label for="zone-dep">Département</label>
+            <select id="zone-dep"></select>
+          </div>
+          <div class="tpanneau tville" id="zone-panneau-ville" hidden>
+            <label for="zone-ville">Ville</label>
+            <input type="text" id="zone-ville" placeholder="Ex. Rouen" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="zone-suggestions">
+            <ul class="tsuggest" id="zone-suggestions" hidden></ul>
+          </div>
+          <div class="tpanneau" id="zone-panneau-moi" hidden>
+            <button type="button" class="btn ghost" id="zone-moi">Me localiser</button>
+          </div>
+          <div class="tpanneau" id="zone-panneau-rayon" hidden>
+            <label for="zone-rayon">Rayon : <output id="zone-rayon-val">50 km</output></label>
+            <input type="range" id="zone-rayon" min="10" max="200" step="5" value="50">
+          </div>
+          <p class="acc-msg" id="zone-msg" role="status" hidden></p>
+        </fieldset>
         <div class="tgroupe">
           <label for="filtre-texte">Recherche</label>
           <input type="search" id="filtre-texte" placeholder="Nom, club ou ville" autocomplete="off">
         </div>
         <fieldset class="tgroupe"><legend>Catégorie</legend><div class="tchips" id="filtre-categories"></div></fieldset>
         <fieldset class="tgroupe"><legend>Sexe</legend><div class="tchips" id="filtre-sexes"></div></fieldset>
-        <div class="tgroupe">
-          <label for="filtre-distance">Distance</label>
-          <select id="filtre-distance"></select>
-        </div>
         <div class="tgroupe tperiode">
           <div><label for="filtre-du">Du</label><input type="date" id="filtre-du"></div>
           <div><label for="filtre-au">Au</label><input type="date" id="filtre-au"></div>
@@ -44,11 +66,15 @@
         <button type="button" class="btn ghost" id="filtre-reinit">Réinitialiser</button>
       </form>
       <div class="tbarre">
-        <p class="tcompteur" id="tournois-compteur" role="status" aria-live="polite"></p>
-        <button type="button" class="btn ghost" id="tournois-tri"></button>
+        <div><p class="tcompteur" id="tournois-compteur" role="status" aria-live="polite"></p><p class="tdetail" id="tournois-detail" hidden></p></div>
+        <div class="tbarre-btns">
+          <button type="button" class="btn ghost" id="tournois-tri"></button>
+          <button type="button" class="btn ghost" id="tournois-tri-distance" hidden>Trier par distance</button>
+        </div>
       </div>
       <div class="tliste" id="tournois-liste"></div>
-      <p class="acc-msg" id="tournois-aucun" hidden>Aucun tournoi ne correspond à ces filtres. Élargis la distance ou la période.</p>
+      <div class="tplus-wrap"><button type="button" class="btn primary" id="tournois-plus" hidden>Voir plus</button></div>
+      <p class="acc-msg" id="tournois-aucun" hidden>Aucun tournoi ne correspond à ces filtres. Élargis le rayon, la zone ou la période.</p>
     </div>
   </div>
 </section>

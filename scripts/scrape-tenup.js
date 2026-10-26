@@ -1,17 +1,22 @@
-// Récupère les tournois de padel publics de Ten'Up autour de Franqueville-Saint-Pierre
-// et les exporte dans assets/data/tournois.json (+ tournois.js, copie pour l'ouverture en file://).
+// Récupère tous les tournois de padel publics de Ten'Up en France (métropole + Corse)
+// sur les 3 prochains mois, et les exporte pour tournois.html :
+//   assets/data/tournois.json (+ .js)       index léger : un tournoi = une ligne, avec lat/lng de la commune
+//   assets/data/fiches/<dep>.json (+ .js)   détails des fiches (épreuves, tarif, cut…), un fichier par département
 // Structure des pages relevée dans scripts/TENUP-API-NOTES.md.
 //
 // Usage (depuis le dossier scripts/) :
 //   npm install && npx playwright install chromium
 //   npm run tournois            -> headless
 //   npm run tournois:debug      -> captures dans scripts/debug/
-//   option --edge : utilise Microsoft Edge déjà installé au lieu du Chromium de Playwright
+//   --edge            : utilise Microsoft Edge déjà installé au lieu du Chromium de Playwright
+//   --refaire-fiches  : ignore le cache et relit toutes les fiches
+//   --max-pages N     : limite le nombre de pages de résultats (essais)
 //
 // Aucune connexion : la recherche et les fiches tournoi sont publiques.
-// Politesse : 1 requête par seconde maximum, fiches lues uniquement pour les nouveaux ids,
-// usage personnel, exécution hebdomadaire. Si Ten'Up bloque l'accès, le script s'arrête :
-// on ne cherche pas à contourner la protection.
+// Politesse : 1 requête Ten'Up par seconde maximum ; les fiches déjà lues ne sont pas relues.
+// La progression est enregistrée toutes les 100 fiches : un arrêt (blocage, coupure) se reprend
+// en relançant simplement le script. Si Ten'Up bloque l'accès, le script s'arrête sans insister.
+// Géocodage des communes : API Géoplateforme de l'IGN (publique), avec cache dans scripts/cache/.
 
 const fs = require("fs");
 const path = require("path");
@@ -20,42 +25,41 @@ const { chromium } = require("playwright");
 const ROOT = path.resolve(__dirname, "..");
 const OUT_DIR = path.join(ROOT, "assets", "data");
 const OUT_JSON = path.join(OUT_DIR, "tournois.json");
+const FICHES_DIR = path.join(OUT_DIR, "fiches");
+const GEO_CACHE = path.join(__dirname, "cache", "communes.json");
 const DEBUG_DIR = path.join(__dirname, "debug");
 const ARGS = process.argv.slice(2);
 const DEBUG = ARGS.includes("--debug");
+const arg = (nom, def) => { const i = ARGS.indexOf(nom); return i >= 0 ? +ARGS[i + 1] : def; };
 
-// Point de référence (coordonnées de l'autocomplétion Ten'Up) et fenêtre de recherche
-const ORIGINE = { nom: "Franqueville-Saint-Pierre", lat: 49.403115, lng: 1.180328 };
-const RAYON_KM = 80;
+// Recherche nationale : un cercle de 1000 km centré sur Bourges couvre la métropole et la Corse
+const CENTRE = { ville: "Bourges", lat: 47.081, lng: 2.399, distance: 1000 };
 const MOIS = 3;
-const MAX_PAGES = 40;
-const DELAI_MS = 1000;
+const MAX_PAGES = arg("--max-pages", 500);
+const INTERVALLE_MS = 1000;
+const SAUVEGARDE_TOUS = 100;
 
 const BASE = "https://tenup.fft.fr";
+const GEO = "https://data.geopf.fr/geocodage/search";
 const BLOCAGE = /Accès temporairement restreint|comportement du navigateur nous a intrigué/i;
 
 // ---------- utilitaires ----------
 const pause = ms => new Promise(r => setTimeout(r, ms));
 const iso = d => d.toISOString().slice(0, 10);
 const frVersIso = s => { const m = /(\d{2})\/(\d{2})\/(\d{4})/.exec(s || ""); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+const lireJson = (f, def) => { try { return JSON.parse(fs.readFileSync(f, "utf8")); } catch { return def; } };
+
+const debut = new Date(), fin = new Date();
+fin.setMonth(fin.getMonth() + MOIS);
+const PERIODE = { du: iso(debut), au: iso(fin) };
 
 function urlResultats(page) {
-  const debut = new Date(), fin = new Date();
-  fin.setMonth(fin.getMonth() + MOIS);
   const q = new URLSearchParams({
-    searchType: "ville", pratique: "PADEL", ville: ORIGINE.nom, distance: RAYON_KM,
-    dateDebut: iso(debut), dateFin: iso(fin), utiliserMesDonnees: "false", sort: "DISTANCE",
-    page, lat: ORIGINE.lat, lng: ORIGINE.lng,
+    searchType: "ville", pratique: "PADEL", ville: CENTRE.ville, distance: CENTRE.distance,
+    dateDebut: PERIODE.du, dateFin: PERIODE.au, utiliserMesDonnees: "false", sort: "DISTANCE",
+    page, lat: CENTRE.lat, lng: CENTRE.lng,
   });
   return `${BASE}/recherche/tournois/resultats?${q}`;
-}
-
-// "939 m" -> 0.9 ; "12,4 km" -> 12.4
-function distanceKm(txt) {
-  const m = /([\d\s]+(?:[.,]\d+)?)\s*(km|m)\b/i.exec(txt || "");
-  if (!m) return null;
-  const v = parseFloat(m[1].replace(/\s/g, "").replace(",", "."));
-  return Math.round((m[2].toLowerCase() === "m" ? v / 1000 : v) * 10) / 10;
 }
 
 // Catégorie : P25…P3000, éventuellement préfixée (DM250, DX100…)
@@ -73,6 +77,14 @@ function sexesTitre(titre) {
   return [...s];
 }
 
+// Code département depuis le code postal (Corse : 2A / 2B, outre-mer : 3 chiffres)
+function departement(cp) {
+  if (!/^\d{5}$/.test(cp || "")) return null;
+  if (cp.startsWith("97") || cp.startsWith("98")) return cp.slice(0, 3);
+  if (cp.startsWith("20")) return +cp < 20200 ? "2A" : "2B";
+  return cp.slice(0, 2);
+}
+
 async function debug(page, nom) {
   if (!DEBUG) return;
   fs.mkdirSync(DEBUG_DIR, { recursive: true });
@@ -80,22 +92,47 @@ async function debug(page, nom) {
   fs.writeFileSync(path.join(DEBUG_DIR, nom + ".html"), await page.content().catch(() => ""));
 }
 
-async function verifierBlocage(page) {
-  const txt = await page.locator("body").innerText().catch(() => "");
-  if (BLOCAGE.test(txt)) {
-    await debug(page, "blocage");
-    throw new Error("Ten'Up bloque l'accès automatisé (« Accès temporairement restreint »). Arrêt : réessaie plus tard, sans insister.");
-  }
-}
+class Bloque extends Error {}
 
-// Ouvre une URL ; Queue-it peut faire patienter jusqu'à 60 s
+// Ouvre une URL Ten'Up : au plus 1 requête par seconde, Queue-it peut faire patienter jusqu'à 60 s
+let derniereRequete = 0;
 async function ouvrir(page, url) {
+  const attente = derniereRequete + INTERVALLE_MS - Date.now();
+  if (attente > 0) await pause(attente);
+  derniereRequete = Date.now();
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
   if (/queue-it\.net/.test(page.url())) {
     console.log("Salle d'attente Queue-it…");
     await page.waitForURL(u => u.hostname === "tenup.fft.fr", { timeout: 60000 });
   }
-  await verifierBlocage(page);
+  const txt = await page.locator("body").innerText().catch(() => "");
+  if (BLOCAGE.test(txt)) {
+    await debug(page, "blocage");
+    throw new Bloque("Ten'Up bloque l'accès automatisé (« Accès temporairement restreint »). Progression enregistrée : réessaie plus tard, sans insister.");
+  }
+}
+
+// ---------- géocodage des communes (IGN), avec cache ----------
+const geoCache = lireJson(GEO_CACHE, {});
+let geoModifie = false;
+async function geocoder(cp, ville) {
+  const cle = `${cp || ""}|${(ville || "").toUpperCase()}`;
+  if (cle in geoCache) return geoCache[cle];
+  let res = null;
+  // Repli sur le nom seul : certains organisateurs saisissent un code postal erroné
+  for (const q of cp ? [{ q: ville, postcode: cp }, { q: `${cp} ${ville}` }, { q: ville }] : [{ q: ville }]) {
+    try {
+      const r = await fetch(`${GEO}?${new URLSearchParams({ ...q, type: "municipality", limit: "1" })}`);
+      if (r.status === 429) { await pause(2000); continue; }
+      const f = r.ok ? (await r.json()).features?.[0] : null;
+      if (f) { res = { lat: +f.geometry.coordinates[1].toFixed(5), lng: +f.geometry.coordinates[0].toFixed(5), cp: f.properties.postcode }; break; }
+    } catch {}
+    await pause(150);
+  }
+  geoCache[cle] = res;
+  geoModifie = true;
+  await pause(150);
+  return res;
 }
 
 // ---------- étape 1 : pages de résultats ----------
@@ -114,42 +151,38 @@ async function lireResultats(page) {
         titre: lien ? lien.textContent.trim() : null,
         ville: infos[0] ? infos[0].textContent.trim() : null,
         club: infos[1] ? infos[1].textContent.trim() : null,
-        distance: (a.querySelector('[data-testid="badge-global"]') || {}).textContent || null,
         dates: spans.length ? spans[spans.length - 1].textContent : "",
       };
     }));
     if (n === 1) await debug(page, "resultats-1");
-    console.log(`Page ${n} : ${lot.length} tournois`);
+    if (n % 20 === 0 || !lot.length) console.log(`Page ${n} : ${lot.length} tournois (${cartes.length + lot.length} au total)`);
     if (!lot.length) break;
     cartes.push(...lot);
-    await pause(DELAI_MS);
   }
   return cartes;
 }
 
 function depuisCarte(c) {
   if (!c.href || !c.titre) return null;
-  const id = c.href.split("/").pop();
   const d = /(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})/.exec(c.dates || "");
-  const debut = d ? frVersIso(d[1]) : frVersIso(c.dates);
-  if (!debut) return null;
+  const debutT = d ? frVersIso(d[1]) : frVersIso(c.dates);
+  if (!debutT) return null;
   return {
-    id,
-    lien: BASE + c.href,
+    id: c.href.split("/").pop(),
     nom: c.titre,
     categorie: categorie(c.titre.split(/\s+/)[0]) || categorie(c.titre),
-    ville: c.ville,
     club: c.club,
-    distance_km: distanceKm(c.distance),
-    date_debut: debut,
-    date_fin: d ? frVersIso(d[2]) : debut,
+    ville: c.ville,
+    cp: null, dep: null, lat: null, lng: null,
+    date_debut: debutT,
+    date_fin: d ? frVersIso(d[2]) : debutT,
     sexes: sexesTitre(c.titre),
   };
 }
 
 // ---------- étape 2 : fiche tournoi ----------
-async function lireFiche(page, t) {
-  await ouvrir(page, t.lien);
+async function lireFiche(page, id) {
+  await ouvrir(page, `${BASE}/tournoi/${id}`);
   await page.locator("h1").first().waitFor({ timeout: 15000 }).catch(() => {});
   const lignes = (await page.locator("main").innerText().catch(() => ""))
     .split("\n").map(s => s.trim()).filter(Boolean);
@@ -158,6 +191,7 @@ async function lireFiche(page, t) {
   // Adresse : « 12 D Rue des terres Rouges76520 ST AUBIN » (rue et code postal collés)
   const ligneAdresse = lignes.find(l => /\d{5}\s+\S/.test(l));
   const adresse = ligneAdresse ? ligneAdresse.replace(/(\D)(\d{5}\s)/, "$1, $2").trim() : null;
+  const mCp = ligneAdresse ? /(\d{5})\s+(.+)$/.exec(ligneAdresse) : null;
   const iEpreuves = lignes.findIndex(l => /^les épreuves$/i.test(l));
   const iJa = lignes.findIndex(l => /^juge-arbitre$/i.test(l));
   // Commentaire organisateur : texte libre entre le nom du JA et « Les épreuves ».
@@ -168,14 +202,14 @@ async function lireFiche(page, t) {
         .replace(/(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}/g, "[téléphone sur Ten'Up]")
     : null;
 
-  // Épreuves : chaque bloc commence par son code (DM, DD, DX…), les libellés et valeurs sont sur des lignes séparées
-  const epreuves = [];
+  // Épreuves : chaque bloc commence par son code (DM, DD, DX…), libellés et valeurs sur des lignes séparées
+  const blocs = [];
   let bloc = null;
   for (const l of iEpreuves >= 0 ? lignes.slice(iEpreuves + 1) : []) {
-    if (/^(DM|DD|DX|SM|SD)$/.test(l)) { bloc = [l]; epreuves.push(bloc); }
+    if (/^(DM|DD|DX|SM|SD)$/.test(l)) { bloc = [l]; blocs.push(bloc); }
     else if (bloc) bloc.push(l);
   }
-  const lireEpreuve = b => {
+  const epreuves = blocs.map(b => {
     const txt = b.join(" ");
     const m = re => (re.exec(txt) || [])[1] || null;
     const tarif = m(/Tarif\s*:\s*([\d\s]+(?:,\d+)?)\s*€/i);
@@ -188,76 +222,96 @@ async function lireFiche(page, t) {
       tarif: tarif ? parseFloat(tarif.replace(/\s/g, "").replace(",", ".")) : null,
       tableau: tableau ? +tableau : null,
     };
-  };
-  const ep = epreuves.map(lireEpreuve);
-  const limite = /(?:limite|clôture)[^\n]*?(\d{2}\/\d{2}\/\d{4})/i.exec(lignes.join("\n"));
-  const sexes = ep.map(e => SEXE_CODE[e.code]).filter(Boolean);
+  });
   const horaires = apres("Horaires"), balles = apres("Balles");
   return {
-    ...t,
-    categorie: t.categorie || (ep.find(e => e.categorie) || {}).categorie || null,
-    sexes: [...new Set(sexes.length ? sexes : t.sexes)],
-    adresse,
-    horaires: horaires && !/non renseigné/i.test(horaires) ? horaires : null,
-    balles: balles && !/non renseigné/i.test(balles) ? balles : null,
-    commentaire,
-    epreuves: ep,
-    limite_inscription: limite ? frVersIso(limite[1]) : null,
-    fiche_lue_le: iso(new Date()),
+    cp: mCp ? mCp[1] : null,
+    villeFiche: mCp ? mCp[2].trim() : null,
+    fiche: {
+      adresse,
+      horaires: horaires && !/non renseigné/i.test(horaires) ? horaires : null,
+      balles: balles && !/non renseigné/i.test(balles) ? balles : null,
+      commentaire,
+      epreuves,
+    },
   };
+}
+
+// ---------- écriture ----------
+function ecrireTout(tournois, fiches) {
+  tournois.sort((a, b) => a.date_debut.localeCompare(b.date_debut) || a.nom.localeCompare(b.nom));
+  const data = { genere_le: new Date().toISOString(), source: "Ten'Up (FFT)", periode: PERIODE, tournois };
+  fs.mkdirSync(FICHES_DIR, { recursive: true });
+  fs.writeFileSync(OUT_JSON, JSON.stringify(data) + "\n");
+  // Copies en JS : fetch() ne marche pas en file://, un <script> si
+  fs.writeFileSync(path.join(OUT_DIR, "tournois.js"),
+    "// Généré par scripts/scrape-tenup.js, ne pas modifier à la main.\nwindow.TOURNOIS_DATA=" + JSON.stringify(data) + ";\n");
+  const parDep = {};
+  for (const t of tournois) if (t.dep && fiches[t.id]) (parDep[t.dep] = parDep[t.dep] || {})[t.id] = fiches[t.id];
+  for (const f of fs.readdirSync(FICHES_DIR)) fs.unlinkSync(path.join(FICHES_DIR, f)); // départements disparus
+  for (const [dep, contenu] of Object.entries(parDep)) {
+    fs.writeFileSync(path.join(FICHES_DIR, dep + ".json"), JSON.stringify(contenu) + "\n");
+    fs.writeFileSync(path.join(FICHES_DIR, dep + ".js"),
+      `// Généré par scripts/scrape-tenup.js.\n(window.TOURNOIS_FICHES=window.TOURNOIS_FICHES||{})[${JSON.stringify(dep)}]=${JSON.stringify(contenu)};\n`);
+  }
+  if (geoModifie) { fs.mkdirSync(path.dirname(GEO_CACHE), { recursive: true }); fs.writeFileSync(GEO_CACHE, JSON.stringify(geoCache, null, 0) + "\n"); geoModifie = false; }
 }
 
 // ---------- main ----------
 (async () => {
-  let cache = {};
-  // --refaire-fiches : ignore le cache et relit toutes les fiches
-  if (!ARGS.includes("--refaire-fiches"))
-    try { for (const t of JSON.parse(fs.readFileSync(OUT_JSON, "utf8")).tournois || []) if (t.fiche_lue_le) cache[t.id] = t; } catch {}
+  // Cache : tournois déjà complets (fiche lue et département connu) dans l'export précédent
+  const connus = {}, fiches = {};
+  if (!ARGS.includes("--refaire-fiches")) {
+    for (const t of lireJson(OUT_JSON, {}).tournois || []) if (t.dep) connus[t.id] = t;
+    if (fs.existsSync(FICHES_DIR))
+      for (const f of fs.readdirSync(FICHES_DIR).filter(f => f.endsWith(".json")))
+        Object.assign(fiches, lireJson(path.join(FICHES_DIR, f), {}));
+  }
 
   const browser = await chromium.launch({ headless: !ARGS.includes("--headed"), channel: ARGS.includes("--edge") ? "msedge" : undefined });
   const page = await browser.newPage({ locale: "fr-FR" });
+  let tournois = [];
   try {
     // Première visite : passage Queue-it et bandeau cookies (on refuse si possible)
     await ouvrir(page, BASE + "/");
     await page.locator("#didomi-notice-disagree-button, #didomi-notice-agree-button").first().click({ timeout: 5000 }).catch(() => {});
-    await pause(DELAI_MS);
 
     const vus = new Map();
     for (const c of await lireResultats(page)) { const t = depuisCarte(c); if (t && !vus.has(t.id)) vus.set(t.id, t); }
     console.log(`${vus.size} tournois uniques dans les résultats.`);
 
-    const tournois = [];
-    let nouveaux = 0;
-    for (const t of vus.values()) {
-      if (cache[t.id]) { tournois.push({ ...cache[t.id], ...t, sexes: cache[t.id].sexes, categorie: t.categorie || cache[t.id].categorie }); continue; }
-      try {
-        tournois.push(await lireFiche(page, t));
-        if (DEBUG && nouveaux === 0) await debug(page, "fiche-1");
-        nouveaux++;
-      } catch (e) {
-        if (BLOCAGE.test(e.message)) throw e;
-        console.warn(`Fiche ${t.id} illisible (${e.message.split("\n")[0]}) : gardé sans détail.`);
-        tournois.push(t);
-      }
-      await pause(DELAI_MS);
-    }
-    tournois.sort((a, b) => a.date_debut.localeCompare(b.date_debut) || (a.distance_km ?? 999) - (b.distance_km ?? 999));
+    // Les tournois déjà connus gardent cp / dep / lat / lng ; les autres seront complétés
+    tournois = [...vus.values()].map(t => connus[t.id] && fiches[t.id]
+      ? { ...t, cp: connus[t.id].cp, dep: connus[t.id].dep, lat: connus[t.id].lat, lng: connus[t.id].lng, sexes: connus[t.id].sexes, categorie: t.categorie || connus[t.id].categorie }
+      : t);
+    const aLire = tournois.filter(t => !t.dep || !fiches[t.id]);
+    console.log(`${aLire.length} fiches à lire (${tournois.length - aLire.length} déjà en cache). Durée estimée : ~${Math.ceil(aLire.length * 1.5 / 60)} min.`);
 
-    const data = {
-      genere_le: new Date().toISOString(),
-      origine: ORIGINE.nom,
-      lat: ORIGINE.lat, lng: ORIGINE.lng,
-      rayon_km: RAYON_KM,
-      source: "Ten'Up (FFT)",
-      tournois,
-    };
-    fs.mkdirSync(OUT_DIR, { recursive: true });
-    fs.writeFileSync(OUT_JSON, JSON.stringify(data, null, 2) + "\n");
-    // Copie en JS : fetch() ne marche pas en file://, un <script> si
-    fs.writeFileSync(path.join(OUT_DIR, "tournois.js"),
-      "// Généré par scripts/scrape-tenup.js, ne pas modifier à la main.\nwindow.TOURNOIS_DATA=" + JSON.stringify(data) + ";\n");
-    console.log(`Écrit : assets/data/tournois.json (${tournois.length} tournois, ${nouveaux} fiches lues, ${tournois.length - nouveaux} depuis le cache).`);
+    let lues = 0;
+    for (const t of aLire) {
+      try {
+        const r = await lireFiche(page, t.id);
+        if (DEBUG && lues === 0) await debug(page, "fiche-1");
+        fiches[t.id] = r.fiche;
+        const sx = r.fiche.epreuves.map(e => SEXE_CODE[e.code]).filter(Boolean);
+        if (sx.length) t.sexes = [...new Set(sx)];
+        if (!t.categorie) t.categorie = (r.fiche.epreuves.find(e => e.categorie) || {}).categorie || null;
+        const geo = await geocoder(r.cp, r.villeFiche || t.ville);
+        t.cp = (geo && geo.cp) || r.cp || null; // code postal de la commune géocodée, plus fiable que la saisie
+        t.dep = departement(t.cp);
+        t.lat = geo ? geo.lat : null;
+        t.lng = geo ? geo.lng : null;
+      } catch (e) {
+        if (e instanceof Bloque) throw e;
+        console.warn(`Fiche ${t.id} illisible (${e.message.split("\n")[0]}) : gardé sans détail.`);
+      }
+      if (++lues % SAUVEGARDE_TOUS === 0) { ecrireTout(tournois, fiches); console.log(`${lues}/${aLire.length} fiches lues (progression enregistrée).`); }
+    }
+    ecrireTout(tournois, fiches);
+    const sansGeo = tournois.filter(t => t.lat == null).length;
+    console.log(`Écrit : assets/data/tournois.json (${tournois.length} tournois, ${lues} fiches lues, ${sansGeo} sans coordonnées).`);
   } catch (e) {
+    if (tournois.length) ecrireTout(tournois, fiches);
     await debug(page, "erreur");
     console.error("Échec :", e.message);
     process.exitCode = 1;
