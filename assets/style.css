@@ -722,3 +722,27 @@ details.geste summary{color:var(--turf)}
   .gen-item-date{grid-column:2;text-align:left}
 }
 @media (max-width:420px){.gen-filtres-dates{grid-template-columns:minmax(0,1fr)}}
+
+/* ===== Accueil : « Cette semaine près de chez toi » ===== */
+.pdt{padding-block:56px}
+.pdt-aide{color:var(--muted);margin:0 0 14px}
+.pdt-aide b{color:var(--fg)}
+.pdt-changer{background:none;border:0;padding:6px 4px;min-height:40px;color:var(--sky);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.pdt-choix{max-width:360px}
+.pdt-choix label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px}
+.pdt-choix select{width:100%;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem}
+.pdt-carte{display:block;width:100%;max-width:520px;margin-top:18px}
+.pdt-carte path{fill:rgba(53,226,127,.2);stroke:rgba(7,11,20,.9);stroke-width:.8;cursor:pointer;transition:fill .15s}
+.pdt-carte path:hover{fill:var(--turf)}
+.pdt-liste{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-width:760px}
+.pdt-liste a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;min-height:56px;padding:10px 14px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);color:var(--fg);text-decoration:none}
+.pdt-liste a:hover{border-color:var(--line-2)}
+.pdt-texte{display:grid;min-width:0}
+.pdt-texte b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdt-texte span{color:var(--muted);font-size:.88rem}
+.pdt-date{color:var(--muted);font-size:.85rem;white-space:nowrap}
+@media (max-width:480px){.pdt-liste a{grid-template-columns:auto minmax(0,1fr)}.pdt-date{grid-column:2}}
+.tcard-lien{color:inherit;text-decoration:none}
+.tcard-lien:hover{text-decoration:underline}
+.tliens .tfiche{color:var(--fg)}
+.pdt .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}

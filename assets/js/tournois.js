@@ -63,6 +63,8 @@ function initialiser(donnees,contenu,horsConnexion){
  const SEXES=[["messieurs","Messieurs"],["dames","Dames"],["mixte","Mixte"]];
  const tournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
  const favoris=window.PA_FAVORIS||null; // favoris.js (étoiles, « Mes tournois », calendrier)
+ const depsAvecFiches=new Set(((window.PA_PAGES_TOURNOIS||{}).departements)||[]);
+ const aUneFiche=t=>!!t.id&&/^\d+$/.test(String(t.id))&&depsAvecFiches.has(t.dep);
  // Sexe : liste « sexes » (une entrée par épreuve), ou ancien champ « sexe »
  const sexesDe=t=>Array.isArray(t.sexes)?t.sexes:(t.sexe?[t.sexe]:[]);
 
@@ -228,7 +230,10 @@ function initialiser(donnees,contenu,horsConnexion){
  function creerCarte(t){
   const carte=document.createElement("article");carte.className="tcard";carte.dataset.id=String(t.id||"");
   const haut=document.createElement("div");haut.className="tcard-top";
-  ajouterTexte(haut,"h3","",t.nom);
+  const titre=ajouterTexte(haut,"h3","","");
+  // Fiche générée (tournoi/<id>.html) pour les départements publiés, sinon simple titre
+  if(aUneFiche(t)){const a=ajouterTexte(titre,"a","tcard-lien",t.nom);a.href="tournoi/"+encodeURIComponent(String(t.id))+".html";}
+  else titre.textContent=t.nom;
   const coin=document.createElement("div");coin.className="tcard-coin";
   if(t.categorie) ajouterTexte(coin,"span","tbadge",t.categorie);
   if(favoris&&t.id){
@@ -256,6 +261,7 @@ function initialiser(donnees,contenu,horsConnexion){
   }
   const url=lienFiche(t);
   const liens=document.createElement("div");liens.className="tliens";
+  if(aUneFiche(t)){const f=ajouterTexte(liens,"a","tlien tfiche","Points et infos");f.href="tournoi/"+encodeURIComponent(String(t.id))+".html";}
   if(url){
    const lien=ajouterTexte(liens,"a","tlien","Voir sur Ten'Up");
    lien.href=url;lien.target="_blank";lien.rel="noopener";
@@ -382,6 +388,8 @@ function initialiser(donnees,contenu,horsConnexion){
  let recherche="";
  function afficher(){
   const etat=lireEtat();
+  // Département choisi : retenu pour l'accueil (« près de chez toi ») et les distances des fiches
+  if(zone.mode==="dep"&&zone.dep){try{localStorage.setItem("pa-mon-departement",zone.dep);}catch(e){}}
   recherche=sansAccent(etat.texte.trim());
   const point=pointDeReference();
   let sansPosition=0;

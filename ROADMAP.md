@@ -19,14 +19,14 @@
 
 ## Lot T — Le hub tournois (jours 1-30)
 
-- [ ] **T1. Script de génération `scripts/generer-pages.js`** (Node, sans dépendance). Lit `assets/data/tournois.json` + `assets/data/fiches/*.json` + `assets/js/bareme.js` et écrit :
+- [x] **T1. Script de génération `scripts/generer-pages.js`** (Node, sans dépendance). Lit `assets/data/tournois.json` + `assets/data/fiches/*.json` + `assets/js/bareme.js` et écrit : ✅ 26/10/2026, commit d5f989e (avec T2).
   - `tournoi/<id>.html` : une page par tournoi (voir T2 pour le contenu).
   - `tournois/<dep>.html` (ex. `tournois/76.html`) : liste du département, carte, filtres catégorie/sexe/date, H1 « Tournois de padel en Seine-Maritime ».
   - `tournois/<region>/<categorie>.html` (13 régions × P25…P1000) : H1 « Tournois de padel P25 en Normandie ».
   - `sitemap.xml` régénéré (toutes les pages, `lastmod`).
   Un gabarit HTML partagé (nav + footer identiques aux autres pages), aucun JS lourd par page, < 25 Ko par page. Lance-le d'abord sur les départements 76, 27, 14, 50, 61, 75, 77, 78, 91, 92, 93, 94, 95 ; vérifie 10 pages au hasard ; puis sur tout. Les pages des tournois terminés restent 60 jours (bandeau « Terminé »), puis passent en `noindex` et renvoient vers la page du département.
 
-- [ ] **T2. Contenu de la fiche tournoi** (gabarit de T1) :
+- [x] **T2. Contenu de la fiche tournoi** (gabarit de T1) : ✅ 26/10/2026, commit d5f989e (gabarit du générateur T1).
   - En-tête : badge de catégorie (couleurs : P25 vert, P50 turquoise, P100 jaune, P250 orange, P500 corail, P1000+ violet, à définir en tokens CSS et réutiliser partout), nom, club, ville, dates, distance « depuis chez toi » (département mémorisé en localStorage ou géoloc sur clic), boutons « S'inscrire sur Ten'Up » (lien vers `https://tenup.fft.fr/tournoi/<id>`) et « Ajouter à mon calendrier » (.ics).
   - « Ce que ça rapporte » : table du barème de la catégorie (réutiliser les données de bareme.js) en colonnes selon le nombre de paires ; si la fiche connaît la taille du tableau (`tableau`), surligner la colonne. Lien vers le simulateur.
   - Épreuves (code, libellé, cut, tarif, taille du tableau), juge-arbitre, balles, commentaire organisateur (données de `fiches/`), adresse + lien itinéraire.

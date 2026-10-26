@@ -437,6 +437,27 @@ for (const region of REGIONS.filter(r => r.deps.every(d => publies.includes(d)))
   }
 }
 
+/* ---------- Prochains tournois par département (accueil « Cette semaine près de chez toi ») ----------
+   Pour TOUS les départements (pas seulement ceux publiés) : le bloc de l'accueil marche partout,
+   avec un lien vers la fiche quand elle existe. Les tournois passés sont filtrés côté navigateur. */
+if (!partiel) {
+  const parDep = {};
+  donnees.tournois.filter(valide).forEach(t => { (parDep[t.dep] = parDep[t.dep] || []).push(t); });
+  const dossierProchains = path.join(RACINE, "assets/data/prochains");
+  fs.mkdirSync(dossierProchains, { recursive: true });
+  const attendus = new Set();
+  for (const dep of Object.keys(parDep).sort()) {
+    const prochains = parDep[dep].filter(aVenir).sort(parDate).slice(0, 12).map(t => ({
+      id: String(t.id), nom: t.nom, categorie: t.categorie || null, ville: casse(t.ville), date_debut: t.date_debut, date_fin: t.date_fin || t.date_debut,
+      ...(typeof t.lat === "number" ? { lat: t.lat, lng: t.lng } : {}), page: publies.includes(dep),
+    }));
+    const f = path.join(dossierProchains, dep + ".json"), contenu = JSON.stringify({ dep, nom: nomDep(dep), tournois: prochains }) + "\n";
+    attendus.add(dep + ".json");
+    if (!fs.existsSync(f) || fs.readFileSync(f, "utf8") !== contenu) fs.writeFileSync(f, contenu);
+  }
+  fs.readdirSync(dossierProchains).filter(f => !attendus.has(f)).forEach(f => fs.unlinkSync(path.join(dossierProchains, f)));
+}
+
 /* ---------- Pages devenues inutiles (tournois supprimés de l'archive, hors périmètre) ---------- */
 let nbSupprimees = 0;
 if (partiel) {
