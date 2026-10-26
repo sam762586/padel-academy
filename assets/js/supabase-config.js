@@ -12,4 +12,6 @@ window.PA_SUPABASE = { url: "https://bvhfizdfgccrkhdfqzkf.supabase.co", anonKey:
 //   "espace"      : migrations 2026-10-26-espace-01 à 06 (résultats, objectifs et rang synchronisés avec le compte)
 //   "journal"     : migrations 2026-10-26-journal-01 à 03 (journal de matchs : partenaire, type, matchs saisis après coup)
 //   "communaute"  : migrations 2026-10-26-t4-*.sql (« J'y vais », annonces et avis sur les fiches tournois)
+//   "quiz2"       : migrations 2026-10-26-quiz-03 à 05 (test de niveau v2 enregistré dans le profil)
+//   "coach"       : migrations 2026-10-27-coach-01 à 04 + fonction déployée (coach IA, voir supabase/LISEZMOI.md)
 window.PA_SUPABASE.activees = [];

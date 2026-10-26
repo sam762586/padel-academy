@@ -86,6 +86,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 4. `2026-10-26-t4-01` à `-12`, puis ajoute `"communaute"` à `PA_SUPABASE.activees`.
 5. `2026-10-26-espace-01` à `-06`, puis ajoute `"espace"` à `PA_SUPABASE.activees`.
 6. `2026-10-26-journal-01` à `-03` (après `20261026_matchs.sql`, déjà exécuté), puis ajoute `"journal"` à `PA_SUPABASE.activees`.
+7. `2026-10-27-coach-01` à `-04`, déploiement de la fonction `coach` et secret `ANTHROPIC_API_KEY` (section « Coach IA » plus bas), puis ajoute `"coach"` à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
@@ -98,3 +99,23 @@ Tant que ce n'est pas fait, l'espace joueur marche entièrement sur l'appareil. 
 `2026-10-26-journal-01` à `-03` complètent la table `matchs` : identifiant `cle` (un match du téléphone n'est jamais copié deux fois ; les anciens matchs prennent leur `id`), `partenaire`, `type_match` (amical, tournoi, entraînement), `saisie` (compteur ou manuelle) ; la liste des points peut être vide pour un match saisi après coup. Ajoute ensuite `"journal"` à `PA_SUPABASE.activees`.
 
 Le compte sert d'archive : effacer l'historique du compteur sur un téléphone ne supprime rien dans le compte. Seule la suppression d'un match depuis le journal de l'espace joueur l'efface partout (mise en attente si le téléphone est hors connexion).
+
+# Coach IA (coach.html)
+
+Le coach répond aux questions de padel des joueurs connectés. La question part vers la fonction Supabase `coach` (`supabase/functions/coach/`), qui appelle l'API Claude d'Anthropic avec le contenu du site. **La clé de l'API Claude reste dans les secrets Supabase, jamais dans le site.** Limite : 10 questions par joueur et par jour (`LIMITE_JOUR` dans `logique.ts`) ; une question qui échoue est rendue.
+
+Mise en route (une seule fois) :
+
+1. **SQL** : exécute `2026-10-27-coach-01` à `-04` dans cet ordre (table `coach_usage` et sa RLS, fonctions `coach_consommer` et `coach_rembourser`, réservées à la clé de service).
+2. **Clé API** : crée une clé sur https://console.anthropic.com (Settings → API Keys), et fixe une limite de dépense mensuelle dans Settings → Limits.
+3. **Secret et déploiement**, depuis le dossier du site, avec la CLI Supabase (`npx supabase login` puis `npx supabase link --project-ref <id du projet>`) :
+   - `npx supabase secrets set ANTHROPIC_API_KEY=<ta clé>`
+   - `npx supabase functions deploy coach`
+   `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` sont fournis automatiquement aux fonctions.
+4. Ajoute `"coach"` à `PA_SUPABASE.activees` (`assets/js/supabase-config.js`), puis publie le site.
+
+Avant ça, la page Coach IA affiche « bientôt » et n'appelle rien.
+
+Contenu : `supabase/functions/coach/connaissances.ts` est généré par `node scripts/generer-connaissances.js` à partir des pages et des données du site. Relance-le après une modification de contenu, puis redéploie la fonction (`npx supabase functions deploy coach`). `scripts/verifier-coach.cjs` signale un fichier en retard.
+
+Coût indicatif (modèle Claude Opus 5.5, tarif d'octobre 2026) : environ 0,02 $ par question quand le contenu du site est en cache (questions rapprochées, moins de 5 minutes d'écart), jusqu'à environ 0,17 $ pour la première question après un moment de calme (le contenu du site, environ 29 000 jetons, est alors relu en entier). Le modèle se change dans `MODELE` (`logique.ts`).

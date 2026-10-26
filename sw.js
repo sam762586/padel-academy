@@ -14,14 +14,14 @@ const SHELL = [
   "./",
   "index.html", "technique.html", "tactique.html", "tutos.html", "niveau.html", "entrainement.html", "videos.html",
   "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
-  "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "score.html", "partenaires.html", "hors-ligne.html",
+  "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "coach.html", "score.html", "partenaires.html", "hors-ligne.html",
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
   "assets/style.css",
   "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",
   "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/plan.js", "assets/js/pwa.js",
   "assets/js/quiz-niveau.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
-  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/accueil-tournois.js", "assets/data/pages-tournois.js",
+  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/accueil-tournois.js", "assets/js/coach.js", "assets/data/pages-tournois.js",
   "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png"
 ];
 

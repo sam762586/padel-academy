@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach IA padel : pose tes questions de jeu</title>
+<meta name="description" content="Le coach IA d'Apprendre Padel répond à tes questions de padel (coups, placement, tactique, matériel, tournois) en s'appuyant sur le contenu du site et sur ton profil.">
+<link rel="canonical" href="https://apprendre-padel.fr/coach.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Apprendre Padel">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://apprendre-padel.fr/coach.html">
+<meta property="og:title" content="Coach IA padel : pose tes questions de jeu">
+<meta property="og:description" content="Le coach IA d'Apprendre Padel répond à tes questions de padel (coups, placement, tactique, matériel, tournois) en s'appuyant sur le contenu du site et sur ton profil.">
+<meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Coach IA", "item": "https://apprendre-padel.fr/coach.html"}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css?v=67290e12b5">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js?v=a63caa1792" defer></script>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Apprendre <span>Padel</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <ul id="nav-menu"><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre active" aria-expanded="false" aria-controls="nav-progresser">Progresser</button><ul class="nav-sous" id="nav-progresser"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li><li><a href="coach.html" class="active" aria-current="page">Coach IA</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-tournois">Tournois</button><ul class="nav-sous" id="nav-tournois"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="coach-page">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Progresser · Coach IA</p><h1>Pose ta question au coach</h1></div>
+      <p>Un coup qui ne passe pas, un placement qui te coûte des points, un choix de raquette, un premier tournoi : le coach répond en quelques lignes, à partir des pages du site et de ton profil de joueur.</p>
+    </div>
+    <div class="acc-card coach" id="coach">
+      <div id="coach-statut"></div>
+      <div id="coach-zone" hidden>
+        <div class="coach-fil" id="coach-fil" aria-live="polite"></div>
+        <div class="coach-suggestions" id="coach-suggestions"></div>
+        <form class="coach-form" id="coach-form" novalidate>
+          <label for="coach-question" class="sr-only">Ta question</label>
+          <textarea id="coach-question" rows="3" maxlength="1000" placeholder="Ex. : comment sortir de la double vitre sans offrir la volée ?"></textarea>
+          <div class="coach-actions">
+            <span id="coach-restant" class="coach-restant" role="status"></span>
+            <button type="button" class="btn ghost" id="coach-nouvelle" hidden>Nouvelle conversation</button>
+            <button type="submit" class="btn primary" id="coach-envoyer">Envoyer</button>
+          </div>
+        </form>
+        <details class="coach-contexte">
+          <summary>Ce que le coach sait de toi</summary>
+          <ul id="coach-contexte-liste"></ul>
+          <label class="coach-partage"><input type="checkbox" id="coach-partage" checked> Partager ces informations avec le coach</label>
+        </details>
+      </div>
+    </div>
+
+    <p class="subhead">Bon à savoir</p>
+    <div class="grid">
+      <div class="card"><div class="top"><h3>Ce qu'il sait faire</h3></div><p>Expliquer un coup, une règle, un placement ; te proposer un exercice ; t'aider à choisir une raquette ou un tournoi. Il s'appuie sur les pages du site et te donne le lien pour approfondir.</p></div>
+      <div class="card"><div class="top"><h3>Ses limites</h3></div><p>Il ne te voit pas jouer : décris la situation précisément (ta position, la balle, ce que tu fais). Il ne remplace ni un entraîneur sur le terrain, ni un médecin si tu as mal.</p></div>
+      <div class="card"><div class="top"><h3>Tes données</h3></div><p>La conversation reste sur ton appareil. Ta question part vers le modèle d'IA pour obtenir la réponse ; le site ne garde que le nombre de questions posées dans la journée. Détails sur la page <a href="confidentialite.html#coach">Confidentialité</a>.</p></div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Apprendre Padel</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par Samuel, joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js?v=bdfc155d0a"></script>
+<script src="assets/js/compte.js?v=29c68d6cfe"></script>
+<script src="assets/js/score.js?v=7775975e61"></script>
+<script src="assets/js/journal.js?v=39dec3002e"></script>
+<script src="assets/js/coach.js?v=928f0f7a9d"></script>
+<script src="assets/js/nav.js?v=bcab64c766"></script>
+<script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

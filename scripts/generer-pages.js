@@ -245,7 +245,7 @@ function sePreparer(t) {
   if (["P100", "P250", "P500"].includes(t.categorie)) liens.push(["tutos.html", "Quand monter au filet, que faire sur un lob : les décisions qui font gagner"]);
   if (["P100", "P250", "P500", "P1000"].includes(t.categorie)) liens.push(["regles.html", "Point décisif, let, vitres : les règles qui coûtent des points"]);
   if (mixte) liens.push(["tactique.html", "Tactique en mixte : placement et répartition des balles"]);
-  liens.push(["niveau.html", "Quel est ton niveau ? Le test en 10 questions"]);
+  liens.push(["niveau.html", "Quel est ton niveau ? Le test en 14 questions"]);
   liens.push(["entrainement.html", "Plan d'entraînement 8 semaines pour arriver prêt"]);
   return liens.slice(0, 3);
 }

@@ -14,6 +14,7 @@ Pages : index, technique, tactique, tutos, niveau, entrainement, videos, regles,
 - Pas de framework, pas de bundler, pas de dépendance npm : on doit pouvoir ouvrir index.html en double-cliquant.
 - Menu et pied de page : une seule source, `scripts/gabarit.js`. Pour changer le menu (ou ajouter une page au menu), modifier `MENU` puis lancer `node scripts/appliquer-gabarit.js` : toutes les pages de la racine sont mises à jour, et les pages tournois le seront à la prochaine génération (`node scripts/generer-pages.js`).
 - Après toute modification de `assets/style.css` ou d'un `assets/js/*.js` : lancer `node scripts/appliquer-gabarit.js` (et `node scripts/generer-pages.js` pour les pages tournois). Les liens portent `?v=<empreinte>` : sans ça, le cache hors connexion peut servir une page neuve avec un ancien style. `appliquer-gabarit.js --verifier` (et `verifier-pages.cjs`) signale les pages en retard.
+- Coach IA : après une modification de contenu (pages, coups, lexique, plan, raquettes…), lancer `node scripts/generer-connaissances.js` puis redéployer la fonction `coach` (voir supabase/LISEZMOI.md).
 - Nouvelle page = copier le squelette d'une page existante (entre `<nav class="nav"` … `</nav>` et `<footer>` … `</footer>`, le script remet le gabarit).
 - Responsive obligatoire (tester à 400 px). Gouttière 16 px minimum.
 - Pas d'images externes ni de iframes YouTube dans le dépôt : liens sortants uniquement, sauf si des photos sont ajoutées dans `assets/img/`.

@@ -138,6 +138,24 @@
   }catch(e){ return echec(e,"Impossible de charger ton historique."); }
  };
 
+ // Coach IA (fonction Supabase « coach ») : demande = { question, historique, contexte }
+ // -> { ok:true, reponse, restant } ou { ok:false, message, restant } (restant : questions encore possibles aujourd'hui)
+ compte.coach=async function(demande){
+  if(!compte.user) return nonConnecte();
+  const restantDe=c=>c&&Number.isInteger(c.restant)?c.restant:null;
+  try{
+   const {data,error}=await client.functions.invoke("coach",{body:demande});
+   if(error){
+    // Réponse d'erreur de la fonction : son message (quota atteint, connexion…) est plus clair que l'erreur brute
+    let corps=null;
+    try{ if(error.context&&typeof error.context.json==="function") corps=await error.context.json(); }catch(e){}
+    return {ok:false,message:corps&&typeof corps.erreur==="string"?corps.erreur:messageErreur(error,"Le coach est indisponible pour le moment."),restant:restantDe(corps)};
+   }
+   if(!data||typeof data.reponse!=="string") return {ok:false,message:data&&typeof data.erreur==="string"?data.erreur:"Le coach n'a pas pu répondre.",restant:restantDe(data)};
+   return {ok:true,reponse:data.reponse,restant:restantDe(data)};
+  }catch(e){ return echec(e,"Le coach est indisponible pour le moment."); }
+ };
+
  // Plan : semaines validées (indices 0 à 7 côté site, stockés tels quels dans plan_progress.semaine)
  compte.loadPlan=async function(proprietaire=compte.user&&compte.user.id){
   if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();

@@ -15,7 +15,7 @@ const AUTEUR = {
 const MENU = [
   { id: "apprendre", nom: "Apprendre", liens: [["technique.html", "Technique"], ["tactique.html", "Tactique"], ["tutos.html", "Tutos"],
     ["regles.html", "Règles"], ["conseils.html", "Conseils"], ["materiel.html", "Matériel"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"]] },
-  { id: "progresser", nom: "Progresser", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Entraînement"], ["score.html", "Compteur"]] },
+  { id: "progresser", nom: "Progresser", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Entraînement"], ["score.html", "Compteur"], ["coach.html", "Coach IA"]] },
   { id: "tournois", nom: "Tournois", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
