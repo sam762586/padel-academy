@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Quelle raquette de padel choisir ? Guide et sélecteur 2026", "item": "https://apprendre-padel.fr/materiel.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=ea7106a133">
+<link rel="stylesheet" href="assets/style.css?v=6360c2b99f">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -38,7 +38,7 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">Tests matériel · Outil</p><h1>Quelle raquette pour moi ?</h1></div>
-      <p>Réponds à 6 questions. On croise ton profil avec notre base de raquettes 2026 (forme, balance, poids, niveau, prix) et on te propose les 3 meilleures.</p>
+      <p>Réponds à 6 questions, et choisis tes marques préférées si tu en as. On croise ton profil avec notre base de raquettes 2025-2026 (forme, balance, poids, niveau, prix) et on te propose les 3 meilleures, puis les suivantes.</p>
     </div>
     <div class="photo-row"><figure><img src="assets/img/photos/raq-1.webp" width="720" height="540" alt="Trois raquettes de padel sur un terrain" loading="lazy"><figcaption>Forme ronde, goutte, diamant</figcaption></figure><figure><img src="assets/img/photos/raq-2.webp" width="720" height="540" alt="Raquettes de padel contre la grille" loading="lazy"><figcaption>Choisir selon son niveau</figcaption></figure><figure><img src="assets/img/photos/raq-3.webp" width="720" height="540" alt="Raquette de padel sur terrain bleu" loading="lazy"><figcaption>Mousse et surface</figcaption></figure><figure><img src="assets/img/photos/raq-4.webp" width="720" height="540" alt="Raquette rouge en gros plan" loading="lazy"><figcaption>Poids et balance</figcaption></figure></div>
     <div class="sel-grid">
@@ -76,6 +76,11 @@
             <label><input type="radio" name="confort" value="oui" id="k-oui">Oui, je veux du confort</label>
           </div>
         </fieldset>
+        <fieldset><legend>Marques préférées <small>(facultatif)</small></legend>
+          <details class="marques" id="marques-details"><summary id="marques-resume">Toutes les marques</summary>
+            <div class="opts" id="marques"></div>
+          </details>
+        </fieldset>
         <fieldset><legend>Budget maximum</legend>
           <div class="range"><input type="range" id="budget" aria-label="Budget maximum" min="50" max="400" step="10" value="180"><output id="budget-out" for="budget">180 €</output></div>
         </fieldset>
@@ -84,7 +89,7 @@
       <div>
         <div class="results-head"><h3 id="res-title">Tes recommandations</h3><span id="res-count"></span></div>
         <div class="results" id="results"></div>
-        <p class="note">Prix constatés chez les revendeurs français le 26/10/2026 (souvent en promotion, −30 à −50 % vs catalogue) : ils bougent chaque semaine. Avant d'acheter, essaie si possible : beaucoup de clubs prêtent des raquettes test.</p>
+        <p class="note">Prix constatés chez les revendeurs français les 26 et 27/10/2026 (souvent en promotion, −30 à −50 % vs catalogue) : ils bougent chaque semaine. Avant d'acheter, essaie si possible : beaucoup de clubs prêtent des raquettes test.</p>
       </div>
     </div>
   </div>
@@ -120,7 +125,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script src="assets/js/raquettes.js?v=94f62217a1"></script>
+<script src="assets/js/raquettes.js?v=ba4a7d92f7"></script>
 <script src="assets/js/nav.js?v=bcab64c766"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

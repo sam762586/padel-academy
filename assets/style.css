@@ -924,3 +924,19 @@ details.geste summary{color:var(--turf)}
   .nav-sous a.active{color:#fff}
 }
 @media (min-width:861px) and (max-width:979px){.nav .brand{font-size:1.35rem}.nav .wrap{gap:10px}.nav #nav-menu{gap:0}.nav #nav-menu>li>a,.nav-titre{padding:8px 9px}}
+
+/* Sélecteur de raquette : marques préférées et suite du classement */
+.marques summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;font-weight:700;font-size:.9rem;color:var(--fg)}
+.marques summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.marques[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+.marques .opts{margin-top:12px}
+.marques .opts small{opacity:.6;font-weight:600}
+.marques-effacer{background:none;border:0;color:var(--turf);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;padding:9px 6px;text-decoration:underline}
+.lien-btn{background:none;border:0;padding:0;color:var(--turf);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.rk-plus{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:6px 18px}
+.rk-plus summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:800;color:var(--turf)}
+.rk-plus ol{margin:0 0 12px;padding-left:24px;display:grid;gap:8px}
+.rk-plus li{color:var(--muted)}
+.rk-plus li>span{display:block}
+.rk-plus li b{color:var(--fg)}
+.rk-plus-meta{font-size:.85rem}
