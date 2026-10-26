@@ -108,7 +108,7 @@ function fauxSdk(matchCommun){
   assert.ok(await page.isVisible('#mp-rang-msg'));
   await page.fill('#mp-rang','4512');await page.click('#mp-form-rang button[type=submit]');
   let palier=await page.textContent('#mp-palier');
-  assert.match(palier,/P100, P250, P500 et plus/);assert.match(palier,/Top 3 000|Top 3 000/);assert.match(palier,/1 512|1 512/);assert.match(palier,/P100 te seront fermés/);
+  assert.match(palier,/en P250, P500 et plus/);assert.match(palier,/Top 1 000|Top 1 000/);assert.match(palier,/3 512|3 512/);assert.match(palier,/P250 te seront fermés/);
   await page.click('label.tchip:has(input[value=dames])');await page.fill('#mp-rang','250');await page.click('#mp-form-rang button[type=submit]');
   palier=await page.textContent('#mp-palier');
   assert.match(palier,/P250, P500 et plus/);assert.match(palier,/Top 100/);

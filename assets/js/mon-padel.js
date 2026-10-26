@@ -71,7 +71,7 @@ const MP_NB_MATCHS=5;
    p2.append("Prochain palier : ",el("b","","Top "+nombre(prochain.cut)),`, encore ${nombre(r.rang-prochain.cut)} places. Une fois dedans, les ${prochain.c} te seront fermés.`);
    zone.appendChild(p2);
   }
-  zone.append(el("p","note",`Cuts indicatifs, repris du tableau de la page Barème. Ton rang évolue chaque mois avec les points de tous les joueurs : vérifie-le sur Ten'Up. Saisi le ${new Date(r.maj).toLocaleDateString("fr-FR")}.`));
+  zone.append(el("p","note",`Cuts relevés sur Ten'Up (tableau de la page Barème). Ton rang évolue chaque mois avec les points de tous les joueurs : vérifie-le sur Ten'Up. Saisi le ${new Date(r.maj).toLocaleDateString("fr-FR")}.`));
  }
  formRang.addEventListener("submit",e=>{
   e.preventDefault();

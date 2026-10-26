@@ -14,8 +14,9 @@ const BAREME={
  P2000:[2000,1700,1500,1400,1200,1160,1120,1080,900,860,820,780,740,700,660,620,540,520,500,480,460,440,420,400,340,300,260,220,180,140,100,60],
  P3000:[3000,2550,2250,2100,1800,1740,1680,1620,1350,1290,1230,1170,1110,1050,990,930,810,780,750,720,690,660,630,600,510,450,390,330,270,210,150,90],
 };
-/* Cuts (classement maximal pour s'inscrire) — Chapitre II 2026, épreuves seniors */
-const CUTS=[["P25","Top 30 000","Top 3 000"],["P50","Top 10 000","Top 1 000"],["P100","Top 3 000","Top 300"],["P250","Top 800","Top 100"],["P500","Open (liste à la charge des paires)","Open"],["P1000","Open / invitation","Open / invitation"],["P2000","Open","Open"],["P3000","Open","Open"]];
+/* Cuts des épreuves seniors : la catégorie est INTERDITE aux joueurs classés dans ce top.
+   Relevé sur les fiches Ten'Up le 26/10/2026 (plusieurs milliers d'épreuves, valeurs identiques partout). */
+const CUTS=[["P25","Top 30 000","Top 3 000"],["P50","Top 10 000","Top 1 000"],["P100","Top 5 000","Top 500"],["P250","Top 1 000","Top 100"],["P500","Open (liste à la charge des paires)","Open"],["P1000","Open / invitation","Open / invitation"],["P2000","Open","Open"],["P3000","Open","Open"]];
 const PLACE_LABEL=i=>i===0?"Vainqueur":i===1?"Finaliste":(i===2||i===3)?`${i+1}e (½ finale)`:(i>=4&&i<=7)?`${i+1}e (¼ finale)`:(i>=8&&i<=15)?`${i+1}e (⅛ finale)`:(i===31?"32e et plus":`${i+1}e`);
 const trancheIdx=n=>n<=8?0:n<=12?1:n<=16?2:n<=20?3:n<=24?4:n<=28?5:6;
 
@@ -55,6 +56,6 @@ function classementEstime(resultats,jour){
  const retenus=lignes.filter(r=>r.date&&r.date<=jour&&simExpire(r.date)>jour).sort((a,b)=>b.pts-a.pts||a.index-b.index).slice(0,12);
  return {retenus,total:retenus.reduce((s,r)=>s+r.pts,0)};
 }
-// Cuts en nombres : classement à partir duquel la catégorie est FERMÉE au joueur (repris du tableau CUTS, indicatif)
-const CUTS_NUM={P25:{messieurs:30000,dames:3000},P50:{messieurs:10000,dames:1000},P100:{messieurs:3000,dames:300},P250:{messieurs:800,dames:100}};
+// Cuts en nombres : classement à partir duquel la catégorie est FERMÉE au joueur (mêmes valeurs que CUTS)
+const CUTS_NUM={P25:{messieurs:30000,dames:3000},P50:{messieurs:10000,dames:1000},P100:{messieurs:5000,dames:500},P250:{messieurs:1000,dames:100}};
 window.PA_BAREME={BAREME,TRANCHES,CUTS,CUTS_NUM,PLACE_LABEL,trancheIdx,ptsFor,simIso,simLireDate,simExpire,simNormaliser,classementEstime,SIM_KEY};
