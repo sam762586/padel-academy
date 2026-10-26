@@ -175,6 +175,7 @@ const MP_NB_MATCHS=5;
  }
 
  rendreClassement();rendreRang();rendreMatchs();rendreFavoris();
+ if(window.PA_FAVORIS)window.PA_FAVORIS.onChange(()=>rendreFavoris());
  chargerMatchsCompte();
  if(window.PA_COMPTE&&window.PA_COMPTE.actif)window.PA_COMPTE.onChange(chargerMatchsCompte);
  // Retour sur l'onglet (après avoir saisi un résultat ou compté un match ailleurs) : on rafraîchit

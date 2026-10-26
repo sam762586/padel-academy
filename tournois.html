@@ -41,6 +41,13 @@
     </div>
     <p class="acc-msg" id="tournois-vide" role="status" hidden>Pas encore de tournois chargés. La liste sera disponible dès qu'elle aura été mise à jour. En attendant, tu peux chercher sur <a href="https://tenup.fft.fr/" target="_blank" rel="noopener">Ten'Up</a>.</p>
     <div id="tournois-contenu" hidden>
+      <p class="acc-msg" id="tournois-fav-msg" role="status" hidden></p>
+      <div class="tmes" id="tournois-mes" hidden>
+        <h2 class="tmes-titre">Mes tournois</h2>
+        <p class="tmes-aide">Tes favoris ★, gardés sur cet appareil (et dans ton compte si tu es connecté). « Ajouter au calendrier » crée un rappel 7 jours avant le tournoi, et la veille de la clôture des inscriptions quand elle est connue.</p>
+        <div class="tliste" id="tournois-mes-liste"></div>
+        <p class="tdetail" id="tournois-mes-note" hidden></p>
+      </div>
       <form class="tfiltres" id="tournois-filtres" novalidate>
         <fieldset class="tgroupe tzone tgroupe-large">
           <legend>Ta zone</legend>
@@ -118,6 +125,10 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/compte.js"></script>
+<script src="assets/js/favoris.js"></script>
 <script src="assets/js/carte-france.js"></script>
 <script src="assets/js/tournois.js"></script>
 <script src="assets/js/nav.js"></script>

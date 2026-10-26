@@ -4,7 +4,7 @@
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v6-mon-padel";
+const CACHE = "pa-v7-favoris";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -18,7 +18,7 @@ const SHELL = [
   "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/plan.js", "assets/js/pwa.js",
   "assets/js/quiz-niveau.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
-  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js",
+  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js",
   "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png"
 ];
 

@@ -62,6 +62,7 @@ function initialiser(donnees,contenu,horsConnexion){
  const JOURS=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
  const SEXES=[["messieurs","Messieurs"],["dames","Dames"],["mixte","Mixte"]];
  const tournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
+ const favoris=window.PA_FAVORIS||null; // favoris.js (étoiles, « Mes tournois », calendrier)
  // Sexe : liste « sexes » (une entrée par épreuve), ou ancien champ « sexe »
  const sexesDe=t=>Array.isArray(t.sexes)?t.sexes:(t.sexe?[t.sexe]:[]);
 
@@ -228,7 +229,15 @@ function initialiser(donnees,contenu,horsConnexion){
   const carte=document.createElement("article");carte.className="tcard";carte.dataset.id=String(t.id||"");
   const haut=document.createElement("div");haut.className="tcard-top";
   ajouterTexte(haut,"h3","",t.nom);
-  if(t.categorie) ajouterTexte(haut,"span","tbadge",t.categorie);
+  const coin=document.createElement("div");coin.className="tcard-coin";
+  if(t.categorie) ajouterTexte(coin,"span","tbadge",t.categorie);
+  if(favoris&&t.id){
+   // Étoile favori (favoris.js) : état mis à jour par majEtoiles()
+   const etoile=ajouterTexte(coin,"button","tfav","");
+   etoile.type="button";etoile.dataset.fav=String(t.id);
+   majEtoile(etoile,t);
+  }
+  haut.appendChild(coin);
   carte.appendChild(haut);
   const lieu=[t.club,t.ville].filter(Boolean).join(" · ");
   if(lieu) ajouterTexte(carte,"p","tlieu",lieu+(t.dep?" ("+t.dep+")":""));
@@ -256,8 +265,70 @@ function initialiser(donnees,contenu,horsConnexion){
    const partenaire=ajouterTexte(liens,"a","tlien tpartenaire","Trouver un partenaire");
    partenaire.href="partenaires.html?tournoi="+encodeURIComponent(String(t.id));
   }
+  if(favoris&&t.id){
+   const cal=ajouterTexte(liens,"button","tlien tcal","Ajouter au calendrier");
+   cal.type="button";cal.dataset.cal=String(t.id);
+   cal.setAttribute("aria-label","Ajouter au calendrier : "+t.nom+" ("+formaterPeriode(t.date_debut,t.date_fin)+")");
+  }
   if(liens.children.length) carte.appendChild(liens);
   return carte;
+ }
+ // ----- Favoris (★) et calendrier -----
+ function majEtoile(bouton,t){
+  const actif=favoris.estFavori(t.id);
+  bouton.textContent=actif?"★":"☆";
+  bouton.setAttribute("aria-pressed",String(actif));
+  bouton.setAttribute("aria-label",(actif?"Retirer des favoris : ":"Ajouter aux favoris : ")+t.nom);
+  bouton.title=actif?"Retirer des favoris":"Ajouter aux favoris";
+ }
+ function majEtoiles(){
+  document.querySelectorAll("#tournois-app .tfav").forEach(b=>{const t=parId.get(b.dataset.fav);if(t)majEtoile(b,t);});
+ }
+ const blocMes=document.getElementById("tournois-mes");
+ const listeMes=document.getElementById("tournois-mes-liste");
+ const noteMes=document.getElementById("tournois-mes-note");
+ const messageFavoris=document.getElementById("tournois-fav-msg");
+ // Section « Mes tournois » : favoris à venir d'abord, puis ceux qui sont passés
+ function afficherMesTournois(){
+  if(!favoris||!blocMes) return;
+  const ids=favoris.liste();
+  const connus=ids.map(id=>parId.get(id)).filter(Boolean);
+  const aVenir=connus.filter(t=>(t.date_fin||t.date_debut)>=aujourdhui).sort((a,b)=>a.date_debut<b.date_debut?-1:1);
+  const passes=connus.filter(t=>(t.date_fin||t.date_debut)<aujourdhui).sort((a,b)=>a.date_debut<b.date_debut?1:-1);
+  blocMes.hidden=!ids.length;
+  listeMes.textContent="";
+  const cartes=[...aVenir,...passes].map(t=>{const c=creerCarte(t);if(passes.includes(t))c.classList.add("tpasse");listeMes.appendChild(c);return c;});
+  enrichirCartes(cartes);
+  const inconnus=ids.length-connus.length;
+  noteMes.textContent=(passes.length?passes.length+" tournoi"+(passes.length>1?"s":"")+" passé"+(passes.length>1?"s":"")+" : retire"+(passes.length>1?"-les":"-le")+" avec l'étoile. ":"")+
+   (inconnus?inconnus+" favori"+(inconnus>1?"s ne sont":" n'est")+" plus dans la liste (tournoi terminé ou retiré de Ten'Up).":"");
+  noteMes.hidden=!noteMes.textContent;
+ }
+ function clicFavoriOuCalendrier(e){
+  const etoile=e.target.closest("button.tfav");
+  if(etoile){
+   favoris.basculer(etoile.dataset.fav);
+   // Le focus reste sur l'étoile cliquée (la section « Mes tournois » est redessinée)
+   const id=etoile.dataset.fav,dansMes=!!etoile.closest("#tournois-mes");
+   if(!dansMes&&etoile.isConnected) etoile.focus();
+   else{const autre=liste.querySelector('button.tfav[data-fav="'+CSS.escape(id)+'"]');if(autre) autre.focus();}
+   return;
+  }
+  const cal=e.target.closest("button.tcal");
+  if(cal){
+   const t=parId.get(cal.dataset.cal);if(!t) return;
+   // Adresse détaillée si la fiche du département est déjà chargée (clic = action immédiate, sans attente réseau)
+   const fiche=fiches[t.dep]?fiches[t.dep][String(t.id)]:null;
+   if(!favoris.telechargerIcs(t,fiche)&&messageFavoris){messageFavoris.hidden=false;messageFavoris.textContent="Impossible de créer le fichier calendrier pour ce tournoi.";}
+  }
+ }
+ if(favoris){
+  liste.addEventListener("click",clicFavoriOuCalendrier);
+  if(listeMes) listeMes.addEventListener("click",clicFavoriOuCalendrier);
+  favoris.onChange((ids,info)=>{
+   majEtoiles();afficherMesTournois();
+   if(messageFavoris){messageFavoris.hidden=!info.texte;messageFavoris.textContent=info.texte;messageFavoris.classList.toggle("acc-err",!!info.erreur);}
+  });
  }
  // Enrichit une carte avec la fiche du tournoi (tarif, places, cut, adresse, commentaire...)
  function enrichirCarte(carte,fiche){
@@ -577,6 +648,7 @@ function initialiser(donnees,contenu,horsConnexion){
   synchroniserZoneVersFormulaire();afficher();
  });
  if(zone.mode==="moi") messageDeZone("Clique sur « Me localiser » pour trouver les tournois autour de toi.",false);
+ afficherMesTournois();
  afficher();
 }
 })();

@@ -198,6 +198,29 @@
   }catch(e){ return echec(e,"Impossible de charger tes matchs."); }
  };
 
+ // Favoris tournois (favoris.js) : identifiants Ten'Up
+ const tableAbsente=error=>error&&(error.code==="42P01"||error.code==="PGRST205");
+ compte.loadFavoris=async function(proprietaire=compte.user&&compte.user.id){
+  if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();
+  try{
+   const {data,error}=await client.from("favoris").select("tournoi_id").eq("user_id",proprietaire).limit(500);
+   if(error) return tableAbsente(error)?{ok:false,message:"La sauvegarde des favoris n'est pas encore activée."}:echec(error,"Impossible de charger tes favoris.");
+   return {ok:true,ids:(data||[]).map(l=>String(l.tournoi_id))};
+  }catch(e){ return echec(e,"Impossible de charger tes favoris."); }
+ };
+ compte.saveFavori=async function(id,actif,proprietaire=compte.user&&compte.user.id){
+  if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();
+  if(typeof id!=="string"||!/^[0-9A-Za-z_-]{1,20}$/.test(id)||typeof actif!=="boolean") return {ok:false,message:"Favori invalide."};
+  try{
+   const requete=actif
+    ?client.from("favoris").upsert({user_id:proprietaire,tournoi_id:id},{onConflict:"user_id,tournoi_id"})
+    :client.from("favoris").delete().eq("user_id",proprietaire).eq("tournoi_id",id);
+   const {error}=await requete;
+   if(error) return tableAbsente(error)?{ok:false,message:"La sauvegarde des favoris n'est pas encore activée."}:echec(error,"Impossible d'enregistrer ce favori.");
+   return {ok:true};
+  }catch(e){ return echec(e,"Impossible d'enregistrer ce favori."); }
+ };
+
  // Suppression définitive (fonction SQL delete_my_account), puis fin de session locale
  compte.deleteAccount=async function(){
   if(!compte.user) return nonConnecte();

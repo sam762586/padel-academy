@@ -631,3 +631,17 @@ details.geste summary{color:var(--turf)}
 .mp-pct{height:10px;border-radius:999px;background:var(--glass-2);overflow:hidden}
 .mp-pct-rempli{display:block;height:100%;background:var(--turf);border-radius:999px}
 .mp-pct-val{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+
+/* ===== Favoris tournois (tournois.html) ===== */
+.tcard-coin{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tfav{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-2);border-radius:50%;background:rgba(0,0,0,.25);color:var(--sand);font-size:1.35rem;line-height:1;cursor:pointer;padding:0}
+.tfav[aria-pressed="true"]{background:rgba(255,181,71,.16);border-color:var(--sand)}
+.tfav:hover{border-color:var(--sand)}
+.tfav:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tcal{background:none;border:0;padding:0;font-family:var(--body);cursor:pointer;color:var(--sky);min-height:40px}
+.tcal:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tliens .tlien{min-height:40px;display:inline-flex;align-items:center}
+.tmes{margin-bottom:28px;padding:18px;border:1px solid rgba(255,181,71,.35);border-radius:var(--r);background:rgba(255,181,71,.05)}
+.tmes-titre{font-size:clamp(1.8rem,4.5vw,2.4rem)}
+.tmes-aide{color:var(--muted);font-size:.9rem;margin:8px 0 14px;max-width:60em}
+.tcard.tpasse{opacity:.6}
