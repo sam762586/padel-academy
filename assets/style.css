@@ -7,6 +7,8 @@
   --accent:var(--turf); --accent-fg:#06110b;
   --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --body:"Manrope","Segoe UI",Helvetica,Arial,sans-serif;
   --r:16px; --r-s:10px; --maxw:1180px; --shadow:0 20px 60px rgba(0,0,0,.45);
+  /* Couleur de chaque catégorie de tournoi (badges, listes, cartes) : texte foncé --cat-fg sur toutes */
+  --cat-p25:#35e27f; --cat-p50:#2dd4bf; --cat-p100:#f5f04a; --cat-p250:#ff9f43; --cat-p500:#ff5d4a; --cat-p1000:#b69cff; --cat-autre:#97a3b6; --cat-fg:#0b0f17;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -660,3 +662,63 @@ details.geste summary{color:var(--turf)}
 .banner + section{padding-top:30px}
 .banner + section .wrap{position:relative;z-index:1}
 @media (max-width:860px){.hero-photo{justify-self:stretch;width:100%;aspect-ratio:16/10;max-height:none;border-radius:20px}.banner{margin-bottom:-60px}}
+
+/* ===== Badges de catégorie (P25 vert, P50 turquoise, P100 jaune, P250 orange, P500 corail, P1000+ violet) ===== */
+.cat-badge{display:inline-grid;place-items:center;min-width:3.2em;padding:3px 8px;border-radius:8px;font-family:var(--display);font-weight:900;font-size:1.05rem;line-height:1.1;color:var(--cat-fg);background:var(--cat-autre)}
+.cat-badge.cat-p25{background:var(--cat-p25)}.cat-badge.cat-p50{background:var(--cat-p50)}.cat-badge.cat-p100{background:var(--cat-p100)}
+.cat-badge.cat-p250{background:var(--cat-p250)}.cat-badge.cat-p500{background:var(--cat-p500)}
+.cat-badge.cat-p1000,.cat-badge.cat-p2000,.cat-badge.cat-p3000{background:var(--cat-p1000)}
+.cat-badge-xl{font-size:clamp(1.8rem,6vw,2.6rem);padding:6px 14px;border-radius:12px}
+
+/* ===== Pages générées (tournoi/, tournois/) ===== */
+.gen{padding-block:28px 64px;overflow-wrap:anywhere}
+.gen-fil ol{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:4px 8px;font-size:.85rem;color:var(--dim)}
+.gen-fil li+li::before{content:"›";margin-right:8px;color:var(--dim)}
+.gen-fil a{color:var(--muted)}
+.gen-tete{margin-bottom:28px}
+.gen-tete h1{font-size:clamp(2.2rem,6vw,3.6rem)}
+.gen-tete-ligne{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.gen-lieu{font-size:1.15rem;font-weight:700;margin:12px 0 0}
+.gen-dates{color:var(--muted);margin:4px 0 0}
+.gen-distance{margin:14px 0 0;color:var(--muted)}
+.gen-distance b{font-family:var(--display);font-size:clamp(2.4rem,8vw,3.4rem);font-weight:900;color:var(--turf);margin-right:8px;line-height:1}
+.gen-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.gen-actions .btn{min-height:48px}
+.gen-termine{padding:12px 14px;border:1px solid var(--coral);border-radius:var(--r-s);background:rgba(255,93,74,.08);margin:0 0 16px}
+.gen-intro{color:var(--muted);max-width:46em;margin-top:12px}
+.gen-bloc{margin-top:36px}
+.gen-bloc h2{font-size:clamp(1.8rem,4.5vw,2.4rem);margin-bottom:14px}
+.gen-bloc h2:not(:first-child){margin-top:28px}
+.gen-bareme table{font-variant-numeric:tabular-nums;overflow-wrap:normal}
+.gen-bareme th span{display:block;font-size:.7rem;color:var(--dim);font-weight:600}
+.gen-bareme .hi{background:rgba(245,240,74,.14);color:var(--fg)}
+.gen-infos{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.gen-liens{margin:0;padding-left:20px;display:grid;gap:6px}
+.gen-liens-ligne{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.gen-liens-ligne a{display:inline-flex;align-items:center;min-height:40px;padding:6px 12px;border:1px solid var(--line-2);border-radius:999px;text-decoration:none;color:var(--fg)}
+.gen-dep{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:24px;align-items:start;margin-bottom:20px}
+.gen-carte{margin:0}
+.gen-carte svg{width:100%;max-height:360px;display:block}
+.gen-carte path{fill:rgba(53,226,127,.08);stroke:var(--turf);stroke-width:.6}
+.gen-carte circle{fill:var(--cat-p100);stroke:var(--bg);stroke-width:.3}
+.gen-carte figcaption{font-size:.8rem;color:var(--dim);margin-top:6px}
+.gen-filtres{display:grid;gap:14px}
+.gen-filtres fieldset{border:0;margin:0;padding:0;min-width:0}
+.gen-filtres legend,.gen-filtres label:not(.tchip){display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.gen-filtres-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gen-filtres-dates>div{min-width:0}
+.gen-filtres input[type=date]{width:100%;min-width:0;min-height:44px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:9px 10px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.gen-liste{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.gen-item[hidden]{display:none}
+.gen-item a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 14px;min-height:56px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);text-decoration:none;color:var(--fg)}
+.gen-item a:hover{border-color:var(--line-2)}
+.gen-item-texte{display:grid;min-width:0}
+.gen-item-texte b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-item-texte span{color:var(--muted);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-item-date{color:var(--muted);font-size:.85rem;text-align:right;white-space:nowrap}
+@media (max-width:700px){
+  .gen-dep{grid-template-columns:1fr}
+  .gen-item a{grid-template-columns:auto minmax(0,1fr)}
+  .gen-item-date{grid-column:2;text-align:left}
+}
+@media (max-width:420px){.gen-filtres-dates{grid-template-columns:minmax(0,1fr)}}
