@@ -267,7 +267,8 @@ function ecrire(tournois) {
 // ---------- main ----------
 (async () => {
   const ids = chargerEnv();
-  const browser = await chromium.launch({ headless: !HEADED });
+  // --edge : utilise Microsoft Edge déjà installé au lieu du Chromium de Playwright
+  const browser = await chromium.launch({ headless: !HEADED, channel: ARGS.includes("--edge") ? "msedge" : undefined });
   const page = await browser.newPage({ locale: "fr-FR" });
   try {
     await connexion(page, ids);
