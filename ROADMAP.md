@@ -41,13 +41,13 @@
   - Annonces partenaires du tournoi (réutiliser `annonces`, filtrées par `tournoi_id`) affichées sur la fiche, avec le formulaire existant.
   - Avis après tournoi (table `avis` : organisation 1-5, niveau réel 1-5, « je recommande » oui/non, texte ≤ 300 caractères passé par `message_sans_contact()` + liste de mots interdits ; 1 avis par joueur et par tournoi ; visible après la date de fin ; signalement et modération comme `annonces`). Note moyenne du club calculée côté client à partir des avis de ses tournois.
 
-- [ ] **T5. Automatisation hebdomadaire** : `scripts/maj-hebdo.bat` (Windows) qui enchaîne robot Ten'Up → `generer-pages.js` → `git add` + `git commit` (pas de push). Documente dans README.md comment le planifier chaque lundi 6 h avec le Planificateur de tâches Windows. Ajoute au robot une **limite de politesse** (1 requête/s, User-Agent normal) et un mode `--departements 76,27` pour les tests.
+- [x] **T5. Automatisation hebdomadaire** : `scripts/maj-hebdo.bat` (Windows) qui enchaîne robot Ten'Up → `generer-pages.js` → `git add` + `git commit` (pas de push). Documente dans README.md comment le planifier chaque lundi 6 h avec le Planificateur de tâches Windows. Ajoute au robot une **limite de politesse** (1 requête/s, User-Agent normal) et un mode `--departements 76,27` pour les tests. ✅ 26/10/2026, commit 2c621b5. User-Agent « normal » non fait : refusé par la sécurité (le robot reste identifiable).
 
 - [ ] **T6. Second canal de données** : page `proposer-un-tournoi.html` (formulaire connecté : club, ville, catégorie, dates, lien d'inscription) → table `tournois_proposes` (RLS : écriture pour soi, lecture admin) ; l'admin valide depuis compte.html et le script de génération intègre les tournois validés. Objectif : ne plus dépendre uniquement du robot.
 
 - [ ] **T7. Favoris + rappels** (ex-A3) : étoile sur les cartes et les fiches (localStorage + table `favoris` si connecté), section « Mes tournois » dans compte.html, fichier .ics avec rappel J-7. Dépend de T2.
 
-- [ ] **T8. Vérifier les cuts 2026/2027** : `@agent-expert-padel` compare les cuts affichés (P100 Top 3 000 / P250 Top 800 messieurs) au règlement FFT 2026/2027 (Chapitre I ou II, saison depuis le 1er septembre 2026 ; Padel Magazine annonce Top 2 000 / Top 500). Corrige compte.html, bareme.html et les fiches ; cite la source dans le Journal.
+- [x] **T8. Vérifier les cuts 2026/2027** : `@agent-expert-padel` compare les cuts affichés (P100 Top 3 000 / P250 Top 800 messieurs) au règlement FFT 2026/2027 (Chapitre I ou II, saison depuis le 1er septembre 2026 ; Padel Magazine annonce Top 2 000 / Top 500). Corrige compte.html, bareme.html et les fiches ; cite la source dans le Journal. ✅ 26/10/2026, commit 5fd5163 : valeurs relevées sur les fiches Ten'Up (champ « cut » de milliers d'épreuves).
 
 ## Lot M — Marque et confiance (jours 1-30, en parallèle de T)
 
@@ -97,3 +97,10 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 
 ## Journal
 (à compléter par Claude Code à la fin de chaque lot : fait, bloqué et pourquoi, SQL à exécuter, choix pris)
+
+### 26/10/2026 — Lot T (T1 à T5), audit, étapes 0 et 1 de l'espace joueur
+**Fait** : T1-T2 (d5f989e), T3 (40af575), T4 (b748978), T5 (2c621b5) ; puis, après l'audit demandé par Samuel : étape 0 (37b45ed) et étape 1 « espace joueur » (811f2cb). Publié jusqu'à T4 inclus ; T5 et les étapes 0-1 sont commités, non poussés.
+**Bloqué / non fait** : T5, User-Agent « normal » du robot refusé par la sécurité (le robot reste identifiable). T6 à T8 et lots M, C, V, R : en attente, l'audit a réorienté les priorités (espace joueur, puis coach IA et Premium).
+**SQL à exécuter (dans cet ordre, voir supabase/LISEZMOI.md)** : classements-01/02 ; quiz-01/02 ; favoris-01 à 03 puis "favoris" ; t4-01 à 12 puis "communaute" ; espace-01 à 06 puis "espace" (noms à ajouter dans PA_SUPABASE.activees, assets/js/supabase-config.js).
+**Choix pris** : pages tournois générées pour Normandie + Île-de-France seulement (validation du rendu) ; T8 fait d'après les fiches Ten'Up (P100 top 5 000 M / 500 D, P250 top 1 000 M / 100 D) ; plus de push automatique dans la mise à jour hebdomadaire ; « Mon compte » devient « Mon espace » dans la nav.
+
