@@ -1,0 +1,2 @@
+// Généré par scripts/scrape-tenup.js.
+(window.TOURNOIS_FICHES=window.TOURNOIS_FICHES||{})["52"]={"307853":{"adresse":"Rue Jean Tabourot Rue caporal Arty, 52200 LANGRES","horaires":null,"balles":"HEAD / Padel Pro S","commentaire":"Renseignements, inscriptions avec paiement en ligne sur Tennis Padel Langres Début des matchs à 18h Restauration possible sur place Ouvert aux dames","epreuves":[{"code":"DM","libelle":"DOUBLE MESSIEURS SENIOR","categorie":"P50","cut":"Interdit au top 10000","tarif":20,"tableau":8}]}};

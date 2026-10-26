@@ -1,0 +1,99 @@
+/* SERVICE WORKER de Padel Academy.
+   - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation, servi en « stale-while-revalidate ».
+   - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) : « network-first »
+     avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
+   - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
+   Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
+const CACHE = "pa-v1";
+
+// Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
+const SHELL = [
+  "./",
+  "index.html", "technique.html", "tactique.html", "tutos.html", "niveau.html", "entrainement.html", "videos.html",
+  "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
+  "compte.html", "confidentialite.html", "partenaires.html", "hors-ligne.html",
+  "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
+  "assets/style.css",
+  "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",
+  "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/plan.js", "assets/js/pwa.js",
+  "assets/js/quiz-niveau.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
+  "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
+  "assets/js/partenaires.js",
+  "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png"
+];
+
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE).then(cache =>
+      Promise.all(SHELL.map(url => cache.add(url).catch(() => null)))
+    ).then(() => self.skipWaiting())
+  );
+});
+
+// Nettoyage des anciennes versions du cache
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys()
+      .then(noms => Promise.all(noms.filter(nom => nom.startsWith("pa-") && nom !== CACHE).map(nom => caches.delete(nom))))
+      .then(() => self.clients.claim())
+  );
+});
+
+// Données : index des tournois et fiches détaillées par département
+const estDonnee = chemin => chemin.endsWith("/assets/data/tournois.json") || /\/assets\/data\/fiches\/[0-9AB]{2,3}\.json$/.test(chemin);
+
+// Réponse du cache, marquée pour que la page sache qu'elle est hors connexion
+function marquerDepuisCache(reponse) {
+  const entetes = new Headers(reponse.headers);
+  entetes.set("X-Depuis-Cache", "1");
+  return reponse.blob().then(corps => new Response(corps, { status: reponse.status, statusText: reponse.statusText, headers: entetes }));
+}
+
+async function reseauDabord(requete) {
+  const cache = await caches.open(CACHE);
+  try {
+    const reponse = await fetch(requete);
+    if (reponse.ok) await cache.put(requete, reponse.clone());
+    return reponse;
+  } catch (erreur) {
+    const copie = await cache.match(requete);
+    if (copie) return marquerDepuisCache(copie);
+    throw erreur;
+  }
+}
+
+async function perimeEtRevalide(requete, estNavigation) {
+  const cache = await caches.open(CACHE);
+  // Les pages sont retrouvées sans leur paramètre (ex. partenaires.html?tournoi=12)
+  const copie = await cache.match(requete, { ignoreSearch: estNavigation });
+  const miseAJour = fetch(requete).then(reponse => {
+    if (reponse.ok && reponse.type === "basic") cache.put(requete, reponse.clone());
+    return reponse;
+  });
+  if (copie) {
+    miseAJour.catch(() => null); // rafraîchissement silencieux
+    return copie;
+  }
+  try {
+    return await miseAJour;
+  } catch (erreur) {
+    if (estNavigation) {
+      const horsLigne = await cache.match("hors-ligne.html");
+      if (horsLigne) return horsLigne;
+    }
+    throw erreur;
+  }
+}
+
+self.addEventListener("fetch", event => {
+  const requete = event.request;
+  if (requete.method !== "GET" || requete.headers.has("range")) return;
+  const url = new URL(requete.url);
+  if (url.origin !== self.location.origin) return; // autre domaine : on ne touche à rien
+  if (estDonnee(url.pathname)) {
+    event.respondWith(reseauDabord(requete));
+    return;
+  }
+  if (url.pathname.includes("/assets/data/")) return; // copies .js et .json hors liste : pas de cache
+  event.respondWith(perimeEtRevalide(requete, requete.mode === "navigate"));
+});

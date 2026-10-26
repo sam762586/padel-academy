@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Icône Padel Academy : balle verte turf sur fond nuit, avec lignes de terrain -->
+  <rect width="512" height="512" rx="96" fill="#070b14"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="8">
+    <rect x="56" y="56" width="400" height="400" rx="24"/>
+    <path d="M56 256h400M256 56v400"/>
+  </g>
+  <circle cx="256" cy="256" r="136" fill="#35e27f"/>
+  <path d="M132 190c60 22 94 62 94 120M392 322c-62-18-96-58-96-120" fill="none" stroke="#06110b" stroke-width="14" stroke-linecap="round" transform="translate(0 0)"/>
+</svg>

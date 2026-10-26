@@ -2,6 +2,8 @@
    Données : assets/data/tournois.json (index léger, ~7 800 tournois), copie assets/data/tournois.js en file://.
    Détails : assets/data/fiches/<dep>.json (copie .js en file://), chargés à la demande par département.
    Zone : département exact, ville + rayon (autocomplétion IGN Géoplateforme) ou « autour de moi » (géolocalisation au clic).
+   Carte : tracés des départements dans assets/js/carte-france.js (chargé avant ce fichier), coloriés selon le nombre de tournois.
+   Hors connexion : le service worker (sw.js) renvoie la dernière liste connue avec l'en-tête X-Depuis-Cache.
    Aucune donnée (ni réponse de l'IGN) n'est insérée avec innerHTML : tout passe par textContent. */
 
 // Départements (code + nom), embarqués ici comme les autres données du site
@@ -38,17 +40,18 @@ const TOURNOIS_DEPARTEMENTS=[
   chargerScript("assets/data/tournois.js").then(()=>window.TOURNOIS_DATA?demarrer(window.TOURNOIS_DATA):vide()).catch(vide);
  }
  if(enHttp){
-  fetch("assets/data/tournois.json",{cache:"no-cache"}).then(r=>{if(!r.ok) throw new Error(r.status);return r.json();})
-   .then(demarrer).catch(repliScript);
+  let depuisCache=false; // vrai si le service worker a répondu avec la copie hors connexion
+  fetch("assets/data/tournois.json",{cache:"no-cache"}).then(r=>{if(!r.ok) throw new Error(r.status);depuisCache=r.headers.get("X-Depuis-Cache")==="1";return r.json();})
+   .then(d=>demarrer(d,depuisCache)).catch(repliScript);
  } else repliScript();
 
-function demarrer(donnees){
+function demarrer(donnees,horsConnexion){
  const contenu=document.getElementById("tournois-contenu");
  if(!donnees||!Array.isArray(donnees.tournois)){ vide(); return; }
- try{ initialiser(donnees,contenu); }catch(e){ vide(); }
+ try{ initialiser(donnees,contenu,!!horsConnexion); }catch(e){ vide(); }
 }
 
-function initialiser(donnees,contenu){
+function initialiser(donnees,contenu,horsConnexion){
  if(messageVide) messageVide.hidden=true;
  contenu.hidden=false;
 
@@ -94,7 +97,8 @@ function initialiser(donnees,contenu){
  const maj=document.getElementById("tournois-maj");
  const dateGeneree=donnees.genere_le?new Date(donnees.genere_le):null;
  let texteMaj="";
- if(dateGeneree&&!isNaN(dateGeneree)) texteMaj+="Mis à jour le "+dateGeneree.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+". ";
+ if(dateGeneree&&!isNaN(dateGeneree)) texteMaj+=(horsConnexion?"Hors connexion : liste du ":"Mis à jour le ")+dateGeneree.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+". ";
+ else if(horsConnexion) texteMaj+="Hors connexion : liste enregistrée. ";
  if(donnees.periode&&donnees.periode.du&&donnees.periode.au&&/^\d{4}-/.test(donnees.periode.du)&&/^\d{4}-/.test(donnees.periode.au)) texteMaj+="Tournois du "+formaterJour(donnees.periode.du)+" au "+formaterJour(donnees.periode.au)+". ";
  maj.textContent=texteMaj;
  if(donnees.source) document.getElementById("tournois-source").textContent=donnees.source;
@@ -242,10 +246,12 @@ function initialiser(donnees,contenu){
    else ajouterTexte(carte,"p","tlimite","Inscriptions jusqu'au "+formaterJour(t.limite_inscription));
   }
   const url=lienFiche(t);
+  const liens=document.createElement("div");liens.className="tliens";
   if(url){
-   const lien=ajouterTexte(carte,"a","tlien","Voir sur Ten'Up");
+   const lien=ajouterTexte(liens,"a","tlien","Voir sur Ten'Up");
    lien.href=url;lien.target="_blank";lien.rel="noopener";
   }
+  if(liens.children.length) carte.appendChild(liens);
   return carte;
  }
  // Enrichit une carte avec la fiche du tournoi (tarif, places, cut, adresse, commentaire...)
@@ -282,15 +288,15 @@ function initialiser(donnees,contenu){
 
  // ----- Filtrage, tri, rendu paginé -----
  let resultats=[], affiches=0;
- function correspond(t,etat,point){
+ function correspond(t,etat,point,ignorerZone){
   if(etat.categories.length&&!etat.categories.includes(t.categorie)) return false;
   if(etat.sexes.length&&!sexesDe(t).some(s=>etat.sexes.includes(s))) return false;
   const fin=t.date_fin||t.date_debut;
   if(etat.du&&fin<etat.du) return false;
   if(etat.au&&t.date_debut>etat.au) return false;
   if(etat.ouvertes&&t.limite_inscription&&t.limite_inscription<aujourdhui) return false;
-  if(zone.mode==="dep"&&zone.dep&&t.dep!==zone.dep) return false;
-  if(point&&(typeof t.distance_km!=="number"||t.distance_km>zone.rayon)) return false;
+  if(!ignorerZone&&zone.mode==="dep"&&zone.dep&&t.dep!==zone.dep) return false;
+  if(!ignorerZone&&point&&(typeof t.distance_km!=="number"||t.distance_km>zone.rayon)) return false;
   if(recherche){
    if(t._r===undefined) t._r=sansAccent([t.nom,t.club,t.ville].filter(Boolean).join(" "));
    if(!t._r.includes(recherche)) return false;
@@ -308,6 +314,7 @@ function initialiser(donnees,contenu){
   if(point) sansPosition=tournois.filter(t=>!aPosition(t)).length;
   if(tri==="distance"&&!point) tri="date";
   resultats=tournois.filter(t=>correspond(t,etat,point));
+  majCarte(etat);
   const sens=etat.croissant?1:-1;
   if(tri==="distance") resultats.sort((a,b)=>a.distance_km-b.distance_km||(a.date_debut<b.date_debut?-1:1));
   else resultats.sort((a,b)=>(a.date_debut<b.date_debut?-1:a.date_debut>b.date_debut?1:0)*sens);
@@ -335,6 +342,129 @@ function initialiser(donnees,contenu){
   boutonPlus.textContent="Voir plus ("+restants.toLocaleString("fr-FR")+" restant"+(restants>1?"s":"")+")";
   enrichirCartes(nouvelles);
  }
+
+ // ----- Carte de France : un tracé par département, colorié selon le nombre de tournois -----
+ // Les tournois comptés respectent les filtres de catégorie, sexe, période, inscriptions et texte (pas la zone).
+ const carteBloc=document.getElementById("carte-bloc");
+ const carteBouton=document.getElementById("carte-bascule");
+ const carteZone=document.getElementById("carte-zone");
+ const carteInfo=document.getElementById("carte-info");
+ const carteNote=document.getElementById("carte-note");
+ const carteLegende=document.getElementById("carte-legende");
+ const carteBulle=document.getElementById("carte-bulle");
+ const NS_SVG="http://www.w3.org/2000/svg";
+ const nomsDep=new Map(TOURNOIS_DEPARTEMENTS.map(d=>[d[0],d[1]]));
+ const traces=new Map();  // code -> élément <path>
+ const comptes=new Map(); // code -> nombre de tournois
+ const libelleTournois=n=>n.toLocaleString("fr-FR")+" tournoi"+(n>1?"s":"");
+ let seuilsCarte=[1,2,3]; // bornes hautes des classes 1 à 3 (la classe 4 va au-delà)
+ function classeCarte(n){
+  if(n<=0) return 0;
+  if(n<=seuilsCarte[0]) return 1;
+  if(n<=seuilsCarte[1]) return 2;
+  if(n<=seuilsCarte[2]) return 3;
+  return 4;
+ }
+ function construireCarte(){
+  if(!carteBloc||!carteZone||!carteBouton||typeof CARTE_FRANCE==="undefined"||!Array.isArray(CARTE_FRANCE)){ if(carteBloc) carteBloc.hidden=true; return; }
+  const vb=typeof CARTE_FRANCE_VIEWBOX!=="undefined"?CARTE_FRANCE_VIEWBOX:[600,561];
+  const svg=document.createElementNS(NS_SVG,"svg");
+  svg.setAttribute("viewBox","0 0 "+vb[0]+" "+vb[1]);
+  svg.setAttribute("role","group");
+  svg.setAttribute("aria-label","Carte des départements de France métropolitaine et de la Corse : choisis un département pour filtrer les tournois");
+  CARTE_FRANCE.forEach(dep=>{
+   const trace=document.createElementNS(NS_SVG,"path");
+   trace.setAttribute("d",dep.d);
+   trace.setAttribute("class","carte-dep");
+   trace.setAttribute("tabindex","0");
+   trace.setAttribute("role","button");
+   trace.dataset.code=dep.code;
+   trace.addEventListener("click",()=>choisirDepartement(dep.code));
+   trace.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choisirDepartement(dep.code);}});
+   trace.addEventListener("pointerenter",e=>montrerBulle(dep.code,e));
+   trace.addEventListener("pointermove",e=>montrerBulle(dep.code,e));
+   trace.addEventListener("pointerleave",masquerBulle);
+   trace.addEventListener("focus",()=>montrerBulle(dep.code,null,trace));
+   trace.addEventListener("blur",masquerBulle);
+   svg.appendChild(trace);
+   traces.set(dep.code,trace);
+  });
+  carteZone.textContent="";carteZone.appendChild(svg);
+  // Échap ferme la bulle ; un appui hors de la carte la masque aussi (mobile)
+  document.addEventListener("keydown",e=>{if(e.key==="Escape") masquerBulle();});
+  document.addEventListener("pointerdown",e=>{if(!e.target.closest||!e.target.closest(".carte-dep")) masquerBulle();});
+  // Bouton replier / déplier : repliée par défaut sur petit écran
+  const replieeParDefaut=!!(window.matchMedia&&window.matchMedia("(max-width:700px)").matches);
+  function regler(ouverte){
+   carteZone.hidden=!ouverte;carteLegende.hidden=!ouverte;carteNote.hidden=!ouverte;
+   carteBouton.setAttribute("aria-expanded",String(ouverte));
+   carteBouton.textContent=ouverte?"Masquer la carte":"Afficher la carte";
+   if(!ouverte) masquerBulle();
+  }
+  regler(!replieeParDefaut);
+  carteBouton.addEventListener("click",()=>regler(carteZone.hidden));
+  carteBloc.hidden=false;
+ }
+ function choisirDepartement(code){
+  zone.mode="dep";zone.dep=code;
+  synchroniserZoneVersFormulaire();messageDeZone("",false);afficher();
+  if(carteInfo) carteInfo.textContent=code+" · "+(nomsDep.get(code)||"")+" sélectionné : "+libelleTournois(comptes.get(code)||0)+" avec les filtres actuels.";
+ }
+ const texteBulle=code=>code+" · "+(nomsDep.get(code)||"")+" : "+libelleTournois(comptes.get(code)||0);
+ // Bulle d'information : suit la souris, ou se place au-dessus du tracé au clavier
+ function montrerBulle(code,evenement,element){
+  if(!carteBulle) return;
+  carteBulle.textContent=texteBulle(code);carteBulle.hidden=false;
+  const cadre=carteZone.getBoundingClientRect();
+  let x,y;
+  if(evenement){x=evenement.clientX;y=evenement.clientY;}
+  else{const r=element.getBoundingClientRect();x=r.left+r.width/2;y=r.top;}
+  const largeur=carteBulle.offsetWidth;
+  carteBulle.style.left=Math.min(Math.max(x-cadre.left-largeur/2,0),Math.max(0,cadre.width-largeur))+"px";
+  carteBulle.style.top=Math.max(0,y-cadre.top-42)+"px";
+ }
+ function masquerBulle(){if(carteBulle) carteBulle.hidden=true;}
+ // Recalcule les comptes, les couleurs, la légende et la note (appelée à chaque affichage)
+ function majCarte(etat){
+  if(!traces.size) return;
+  comptes.clear();
+  let sansDep=0,max=0;
+  tournois.forEach(t=>{
+   if(!correspond(t,etat,null,true)) return;
+   if(!t.dep||!nomsDep.has(t.dep)){sansDep++;return;}
+   comptes.set(t.dep,(comptes.get(t.dep)||0)+1);
+  });
+  comptes.forEach(n=>{if(n>max) max=n;});
+  // Seuils strictement croissants, répartis sur le maximum observé
+  const s1=Math.max(1,Math.ceil(max*.1)),s2=Math.max(s1+1,Math.ceil(max*.3)),s3=Math.max(s2+1,Math.ceil(max*.6));
+  seuilsCarte=[s1,s2,s3];
+  const selectionne=zone.mode==="dep"?zone.dep:"";
+  traces.forEach((trace,code)=>{
+   const n=comptes.get(code)||0;
+   trace.dataset.classe=String(classeCarte(n));
+   trace.setAttribute("aria-label",(nomsDep.get(code)||code)+", "+libelleTournois(n));
+   trace.setAttribute("aria-pressed",String(selectionne===code));
+   trace.classList.toggle("carte-sel",selectionne===code);
+  });
+  // Le tracé sélectionné passe au premier plan pour que son contour ne soit pas rogné
+  const tracheSel=selectionne?traces.get(selectionne):null;
+  if(tracheSel&&tracheSel.parentNode.lastChild!==tracheSel) tracheSel.parentNode.appendChild(tracheSel);
+  // Légende : une pastille par classe atteinte, avec ses bornes
+  carteLegende.textContent="";
+  const classes=[[0,0],[1,s1],[s1+1,s2],[s2+1,s3],[s3+1,null]];
+  classes.forEach((b,i)=>{
+   if(i>0&&b[0]>max) return;
+   const li=document.createElement("li");
+   const pastille=document.createElement("i");pastille.dataset.classe=String(i);pastille.setAttribute("aria-hidden","true");
+   const texte=i===0?"0":b[1]===null?b[0]+" et plus":b[0]===b[1]?String(b[0]):b[0]+" à "+b[1];
+   li.append(pastille,document.createTextNode(texte));carteLegende.appendChild(li);
+  });
+  const outremer="Les départements d'outre-mer se choisissent dans la liste « Département ».";
+  carteNote.textContent=sansDep
+   ?libelleTournois(sansDep)+" "+(sansDep>1?"n'ont":"n'a")+" pas encore de département connu et "+(sansDep>1?"ne sont comptés":"n'est compté")+" sur aucun département. "+outremer
+   :outremer;
+ }
+ construireCarte();
 
  // ----- Zone : messages, départements, ville (IGN), géolocalisation -----
  function messageDeZone(texte,erreur){

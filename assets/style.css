@@ -378,3 +378,97 @@ a.card.link:hover h4{color:var(--turf)}
 
 /* SEO : H1 de page au gabarit des titres de section */
 .sec-head h1{font-size:clamp(2.4rem,5.5vw,4rem);font-weight:900;text-transform:uppercase;margin-top:10px}
+
+/* CARTE : carte de France des tournois (coloriée selon le nombre de tournois) */
+:root{
+  --carte-0:#141c2e; --carte-1:#164b36; --carte-2:#1b7a4f; --carte-3:#27b86c; --carte-4:#7dffb0; --carte-trait:#070b14;
+}
+.carte-bloc{margin:0 0 24px;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass)}
+.carte-tete{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.carte-titre{font-size:1.6rem}
+.carte-tete .btn{padding:10px 16px}
+.carte-corps{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:16px 24px;align-items:start;margin-top:12px}
+.carte-svg-wrap{position:relative;min-width:0;max-width:640px;width:100%;margin:0 auto}
+.carte-zone svg{display:block;width:100%;height:auto;max-width:100%;touch-action:manipulation}
+.carte-dep{fill:var(--carte-0);stroke:var(--carte-trait);stroke-width:.8;stroke-linejoin:round;cursor:pointer;transition:fill .15s}
+.carte-dep[data-classe="1"]{fill:var(--carte-1)}
+.carte-dep[data-classe="2"]{fill:var(--carte-2)}
+.carte-dep[data-classe="3"]{fill:var(--carte-3)}
+.carte-dep[data-classe="4"]{fill:var(--carte-4)}
+.carte-dep:hover{stroke:#fff;stroke-width:1.4}
+.carte-dep:focus{outline:none}
+.carte-dep:focus-visible{stroke:var(--sand);stroke-width:2.4}
+.carte-dep.carte-sel{stroke:var(--sand);stroke-width:2.6}
+.carte-bulle{position:absolute;z-index:3;pointer-events:none;white-space:nowrap;max-width:100%;padding:6px 10px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font-size:.82rem;font-weight:700;box-shadow:var(--shadow)}
+.carte-bulle[hidden]{display:none}
+.carte-legende{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.82rem;color:var(--muted)}
+.carte-legende li{display:inline-flex;align-items:center;gap:6px}
+.carte-legende i{width:16px;height:16px;border-radius:4px;border:1px solid var(--line-2);display:inline-block}
+.carte-legende i[data-classe="0"]{background:var(--carte-0)}
+.carte-legende i[data-classe="1"]{background:var(--carte-1)}
+.carte-legende i[data-classe="2"]{background:var(--carte-2)}
+.carte-legende i[data-classe="3"]{background:var(--carte-3)}
+.carte-legende i[data-classe="4"]{background:var(--carte-4)}
+.carte-note{color:var(--dim);font-size:.8rem;margin-top:8px}
+.carte-note:empty{display:none}
+.tliens{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:auto}
+.tliens .tlien{margin-top:0}
+.tliens .tpartenaire{color:var(--sand)}
+@media (max-width:700px){
+  .carte-corps{grid-template-columns:minmax(0,1fr)}
+  .carte-bloc{padding:12px}
+}
+
+/* PWA : message hors connexion */
+.hors-ligne{display:inline-block;margin-right:6px;padding:2px 10px;border-radius:999px;border:1px solid rgba(255,181,71,.4);background:rgba(255,181,71,.14);color:var(--sand);font-weight:700}
+.hl-page{min-height:60vh;display:flex;align-items:center}
+.hl-page .btn{margin-top:20px}
+
+/* SCHÉMAS : schémas animés des coups (technique.html) */
+details.geste summary{color:var(--turf)}
+.card.card-geste{grid-column:1/-1}
+.sch-hote{margin-top:10px}
+.sch{max-width:680px}
+.sch svg{width:100%;height:auto;display:block;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-s)}
+.sch-sol{fill:#1c7f4a}
+.sch-vitre{fill:rgba(90,176,255,.22);stroke:var(--sky);stroke-width:1.5}
+.sch-grille{fill:none;stroke:var(--sky);stroke-width:1.5;stroke-dasharray:3 3;opacity:.7}
+.sch-vitre-l{stroke:var(--sky);stroke-width:4;opacity:.75;fill:none}
+.sch-filet{stroke:#eaf2ff;stroke-width:4;fill:none}
+.sch-cour{stroke:#fff;stroke-width:3}
+.sch-ligne{stroke:#fff;stroke-width:2.5;fill:none}
+.sch-lab{fill:#c3cddc;font:700 13px var(--body);letter-spacing:.08em}
+.sch-note{font:700 15px var(--body)}
+.sch-fig path,.sch-fig circle,.sch-fig ellipse{fill:none;stroke-width:3;stroke-linecap:round}
+.sch-fig.sch-toi *{stroke:var(--turf)}
+.sch-fig.sch-adv *{stroke:#c3cddc}
+.sch-pion.sch-toi circle{fill:var(--turf);stroke:#06110b;stroke-width:2}
+.sch-pion.sch-toi text{fill:#06110b;font:800 9px var(--body)}
+.sch-pion.sch-adv circle{fill:#fff;stroke:#06110b;stroke-width:2}
+.sch-ghost{fill:none;stroke-width:2;stroke-dasharray:4 5;opacity:.45}
+.sch-trace{fill:none;stroke-width:4;stroke-linecap:butt;stroke-dasharray:1 1;stroke-dashoffset:1}
+.sch-sky{stroke:var(--sky);fill:var(--sky)}
+.sch-turf{stroke:var(--turf);fill:var(--turf)}
+.sch-sand{stroke:var(--sand);fill:var(--sand)}
+.sch-coral{stroke:var(--coral);fill:var(--coral)}
+.sch-ghost,.sch-trace{fill:none}
+.sch-note{stroke:none}
+.sch-balle{fill:#f5f04a;stroke:#06110b;stroke-width:1.5}
+.sch-mk{opacity:0;transition:opacity .3s}
+.sch-mk.vu{opacity:1}
+.sch-mk circle{fill:var(--bg-2);stroke:var(--turf);stroke-width:2}
+.sch-mk text{fill:#fff;font:800 13px var(--body);stroke:none}
+.sch-mk.cur circle{fill:var(--turf)}
+.sch-mk.cur text{fill:#06110b}
+.sch-ctl{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.sch-b{padding:9px 14px;font-size:.78rem}
+.sch-b[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+.sch-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.sch-steps li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;color:var(--muted);padding:8px 10px;border-radius:var(--r-s);border:1px solid transparent}
+.sch-steps li.cur{color:var(--fg);background:var(--glass-2);border-color:var(--turf)}
+.sch-n{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--turf);color:#fff;font:800 .8rem/20px var(--body);text-align:center}
+.sch-steps li.cur .sch-n{background:var(--turf);color:#06110b}
+.sch.sch-statique .sch-ctl{display:none}
+.sch.sch-statique .sch-balle{display:none}
+.sch.sch-statique .sch-trace{stroke-dashoffset:0!important;opacity:1!important}
+@media (prefers-reduced-motion:reduce){.sch-mk{transition:none}.sch-mk{opacity:1}}

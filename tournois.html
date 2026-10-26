@@ -22,6 +22,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js" defer></script>
 </head>
 <body>
 <nav class="nav" aria-label="Navigation principale">
@@ -79,6 +81,23 @@
         <label class="tchip tgroupe-ouvertes"><input type="checkbox" id="filtre-ouvertes"><span>Inscriptions encore ouvertes</span></label>
         <button type="button" class="btn ghost" id="filtre-reinit">Réinitialiser</button>
       </form>
+      <div class="carte-bloc" id="carte-bloc" hidden>
+        <div class="carte-tete">
+          <h2 class="carte-titre">Carte des tournois</h2>
+          <button type="button" class="btn ghost" id="carte-bascule" aria-expanded="true" aria-controls="carte-zone">Masquer la carte</button>
+        </div>
+        <div class="carte-corps">
+          <div class="carte-svg-wrap">
+            <div class="carte-zone" id="carte-zone"></div>
+            <div class="carte-bulle" id="carte-bulle" role="tooltip" hidden></div>
+          </div>
+          <div class="carte-cote">
+            <ul class="carte-legende" id="carte-legende" aria-label="Légende : nombre de tournois par département"></ul>
+            <p class="carte-note" id="carte-note"></p>
+            <p class="carte-note" id="carte-info" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
       <div class="tbarre">
         <div><p class="tcompteur" id="tournois-compteur" role="status" aria-live="polite"></p><p class="tdetail" id="tournois-detail" hidden></p></div>
         <div class="tbarre-btns">
@@ -99,6 +118,7 @@
     <div><a href="confidentialite.html">Confidentialité</a></div>
   </div>
 </footer>
+<script src="assets/js/carte-france.js"></script>
 <script src="assets/js/tournois.js"></script>
 <script src="assets/js/nav.js"></script>
 </body>

@@ -6,3 +6,5 @@ scripts/.env
 scripts/node_modules/
 scripts/debug/
 scripts/import/
+scripts/logs/
+scripts/maj-tournois.lock
