@@ -16,10 +16,10 @@ function pairPositions(){
    if(bx<=220){ // ball on our side while we're at the net: it's a lob over us or a ball at our feet
      if(bx<120){ // deep: lob passed over us
        us=[[80,yA,"Recul"],[95,yB,"Recul"]];
-       txt=["<b>Lob passé :</b> la balle est derrière vous. Celui qui est lobé recule en diagonale, l'autre recule aussi (jamais un au filet, un au fond).","Le lobé joue bajada ou lob ; vous remontez ensemble ensuite.","Si le lob est vraiment imprenable, c'est le partenaire qui croise derrière pour le jouer (« cambio ») et vous échangez de côté."];
+       txt=["<b>Lob passé :</b> la balle est derrière vous deux. Celui qui est lobé recule en diagonale, l'autre recule aussi (jamais un au filet, un au fond).","Le lobé joue bajada ou lob ; on remonte ensemble ensuite.","Si le lob est vraiment imprenable, c'est le partenaire qui croise derrière pour le jouer (« cambio ») et on échange de côté."];
      } else {
        us=[[185,yA,"Volée"],[180,yB,"Couvre"]];
-       txt=["<b>Balle dans nos pieds :</b> celui du côté de la balle la joue en volée basse, l'autre reste à hauteur et couvre le centre.","Volée de sécurité : longue, au centre, pas de tentative gagnante sur une balle basse.","Restez à 2–3 m du filet, ne reculez pas sur une balle basse."];
+       txt=["<b>Balle dans nos pieds :</b> celui du côté de la balle la joue en volée basse, l'autre reste à hauteur et couvre le centre.","Volée de sécurité : longue, au centre, pas de tentative gagnante sur une balle basse.","On reste à 2–2,5 m du filet, on ne recule pas sur une balle basse."];
      }
    } else {
      const lobRisk=bx>380;
@@ -29,9 +29,9 @@ function pairPositions(){
      if(ballTop){us=[[195,clamp(yAa-6,40,118),"Ligne"],[172,yBb,"Centre"]];}
      else{us=[[172,yAa,"Centre"],[195,clamp(yBb+6,122,200),"Ligne"]];}
      if(lobRisk){us[0][0]-=15;us[1][0]-=15;}
-     txt=[`<b>Balle côté ${ballTop?"haut":"bas"} du schéma :</b> vous glissez tous les deux vers la balle. Le joueur côté balle ferme la ligne (1 pas plus avancé), l'autre ferme le centre, un demi-pas en retrait.`,
-          lobRisk?"<b>Adversaire au fond près de la vitre :</b> risque de lob, reculez d'un demi-pas tous les deux et levez la raquette.":"<b>Adversaire à mi-court :</b> il va jouer bas ou vite. Raquette devant, poids sur l'avant, prêts à bloquer.",
-          "La corde entre vous reste tendue mais jamais plus de 3-4 m : si elle casse, le centre est ouvert."];
+     txt=[`<b>Balle côté ${ballTop?"haut":"bas"} du schéma :</b> on glisse tous les deux vers la balle. Le joueur côté balle ferme la ligne (1 pas plus avancé), l'autre ferme le centre, un demi-pas en retrait.`,
+          lobRisk?"<b>Adversaire au fond près de la vitre :</b> risque de lob, on recule d'un demi-pas tous les deux et on lève la raquette.":"<b>Adversaire à mi-court :</b> il va jouer bas ou vite. Raquette devant, poids sur l'avant, prêts à bloquer.",
+          "La corde entre vous deux ne doit jamais être tendue, ni dépasser 3–4 m : tendue, elle ouvre un trou au centre."];
    }
  } else {
    // we're at the back, they're at net
@@ -42,14 +42,14 @@ function pairPositions(){
      const xS=deep?45:70;
      if(ballTop){us=[[deep?30:55,clamp(by,35,110),"Joue"],[60,yB,"Centre"]];}
      else{us=[[60,yA,"Centre"],[deep?30:55,clamp(by,130,205),"Joue"]];}
-     txt=[`<b>Balle dans notre camp :</b> celui du côté de la balle la joue ; l'autre se décale <i>vers le centre</i> pour couvrir, à la même profondeur.`,
-          deep?"<b>Balle profonde / vitre :</b> laissez-la toucher la vitre et ressortir. Jouez lob ou balle lente croisée.":"<b>Balle courte :</b> option chiquita dans les pieds du volleyeur, puis vous montez tous les deux.",
+     txt=[`<b>Balle dans notre camp :</b> celui du côté de la balle la joue ; l'autre se décale <i>vers le centre</i> pour couvrir, à la même profondeur.`,
+          deep?"<b>Balle profonde / vitre :</b> laisse-la toucher la vitre et ressortir. Joue lob ou balle lente croisée.":"<b>Balle courte :</b> option chiquita dans les pieds du volleyeur, puis on monte tous les deux.",
           "Jamais un joueur qui monte seul pendant que l'autre défend."];
    } else {
      // ball on their side, they're volleying; we stay back, shift laterally slightly
      const ballTop=by<120;
      us=[[55,clamp(65+lateral*15,40,110),ballTop?"Ligne":"Centre"],[55,clamp(175+lateral*15,130,200),ballTop?"Centre":"Ligne"]];
-     txt=["<b>Ils volleyent :</b> restez à 1–1,5 m de la vitre du fond, même hauteur tous les deux, légèrement décalés vers le côté de la balle.","Lisez la raquette : ouverte = balle lente → prêts à monter ; fermée/haute = volée forte ou smash → reculez.","Objectif de la balle suivante : lob profond ou chiquita, pas une frappe forte."];
+     txt=["<b>Ils volleyent :</b> on reste à 1–1,5 m de la vitre du fond, même hauteur tous les deux, légèrement décalés vers le côté de la balle.","Lis la raquette : ouverte = balle lente → prêts à monter ; fermée/haute = volée forte ou smash → on recule.","Objectif de la balle suivante : lob profond ou chiquita, pas une frappe forte."];
    }
  }
  // opponents
