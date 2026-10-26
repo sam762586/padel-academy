@@ -1,0 +1,12 @@
+{
+  "name": "padel-academy-scripts",
+  "private": true,
+  "description": "Outils hors site (non chargés par les pages). Le site reste sans dépendance npm.",
+  "scripts": {
+    "tournois": "node scrape-tenup.js",
+    "tournois:debug": "node scrape-tenup.js --headed --debug"
+  },
+  "devDependencies": {
+    "playwright": "1.47.2"
+  }
+}

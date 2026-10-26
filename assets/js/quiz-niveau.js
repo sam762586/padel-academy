@@ -28,18 +28,41 @@ document.getElementById("qopts").addEventListener("click",e=>{
 function qResult(){
  const total=qa.reduce((s,a)=>s+a.pts,0), max=QL.length*3;
  const pct=Math.round(total/max*100);
- let lvl,txt,cls;
- if(pct<30){lvl="Débutant · P25";cls="go";txt="Tu découvres le jeu. Priorité absolue : laisser rebondir sur la vitre, jouer long, et ne jamais rester à mi-court. Ta raquette : ronde, légère, confortable.";}
- else if(pct<55){lvl="Loisir · P100";cls="go";txt="Tu tiens l'échange et tu connais les coups. Ce qui te fait passer un cap : la bandeja fiable, monter à deux derrière un vrai lob, et parler avec ton partenaire.";}
- else if(pct<80){lvl="Intermédiaire · P250";cls="maybe";txt="Tu construis des points. La différence avec le niveau au-dessus se joue sur la décision : bandeja ou víbora, quand ne pas monter, et la gestion des balles de jeu.";}
- else{lvl="Avancé · P500 et +";cls="stop";txt="Ton jeu est structuré. Travaille la variété (rulo, par 3, amago), la lecture de la paire adverse et la condition physique pour tenir trois sets.";}
+ let lvl,txt,cls,niveau; // niveau : palier 1 à 4 (utilisé seulement pour l'enregistrement dans le profil)
+ if(pct<30){lvl="Débutant · P25";niveau=1;cls="go";txt="Tu découvres le jeu. Priorité absolue : laisser rebondir sur la vitre, jouer long, et ne jamais rester à mi-court. Ta raquette : ronde, légère, confortable.";}
+ else if(pct<55){lvl="Loisir · P100";niveau=2;cls="go";txt="Tu tiens l'échange et tu connais les coups. Ce qui te fait passer un cap : la bandeja fiable, monter à deux derrière un vrai lob, et parler avec ton partenaire.";}
+ else if(pct<80){lvl="Intermédiaire · P250";niveau=3;cls="maybe";txt="Tu construis des points. La différence avec le niveau au-dessus se joue sur la décision : bandeja ou víbora, quand ne pas monter, et la gestion des balles de jeu.";}
+ else{lvl="Avancé · P500 et +";niveau=4;cls="stop";txt="Ton jeu est structuré. Travaille la variété (rulo, par 3, amago), la lecture de la paire adverse et la condition physique pour tenir trois sets.";}
  const weak=qa.filter(a=>a.pts<=1).map(a=>a.theme);
  const uniq=[...new Set(weak)].slice(0,4);
  document.getElementById("qcard").hidden=true;
  const r=document.getElementById("qresult");r.hidden=false;
  r.innerHTML=`<span class="vtag ${cls}">${lvl}</span><p class="score">${total} / ${max} points</p><p>${txt}</p>
  ${uniq.length?`<h4 style="margin-top:18px">À travailler en priorité</h4><ul class="steps">${uniq.map(t=>`<li><a href="${QL_THEMES[t][1]}">${QL_THEMES[t][0]}</a></li>`).join("")}</ul>`:`<p style="margin-top:12px">Aucun point faible marqué. Passe au plan d'entraînement pour affiner.</p>`}
- <div class="btns" style="margin-top:20px"><a class="btn primary" href="entrainement.html">Voir le plan 8 semaines</a><a class="btn ghost" href="materiel.html#raquette">Choisir ma raquette</a><button type="button" class="btn ghost" id="qagain">Refaire le test</button></div>`;
+ <div class="btns" style="margin-top:20px"><a class="btn primary" href="entrainement.html">Voir le plan 8 semaines</a><a class="btn ghost" href="materiel.html#raquette">Choisir ma raquette</a><button type="button" class="btn ghost" id="qagain">Refaire le test</button></div>
+ <div class="acc-save" id="qsave" hidden></div>`;
+ qCompte(document.getElementById("qsave"),{score:total,niveau:niveau,reponses:qa});
  document.getElementById("qagain").addEventListener("click",()=>{qi=0;qa=[];r.hidden=true;document.getElementById("qcard").hidden=false;qRender();});
+}
+/* Enregistrement dans le profil : uniquement si les comptes sont actifs (compte.js), sinon rien n'est affiché */
+function qCompte(zone,resultat){
+ const compte=window.PA_COMPTE;
+ if(!zone||!compte||!compte.actif) return;
+ compte.ready.then(()=>{
+  zone.hidden=false;zone.textContent="";
+  if(!compte.user){
+   const lien=document.createElement("a");lien.href="compte.html";lien.textContent="Crée un compte pour garder ton résultat";
+   zone.appendChild(lien);return;
+  }
+  const bouton=document.createElement("button");bouton.type="button";bouton.className="btn solid";bouton.textContent="Enregistrer dans mon profil";
+  const retour=document.createElement("p");retour.setAttribute("role","status");
+  bouton.addEventListener("click",async()=>{
+   bouton.disabled=true;retour.className="";retour.textContent="Enregistrement…";
+   const reponse=await compte.saveQuiz(resultat);
+   if(reponse.ok){retour.className="acc-ok";retour.textContent="Résultat enregistré dans ton profil.";}
+   else{bouton.disabled=false;retour.className="acc-err";retour.textContent=reponse.message;}
+  });
+  zone.append(bouton,retour);
+ }).catch(()=>{});
 }
 qRender();

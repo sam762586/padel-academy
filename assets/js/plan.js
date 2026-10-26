@@ -21,5 +21,39 @@ function wRender(){
   <details><summary>Exercice clé + consigne match</summary><p><b>Exercice (45 min) :</b> ${w.ex}</p><p style="margin-top:8px"><b>${w.match.split(":")[0].trim()} :</b>${w.match.split(":").slice(1).join(":")}</p></details></div>
  </article>`).join("");
 }
-wk.addEventListener("change",e=>{const i=+e.target.dataset.i;if(isNaN(i))return;done=e.target.checked?[...new Set([...done,i])]:done.filter(x=>x!==i);try{localStorage.setItem("pa-weeks",JSON.stringify(done));}catch(err){}wRender();});
+function wSauver(){try{localStorage.setItem("pa-weeks",JSON.stringify(done));}catch(err){}}
+/* Message de synchronisation (créé seulement si les comptes sont actifs et l'utilisateur connecté) */
+let wMessage=null;
+function wInfo(texte,erreur){
+ if(!wMessage){wMessage=document.createElement("p");wMessage.setAttribute("role","status");wMessage.className="acc-msg";wk.parentNode.insertBefore(wMessage,wk);}
+ wMessage.hidden=!texte;wMessage.textContent=texte||"";wMessage.classList.toggle("acc-err",!!erreur);
+}
+wk.addEventListener("change",async e=>{
+ const i=+e.target.dataset.i;if(isNaN(i))return;
+ const coche=e.target.checked;
+ done=coche?[...new Set([...done,i])]:done.filter(x=>x!==i);
+ wSauver();wRender();
+ // Connecté : on répercute aussi sur le serveur (le stockage local reste la source en cas d'échec)
+ const compte=window.PA_COMPTE;
+ if(compte&&compte.actif&&compte.user){
+  const reponse=await compte.savePlanWeek(i,coche);
+  wInfo(reponse.ok?"":reponse.message+" Ta progression reste enregistrée sur cet appareil.",!reponse.ok);
+ }
+});
+/* À la connexion : union du local et du serveur, écrite des deux côtés */
+async function wSynchroniser(){
+ const compte=window.PA_COMPTE;
+ if(!compte||!compte.actif||!compte.user) return;
+ const serveur=await compte.loadPlan();
+ if(!serveur.ok){wInfo(serveur.message+" Ta progression reste enregistrée sur cet appareil.",true);return;}
+ const union=[...new Set([...done,...serveur.weeks])].filter(n=>Number.isInteger(n)&&n>=0&&n<WEEKS.length).sort((x,y)=>x-y);
+ const aEnvoyer=union.filter(n=>!serveur.weeks.includes(n));
+ done=union;wSauver();wRender();
+ const envoi=await compte.savePlanWeeks(aEnvoyer);
+ wInfo(envoi.ok?"":envoi.message+" Ta progression reste enregistrée sur cet appareil.",!envoi.ok);
+}
 wRender();
+if(window.PA_COMPTE&&window.PA_COMPTE.actif){
+ window.PA_COMPTE.ready.then(wSynchroniser).catch(()=>{});
+ window.PA_COMPTE.onChange(()=>{wSynchroniser().catch(()=>{});});
+}

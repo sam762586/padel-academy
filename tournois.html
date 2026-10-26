@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tournois · Padel Academy</title>
+<meta name="description" content="Tournois de padel près de chez toi : filtre par catégorie, distance, date et inscriptions ouvertes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <ul><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="tournois.html" class="active">Tournois</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="tournois">
+  <div class="wrap" id="tournois-app">
+    <div class="sec-head">
+      <div><p class="eyebrow">Compétition · Près de chez toi</p><h2 id="tournois-titre">Tournois de padel</h2></div>
+      <p><span id="tournois-maj"></span>Source : <a href="https://tenup.fft.fr/" target="_blank" rel="noopener"><span id="tournois-source">Ten'Up (FFT)</span></a>. Vérifie toujours les dates et les conditions sur la fiche du tournoi avant de t'inscrire.</p>
+    </div>
+    <p class="acc-msg" id="tournois-vide" role="status" hidden>Pas encore de tournois chargés. La liste sera disponible dès qu'elle aura été mise à jour. En attendant, tu peux chercher sur <a href="https://tenup.fft.fr/" target="_blank" rel="noopener">Ten'Up</a>.</p>
+    <div id="tournois-contenu" hidden>
+      <form class="tfiltres" id="tournois-filtres" novalidate>
+        <div class="tgroupe">
+          <label for="filtre-texte">Recherche</label>
+          <input type="search" id="filtre-texte" placeholder="Nom, club ou ville" autocomplete="off">
+        </div>
+        <fieldset class="tgroupe"><legend>Catégorie</legend><div class="tchips" id="filtre-categories"></div></fieldset>
+        <fieldset class="tgroupe"><legend>Sexe</legend><div class="tchips" id="filtre-sexes"></div></fieldset>
+        <div class="tgroupe">
+          <label for="filtre-distance">Distance</label>
+          <select id="filtre-distance"></select>
+        </div>
+        <div class="tgroupe tperiode">
+          <div><label for="filtre-du">Du</label><input type="date" id="filtre-du"></div>
+          <div><label for="filtre-au">Au</label><input type="date" id="filtre-au"></div>
+        </div>
+        <label class="tchip tgroupe-ouvertes"><input type="checkbox" id="filtre-ouvertes"><span>Inscriptions encore ouvertes</span></label>
+        <button type="button" class="btn ghost" id="filtre-reinit">Réinitialiser</button>
+      </form>
+      <div class="tbarre">
+        <p class="tcompteur" id="tournois-compteur" role="status" aria-live="polite"></p>
+        <button type="button" class="btn ghost" id="tournois-tri"></button>
+      </div>
+      <div class="tliste" id="tournois-liste"></div>
+      <p class="acc-msg" id="tournois-aucun" hidden>Aucun tournoi ne correspond à ces filtres. Élargis la distance ou la période.</p>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a></div>
+  </div>
+</footer>
+<script src="assets/data/tournois.js"></script>
+<script src="assets/js/tournois.js"></script>
+</body>
+</html>

@@ -1,2 +1,7 @@
 .DS_Store
 Thumbs.db
+# Identifiants et sorties des scripts (jamais commités)
+.env
+scripts/.env
+scripts/node_modules/
+scripts/debug/

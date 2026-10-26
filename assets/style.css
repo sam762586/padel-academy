@@ -273,3 +273,59 @@ a.card.link:hover h4{color:var(--turf)}
 .home-grid .card .more{margin-top:auto;color:var(--turf);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em}
 .nav li a.active{color:#fff;background:var(--glass-2)}
 .page-hero{padding-block:56px 10px}
+
+/* COMPTE JOUEUR */
+.acc-card{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);max-width:760px;margin-bottom:16px}
+.acc-card p{color:var(--muted);margin-top:10px}
+.acc-card .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.acc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.acc-muted{color:var(--muted)}
+.acc-muted b{color:#fff;overflow-wrap:anywhere}
+.acc-form{display:grid;gap:8px;margin-top:16px}
+.acc-form label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-top:8px}
+.acc-form input,.acc-form select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:12px 14px;font-family:var(--body);font-size:1rem}
+.acc-form input:focus-visible,.acc-form select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.acc-form .btn{justify-content:center;margin-top:12px}
+.acc-msg{margin:12px 0;font-size:.93rem;color:var(--muted)}
+.acc-msg.acc-ok,.acc-ok{color:var(--turf)}
+.acc-msg.acc-err,.acc-err{color:var(--coral)}
+.acc-scroll{overflow-x:auto;margin-top:12px}
+.acc-bar{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:12px}
+.acc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--turf-deep),var(--turf))}
+.acc-danger{border-color:rgba(255,93,74,.4)}
+.btn.danger{background:var(--coral);color:#fff}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.acc-save{margin-top:16px}
+.acc-save p{margin-top:10px}
+.prose h3{margin-top:22px}
+.prose h3:first-child{margin-top:0}
+.prose ul{color:var(--muted);padding-left:20px;margin:10px 0 0;display:grid;gap:6px}
+.btn[hidden]{display:none}
+
+/* TOURNOIS */
+.tfiltres{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:20px;align-items:end}
+.tfiltres label:not(.tchip),.tfiltres legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.tfiltres fieldset{border:0;margin:0;padding:0;min-width:0}
+.tfiltres input[type=search],.tfiltres input[type=date],.tfiltres select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.tfiltres input:focus-visible,.tfiltres select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tperiode{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{position:relative;display:inline-flex;cursor:pointer}
+.tchip input{position:absolute;opacity:0;width:0;height:0}
+.tchip span{display:inline-block;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);background:rgba(0,0,0,.25);color:var(--muted);font-size:.85rem;font-weight:700;transition:all .15s}
+.tchip input:checked+span{background:var(--turf);border-color:var(--turf);color:var(--accent-fg)}
+.tchip input:focus-visible+span{outline:3px solid var(--sand);outline-offset:2px}
+.tbarre{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0 14px}
+.tcompteur{font-family:var(--display);font-size:1.8rem;text-transform:uppercase;color:var(--sand);line-height:1}
+.tbarre .btn{padding:10px 16px;font-size:.8rem}
+.tliste{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.tcard{display:flex;flex-direction:column;gap:8px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.tcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tcard h3{font-size:1.35rem;line-height:1.05;overflow-wrap:anywhere}
+.tbadge{flex:none;font-family:var(--display);font-weight:900;font-size:1.1rem;padding:2px 10px;border-radius:8px;background:var(--sand);color:#1a1200}
+.tlieu{color:var(--muted);font-size:.92rem;overflow-wrap:anywhere}
+.tinfos{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;color:#fff;font-weight:600;font-size:.9rem}
+.tlimite{font-size:.85rem;color:var(--muted)}
+.tlimite.proche{color:var(--sand);font-weight:700}
+.tlimite.clos{color:var(--coral);font-weight:700}
+.tlien{margin-top:auto;padding-top:6px;color:var(--turf);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}

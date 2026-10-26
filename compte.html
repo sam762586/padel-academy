@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mon compte · Padel Academy</title>
+<meta name="description" content="Ton compte Padel Academy : profil, résultats du quiz et progression du plan 8 semaines.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <ul><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html" class="active">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="compte">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Mon espace · Facultatif</p><h2>Mon compte</h2></div>
+      <p>Un compte te permet de garder ton profil, tes résultats du quiz et ta progression sur le plan 8 semaines, d'un appareil à l'autre. Le site marche très bien sans compte.</p>
+    </div>
+    <p class="acc-msg" id="compte-msg" role="status">Chargement…</p>
+    <div class="acc-card" id="compte-connexion" hidden>
+      <h3>Connexion par lien magique</h3>
+      <p>Pas de mot de passe : tu saisis ton e-mail, tu reçois un lien, tu cliques dessus et tu es connecté.</p>
+      <form class="acc-form" id="compte-form-mail" novalidate>
+        <label for="compte-email">Ton e-mail</label>
+        <input type="email" id="compte-email" autocomplete="email" placeholder="toi@exemple.fr" required>
+        <button type="submit" class="btn primary" id="compte-envoyer">Recevoir mon lien</button>
+      </form>
+      <p class="acc-msg" id="compte-mail-msg" role="status" hidden></p>
+    </div>
+    <div id="compte-profil" hidden>
+      <div class="acc-card">
+        <div class="acc-top"><h3>Mon profil</h3><button type="button" class="btn ghost" id="compte-deco">Me déconnecter</button></div>
+        <p class="acc-muted">Connecté avec : <b id="compte-adresse"></b></p>
+        <form class="acc-form" id="compte-form-profil" novalidate>
+          <label for="pf-pseudo">Pseudo</label>
+          <input type="text" id="pf-pseudo" maxlength="30" autocomplete="nickname">
+          <label for="pf-niveau">Niveau déclaré</label>
+          <select id="pf-niveau"></select>
+          <label for="pf-classement">Classement P (facultatif)</label>
+          <select id="pf-classement"></select>
+          <label for="pf-cote">Côté de jeu</label>
+          <select id="pf-cote"><option value="">Non précisé</option><option value="droite">Droite</option><option value="gauche">Gauche</option></select>
+          <label for="pf-main">Main forte</label>
+          <select id="pf-main"><option value="">Non précisée</option><option value="droite">Droite</option><option value="gauche">Gauche</option></select>
+          <label for="pf-club">Club ou ville (facultatif)</label>
+          <input type="text" id="pf-club" maxlength="80" autocomplete="off">
+          <button type="submit" class="btn primary" id="pf-enregistrer">Enregistrer mon profil</button>
+        </form>
+        <p class="acc-msg" id="pf-msg" role="status" hidden></p>
+      </div>
+      <div class="acc-card">
+        <h3>Historique du quiz</h3>
+        <div id="compte-quiz"><p class="acc-muted">Chargement…</p></div>
+        <div class="btns"><a class="btn ghost" href="niveau.html">Passer le test</a></div>
+      </div>
+      <div class="acc-card">
+        <h3>Plan 8 semaines</h3>
+        <div id="compte-plan"><p class="acc-muted">Chargement…</p></div>
+        <div class="btns"><a class="btn ghost" href="entrainement.html">Ouvrir le plan</a></div>
+      </div>
+      <div class="acc-card acc-danger">
+        <h3>Supprimer mon compte</h3>
+        <p>Cette action efface ton profil, tes résultats de quiz et ta progression. Elle est définitive. <a href="confidentialite.html">En savoir plus</a></p>
+        <div class="btns">
+          <button type="button" class="btn ghost" id="sup-demander">Supprimer mon compte</button>
+          <button type="button" class="btn danger" id="sup-confirmer" hidden>Oui, supprimer définitivement</button>
+          <button type="button" class="btn ghost" id="sup-annuler" hidden>Annuler</button>
+        </div>
+        <p class="acc-msg" id="sup-msg" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/compte.js"></script>
+<script src="assets/js/compte-page.js"></script>
+</body>
+</html>
