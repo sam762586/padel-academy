@@ -1,0 +1,26 @@
+/* LEXIQUE */
+const LEX=[
+ ["Bandeja","Coup haut coupé, type « plateau », pour garder le filet sur un lob."],
+ ["Víbora","Bandeja agressive avec effet latéral, vise le coin vitre-grille."],
+ ["Rincón","Le coin entre la vitre et la grille. Zone où la balle devient injouable."],
+ ["Globo","Le lob."],
+ ["Chiquita","Balle courte et molle dans les pieds des volleyeurs pour monter."],
+ ["Bajada","Frappe descendante sur une balle qui ressort haute de la vitre."],
+ ["Remate","Le smash."],
+ ["Por tres / por cuatro","Smash qui sort du terrain par la vitre latérale (3 m) ou du fond (4 m)."],
+ ["Gancho","Smash « crochet » derrière la tête, lent et profond."],
+ ["Rulo","Smash lifté qui saute sur la vitre."],
+ ["Dejada","L'amorti."],
+ ["Saque","Le service."],
+ ["Punto de oro","Point décisif à 40-40, sans avantage."],
+ ["Zone de la mort","Mi-court, entre ligne de service et filet. On la traverse, on n'y reste pas."],
+ ["Doble pared","Double vitre : la balle touche deux vitres avant d'être jouée."],
+ ["Contrapared","Jouer la balle contre sa propre vitre du fond pour la renvoyer."],
+ ["Drive / revés","Coup droit / revers."],
+ ["Pala","La raquette de padel (en espagnol)."],
+ ["EVA / FOAM","Les deux types de mousse du cœur de la raquette : dure / souple."],
+ ["Balance","Répartition du poids : basse (contrôle), haute (puissance)."],
+ ["Ten'Up","Appli FFT pour trouver tournois et classement."],
+ ["P25 → P2000","Catégories de tournois FFT, du débutant à l'élite."],
+];
+document.getElementById("lex").innerHTML=LEX.map(([t,d])=>`<div><dt>${t}</dt><dd>${d}</dd></div>`).join("");
