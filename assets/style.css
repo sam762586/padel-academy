@@ -645,3 +645,18 @@ details.geste summary{color:var(--turf)}
 .tmes-titre{font-size:clamp(1.8rem,4.5vw,2.4rem)}
 .tmes-aide{color:var(--muted);font-size:.9rem;margin:8px 0 14px;max-width:60em}
 .tcard.tpasse{opacity:.6}
+
+/* ---- Photos (Pexels, licence libre) ---- */
+.hero.photo .stage{display:none}
+.hero-photo{margin:0;position:relative;aspect-ratio:4/5;max-height:620px;border-radius:28px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.55);justify-self:end;width:min(100%,460px)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(7,11,20,.85) 100%);pointer-events:none}
+.hero-photo figcaption{position:absolute;left:18px;right:18px;bottom:16px;display:flex;align-items:center;gap:12px;color:#fff;font-size:.85rem;font-weight:700}
+.hero-photo figcaption b{font-family:var(--display);font-size:1.9rem;font-weight:800;line-height:1;color:var(--turf)}
+.hero-photo figcaption small{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim)}
+.banner{position:relative;height:clamp(200px,32vw,380px);margin-bottom:-90px;overflow:hidden}
+.banner img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,11,20,.55) 0%,rgba(7,11,20,.15) 35%,rgba(7,11,20,.75) 75%,var(--bg) 100%)}
+.banner + section{padding-top:30px}
+.banner + section .wrap{position:relative;z-index:1}
+@media (max-width:860px){.hero-photo{justify-self:stretch;width:100%;aspect-ratio:16/10;max-height:none;border-radius:20px}.banner{margin-bottom:-60px}}
