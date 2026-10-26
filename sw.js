@@ -4,14 +4,14 @@
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v3-partenaires";
+const CACHE = "pa-v4-mentions";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
   "./",
   "index.html", "technique.html", "tactique.html", "tutos.html", "niveau.html", "entrainement.html", "videos.html",
   "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
-  "compte.html", "confidentialite.html", "partenaires.html", "hors-ligne.html",
+  "compte.html", "confidentialite.html", "mentions-legales.html", "partenaires.html", "hors-ligne.html",
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
   "assets/style.css",
   "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",

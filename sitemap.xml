@@ -49,6 +49,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/mentions-legales.html</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/niveau.html</loc>
     <lastmod>2026-10-26</lastmod>
     <changefreq>monthly</changefreq>
