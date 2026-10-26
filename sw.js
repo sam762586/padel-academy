@@ -3,8 +3,11 @@
    - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
+   - Style et scripts sont appelés avec « ?v=<empreinte> » (scripts/gabarit.js) : une nouvelle version a une autre adresse,
+     donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
+     hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v15-menu";
+const CACHE = "pa-v16-versions";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -25,7 +28,8 @@ const SHELL = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE).then(cache =>
-      Promise.all(SHELL.map(url => cache.add(url).catch(() => null)))
+      // cache: "reload" : toujours la version du serveur, jamais une copie déjà périmée du cache HTTP du navigateur
+      Promise.all(SHELL.map(url => cache.add(new Request(url, { cache: "reload" })).catch(() => null)))
     ).then(() => self.skipWaiting())
   );
 });
@@ -62,12 +66,25 @@ async function reseauDabord(requete) {
   }
 }
 
+// Garde une seule version de chaque fichier versionné (style.css?v=…, nav.js?v=…)
+async function retirerAnciennesVersions(cache, adresse) {
+  const cible = new URL(adresse);
+  for (const cle of await cache.keys()) {
+    const u = new URL(cle.url);
+    if (u.pathname === cible.pathname && u.search !== cible.search) await cache.delete(cle);
+  }
+}
+
 async function perimeEtRevalide(requete, estNavigation) {
   const cache = await caches.open(CACHE);
   // Les pages sont retrouvées sans leur paramètre (ex. partenaires.html?tournoi=12)
   const copie = await cache.match(requete, { ignoreSearch: estNavigation });
+  const versionne = new URL(requete.url).searchParams.has("v");
   const miseAJour = fetch(requete).then(reponse => {
-    if (reponse.ok && reponse.type === "basic") cache.put(requete, reponse.clone());
+    if (reponse.ok && reponse.type === "basic") {
+      cache.put(requete, reponse.clone());
+      if (versionne) retirerAnciennesVersions(cache, requete.url);
+    }
     return reponse;
   });
   if (copie) {
@@ -77,6 +94,11 @@ async function perimeEtRevalide(requete, estNavigation) {
   try {
     return await miseAJour;
   } catch (erreur) {
+    // Hors connexion : dernière version connue du style ou du script
+    if (versionne) {
+      const ancienne = await cache.match(requete, { ignoreSearch: true });
+      if (ancienne) return ancienne;
+    }
     if (estNavigation) {
       const horsLigne = await cache.match("hors-ligne.html");
       if (horsLigne) return horsLigne;

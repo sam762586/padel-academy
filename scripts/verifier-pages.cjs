@@ -17,6 +17,7 @@ function copie(){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'padel-gen-'));
  for(const f of ['index.html','sitemap.xml','tournois.html'])fs.copyFileSync(path.join(racine,f),path.join(dir,f));
  fs.cpSync(path.join(racine,'assets/js'),path.join(dir,'assets/js'),{recursive:true});
+ fs.copyFileSync(path.join(racine,'assets/style.css'),path.join(dir,'assets/style.css')); // empreinte des liens versionnés
  fs.mkdirSync(path.join(dir,'assets/data/fiches'),{recursive:true});
  fs.mkdirSync(path.join(dir,'scripts/cache'),{recursive:true});
  fs.copyFileSync(path.join(__dirname,'generer-pages.js'),path.join(dir,'scripts/generer-pages.js'));

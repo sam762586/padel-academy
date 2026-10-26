@@ -121,3 +121,6 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 - Progresser : Mon niveau, Entraînement, Compteur ;
 - Tournois : Trouver un tournoi, Jouer en compétition, Barème des points, Trouver un partenaire.
 Sur ordinateur, ce sont des menus déroulants (au clic et au survol ; Échap et un clic ailleurs les ferment), sur une seule ligne dès 861 px. Sur mobile, ce sont des accordéons, et le groupe de la page en cours est déplié. Corrigé au passage : le panneau mobile laissait voir la page dessous. Test : scripts/verifier-menu.cjs (9).
+
+### 26/10/2026 — Correctif : menu mal affiché sur PC après publication
+**Cause** : le cache hors connexion (sw.js, « stale-while-revalidate ») pouvait servir la nouvelle page avec l'ancien style.css, et le menu s'affichait en vrac. **Fait** : style.css et les scripts sont appelés avec `?v=<empreinte du contenu>` (gabarit.js, appliqué aux pages de la racine et aux pages générées). Le service worker précharge avec `cache: "reload"`, ne garde qu'une version par fichier et, hors connexion, sert la dernière connue. Test : scripts/verifier-cache.cjs (5) simule une publication avec le service worker actif.

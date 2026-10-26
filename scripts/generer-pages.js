@@ -115,14 +115,15 @@ const SEXES = { messieurs: "Messieurs", dames: "Dames", mixte: "Mixte" };
 const majuscule = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- Gabarit : nav et footer communs (scripts/gabarit.js) ---------- */
-const { NOM_SITE, nav: navGabarit, footer: footerGabarit } = require("./gabarit");
+const { NOM_SITE, nav: navGabarit, footer: footerGabarit, versionner } = require("./gabarit");
 
 function page({ chemin, titre, description, h1, corps, jsonLd = [], noindex = false, scripts = [], navActif = "tournois.html" }) {
   const profondeur = chemin.split("/").length - 1;
   const pre = "../".repeat(profondeur);
   const url = SITE + chemin;
   const nav = navGabarit(navActif, pre);
-  return `<!doctype html>
+  // style.css et scripts versionnés (?v=<empreinte>) : jamais un ancien fichier en cache avec une page neuve
+  return versionner(`<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -162,7 +163,7 @@ ${scripts.map(s => `<script src="${s.startsWith("http") ? s : pre + s}"></script
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
-`;
+`);
 }
 const fil = (elements) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: elements.map(([nom, url], i) => ({ "@type": "ListItem", position: i + 1, name: nom, item: SITE + url })) });
 function filHtml(elements, pre) {

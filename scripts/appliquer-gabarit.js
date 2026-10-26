@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-/* Recopie le menu et le pied de page du gabarit (scripts/gabarit.js) dans toutes les pages HTML de la racine.
+/* Recopie le menu et le pied de page du gabarit (scripts/gabarit.js) dans toutes les pages HTML de la racine,
+   et versionne les liens vers le style et les scripts (?v=<empreinte>) : à relancer après chaque modification de CSS ou de JS.
    La page courante est marquée « active » dans le menu quand elle y figure.
    Usage :
      node scripts/appliquer-gabarit.js              écrit les pages qui diffèrent
@@ -7,7 +8,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { nav, footer } = require("./gabarit");
+const { nav, footer, versionner } = require("./gabarit");
 
 const RACINE = path.join(__dirname, "..");
 const verifier = process.argv.includes("--verifier");
@@ -25,6 +26,7 @@ for (const f of fs.readdirSync(RACINE).filter(n => n.endsWith(".html")).sort()) 
   };
   remplacer(/<nav class="nav"[\s\S]*?<\/nav>/, nav(f, prefixe));
   remplacer(/<footer>[\s\S]*?<\/footer>/, footer(prefixe));
+  apres = versionner(apres); // style.css et scripts : ?v=<empreinte>
   if (apres !== avant) {
     differentes.push(f);
     if (!verifier) fs.writeFileSync(fichier, apres);

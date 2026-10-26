@@ -103,7 +103,7 @@ async function compteUnitaires(){
   assert.equal(await page.locator('#sim-list tr').count(),1);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:path.join(captures,'bareme-mobile.png'),fullPage:true});ok('simulateur utilisable à 400 px sans débordement de page');
-  await ctx.route('**/assets/js/compte.js',route=>route.fulfill({contentType:'text/javascript',body:'('+fauxCompte.toString()+')()'}));
+  await ctx.route('**/assets/js/compte.js*',route=>route.fulfill({contentType:'text/javascript',body:'('+fauxCompte.toString()+')()'}));
   await page.evaluate(()=>{localStorage.clear();localStorage.setItem('pa-weeks','[4]');});
   await page.goto(base+'/entrainement.html');
   await page.waitForFunction(()=>window.PA_COMPTE&&document.querySelector('#w0').checked);

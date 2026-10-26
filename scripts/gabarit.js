@@ -50,4 +50,24 @@ function footer(prefixe = "") {
   </div>
 </footer>`;
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, PAGES_MENU, nav, footer };
+/* Versions des fichiers : chaque lien vers assets/style.css ou assets/js/*.js reçoit « ?v=<empreinte du contenu> ».
+   Une page publiée ne peut donc jamais être servie avec un ancien style ou un ancien script gardé en cache
+   (service worker, navigateur) : quand le fichier change, son adresse change. Empreinte calculée sur le contenu
+   aux fins de ligne normalisées (identique sous Windows et sous Linux). assets/data/ n'est pas versionné (jamais mis en cache). */
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+const RACINE = path.join(__dirname, "..");
+const empreintes = {};
+function empreinte(relatif) {
+  if (!(relatif in empreintes)) {
+    const contenu = fs.readFileSync(path.join(RACINE, relatif), "utf8").replace(/\r\n/g, "\n");
+    empreintes[relatif] = crypto.createHash("sha256").update(contenu).digest("hex").slice(0, 10);
+  }
+  return empreintes[relatif];
+}
+function versionner(html) {
+  return html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:style\.css|js\/[\w-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
+    (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`);
+}
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, PAGES_MENU, nav, footer, versionner, empreinte };

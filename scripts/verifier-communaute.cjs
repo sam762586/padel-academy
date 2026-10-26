@@ -114,7 +114,7 @@ const serveur=http.createServer((req,res)=>{
  const nouveau=async(options={})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:FAUX}));
-  await ctx.route('**/assets/js/supabase-config.js',r=>r.fulfill({contentType:'text/javascript',body:CONFIG_ACTIVE}));
+  await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:CONFIG_ACTIVE}));
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page=await ctx.newPage();
   if(options.date)await page.clock.install({time:new Date(options.date)});
