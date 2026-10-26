@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Confidentialité", "item": "https://apprendre-padel.fr/confidentialite.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=67290e12b5">
+<link rel="stylesheet" href="assets/style.css?v=6360c2b99f">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -30,7 +30,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Apprendre <span>Padel</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu"><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-progresser">Progresser</button><ul class="nav-sous" id="nav-progresser"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li><li><a href="coach.html">Coach IA</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-tournois">Tournois</button><ul class="nav-sous" id="nav-tournois"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+    <ul id="nav-menu"><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-progresser">Progresser</button><ul class="nav-sous" id="nav-progresser"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html">Compteur</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-tournois">Tournois</button><ul class="nav-sous" id="nav-tournois"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
 <section id="confidentialite">
@@ -74,14 +74,6 @@
         <li><b>Modération :</b> une annonce signalée par 3 joueurs différents est masquée automatiquement. L'administrateur du site peut voir les annonces signalées, les masquer, les rétablir ou les supprimer.</li>
         <li><b>Durée :</b> chaque annonce (et ses réponses et signalements) est supprimée 30 jours après la date du tournoi, ou plus tôt si tu la supprimes toi-même depuis <a href="compte.html#mes-annonces">Mon compte</a>, ou si tu supprimes ton compte. Tu peux supprimer à tout moment chacune de tes annonces et de tes réponses.</li>
         <li><b>Base légale :</b> ton consentement, que tu donnes en cochant les deux cases et que tu retires en supprimant tes annonces ou ton compte.</li>
-      </ul>
-      <h3 id="coach">Coach IA</h3>
-      <p>Le coach IA est facultatif et réservé aux personnes connectées.</p>
-      <ul>
-        <li><b>Ce qui part au modèle :</b> ta question, tes derniers échanges avec le coach, et si la case « Partager ces informations avec le coach » est cochée, ton palier et tes priorités du test de niveau, ton classement FFT déclaré et le résumé de tes derniers matchs comptés. Ces éléments passent par le serveur du site (Supabase) puis sont envoyés à <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a>, qui fournit le modèle d'IA Claude, pour produire la réponse. Anthropic n'utilise pas ces échanges pour entraîner ses modèles.</li>
-        <li><b>Ce que le site garde :</b> seulement le nombre de questions posées chaque jour, pour appliquer la limite quotidienne. Ni la question ni la réponse ne sont enregistrées dans ton compte.</li>
-        <li><b>Sur ton appareil :</b> la conversation est gardée dans ton navigateur ; « Nouvelle conversation » l'efface.</li>
-        <li><b>Conseil :</b> n'écris pas d'informations personnelles (nom, coordonnées, santé détaillée) dans tes questions.</li>
       </ul>
       <h3>Sur ton appareil</h3>
       <p>Le site garde aussi, dans ton navigateur, quelques préférences de confort (par exemple les semaines cochées du plan). La progression locale est séparée par compte. Sans compte, elle reste distincte et peut être importée à ta demande. Quand tu es connecté, les changements en attente sont envoyés à ton compte au retour de la connexion sur la page Entraînement. Tu peux effacer les copies locales avec les données du site dans ton navigateur.</p>
