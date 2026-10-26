@@ -34,6 +34,8 @@
  };
  window.PA_COMPTE=compte;
  if(!client) return; // comptes inactifs : on s'arrête ici, rien d'autre n'est défini
+ // Client Supabase partagé (utilisé par partenaires.js pour ne pas créer une seconde session)
+ compte.client=client;
 
  function messageErreur(e,defaut){
   const brut=((e&&e.message)||"").toLowerCase();
@@ -106,6 +108,14 @@
  // Quiz : result = { score, niveau (1 à 4), reponses (JSON) }
  compte.saveQuiz=async function(result){
   if(!compte.user) return nonConnecte();
+  const themes=["vitre","service","aerien","couple","placement","montee","regularite","transition","communication","compet"];
+  if(!result||!Number.isInteger(result.score)||result.score<0||result.score>30||
+     result.niveau!==(result.score<9?1:result.score<17?2:result.score<24?3:4)||
+     !Array.isArray(result.reponses)||result.reponses.length!==10||
+     result.reponses.some((r,i)=>!r||!Number.isInteger(r.pts)||r.pts<0||r.pts>3||r.theme!==themes[i])||
+     result.reponses.reduce((s,r)=>s+r.pts,0)!==result.score){
+   return {ok:false,message:"Ce résultat est invalide. Recommence le test avant de l'enregistrer."};
+  }
   try{
    const {error}=await client.from("quiz_results").insert({user_id:compte.user.id,score:result.score,niveau:result.niveau,reponses:result.reponses||null});
    if(error) return echec(error,"Impossible d'enregistrer ton résultat.");
@@ -115,27 +125,28 @@
  compte.loadQuizzes=async function(){
   if(!compte.user) return nonConnecte();
   try{
-   const {data,error}=await client.from("quiz_results").select("id,score,niveau,created_at").order("created_at",{ascending:false}).limit(50);
+   const {data,error}=await client.from("quiz_results").select("id,score,niveau,created_at").eq("user_id",compte.user.id).order("created_at",{ascending:false}).limit(50);
    if(error) return echec(error,"Impossible de charger ton historique.");
    return {ok:true,results:data||[]};
   }catch(e){ return echec(e,"Impossible de charger ton historique."); }
  };
 
  // Plan : semaines validées (indices 0 à 7 côté site, stockés tels quels dans plan_progress.semaine)
- compte.loadPlan=async function(){
-  if(!compte.user) return nonConnecte();
+ compte.loadPlan=async function(proprietaire=compte.user&&compte.user.id){
+  if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();
   try{
-   const {data,error}=await client.from("plan_progress").select("semaine");
+   const {data,error}=await client.from("plan_progress").select("semaine").eq("user_id",proprietaire);
    if(error) return echec(error,"Impossible de charger ta progression.");
    return {ok:true,weeks:(data||[]).map(l=>l.semaine)};
   }catch(e){ return echec(e,"Impossible de charger ta progression."); }
  };
- compte.savePlanWeek=async function(i,done){
-  if(!compte.user) return nonConnecte();
+ compte.savePlanWeek=async function(i,done,proprietaire=compte.user&&compte.user.id){
+  if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();
+  if(!Number.isInteger(i)||i<0||i>7||typeof done!=="boolean")return {ok:false,message:"Semaine invalide."};
   try{
    const requete=done
-    ?client.from("plan_progress").upsert({user_id:compte.user.id,semaine:i},{onConflict:"user_id,semaine"})
-    :client.from("plan_progress").delete().eq("user_id",compte.user.id).eq("semaine",i);
+    ?client.from("plan_progress").upsert({user_id:proprietaire,semaine:i},{onConflict:"user_id,semaine"})
+    :client.from("plan_progress").delete().eq("user_id",proprietaire).eq("semaine",i);
    const {error}=await requete;
    if(error) return echec(error,"Impossible de synchroniser ta progression.");
    return {ok:true};
@@ -144,6 +155,7 @@
  // Fusion : écrit sur le serveur une liste de semaines en une seule requête
  compte.savePlanWeeks=async function(liste){
   if(!compte.user) return nonConnecte();
+  if(!Array.isArray(liste)||liste.some(i=>!Number.isInteger(i)||i<0||i>7))return {ok:false,message:"Semaines invalides."};
   if(!liste.length) return {ok:true};
   try{
    const {error}=await client.from("plan_progress").upsert(liste.map(s=>({user_id:compte.user.id,semaine:s})),{onConflict:"user_id,semaine"});
@@ -155,9 +167,11 @@
  // Suppression définitive (fonction SQL delete_my_account), puis fin de session locale
  compte.deleteAccount=async function(){
   if(!compte.user) return nonConnecte();
+  const proprietaire=compte.user.id;
   try{
    const {error}=await client.rpc("delete_my_account");
    if(error) return echec(error,"Suppression impossible pour le moment.");
+   try{localStorage.removeItem("pa-weeks-v2:"+proprietaire);}catch(e){}
    try{ await client.auth.signOut(); }catch(e){}
    return {ok:true};
   }catch(e){ return echec(e,"Suppression impossible pour le moment."); }

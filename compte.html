@@ -31,7 +31,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html" class="active">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html" class="active">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
 <section id="compte">
@@ -82,9 +82,15 @@
         <div id="compte-plan"><p class="acc-muted">Chargement…</p></div>
         <div class="btns"><a class="btn ghost" href="entrainement.html">Ouvrir le plan</a></div>
       </div>
+      <div class="acc-card pt-large" id="mes-annonces">
+        <h3>Mes annonces et réponses</h3>
+        <p class="acc-muted">Tes annonces « Trouver un partenaire », les réponses reçues et celles que tu as envoyées.</p>
+        <div id="compte-partenaires"><p class="acc-muted">Chargement…</p></div>
+        <div class="btns"><a class="btn ghost" href="partenaires.html">Trouver un partenaire</a></div>
+      </div>
       <div class="acc-card acc-danger">
         <h3>Supprimer mon compte</h3>
-        <p>Cette action efface ton profil, tes résultats de quiz et ta progression. Elle est définitive. <a href="confidentialite.html">En savoir plus</a></p>
+        <p>Cette action efface ton profil, tes résultats de quiz, ta progression, tes annonces, tes réponses et tes signalements. Elle est définitive. <a href="confidentialite.html">En savoir plus</a></p>
         <div class="btns">
           <button type="button" class="btn ghost" id="sup-demander">Supprimer mon compte</button>
           <button type="button" class="btn danger" id="sup-confirmer" hidden>Oui, supprimer définitivement</button>
@@ -105,6 +111,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/compte.js"></script>
+<script src="assets/js/partenaires.js"></script>
 <script src="assets/js/compte-page.js"></script>
 <script src="assets/js/nav.js"></script>
 </body>

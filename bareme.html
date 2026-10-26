@@ -40,7 +40,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html" class="active">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html" class="active">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
 <section id="bareme">
@@ -71,6 +71,9 @@
           <div class="range"><input type="range" id="b-place" min="1" max="32" step="1" value="5"><output id="b-place-out" for="b-place">5e</output></div>
         </fieldset>
         <div class="verdict" id="b-verdict" style="min-height:0"></div>
+        <label for="sim-date">Date du tournoi</label>
+        <input type="date" id="sim-date" class="bsel" required>
+        <p id="sim-message" role="status" class="acc-msg" hidden></p>
         <button type="button" class="btn solid" id="sim-add">+ Ajouter à mon simulateur</button>
       </form>
 
@@ -84,9 +87,9 @@
     <div class="two">
       <div class="card">
         <div class="top"><h3>Mes résultats</h3><span class="tag tact"><span id="sim-count"></span></span></div>
-        <div class="tbl" style="margin-top:8px"><table id="sim-table"><thead><tr><th>Cat.</th><th>Place</th><th>Paires / tableau</th><th class="n">Pts</th><th></th></tr></thead><tbody id="sim-list"></tbody></table></div>
+        <div class="tbl" style="margin-top:8px"><table id="sim-table"><thead><tr><th>Date</th><th>Cat.</th><th>Place</th><th>Paires / tableau</th><th class="n">Pts</th><th>Statut</th><th>Action</th></tr></thead><tbody id="sim-list"></tbody></table></div>
         <div class="results-head" style="margin-top:14px"><h3>Total : <span id="sim-total" style="color:var(--sand)">0</span> pts</h3><button type="button" class="btn ghost" id="sim-clear" style="padding:8px 14px;font-size:.75rem">Tout effacer</button></div>
-        <p style="color:var(--dim);font-size:.82rem;margin-top:8px">Sauvegardé sur cet appareil. Les lignes grisées ne comptent pas (au-delà des 12 meilleurs résultats).</p>
+        <p style="color:var(--dim);font-size:.82rem;margin-top:8px">Sauvegardé sur cet appareil. Seuls les 12 meilleurs résultats datés des 12 derniers mois comptent. Les anciens résultats sans date restent visibles : renseigne leur date pour les inclure.</p>
       </div>
       <div class="card">
         <div class="top"><h3>Comment marche le classement</h3><span class="tag regle">FFT</span></div>

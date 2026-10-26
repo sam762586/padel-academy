@@ -251,6 +251,11 @@ function initialiser(donnees,contenu,horsConnexion){
    const lien=ajouterTexte(liens,"a","tlien","Voir sur Ten'Up");
    lien.href=url;lien.target="_blank";lien.rel="noopener";
   }
+  if(t.id){
+   // Page « partenaires » : trouver quelqu'un pour jouer ce tournoi
+   const partenaire=ajouterTexte(liens,"a","tlien tpartenaire","Trouver un partenaire");
+   partenaire.href="partenaires.html?tournoi="+encodeURIComponent(String(t.id));
+  }
   if(liens.children.length) carte.appendChild(liens);
   return carte;
  }

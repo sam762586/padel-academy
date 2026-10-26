@@ -45,6 +45,7 @@ function renderTable(){
    mine=(sexe==="messieurs"?m[place-1]:(d[Math.min(place-1,24)]))??null;
    note.textContent=`${cat} : barèmes distincts messieurs / dames, indépendants du nombre de paires. Dames : à partir de la 25e place, points identiques.`;
  }
+ if(Array.isArray(data)&&Array.isArray(data[0])&&place>nb)mine=null;
  wrap.innerHTML=`<table><thead>${header}</thead><tbody>${rows}</tbody></table>`;
  const lbl=PLACE_LABEL(place-1);
  v.innerHTML=mine===null?`<span class="vtag stop">Place inexistante</span><p>Avec ${nb} paires, il n'y a pas de ${place}e place dans un ${cat}. Réduis la place ou augmente le nombre de paires.</p>`
@@ -64,21 +65,82 @@ document.getElementById("cuts").innerHTML=CUTS.map(([c,m,d])=>`<tr><td><b>${c}</
 
 /* Simulateur : mes 12 meilleurs résultats */
 const SIM_KEY="pa-sim-resultats";
-let sim=[];try{sim=JSON.parse(localStorage.getItem(SIM_KEY)||"[]");}catch(e){}
-function ptsFor(cat,place,nb,sexe){const d=BAREME[cat];if(Array.isArray(d)&&Array.isArray(d[0]))return d[place-1]?.[trancheIdx(nb)]??0;if(Array.isArray(d))return d[place-1]??0;return (sexe==="messieurs"?d.messieurs[place-1]:d.dames[Math.min(place-1,24)])??0;}
+const simDate=document.getElementById("sim-date"), simMessage=document.getElementById("sim-message");
+const simIso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function simLireDate(texte){
+ if(typeof texte!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(texte))return null;
+ const [a,m,j]=texte.split("-").map(Number), d=new Date(a,m-1,j,12);
+ return a>=1900&&simIso(d)===texte?d:null;
+}
+function simExpire(date){
+ const d=simLireDate(date);
+ if(!d)return null;
+ const annee=d.getFullYear()+1, mois=d.getMonth();
+ // Le 29 février expire le 28 février de l'année suivante.
+ return simIso(new Date(annee,mois,Math.min(d.getDate(),new Date(annee,mois+1,0).getDate()),12));
+}
+function ptsFor(cat,place,nb,sexe){
+ if(!Object.prototype.hasOwnProperty.call(BAREME,cat)||!Number.isInteger(place)||place<1||place>32||
+    !Number.isInteger(nb)||nb<4||nb>40||!["messieurs","dames"].includes(sexe))return null;
+ const d=BAREME[cat];
+ if(Array.isArray(d)&&Array.isArray(d[0]))return place>nb?null:d[place-1]?.[trancheIdx(nb)]??null;
+ if(Array.isArray(d))return d[place-1]??null;
+ return (sexe==="messieurs"?d.messieurs[place-1]:d.dames[Math.min(place-1,24)])??null;
+}
+function simNormaliser(liste){
+ if(!Array.isArray(liste))return [];
+ return liste.filter(r=>r&&ptsFor(r.cat,r.place,r.nb,r.sexe)!==null).map(r=>({
+  cat:r.cat,place:r.place,nb:r.nb,sexe:r.sexe,date:simLireDate(r.date)?r.date:null
+ }));
+}
+let sim=[];
+try{sim=simNormaliser(JSON.parse(localStorage.getItem(SIM_KEY)||"[]"));}catch(e){}
+function simInfo(texte){simMessage.textContent=texte;simMessage.hidden=!texte;}
+function simSauver(){
+ try{localStorage.setItem(SIM_KEY,JSON.stringify(sim));}
+ catch(e){simInfo("Le stockage est indisponible : ces résultats seront perdus à la fermeture de la page.");}
+}
 function simRender(){
- const el=document.getElementById("sim-list");
- const rows=sim.map(r=>({...r,pts:ptsFor(r.cat,r.place,r.nb,r.sexe)})).sort((a,b)=>b.pts-a.pts);
- const kept=rows.slice(0,12), total=kept.reduce((s,r)=>s+r.pts,0);
- el.innerHTML=rows.length?rows.map((r,i)=>`<tr class="${i>=12?'dim':''}"><td>${r.cat}</td><td>${PLACE_LABEL(r.place-1)}</td><td>${['P500','P1000'].includes(r.cat)?r.sexe:(r.nb+' paires')}</td><td class="n">${r.pts}</td><td><button type="button" class="x" data-i="${sim.indexOf(sim.find(s=>s===r||(s.cat===r.cat&&s.place===r.place&&s.nb===r.nb&&s.sexe===r.sexe)))}">✕</button></td></tr>`).join(""):`<tr><td colspan="5" style="color:var(--dim)">Aucun résultat saisi. Ajoute tes tournois des 12 derniers mois.</td></tr>`;
+ const el=document.getElementById("sim-list"), aujourd=simIso(new Date());
+ simDate.max=aujourd;simDate.min="1900-01-01";
+ const rows=sim.map((r,index)=>({...r,index,pts:ptsFor(r.cat,r.place,r.nb,r.sexe)})).sort((a,b)=>b.pts-a.pts||a.index-b.index);
+ const kept=rows.filter(r=>r.date&&r.date<=aujourd&&simExpire(r.date)>aujourd).slice(0,12);
+ const retenus=new Set(kept.map(r=>r.index)), total=kept.reduce((s,r)=>s+r.pts,0);
+ el.textContent="";
+ if(!rows.length){const cellule=el.insertRow().insertCell();cellule.colSpan=7;cellule.textContent="Aucun résultat saisi. Ajoute tes tournois des 12 derniers mois.";}
+ rows.forEach(r=>{
+  const ligne=el.insertRow();if(!retenus.has(r.index))ligne.className="dim";
+  const date=document.createElement("input");date.type="date";date.value=r.date||"";
+  date.className="bsel";date.min="1900-01-01";date.max=aujourd;date.dataset.i=String(r.index);
+  date.setAttribute("aria-label","Date du résultat "+(r.index+1)+" : "+r.cat+", "+PLACE_LABEL(r.place-1));
+  ligne.insertCell().appendChild(date);
+  [r.cat,PLACE_LABEL(r.place-1),['P500','P1000'].includes(r.cat)?r.sexe:r.nb+' paires',r.pts].forEach(t=>{ligne.insertCell().textContent=String(t);});
+  ligne.insertCell().textContent=!r.date?"Date à renseigner":r.date>aujourd?"À venir":simExpire(r.date)<=aujourd?"Expiré":retenus.has(r.index)?"Retenu":"Hors des 12 meilleurs";
+  const bouton=document.createElement("button");bouton.type="button";bouton.className="x";bouton.dataset.i=String(r.index);bouton.textContent="✕";
+  bouton.setAttribute("aria-label","Supprimer le résultat "+(r.index+1)+" : "+r.cat);
+  ligne.insertCell().appendChild(bouton);
+ });
  document.getElementById("sim-total").textContent=total;
- document.getElementById("sim-count").textContent=`${Math.min(rows.length,12)} résultat${rows.length>1?'s':''} retenu${rows.length>1?'s':''} sur ${rows.length}`;
- try{localStorage.setItem(SIM_KEY,JSON.stringify(sim));}catch(e){}
+ document.getElementById("sim-count").textContent=`${kept.length} résultat${kept.length>1?'s':''} retenu${kept.length>1?'s':''} sur ${rows.length}`;
 }
 document.getElementById("sim-add").addEventListener("click",()=>{
- sim.push({cat:document.getElementById("b-cat").value,place:+document.getElementById("b-place").value,nb:+document.getElementById("b-nb").value,sexe:document.querySelector('input[name="b-sexe"]:checked').value});
- simRender();
+ const resultat={cat:document.getElementById("b-cat").value,place:+document.getElementById("b-place").value,nb:+document.getElementById("b-nb").value,sexe:document.querySelector('input[name="b-sexe"]:checked').value,date:simDate.value};
+ if(!simLireDate(resultat.date)||resultat.date>simIso(new Date())){simInfo("Choisis une date de tournoi valide, aujourd'hui ou dans le passé.");simDate.focus();return;}
+ if(ptsFor(resultat.cat,resultat.place,resultat.nb,resultat.sexe)===null){simInfo("Cette place n'existe pas pour le tableau choisi.");return;}
+ simInfo("");sim.push(resultat);simSauver();simRender();
 });
-document.getElementById("sim-list").addEventListener("click",e=>{const b=e.target.closest(".x");if(!b)return;sim.splice(+b.dataset.i,1);simRender();});
-document.getElementById("sim-clear").addEventListener("click",()=>{sim=[];simRender();});
+document.getElementById("sim-list").addEventListener("click",e=>{
+ const b=e.target.closest(".x");if(!b)return;
+ const i=Number(b.dataset.i);if(!Number.isInteger(i)||i<0||i>=sim.length)return;
+ sim.splice(i,1);simInfo("");simSauver();simRender();
+});
+document.getElementById("sim-list").addEventListener("change",e=>{
+ const i=Number(e.target.dataset.i), valeur=e.target.value;
+ if(e.target.type!=="date"||!Number.isInteger(i)||i<0||i>=sim.length)return;
+ if(!simLireDate(valeur)||valeur>simIso(new Date())){simInfo("Choisis une date valide, aujourd'hui ou dans le passé.");e.target.value=sim[i].date||"";return;}
+ sim[i].date=valeur;simInfo("");simSauver();simRender();
+});
+document.getElementById("sim-clear").addEventListener("click",()=>{sim=[];simInfo("");simSauver();simRender();});
+simDate.value=simIso(new Date());
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)simRender();});
 renderTable();simRender();

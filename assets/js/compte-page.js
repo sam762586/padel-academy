@@ -12,6 +12,7 @@ const NB_SEMAINES_PLAN=8;
  const compte=window.PA_COMPTE;
  const blocConnexion=document.getElementById("compte-connexion");
  const blocProfil=document.getElementById("compte-profil");
+ let versionSession=0;
 
  // Affiche un message (texte seul) dans un paragraphe, avec un état : "ok", "err" ou ""
  function afficher(element,texte,etat){
@@ -75,7 +76,9 @@ const NB_SEMAINES_PLAN=8;
  const formProfil=document.getElementById("compte-form-profil");
  const messageProfil=document.getElementById("pf-msg");
  async function chargerProfil(){
+  const version=versionSession;
   const reponse=await compte.loadProfile();
+  if(version!==versionSession||!compte.user)return;
   if(!reponse.ok){afficher(messageProfil,reponse.message,"err");return;}
   const profil=reponse.profile;
   champPseudo.value=profil.pseudo||"";
@@ -103,8 +106,10 @@ const NB_SEMAINES_PLAN=8;
 
  // --- Historique du quiz ---
  async function chargerQuiz(){
+  const version=versionSession;
   const zone=document.getElementById("compte-quiz");
   const reponse=await compte.loadQuizzes();
+  if(version!==versionSession||!compte.user)return;
   zone.textContent="";
   if(!reponse.ok){const p=document.createElement("p");p.className="acc-msg acc-err";p.textContent=reponse.message;zone.appendChild(p);return;}
   if(!reponse.results.length){const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun résultat enregistré pour l'instant. Passe le test, puis clique sur « Enregistrer dans mon profil ».";zone.appendChild(p);return;}
@@ -124,8 +129,10 @@ const NB_SEMAINES_PLAN=8;
 
  // --- Progression du plan ---
  async function chargerPlan(){
+  const version=versionSession;
   const zone=document.getElementById("compte-plan");
   const reponse=await compte.loadPlan();
+  if(version!==versionSession||!compte.user)return;
   zone.textContent="";
   const p=document.createElement("p");
   if(!reponse.ok){p.className="acc-msg acc-err";p.textContent=reponse.message;zone.appendChild(p);return;}
@@ -134,6 +141,18 @@ const NB_SEMAINES_PLAN=8;
   const barre=document.createElement("div");barre.className="acc-bar";
   const remplissage=document.createElement("i");remplissage.style.width=(faites/NB_SEMAINES_PLAN*100)+"%";barre.appendChild(remplissage);
   zone.append(p,barre);
+ }
+
+ // --- Mes annonces et réponses (« Trouver un partenaire »), rendu fourni par partenaires.js ---
+ function chargerPartenaires(){
+  const zone=document.getElementById("compte-partenaires");
+  if(!zone) return;
+  if(!window.PA_PARTENAIRES||typeof window.PA_PARTENAIRES.rendreMesAnnonces!=="function"){
+   zone.textContent="";const p=document.createElement("p");p.className="acc-muted";p.textContent="Cette section n'est pas disponible pour le moment.";zone.appendChild(p);return;
+  }
+  window.PA_PARTENAIRES.rendreMesAnnonces(zone).catch(()=>{
+   zone.textContent="";const p=document.createElement("p");p.className="acc-msg acc-err";p.textContent="Impossible de charger tes annonces pour le moment.";zone.appendChild(p);
+  });
  }
 
  // --- Suppression du compte (confirmation intégrée, sans confirm()) ---
@@ -165,12 +184,17 @@ const NB_SEMAINES_PLAN=8;
 
  // --- Bascule connecté / non connecté ---
  function afficherEtat(){
+  versionSession++;
+  formProfil.reset();
+  document.getElementById("compte-adresse").textContent="";
+  document.getElementById("compte-quiz").textContent="";
+  document.getElementById("compte-plan").textContent="";
   if(compte.user){
    blocConnexion.hidden=true;blocProfil.hidden=false;
    zoneMessage.hidden=true;
    document.getElementById("compte-adresse").textContent=compte.user.email||"";
    afficher(messageProfil,"","");afficher(messageSuppression,"","");modeConfirmation(false);
-   chargerProfil();chargerQuiz();chargerPlan();
+   chargerProfil();chargerQuiz();chargerPlan();chargerPartenaires();
   }else{
    blocProfil.hidden=true;blocConnexion.hidden=false;
    if(!zoneMessage.classList.contains("acc-ok")) zoneMessage.hidden=true;

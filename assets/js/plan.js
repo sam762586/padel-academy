@@ -12,48 +12,123 @@ const WEEKS=[
  {t:"Semaine match",obj:"Mettre tout ensemble, jouer un tournoi P25 ou P100.",ex:"Séance de points joués à thème : 1) points qui commencent par un lob, 2) points où l'équipe au fond doit monter en moins de 3 balles, 3) tie-breaks à 7 points avec punto de oro.",match:"En match : inscris-toi sur Ten'Up à un tournoi avec un partenaire de niveau proche. Objectif : zéro faute directe inutile, pas le résultat."},
 ];
 const wk=document.getElementById("weeks");
-let done=[];try{done=JSON.parse(localStorage.getItem("pa-weeks")||"[]");}catch(e){}
+const wCompte=window.PA_COMPTE;
+const wCle=id=>"pa-weeks-v2:"+(id||"invite");
+const wSemaines=liste=>Array.isArray(liste)?[...new Set(liste.filter(n=>Number.isInteger(n)&&n>=0&&n<WEEKS.length))]:[];
+let wPret=!(wCompte&&wCompte.actif), wEtat=null;
+function wLire(id){
+ let data=null;
+ try{
+  const brut=localStorage.getItem(wCle(id));
+  data=brut?JSON.parse(brut):null;
+  // L'ancien stockage n'a pas de propriétaire : proposer son import, jamais le fusionner automatiquement.
+  if(!data&&!id) data={done:JSON.parse(localStorage.getItem("pa-weeks")||"[]")};
+ }catch(e){}
+ const etat={id,done:wSemaines(data&&data.done),pending:{},running:false};
+ if(id&&data&&data.pending&&typeof data.pending==="object"){
+  for(let i=0;i<WEEKS.length;i++){
+   if(typeof data.pending[i]==="boolean") etat.pending[i]=data.pending[i];
+  }
+ }
+ wAppliquer(etat);
+ return etat;
+}
+function wAppliquer(etat){
+ const faites=new Set(etat.done);
+ Object.entries(etat.pending).forEach(([i,valeur])=>valeur?faites.add(+i):faites.delete(+i));
+ etat.done=[...faites].sort((a,b)=>a-b);
+}
+wEtat=wLire(null);
 function wRender(){
- wk.innerHTML=WEEKS.map((w,i)=>`<article class="week ${done.includes(i)?'done':''}">
-  <label class="wcheck"><input type="checkbox" id="w${i}" ${done.includes(i)?'checked':''} data-i="${i}"><span></span></label>
+ const focus=wk.contains(document.activeElement)?document.activeElement.id:null;
+ wk.innerHTML=WEEKS.map((w,i)=>`<article class="week ${wEtat.done.includes(i)?'done':''}">
+  <label class="wcheck"><input type="checkbox" id="w${i}" aria-label="Valider la semaine ${i+1}" ${wEtat.done.includes(i)?'checked':''} ${wPret?'':'disabled'} data-i="${i}"><span></span></label>
   <div class="wnum">S${i+1}</div>
   <div class="wbody"><h3>${w.t}</h3><p class="wobj"><b>Objectif :</b> ${w.obj}</p>
   <details><summary>Exercice clé + consigne match</summary><p><b>Exercice (45 min) :</b> ${w.ex}</p><p style="margin-top:8px"><b>${w.match.split(":")[0].trim()} :</b>${w.match.split(":").slice(1).join(":")}</p></details></div>
  </article>`).join("");
+ if(focus){const champ=document.getElementById(focus);if(champ) champ.focus();}
 }
-function wSauver(){try{localStorage.setItem("pa-weeks",JSON.stringify(done));}catch(err){}}
-/* Message de synchronisation (créé seulement si les comptes sont actifs et l'utilisateur connecté) */
-let wMessage=null;
+function wSauver(etat=wEtat){
+ try{localStorage.setItem(wCle(etat.id),JSON.stringify({done:etat.done,pending:etat.pending}));return true;}
+ catch(err){wInfo("Le stockage de cet appareil est indisponible. Garde cette page ouverte pour ne pas perdre les changements non synchronisés.",true);return false;}
+}
+const wMessage=document.createElement("p"), wActions=document.createElement("div");
+wMessage.setAttribute("role","status");wMessage.className="acc-msg";wMessage.hidden=true;
+wActions.className="plan-actions";
+wk.before(wMessage,wActions);
+const wImporter=document.createElement("button"), wReessayer=document.createElement("button");
+wImporter.type=wReessayer.type="button";wImporter.className=wReessayer.className="btn ghost";
+wImporter.textContent="Importer les semaines enregistrées sans compte dans mon compte";
+wReessayer.textContent="Réessayer la synchronisation";
+wImporter.hidden=wReessayer.hidden=true;
+wActions.append(wImporter,wReessayer);
 function wInfo(texte,erreur){
- if(!wMessage){wMessage=document.createElement("p");wMessage.setAttribute("role","status");wMessage.className="acc-msg";wk.parentNode.insertBefore(wMessage,wk);}
  wMessage.hidden=!texte;wMessage.textContent=texte||"";wMessage.classList.toggle("acc-err",!!erreur);
 }
-wk.addEventListener("change",async e=>{
- const i=+e.target.dataset.i;if(isNaN(i))return;
+function wActuel(etat){return wEtat===etat&&wCompte&&wCompte.user&&wCompte.user.id===etat.id;}
+wk.addEventListener("change",e=>{
+ const i=Number(e.target.dataset.i);
+ if(!wPret||e.target.type!=="checkbox"||!Number.isInteger(i)||i<0||i>=WEEKS.length)return;
  const coche=e.target.checked;
- done=coche?[...new Set([...done,i])]:done.filter(x=>x!==i);
+ wEtat.done=coche?wSemaines([...wEtat.done,i]):wEtat.done.filter(x=>x!==i);
+ if(wEtat.id) wEtat.pending[i]=coche;
  wSauver();wRender();
- // Connecté : on répercute aussi sur le serveur (le stockage local reste la source en cas d'échec)
- const compte=window.PA_COMPTE;
- if(compte&&compte.actif&&compte.user){
-  const reponse=await compte.savePlanWeek(i,coche);
-  wInfo(reponse.ok?"":reponse.message+" Ta progression reste enregistrée sur cet appareil.",!reponse.ok);
- }
+ wSynchroniser();
 });
-/* À la connexion : union du local et du serveur, écrite des deux côtés */
+/* Une file par compte conserve aussi les décochages. Les réponses d'une ancienne session sont ignorées. */
 async function wSynchroniser(){
- const compte=window.PA_COMPTE;
- if(!compte||!compte.actif||!compte.user) return;
- const serveur=await compte.loadPlan();
- if(!serveur.ok){wInfo(serveur.message+" Ta progression reste enregistrée sur cet appareil.",true);return;}
- const union=[...new Set([...done,...serveur.weeks])].filter(n=>Number.isInteger(n)&&n>=0&&n<WEEKS.length).sort((x,y)=>x-y);
- const aEnvoyer=union.filter(n=>!serveur.weeks.includes(n));
- done=union;wSauver();wRender();
- const envoi=await compte.savePlanWeeks(aEnvoyer);
- wInfo(envoi.ok?"":envoi.message+" Ta progression reste enregistrée sur cet appareil.",!envoi.ok);
+ const etat=wEtat;
+ if(!wPret||!etat.id||!wActuel(etat)||etat.running)return;
+ etat.running=true;wReessayer.hidden=true;
+ try{
+  do{
+   while(Object.keys(etat.pending).length){
+    if(!wActuel(etat))return;
+    const i=Object.keys(etat.pending)[0], valeur=etat.pending[i];
+    const reponse=await wCompte.savePlanWeek(+i,valeur,etat.id);
+    if(!wActuel(etat))return;
+    if(!reponse.ok)throw new Error(reponse.message);
+    // Un second clic pendant la requête doit encore être envoyé.
+    if(etat.pending[i]===valeur)delete etat.pending[i];
+    wSauver(etat);
+   }
+   const serveur=await wCompte.loadPlan(etat.id);
+   if(!wActuel(etat))return;
+   if(!serveur.ok)throw new Error(serveur.message);
+   etat.done=wSemaines(serveur.weeks);wAppliquer(etat);
+   const sauve=wSauver(etat);wRender();
+   if(sauve)wInfo("Progression synchronisée.",false);
+  }while(Object.keys(etat.pending).length);
+ }catch(e){
+  if(wActuel(etat)){
+   wInfo("Synchronisation impossible pour le moment. Tes changements restent en attente sur cette page ; réessaie dès que la connexion revient.",true);
+   wReessayer.hidden=false;
+  }
+ }finally{etat.running=false;}
 }
+wImporter.addEventListener("click",()=>{
+ if(!wEtat.id||!wActuel(wEtat))return;
+ const invite=wLire(null);
+ invite.done.forEach(i=>{wEtat.pending[i]=true;});wAppliquer(wEtat);
+ if(wSauver()){
+  try{localStorage.setItem(wCle(null),JSON.stringify({done:[],pending:{}}));localStorage.removeItem("pa-weeks");}catch(e){}
+  wImporter.hidden=true;
+ }
+ wRender();wSynchroniser();
+});
+function wChangerCompte(){
+ const id=wCompte&&wCompte.user?wCompte.user.id:null;
+ wPret=true;
+ if(wEtat.id!==id)wEtat=wLire(id);
+ wInfo("",false);wReessayer.hidden=true;
+ wImporter.hidden=!id||!wLire(null).done.length;
+ wRender();wSynchroniser();
+}
+wReessayer.addEventListener("click",wSynchroniser);
+window.addEventListener("online",wSynchroniser);
 wRender();
-if(window.PA_COMPTE&&window.PA_COMPTE.actif){
- window.PA_COMPTE.ready.then(wSynchroniser).catch(()=>{});
- window.PA_COMPTE.onChange(()=>{wSynchroniser().catch(()=>{});});
+if(wCompte&&wCompte.actif){
+ wCompte.onChange(wChangerCompte);
+ wCompte.ready.then(wChangerCompte).catch(()=>{wPret=true;wRender();wInfo("Connexion au compte indisponible. La progression reste locale.",true);});
 }

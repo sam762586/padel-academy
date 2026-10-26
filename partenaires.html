@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trouver un partenaire de padel pour un tournoi</title>
+<meta name="description" content="Tu cherches un partenaire pour un tournoi de padel ? Publie une annonce pour le tournoi de ton choix ou réponds à celles des autres joueurs, avec un compte gratuit.">
+<link rel="canonical" href="https://apprendre-padel.fr/partenaires.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padel Academy · apprendre-padel.fr">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://apprendre-padel.fr/partenaires.html">
+<meta property="og:title" content="Trouver un partenaire de padel pour un tournoi">
+<meta property="og:description" content="Tu cherches un partenaire pour un tournoi de padel ? Publie une annonce pour le tournoi de ton choix ou réponds à celles des autres joueurs, avec un compte gratuit.">
+<meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Trouver un partenaire", "item": "https://apprendre-padel.fr/partenaires.html"}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js" defer></script>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html" class="active">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="partenaires">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Compétition · Entre joueurs</p><h1>Trouver un partenaire pour un tournoi</h1></div>
+      <p>Choisis un tournoi, publie une annonce ou réponds à celle d'un autre joueur. Les annonces sont réservées aux joueurs connectés, et aucun e-mail ni numéro n'est affiché publiquement.</p>
+    </div>
+    <p class="acc-msg" id="pt-etat" role="status">Chargement…</p>
+
+    <div class="acc-card" id="pt-connexion">
+      <h3>Comment ça marche</h3>
+      <ol class="pt-etapes">
+        <li>Tu te connectes avec ton compte gratuit (lien magique par e-mail) et tu renseignes un pseudo dans ton profil.</li>
+        <li>Tu cherches ton tournoi par nom, ville ou département, puis tu publies une annonce : ton niveau, ton côté de jeu et un court message.</li>
+        <li>Un joueur clique sur « Je suis intéressé·e » : sa réponse reste privée entre vous deux. Tu acceptes ou tu refuses, puis vous vous organisez en privé.</li>
+      </ol>
+      <p>Tu dois avoir 15 ans ou plus et accepter la charte ci-dessous avant ta première annonce.</p>
+      <div class="btns"><a class="btn primary" href="compte.html">Me connecter ou créer mon compte</a></div>
+    </div>
+
+    <div id="pt-app" hidden>
+      <p class="acc-msg" id="pt-msg" role="status" hidden></p>
+
+      <div class="acc-card pt-large">
+        <h3>1. Choisis un tournoi</h3>
+        <div class="acc-form">
+          <label for="pt-recherche">Nom, ville ou département</label>
+          <input type="search" id="pt-recherche" placeholder="Ex. Rouen, P250 ou 76" autocomplete="off">
+        </div>
+        <ul class="pt-resultats" id="pt-resultats" hidden></ul>
+        <div class="pt-choisi" id="pt-selection" hidden></div>
+        <p class="pt-aide">Seuls les tournois à venir sont proposés. Tu peux aussi partir de la fiche d'un tournoi sur la page <a href="tournois.html">Tournois</a>.</p>
+      </div>
+
+      <div class="acc-card pt-large" id="pt-publier" hidden>
+        <h3>2. Publie ton annonce</h3>
+        <p id="pt-profil-resume" class="acc-muted"></p>
+        <form class="acc-form" id="pt-form" novalidate>
+          <label for="pt-sexe">Épreuve cherchée</label>
+          <select id="pt-sexe"></select>
+          <label for="pt-cote">Côté de jeu préféré</label>
+          <select id="pt-cote"><option value="indifferent">Indifférent</option><option value="droite">Droite</option><option value="gauche">Gauche</option></select>
+          <label for="pt-texte">Message (500 caractères max.)</label>
+          <textarea id="pt-texte" maxlength="500" rows="4" placeholder="Ex. Je cherche un partenaire régulier, plutôt offensif, dispo tout le week-end."></textarea>
+          <p class="pt-aide"><span id="pt-compteur">0 / 500</span> · Pas d'e-mail, de téléphone ni de lien : les contacts se partagent en privé, après une réponse.</p>
+          <p class="acc-msg acc-err" id="pt-alerte-contact" role="alert" hidden>Ce message contient un e-mail, un numéro, un lien ou une messagerie : retire-le pour pouvoir publier.</p>
+          <div id="pt-consent-zone"></div>
+          <button type="submit" class="btn primary" id="pt-publier-btn">Publier l'annonce</button>
+        </form>
+        <p class="acc-msg" id="pt-form-msg" role="status" hidden></p>
+        <p class="pt-aide">5 annonces actives maximum. Tes annonces disparaissent des listes après la date du tournoi, et tu peux les supprimer à tout moment depuis <a href="compte.html#mes-annonces">Mon compte</a>.</p>
+      </div>
+
+      <div class="pt-large">
+        <div class="tbarre">
+          <h2 class="pt-h2" id="pt-titre-annonces">Annonces à venir</h2>
+          <div class="pt-filtre">
+            <label for="pt-filtre-sexe">Épreuve</label>
+            <select id="pt-filtre-sexe"><option value="">Toutes</option><option value="messieurs">Messieurs</option><option value="dames">Dames</option><option value="mixte">Mixte</option></select>
+          </div>
+        </div>
+        <div class="pt-liste" id="pt-annonces"></div>
+      </div>
+
+      <div class="pt-large" id="pt-admin" hidden>
+        <h2 class="pt-h2">Modération (admin)</h2>
+        <p class="acc-muted">Annonces signalées ou masquées. « Rétablir » efface aussi les signalements.</p>
+        <p class="acc-msg" id="pt-admin-msg" role="status" hidden></p>
+        <div class="pt-liste" id="pt-admin-liste"></div>
+      </div>
+    </div>
+
+    <div class="acc-card prose pt-large" id="charte">
+      <h3>Charte du partenaire de tournoi</h3>
+      <ul>
+        <li><b>Respect.</b> Tu parles à tes futurs partenaires et adversaires comme tu voudrais qu'on te parle : pas d'insultes, de moqueries, de harcèlement ni de discrimination.</li>
+        <li><b>Pas de contact public.</b> Tu ne publies ni e-mail, ni numéro, ni lien, ni identifiant de messagerie dans une annonce. Tu partages tes coordonnées seulement en privé, avec la personne que tu choisis.</li>
+        <li><b>Pas de contenu commercial.</b> Pas de publicité, de vente, de démarchage ni de recrutement.</li>
+        <li><b>Des annonces vraies.</b> Une annonce correspond à un vrai projet de tournoi, avec ton vrai niveau.</li>
+        <li><b>Modération.</b> Tu peux signaler une annonce. Après 3 signalements de joueurs différents, elle est masquée automatiquement, puis vérifiée par l'administrateur du site.</li>
+      </ul>
+      <p>Tes données d'annonce sont expliquées sur la page <a href="confidentialite.html#partenaires">Confidentialité</a>.</p>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/compte.js"></script>
+<script src="assets/js/partenaires.js"></script>
+<script src="assets/js/nav.js"></script>
+</body>
+</html>
