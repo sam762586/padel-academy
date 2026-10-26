@@ -36,7 +36,7 @@
 
 - [x] **T3. Brancher le site sur les nouvelles pages** : chaque carte de `tournois.html` renvoie vers `tournoi/<id>.html` ; la nav « Tournois » renvoie vers la liste nationale ; la page d'accueil reçoit le bloc « Cette semaine près de chez toi » (5 tournois du département mémorisé, sinon carte de France cliquable). Supprime le détail en modale de tournois.html s'il fait doublon. ✅ 26/10/2026, commit 40af575.
 
-- [ ] **T4. Communauté sur la fiche** (SQL dans `supabase/migrations/`) :
+- [x] **T4. Communauté sur la fiche** (SQL dans `supabase/migrations/`) : ✅ 26/10/2026, commit b748978. SQL à exécuter : supabase/migrations/2026-10-26-t4-01 à t4-12 (dans l'ordre), puis ajouter "communaute" à PA_SUPABASE.activees.
   - « J'y vais » (table `presences` : user_id, tournoi_id, unique ; RLS lecture pour tous les connectés, écriture pour soi) ; affichage des pseudos + classement déclaré ; compteur visible même déconnecté (via une fonction `security definer` qui ne renvoie que le nombre).
   - Annonces partenaires du tournoi (réutiliser `annonces`, filtrées par `tournoi_id`) affichées sur la fiche, avec le formulaire existant.
   - Avis après tournoi (table `avis` : organisation 1-5, niveau réel 1-5, « je recommande » oui/non, texte ≤ 300 caractères passé par `message_sans_contact()` + liste de mots interdits ; 1 avis par joueur et par tournoi ; visible après la date de fin ; signalement et modération comme `annonces`). Note moyenne du club calculée côté client à partir des avis de ses tournois.
