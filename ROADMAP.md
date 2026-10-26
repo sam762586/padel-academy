@@ -114,3 +114,10 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 **Fait** : scripts/gabarit.js devient la seule source du menu et du pied de page. scripts/appliquer-gabarit.js les recopie dans les 22 pages de la racine (`--verifier` pour contrôler), et generer-pages.js s'en sert pour les 1 019 pages tournois (régénérées). M1 : renommage partout (titres, og:site_name, manifest, ics, CLAUDE.md, README, agents). « Padel Academy » ne reste que dans « anciennement Padel Academy » (mentions légales) et dans la chaîne YouTube Hello Padel Academy. M2 : bloc auteur sur l'accueil, auteur dans chaque pied de page, données Person. Test : verifier-pages (13).
 **Bloqué** : photo de Samuel (l'initiale « S » tient la place).
 **À voir** : le menu a 17 liens et passe sur deux lignes sur ordinateur. Le regrouper (Apprendre / Jouer / Tournois / Mon espace) simplifierait la navigation, c'est une décision de structure à prendre.
+
+### 26/10/2026 — Menu regroupé (demande de Samuel)
+**Fait** : le menu passe de 17 liens à 3 groupes + Mon espace + « Choisir sa raquette » :
+- Apprendre : Technique, Tactique, Tutos, Règles, Conseils, Matériel, Vidéos, Lexique ;
+- Progresser : Mon niveau, Entraînement, Compteur ;
+- Tournois : Trouver un tournoi, Jouer en compétition, Barème des points, Trouver un partenaire.
+Sur ordinateur, ce sont des menus déroulants (au clic et au survol ; Échap et un clic ailleurs les ferment), sur une seule ligne dès 861 px. Sur mobile, ce sont des accordéons, et le groupe de la page en cours est déplié. Corrigé au passage : le panneau mobile laissait voir la page dessous. Test : scripts/verifier-menu.cjs (9).
