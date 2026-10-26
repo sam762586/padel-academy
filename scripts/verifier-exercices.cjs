@@ -44,7 +44,13 @@ function moteur(){
  // lob : 4 points seulement -> ignoré ; smash : 2 points -> ignoré
  // Matchs non comptés (saisis après coup) : ignorés
  assert.equal(P.themesPrioritaires(null,[{pointsTotal:0,motifsPerdus:{}}]).length,0);
- ok('moteur : points faibles du test, motifs de points perdus avec seuils, matchs saisis ignorés');
+ // Test v2 : priorités enregistrées, sinon thèmes au palier du joueur ou en dessous (sans la compétition)
+ const v2={palier:2,niveau:2,reponses:THEMES.map(t=>({theme:t,palier:t==='aerien'?0:t==='compet'?0:3,pts:t==='aerien'?0:t==='compet'?0:3}))};
+ r=JSON.parse(JSON.stringify(P.themesPrioritaires(v2,[])));
+ assert.deepEqual(r.map(x=>x.theme),['aerien']);assert.match(r[0].raisons[0],/palier Découverte/);
+ r=JSON.parse(JSON.stringify(P.themesPrioritaires({...v2,priorites:['vitre','service']},[])));
+ assert.deepEqual(r.map(x=>x.theme).sort(),['service','vitre']);
+ ok('moteur : points faibles du test, motifs de points perdus avec seuils, matchs saisis ignorés, test v2');
  // Choix selon le niveau
  THEMES.forEach(t=>[1,2,3,4].forEach(n=>{const l=P.exercicesPour(t,n);assert.equal(l.length,2);assert.ok(l.some(e=>e.niveaux.includes(n))||!E.some(e=>e.theme===t&&e.niveaux.includes(n)),t+' '+n);}));
  ok('choix : 2 exercices par thème, adaptés au niveau quand il y en a');
@@ -78,16 +84,19 @@ const serveur=http.createServer((req,res)=>{
   ok('sans données : invitation au test et au compteur, 3 exercices de base');
   // Test de niveau passé sur niveau.html : gardé sur l'appareil
   await page.goto(base+'/niveau.html');
-  for(let i=0;i<10;i++){await page.locator('#qopts .qopt').first().click();}
+  // Réponses les plus basses partout (options mélangées : on clique par texte)
+  await page.click('text=Je ne suis pas classé(e)');
+  const textes=await page.evaluate(()=>[...window.PA_NIVEAU.REPERES,...window.PA_NIVEAU.SITUATIONS].map(x=>x.o[0][0]));
+  for(const t of textes)await page.locator('#qopts .qopt',{hasText:t}).first().click();
   await page.waitForSelector('#qresult:not([hidden])');
   const q=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-quiz-dernier')));
-  assert.equal(q.reponses.length,10);assert.equal(q.niveau,1);
+  assert.equal(q.reponses.length,10);assert.equal(q.palier,0);assert.equal(q.niveau,1);
   ok('test de niveau : dernier résultat gardé sur l\'appareil');
-  // Espace : 3 thèmes (toutes les réponses à 0 -> priorité par ordre alphabétique à égalité), exercices de niveau 1
+  // Espace : 3 thèmes (toutes les réponses au palier 0 -> les coups clés d'abord), exercices de niveau 1
   await page.goto(base+'/espace.html');
   assert.equal(await page.locator('#esp-exercices .ex-theme').count(),3);
-  assert.match(await page.textContent('#esp-exercices'),/niveau 1 sur 4/);
-  assert.match(await page.textContent('#esp-exercices .ex-raisons'),/0 point sur 3/);
+  assert.match(await page.textContent('#esp-exercices'),/palier Découverte/);
+  assert.match(await page.textContent('#esp-exercices .ex-raisons'),/correspond au palier Découverte/);
   // Matchs comptés : 8 points perdus sur faute directe -> régularité en tête
   await page.evaluate(()=>{
    const pts=[...Array(8)].map(()=>({g:1,m:'faute'})).concat([...Array(4)].map(()=>({g:0,m:'gagnant'})));

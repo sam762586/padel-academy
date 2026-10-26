@@ -43,6 +43,8 @@ Notes :
 
 Après le schéma initial, appliquer `supabase/migrations/2026-10-26-quiz-01-fonction-quiz-resultat-valide.sql` puis `2026-10-26-quiz-02-contrainte-quiz-resultat-coherent.sql` dans le SQL Editor. Cette migration contrôle le score (0 à 30), sa cohérence avec le niveau et les réponses fournies. Elle ne supprime ni ne réécrit les résultats existants. La contrainte `NOT VALID` contrôle les nouvelles écritures ; les anciennes lignes sont à examiner avant validation globale. Cette migration doit aussi être appliquée sur une nouvelle base.
 
+Test de niveau v2 (6 paliers, de Découverte à P1000 et +) : `2026-10-26-quiz-03` ajoute la colonne `palier`, `-04` crée le contrôle `quiz_resultat_valide_v2` (il reprend l'ancien contrôle pour les résultats sans palier), `-05` fait pointer la contrainte dessus. Ajoute ensuite `"quiz2"` à `PA_SUPABASE.activees`. Avant ça, le nouveau test fonctionne entièrement sur l'appareil (et dans l'espace joueur), mais le bouton « Enregistrer dans mon profil » n'apparaît pas.
+
 # Sauvegarde des matchs du compteur (score.html)
 
 Le compteur fonctionne sans compte : les matchs restent sur l'appareil. Pour que les joueurs connectés retrouvent leurs matchs sur tous leurs appareils, applique `supabase/migrations/20261026_matchs.sql` dans le SQL Editor (après `schema.sql`, relançable sans risque). Il crée la table `matchs` avec les règles RLS (chacun ne voit que ses matchs, pas de modification après enregistrement). Tant que ce n'est pas fait, la fin de match affiche « La sauvegarde des matchs n'est pas encore activée » et le match reste enregistré sur l'appareil. Suppression de compte : les matchs partent en cascade, `delete_my_account()` ne change pas.
@@ -79,7 +81,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 # Ordre conseillé pour tout le SQL en attente (format `$fn$`, un objet par fichier)
 
 1. `2026-10-26-classements-01` et `-02` ;
-2. `2026-10-26-quiz-01` et `-02` ;
+2. `2026-10-26-quiz-01` à `-05`, puis ajoute `"quiz2"` à `PA_SUPABASE.activees` ;
 3. `2026-10-26-favoris-01` à `-03`, puis ajoute `"favoris"` à `PA_SUPABASE.activees` ;
 4. `2026-10-26-t4-01` à `-12`, puis ajoute `"communaute"` à `PA_SUPABASE.activees`.
 5. `2026-10-26-espace-01` à `-06`, puis ajoute `"espace"` à `PA_SUPABASE.activees`.

@@ -1,11 +1,13 @@
 /* EXERCICES RECOMMANDÉS (espace joueur)
    Choisit 3 thèmes à travailler à partir :
-     - du dernier test de niveau (réponses à 0 ou 1 point sur 3) : sur l'appareil (pa-quiz-dernier) ou dans le compte ;
+     - du dernier test de niveau : sur l'appareil (pa-quiz-dernier) ou dans le compte. Test v2 (champ palier) : thèmes où le jeu
+       décrit est au palier du joueur ou en dessous, les plus bas d'abord ; ancien test : réponses à 0 ou 1 point sur 3 ;
      - des 10 derniers matchs comptés au compteur : motifs des points perdus (MOTIF_VERS_THEME, exercices-donnees.js).
    Puis propose 2 exercices par thème, adaptés au niveau du test. « Je l'ai fait » est gardé sur l'appareil.
    Dépend de exercices-donnees.js (EXERCICES, MOTIF_VERS_THEME, MOTIF_EXPLICATION) et journal.js (PA_JOURNAL). */
 const EX_LIBELLES_THEMES={vitre:"Sorties de vitre",service:"Service et montée",aerien:"Bandeja, víbora et smash",couple:"Bouger avec son partenaire",
  placement:"Placement au filet",montee:"Monter au filet",regularite:"Régularité",transition:"Transition et chiquita",communication:"Communication",compet:"Compétition"};
+const EX_PALIERS=["Découverte","P25","P100","P250","P500","P1000 et +"]; // mêmes noms que quiz-niveau.js
 const EX_CLE_FAITS="pa-exercices-faits";
 const EX_NB_MATCHS=10;      // matchs comptés pris en compte
 const EX_MIN_POINTS=5;      // points perdus minimum sur un motif pour qu'il compte
@@ -15,7 +17,11 @@ const EX_PART_MIN=0.2;      // part minimale des points perdus
 function exThemesPrioritaires(quiz,matchs){
  const scores={};
  const ajouter=(theme,points,raison)=>{if(!EX_LIBELLES_THEMES[theme])return;const s=scores[theme]=scores[theme]||{theme,score:0,raisons:[]};s.score+=points;s.raisons.push(raison);};
- if(quiz&&Array.isArray(quiz.reponses)){
+ if(quiz&&Array.isArray(quiz.reponses)&&Number.isInteger(quiz.palier)){
+  const valides=quiz.reponses.filter(r=>r&&r.theme!=="compet"&&Number.isInteger(r.pts)&&Number.isInteger(r.palier));
+  const prio=Array.isArray(quiz.priorites)?quiz.priorites:valides.filter(r=>r.pts<=2).sort((a,b)=>a.pts-b.pts).slice(0,3).map(r=>r.theme);
+  prio.forEach(th=>{const r=valides.find(x=>x.theme===th);if(r&&EX_PALIERS[r.palier])ajouter(th,3-r.pts,"Test de niveau : ton jeu ici correspond au palier "+EX_PALIERS[r.palier]);});
+ }else if(quiz&&Array.isArray(quiz.reponses)){
   quiz.reponses.forEach(r=>{if(r&&Number.isInteger(r.pts)&&r.pts<=1)ajouter(r.theme,2-r.pts,"Test de niveau : "+r.pts+" point sur 3 sur ce thème");});
  }
  const comptes=(matchs||[]).filter(m=>m.pointsTotal>0&&m.motifsPerdus).slice(0,EX_NB_MATCHS);
@@ -78,7 +84,7 @@ window.PA_EXERCICES={themesPrioritaires:exThemesPrioritaires,exercicesPour:exExe
   const niveau=quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2;
   const themes=exThemesPrioritaires(quiz,matchs);
   const base=el("p","acc-muted");
-  base.append(quiz?"Basé sur ton test de niveau du "+new Date(quiz.date).toLocaleDateString("fr-FR")+" (niveau "+niveau+" sur 4)":"Pas encore de test de niveau",
+  base.append(quiz?"Basé sur ton test de niveau du "+new Date(quiz.date).toLocaleDateString("fr-FR")+(EX_PALIERS[quiz.palier]?" (palier "+EX_PALIERS[quiz.palier]+")":" (niveau "+niveau+" sur 4)"):"Pas encore de test de niveau",
    (n=>n?" et sur "+n+" match"+(n>1?"s":"")+" compté"+(n>1?"s":"")+" au compteur.":", sans match compté au compteur.")(matchs.filter(m=>m.pointsTotal>0).slice(0,EX_NB_MATCHS).length));
   zone.appendChild(base);
   if(!themes.length){
@@ -109,7 +115,7 @@ window.PA_EXERCICES={themesPrioritaires:exThemesPrioritaires,exercicesPour:exExe
   if(!c.user){quizCompte=null;rendre();return;}
   const r=await c.loadQuizzes();
   const d=r.ok&&r.results.find(q=>Array.isArray(q.reponses));
-  quizCompte=d?{date:d.created_at,score:d.score,niveau:d.niveau,reponses:d.reponses}:null;
+  quizCompte=d?{date:d.created_at,score:d.score,niveau:d.niveau,palier:Number.isInteger(d.palier)?d.palier:undefined,reponses:d.reponses}:null;
   rendre();
  }
  if(window.PA_JOURNAL)window.PA_JOURNAL.onChange(rendre);

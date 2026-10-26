@@ -104,3 +104,8 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 **SQL à exécuter (dans cet ordre, voir supabase/LISEZMOI.md)** : classements-01/02 ; quiz-01/02 ; favoris-01 à 03 puis "favoris" ; t4-01 à 12 puis "communaute" ; espace-01 à 06 puis "espace" (noms à ajouter dans PA_SUPABASE.activees, assets/js/supabase-config.js).
 **Choix pris** : pages tournois générées pour Normandie + Île-de-France seulement (validation du rendu) ; T8 fait d'après les fiches Ten'Up (P100 top 5 000 M / 500 D, P250 top 1 000 M / 100 D) ; plus de push automatique dans la mise à jour hebdomadaire ; « Mon compte » devient « Mon espace » dans la nav.
 
+
+### 26/10/2026 — Test de niveau v2 (demande de Samuel : « pas du tout réaliste »)
+**Fait** : test refait en 14 questions. 5 repères (classement FFT, résultats en tournoi, ancienneté, fréquence, passé en raquette) puis 9 situations de match, réponses mélangées. 6 paliers, de Découverte à P1000 et +. Le classement fait foi, les résultats servent de plancher, l'ancienneté plafonne la technique, et sans tournoi le test s'arrête à P250. Profil par thème et 3 priorités. L'espace joueur (exercices) et Mon compte lisent les deux formats. Tests : scripts/verifier-niveau.cjs (13), verifier-corrections et verifier-exercices mis à jour.
+**SQL à exécuter** : quiz-03 (colonne palier), quiz-04 (contrôle v2), quiz-05 (contrainte), puis "quiz2" dans PA_SUPABASE.activees. Avant ça, le test marche sur l'appareil mais ne propose pas l'enregistrement dans le profil.
+**Choix pris** : repères de classement messieurs P1000+ ≤ 200e, P500 ≤ 1 000e, P250 ≤ 5 000e, P100 ≤ 15 000e (dames ÷ 10), cohérents avec les cuts relevés en T8. Les seuils 200 et 15 000 sont un choix, à ajuster si tu as de meilleurs repères.

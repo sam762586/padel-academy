@@ -105,19 +105,26 @@
   }catch(e){ return echec(e,"Impossible d'enregistrer ton profil."); }
  };
 
- // Quiz : result = { score, niveau (1 à 4), reponses (JSON) }
+ const activee=nom=>((window.PA_SUPABASE||{}).activees||[]).includes(nom);
+ // Quiz : result = { score, niveau (1 à 4), reponses (JSON) }.
+ // Test v2 : en plus palier (0 Découverte à 5 P1000 et +), niveau = niveau des exercices du palier, chaque réponse porte son palier.
+ // Le v2 s'enregistre seulement si "quiz2" est dans PA_SUPABASE.activees (SQL 2026-10-26-quiz-03 à -05).
  compte.saveQuiz=async function(result){
   if(!compte.user) return nonConnecte();
   const themes=["vitre","service","aerien","couple","placement","montee","regularite","transition","communication","compet"];
+  const v2=!!result&&result.palier!==undefined;
   if(!result||!Number.isInteger(result.score)||result.score<0||result.score>30||
-     result.niveau!==(result.score<9?1:result.score<17?2:result.score<24?3:4)||
+     (v2?!Number.isInteger(result.palier)||result.palier<0||result.palier>5||result.niveau!==[1,1,2,3,4,4][result.palier]||!activee("quiz2")
+        :result.niveau!==(result.score<9?1:result.score<17?2:result.score<24?3:4))||
      !Array.isArray(result.reponses)||result.reponses.length!==10||
-     result.reponses.some((r,i)=>!r||!Number.isInteger(r.pts)||r.pts<0||r.pts>3||r.theme!==themes[i])||
+     result.reponses.some((r,i)=>!r||!Number.isInteger(r.pts)||r.pts<0||r.pts>3||r.theme!==themes[i]||(v2&&(!Number.isInteger(r.palier)||r.palier<0||r.palier>5)))||
      result.reponses.reduce((s,r)=>s+r.pts,0)!==result.score){
    return {ok:false,message:"Ce résultat est invalide. Recommence le test avant de l'enregistrer."};
   }
   try{
-   const {error}=await client.from("quiz_results").insert({user_id:compte.user.id,score:result.score,niveau:result.niveau,reponses:result.reponses||null});
+   const ligne={user_id:compte.user.id,score:result.score,niveau:result.niveau,reponses:result.reponses||null};
+   if(v2)ligne.palier=result.palier;
+   const {error}=await client.from("quiz_results").insert(ligne);
    if(error) return echec(error,"Impossible d'enregistrer ton résultat.");
    return {ok:true};
   }catch(e){ return echec(e,"Impossible d'enregistrer ton résultat."); }
@@ -125,7 +132,7 @@
  compte.loadQuizzes=async function(){
   if(!compte.user) return nonConnecte();
   try{
-   const {data,error}=await client.from("quiz_results").select("id,score,niveau,reponses,created_at").eq("user_id",compte.user.id).order("created_at",{ascending:false}).limit(50);
+   const {data,error}=await client.from("quiz_results").select("id,score,niveau,reponses,created_at"+(activee("quiz2")?",palier":"")).eq("user_id",compte.user.id).order("created_at",{ascending:false}).limit(50);
    if(error) return echec(error,"Impossible de charger ton historique.");
    return {ok:true,results:data||[]};
   }catch(e){ return echec(e,"Impossible de charger ton historique."); }

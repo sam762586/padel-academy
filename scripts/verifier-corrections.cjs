@@ -44,6 +44,13 @@ async function compteUnitaires(){
  assert.equal((await c.saveQuiz(resultat)).ok,true);
  for(const invalide of [null,{...resultat,score:31},{...resultat,niveau:4},{...resultat,reponses:[]},{...resultat,score:19},{...resultat,reponses:themes.map(theme=>({theme,pts:2.1}))}])assert.equal((await c.saveQuiz(invalide)).ok,false);
  assert.equal(ecritures,1);ok('validation du quiz : score, niveau, réponses et somme');
+ // Test v2 : palier 0 à 5, niveau des exercices du palier, palier par réponse ; seulement avec "quiz2"
+ const v2={score:20,niveau:3,palier:3,reponses:themes.map(theme=>({theme,pts:2,palier:3}))};
+ assert.equal((await c.saveQuiz(v2)).ok,false);
+ bac.window.PA_SUPABASE.activees=['quiz2'];
+ assert.equal((await c.saveQuiz(v2)).ok,true);
+ for(const invalide of [{...v2,palier:6},{...v2,niveau:4},{...v2,palier:0},{...v2,reponses:themes.map(theme=>({theme,pts:2}))},{...v2,reponses:themes.map(theme=>({theme,pts:2,palier:9}))}])assert.equal((await c.saveQuiz(invalide)).ok,false);
+ assert.equal(ecritures,2);ecritures=1;ok('validation du quiz v2 : palier, niveau associé, palier par thème, drapeau "quiz2"');
  assert.equal((await c.savePlanWeek(8,true,'A')).ok,false);
  assert.equal((await c.savePlanWeek(0,'oui','A')).ok,false);
  assert.equal((await c.savePlanWeek(0,true,'B')).ok,false);
@@ -66,8 +73,8 @@ async function compteUnitaires(){
   for(const f of fs.readdirSync(racine).filter(n=>n.endsWith('.html'))){await page.goto(base+'/'+f);await page.waitForTimeout(80);}
   assert.deepEqual(erreurs,[]);ok('toutes les pages HTML ouvertes à 400 px : aucune exception JavaScript');
   await page.goto(base+'/niveau.html');
-  for(let i=0;i<10;i++)await page.locator('.qopt').last().click();
-  await page.getByText('30 / 30 points',{exact:false}).waitFor();ok('quiz complet dans le navigateur');
+  for(let i=0;i<14;i++)await page.locator('.qopt').last().click(); // classement : « Je ne suis pas classé(e) », puis une option au hasard
+  await page.locator('#qresult .vtag').waitFor();ok('quiz complet dans le navigateur');
   await page.goto(base+'/materiel.html');
   assert.ok(await page.locator('.rk').count()>0);ok('sélecteur de raquettes : recommandations affichées');
   await page.goto(base+'/bareme.html');

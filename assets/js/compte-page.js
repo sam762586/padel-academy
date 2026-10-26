@@ -1,8 +1,9 @@
 /* PAGE « MON COMPTE » : connexion, profil, historique du quiz, progression du plan, suppression.
    Dépend de compte.js (PA_COMPTE). Tout le texte venant de la base est inséré avec textContent. */
-const NIVEAUX_QUIZ=[ // mêmes libellés exacts que dans quiz-niveau.js (palier 1 à 4)
+const NIVEAUX_QUIZ=[ // ancien test (niveau 1 à 4)
  "Débutant · P25","Loisir · P100","Intermédiaire · P250","Avancé · P500 et +"
 ];
+const PALIERS_QUIZ=["Découverte","P25","P100","P250","P500","P1000 et +"]; // test v2 : mêmes noms que quiz-niveau.js
 // Catégories 2026/2027 : le P1500 est devenu P2000, l'ancien P2000 est devenu P3000
 const CLASSEMENTS_P=["P25","P50","P100","P250","P500","P1000","P2000","P3000"];
 const NB_SEMAINES_PLAN=8;
@@ -116,13 +117,14 @@ const NB_SEMAINES_PLAN=8;
   if(!reponse.results.length){const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun résultat enregistré pour l'instant. Passe le test, puis clique sur « Enregistrer dans mon profil ».";zone.appendChild(p);return;}
   const tableau=document.createElement("table");
   const entete=tableau.createTHead().insertRow();
-  ["Date","Score","Niveau"].forEach(t=>{const th=document.createElement("th");th.textContent=t;entete.appendChild(th);});
+  ["Date","Score","Palier"].forEach(t=>{const th=document.createElement("th");th.textContent=t;entete.appendChild(th);});
   const corps=tableau.createTBody();
   reponse.results.forEach(r=>{
    const ligne=corps.insertRow();
    ligne.insertCell().textContent=new Date(r.created_at).toLocaleDateString("fr-FR");
-   ligne.insertCell().textContent=r.score+" / 30";
-   ligne.insertCell().textContent=NIVEAUX_QUIZ[r.niveau-1]||"—";
+   const v2=Number.isInteger(r.palier);
+   ligne.insertCell().textContent=v2?"—":r.score+" / 30"; // le score v2 n'est qu'une somme interne, le palier suffit
+   ligne.insertCell().textContent=(v2?PALIERS_QUIZ[r.palier]:NIVEAUX_QUIZ[r.niveau-1])||"—";
   });
   const defilement=document.createElement("div");defilement.className="acc-scroll";defilement.appendChild(tableau);
   zone.appendChild(defilement);

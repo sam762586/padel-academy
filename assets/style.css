@@ -876,3 +876,20 @@ details.geste summary{color:var(--turf)}
 .ex-pied a{min-height:40px;display:inline-flex;align-items:center}
 .ex-fait{min-height:44px}
 .ex-fait[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+
+/* Test de niveau v2 : rang FFT, notes et profil par thème */
+.qrang{display:grid;gap:12px;padding:14px;border:1px solid var(--line-2);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.qrang-sexe{display:flex;gap:18px;flex-wrap:wrap}
+.qrang-sexe label{display:inline-flex;align-items:center;gap:6px;min-height:44px;cursor:pointer}
+.qrang-champ{display:grid;gap:6px;font-weight:700;font-size:.9rem}
+.qrang-champ input{min-height:44px;padding:8px 12px;border-radius:var(--r-s);border:1px solid var(--line-2);background:rgba(0,0,0,.3);color:var(--fg);font:inherit;font-size:1rem;max-width:220px}
+.qrang .btn{justify-self:start}
+.qrang .acc-err:empty{display:none}
+.qresult .qnote{padding:10px 12px;border-left:3px solid var(--sand);background:rgba(255,181,71,.08);border-radius:0 var(--r-s) var(--r-s) 0}
+.qresult .qtitre{margin-top:18px}
+.qprofil{margin-top:16px}
+.qprofil summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.qprofil-liste{list-style:none;margin:6px 0 0;padding:0}
+.qprofil-liste li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.qprofil-liste b{color:var(--fg);white-space:nowrap}
+.qresult .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
