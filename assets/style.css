@@ -595,3 +595,39 @@ details.geste summary{color:var(--turf)}
   .sc-histo{grid-template-columns:minmax(0,1fr) auto}
   .sc-histo-date{grid-column:1 / -1}
 }
+
+/* ===== Tableau de bord « Mon padel » (compte.html) ===== */
+.mp{margin-bottom:24px}
+.mp-titre{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:6px}
+.mp-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin-top:14px}
+.mp-bloc{background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:var(--r-s);padding:16px;min-width:0}
+.mp-bloc h3{font-size:1.15rem;text-transform:uppercase;margin-bottom:10px}
+.mp-bloc .btns{margin-top:12px}
+.mp-chiffres{display:grid;gap:10px}
+.mp-chiffre b{display:block;font-family:var(--display);font-size:2.6rem;font-weight:900;line-height:1;color:var(--turf)}
+.mp-chiffre.alerte b{color:var(--coral)}
+.mp-chiffre span{color:var(--muted);font-size:.9rem}
+.mp-liste{margin:12px 0 0;padding-left:18px;font-size:.92rem}
+.mp-liste li+li{margin-top:4px}
+.mp-form-rang{display:grid;gap:10px}
+.mp-form-rang fieldset{border:0;margin:0;padding:0;min-width:0}
+.mp-form-rang label:not(.tchip),.mp-form-rang legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.mp-form-rang input[type=number]{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
+.mp-form-rang input:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.mp-form-rang .btn{min-height:48px;justify-content:center}
+.mp-palier-ligne{margin:12px 0 0}
+.mp-tendance{margin:0 0 10px}
+.mp-sens{font-weight:800}
+.mp-sens.hausse{color:var(--turf)}.mp-sens.baisse{color:var(--coral)}.mp-sens.stable{color:var(--sand)}
+.mp-matchs{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mp-matchs li{display:grid;grid-template-columns:28px minmax(0,1fr) 64px 3em;align-items:center;gap:10px;font-size:.9rem}
+.mp-issue{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;background:var(--glass-2);color:var(--muted)}
+.mp-issue.v{background:var(--turf);color:var(--accent-fg)}
+.mp-issue.d{background:var(--coral);color:#1a0603}
+.mp-match-texte{display:grid;min-width:0}
+.mp-match-date{color:var(--dim);font-size:.75rem;font-weight:700;text-transform:uppercase}
+.mp-match-noms{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-match-score{font-weight:800;font-variant-numeric:tabular-nums}
+.mp-pct{height:10px;border-radius:999px;background:var(--glass-2);overflow:hidden}
+.mp-pct-rempli{display:block;height:100%;background:var(--turf);border-radius:999px}
+.mp-pct-val{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
