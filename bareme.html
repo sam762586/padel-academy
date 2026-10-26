@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Barème des points · Padel Academy</title>
+<meta name="description" content="Barème officiel FFT padel 2026/2027 : points par catégorie (P25 à P3000), nombre de paires et place finale, avec simulateur de classement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.bsel{width:100%;background:rgba(0,0,0,.25);color:var(--fg);border:1px solid var(--line-2);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem}
+.bareme-tbl table{min-width:0}
+.bareme-tbl td.hi,.bareme-tbl th.hi{background:rgba(53,226,127,.1);color:#fff}
+.bareme-tbl tr.me td{background:rgba(255,181,71,.18);color:#fff;font-weight:700}
+.bareme-tbl th{position:sticky;top:0}
+.bareme-tbl{max-height:70vh;overflow:auto}
+#sim-table tr.dim td{opacity:.4}
+#sim-table .x{background:none;border:0;color:var(--coral);cursor:pointer;font-size:1rem}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <ul><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html" class="active">Barème</a></li><li><a href="lexique.html">Lexique</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="bareme">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Infos pratiques · Classement</p><h2>Combien de points rapporte un tournoi ?</h2></div>
+      <p>Barème officiel FFT 2026/2027 (en vigueur depuis le 1er septembre 2026). Choisis la catégorie, le nombre de paires et ta place finale : les points s'affichent, et le tableau complet est surligné.</p>
+    </div>
+
+    <div class="sel-grid">
+      <form class="quiz" id="b-form" onsubmit="return false">
+        <fieldset><legend>Catégorie du tournoi</legend>
+          <select id="b-cat" class="bsel">
+            <option value="P25">P25</option><option value="P50">P50</option><option value="P100" selected>P100</option><option value="P250">P250</option>
+            <option value="P500">P500</option><option value="P1000">P1000</option><option value="P2000">P2000</option><option value="P3000">P3000</option>
+          </select>
+        </fieldset>
+        <fieldset id="b-nb-row"><legend>Nombre de paires inscrites</legend>
+          <div class="range"><input type="range" id="b-nb" min="4" max="40" step="1" value="16"><output id="b-nb-out" for="b-nb">16 paires</output></div>
+        </fieldset>
+        <fieldset id="b-sexe-row" style="display:none"><legend>Tableau</legend>
+          <div class="opts">
+            <label><input type="radio" name="b-sexe" value="messieurs" id="b-m" checked>Messieurs</label>
+            <label><input type="radio" name="b-sexe" value="dames" id="b-d">Dames</label>
+          </div>
+        </fieldset>
+        <fieldset><legend>Ma place finale</legend>
+          <div class="range"><input type="range" id="b-place" min="1" max="32" step="1" value="5"><output id="b-place-out" for="b-place">5e</output></div>
+        </fieldset>
+        <div class="verdict" id="b-verdict" style="min-height:0"></div>
+        <button type="button" class="btn solid" id="sim-add">+ Ajouter à mon simulateur</button>
+      </form>
+
+      <div>
+        <div class="results-head"><h3>Barème complet</h3><span id="b-note"></span></div>
+        <div class="tbl bareme-tbl" id="b-table"></div>
+      </div>
+    </div>
+
+    <p class="subhead">Simulateur de classement <small>· tes 12 meilleurs résultats sur 12 mois</small></p>
+    <div class="two">
+      <div class="card">
+        <div class="top"><h3>Mes résultats</h3><span class="tag tact"><span id="sim-count"></span></span></div>
+        <div class="tbl" style="margin-top:8px"><table id="sim-table"><thead><tr><th>Cat.</th><th>Place</th><th>Paires / tableau</th><th class="n">Pts</th><th></th></tr></thead><tbody id="sim-list"></tbody></table></div>
+        <div class="results-head" style="margin-top:14px"><h3>Total : <span id="sim-total" style="color:var(--sand)">0</span> pts</h3><button type="button" class="btn ghost" id="sim-clear" style="padding:8px 14px;font-size:.75rem">Tout effacer</button></div>
+        <p style="color:var(--dim);font-size:.82rem;margin-top:8px">Sauvegardé sur cet appareil. Les lignes grisées ne comptent pas (au-delà des 12 meilleurs résultats).</p>
+      </div>
+      <div class="card">
+        <div class="top"><h3>Comment marche le classement</h3><span class="tag regle">FFT</span></div>
+        <ul class="steps">
+          <li><b>Individuel</b>, même si on joue en paire : chaque joueur reçoit les points de la place finale de sa paire. Les épreuves mixtes comptent pour les deux classements.</li>
+          <li><b>12 meilleurs résultats des 12 derniers mois</b> (fenêtre glissante). Un résultat sort du calcul 12 mois après la date du tournoi.</li>
+          <li><b>Publication mensuelle</b>, le premier mardi du mois, classements messieurs et dames séparés.</li>
+          <li><b>Poids d'une paire</b> = somme des deux classements. Plus il est bas, plus la paire est forte : c'est lui qui fait les têtes de série et la liste d'attente.</li>
+          <li><b>Non classé</b> = dernière place du classement + 1.</li>
+          <li><b>Poules</b> : en cas d'égalité entre poules, les paires partagent la même place et les mêmes points.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="subhead">Cuts <small>· classement maximal pour s'inscrire (épreuves seniors)</small></p>
+    <div class="two">
+      <div class="tbl"><table><thead><tr><th>Catégorie</th><th>Messieurs</th><th>Dames</th></tr></thead><tbody id="cuts"></tbody></table></div>
+      <div class="card">
+        <div class="top"><h3>À retenir</h3><span class="tag mat">Stratégie</span></div>
+        <ul class="steps">
+          <li>En P25 → P250, <b>le nombre de paires change tout</b> : une finale perdue en P100 vaut 80 pts avec 8 paires, 85 avec 20. Une ⅛ (9e-16e) ne rapporte presque rien en petit tableau.</li>
+          <li>Un <b>P100 gagné (100 pts)</b> vaut plus qu'une demi-finale de P250 à 8 paires (100 pts) pour beaucoup moins d'adversité : choisis tes tournois.</li>
+          <li>Seuls <b>12 résultats</b> comptent : remplacer un 2-point par un 40-point fait plus que jouer 5 tournois de plus.</li>
+          <li>Nouveauté 2026/2027 : le <b>P1500 n'existe plus</b> (devenu P2000), l'ancien P2000 est devenu <b>P3000</b>.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="margin-top:20px">Source : règlement sportif FFT padel 2026/2027, Chapitre II « Classements, barèmes &amp; assimilations » (publié juillet 2026, applicable au 1er septembre 2026). Relevé le 26/10/2026. En cas de doute, seul le règlement publié par la FFT fait foi : <a href="https://www.fft.fr/nos-sports/padel/competitions-padel" target="_blank" rel="noopener">fft.fr/padel</a>.</p>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+  </div>
+</footer>
+
+<script src="assets/js/bareme.js"></script>
+</body>
+</html>
