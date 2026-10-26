@@ -11,6 +11,7 @@
 //   --edge            : utilise Microsoft Edge déjà installé au lieu du Chromium de Playwright
 //   --refaire-fiches  : ignore le cache et relit toutes les fiches
 //   --max-pages N     : limite le nombre de pages de résultats (essais)
+//   --departements 76,27 : ne collecte que ces départements (essais) ; les autres gardent leurs données
 //
 // Aucune connexion : la recherche et les fiches tournoi sont publiques.
 // Politesse : 1 requête Ten'Up par seconde maximum ; les fiches déjà lues ne sont pas relues.
@@ -36,6 +37,9 @@ const arg = (nom, def) => { const i = ARGS.indexOf(nom); return i >= 0 ? +ARGS[i
 const CENTRE = { ville: "Bourges", lat: 47.081, lng: 2.399, distance: 1000 };
 const MOIS = 3;
 const MAX_PAGES = arg("--max-pages", 500);
+// Mode essai : liste de départements (recherche centrée sur chacun, rayon réduit, fusion avec les données existantes)
+const DEPARTEMENTS = (() => { const i = ARGS.indexOf("--departements"); return i >= 0 ? (ARGS[i + 1] || "").split(",").map(s => s.trim()).filter(s => /^[0-9AB]{2,3}$/.test(s)) : null; })();
+const RAYON_DEPARTEMENT = 70; // km autour du centre des tournois connus du département
 const INTERVALLE_MS = 1000;
 const SAUVEGARDE_TOUS = 100;
 
@@ -53,11 +57,11 @@ const debut = new Date(), fin = new Date();
 fin.setMonth(fin.getMonth() + MOIS);
 const PERIODE = { du: iso(debut), au: iso(fin) };
 
-function urlResultats(page) {
+function urlResultats(page, centre = CENTRE) {
   const q = new URLSearchParams({
-    searchType: "ville", pratique: "PADEL", ville: CENTRE.ville, distance: CENTRE.distance,
+    searchType: "ville", pratique: "PADEL", ville: centre.ville, distance: centre.distance,
     dateDebut: PERIODE.du, dateFin: PERIODE.au, utiliserMesDonnees: "false", sort: "DISTANCE",
-    page, lat: CENTRE.lat, lng: CENTRE.lng,
+    page, lat: centre.lat, lng: centre.lng,
   });
   return `${BASE}/recherche/tournois/resultats?${q}`;
 }
@@ -136,10 +140,10 @@ async function geocoder(cp, ville) {
 }
 
 // ---------- étape 1 : pages de résultats ----------
-async function lireResultats(page) {
+async function lireResultats(page, centre = CENTRE) {
   const cartes = [];
   for (let n = 1; n <= MAX_PAGES; n++) {
-    await ouvrir(page, urlResultats(n));
+    await ouvrir(page, urlResultats(n, centre));
     await page.locator("main article").first().waitFor({ timeout: 15000 }).catch(() => {});
     const lot = await page.$$eval("main article", arts => arts.map(a => {
       const lien = a.querySelector('a[href^="/tournoi/"]');
@@ -277,11 +281,31 @@ function ecrireTout(tournois, fiches) {
     await page.locator("#didomi-notice-disagree-button, #didomi-notice-agree-button").first().click({ timeout: 5000 }).catch(() => {});
 
     const vus = new Map();
-    for (const c of await lireResultats(page)) { const t = depuisCarte(c); if (t && !vus.has(t.id)) vus.set(t.id, t); }
+    if (DEPARTEMENTS) {
+      // Une recherche par département, centrée sur ses tournois déjà connus ; on ne garde que les tournois
+      // dont la commune (géocodée) est dans la liste demandée
+      const anciens = lireJson(OUT_JSON, {}).tournois || [];
+      for (const dep of DEPARTEMENTS) {
+        const pts = anciens.filter(t => t.dep === dep && typeof t.lat === "number");
+        if (!pts.length) { console.warn(`Département ${dep} : aucun tournoi connu pour centrer la recherche, ignoré.`); continue; }
+        const centre = { ville: dep, lat: +(pts.reduce((s, t) => s + t.lat, 0) / pts.length).toFixed(3), lng: +(pts.reduce((s, t) => s + t.lng, 0) / pts.length).toFixed(3), distance: RAYON_DEPARTEMENT };
+        for (const c of await lireResultats(page, centre)) {
+          const t = depuisCarte(c);
+          if (!t || vus.has(t.id)) continue;
+          const depT = connus[t.id] ? connus[t.id].dep : departement((await geocoder(null, t.ville) || {}).cp);
+          if (DEPARTEMENTS.includes(depT)) vus.set(t.id, t);
+        }
+      }
+      // Les autres départements gardent leurs données actuelles
+      for (const t of anciens) if (t.dep && !DEPARTEMENTS.includes(t.dep) && !vus.has(t.id)) vus.set(t.id, { ...t, _garde: true });
+      console.log(`Mode départements (${DEPARTEMENTS.join(", ")}) : ${[...vus.values()].filter(t => !t._garde).length} tournois trouvés.`);
+    } else {
+      for (const c of await lireResultats(page)) { const t = depuisCarte(c); if (t && !vus.has(t.id)) vus.set(t.id, t); }
+    }
     console.log(`${vus.size} tournois uniques dans les résultats.`);
 
     // Les tournois déjà connus gardent cp / dep / lat / lng ; les autres seront complétés
-    tournois = [...vus.values()].map(t => connus[t.id] && fiches[t.id]
+    tournois = [...vus.values()].map(({ _garde, ...t }) => _garde ? t : connus[t.id] && fiches[t.id]
       ? { ...t, cp: connus[t.id].cp, dep: connus[t.id].dep, lat: connus[t.id].lat, lng: connus[t.id].lng, sexes: connus[t.id].sexes, categorie: t.categorie || connus[t.id].categorie }
       : t);
     const aLire = tournois.filter(t => !t.dep || !fiches[t.id]);

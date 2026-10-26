@@ -1,0 +1,2 @@
+# cmd.exe exige des fins de ligne Windows
+*.bat text eol=crlf

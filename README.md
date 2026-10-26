@@ -28,3 +28,19 @@ Exemples :
 
 ## Déployer
 Dossier statique : glisser-déposer sur Netlify Drop, ou GitHub Pages, ou n'importe quel hébergeur.
+
+## Mise à jour chaque lundi (tournois)
+`scripts\maj-hebdo.bat` enchaîne :
+1. le robot Ten'Up (`scripts/scrape-tenup.js --edge`, 1 requête par seconde, reprise automatique après une coupure) ;
+2. la vérification des JSON de `assets/data` ;
+3. la génération des pages (`scripts/generer-pages.js` : `tournoi/`, `tournois/`, `sitemap.xml`, `assets/data/prochains/`) ;
+4. un commit local des seules données et pages générées. **Pas de push** : vérifie, puis publie avec `git push`.
+
+Journal : `scripts/logs/maj-hebdo.log`. Essai sur quelques départements : `scripts\maj-hebdo.bat --departements 76,27` (les autres départements gardent leurs données ; le sitemap n'est pas modifié).
+
+**Planifier chaque lundi à 6 h** avec le Planificateur de tâches Windows :
+- automatiquement : clic droit sur `scripts\installer-maj-tournois.ps1` > « Exécuter avec PowerShell » (crée la tâche « Apprendre Padel - Tournois » et supprime l'ancienne tâche de 4 h qui publiait toute seule) ;
+- ou à la main : Planificateur de tâches > Créer une tâche > Déclencheur « Hebdomadaire, lundi, 6:00 » > Action « Démarrer un programme » : `cmd.exe`, arguments `/c "C:\cheminers\padel-academy\scripts\maj-hebdo.bat"`, dossier de départ : le dossier du site > Paramètres : cocher « Exécuter la tâche dès que possible si un démarrage planifié est manqué ».
+
+Le PC doit être allumé et Microsoft Edge installé. Pour tout générer d'un coup (toute la France) : `node scripts/generer-pages.js --tout`.
+
