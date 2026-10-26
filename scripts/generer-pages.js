@@ -114,24 +114,14 @@ const sexesDe = t => Array.isArray(t.sexes) ? t.sexes : [];
 const SEXES = { messieurs: "Messieurs", dames: "Dames", mixte: "Mixte" };
 const majuscule = s => s.charAt(0).toUpperCase() + s.slice(1);
 
-/* ---------- Gabarit : nav et footer recopiés depuis index.html ---------- */
-const INDEX = fs.readFileSync(path.join(RACINE, "index.html"), "utf8");
-function extraire(debut, fin) {
-  const i = INDEX.indexOf(debut), j = INDEX.indexOf(fin, i);
-  if (i < 0 || j < 0) throw new Error("Gabarit introuvable dans index.html : " + debut);
-  return INDEX.slice(i, j + fin.length);
-}
-// Liens relatifs du site préfixés (« ../ ») pour les pages en sous-dossier
-const prefixer = (html, prefixe) => html.replace(/(href|src)="(?!https?:|\/|#|mailto:|tel:|data:)([^"]*)"/g, (m, attr, url) => `${attr}="${prefixe}${url}"`);
-const NAV = extraire('<nav class="nav"', "</nav>").replace(/ class="active"/g, "");
-const FOOTER = extraire("<footer>", "</footer>");
-const NOM_SITE = (/"@type": "WebSite"[^}]*"name": "([^"]+)"/.exec(INDEX) || [])[1] || "Apprendre Padel";
+/* ---------- Gabarit : nav et footer communs (scripts/gabarit.js) ---------- */
+const { NOM_SITE, nav: navGabarit, footer: footerGabarit } = require("./gabarit");
 
 function page({ chemin, titre, description, h1, corps, jsonLd = [], noindex = false, scripts = [], navActif = "tournois.html" }) {
   const profondeur = chemin.split("/").length - 1;
   const pre = "../".repeat(profondeur);
   const url = SITE + chemin;
-  const nav = prefixer(NAV.replace(`href="${navActif}"`, `href="${navActif}" class="active"`), pre);
+  const nav = navGabarit(navActif, pre);
   return `<!doctype html>
 <html lang="fr">
 <head>
@@ -144,7 +134,7 @@ ${noindex ? '<meta name="robots" content="noindex,follow">\n' : ""}<link rel="ca
 <link rel="apple-touch-icon" href="${pre}apple-touch-icon.png">
 <meta name="theme-color" content="#070b14">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="${echapper(NOM_SITE)} · apprendre-padel.fr">
+<meta property="og:site_name" content="${echapper(NOM_SITE)}">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${echapper(titre)}">
@@ -166,7 +156,7 @@ ${h1}
 ${corps}
 </div>
 </main>
-${prefixer(FOOTER, pre)}
+${footerGabarit(pre)}
 ${scripts.map(s => `<script src="${s.startsWith("http") ? s : pre + s}"></script>`).join("\n")}
 <script src="${pre}assets/js/nav.js"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

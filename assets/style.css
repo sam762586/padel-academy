@@ -893,3 +893,11 @@ details.geste summary{color:var(--turf)}
 .qprofil-liste li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--muted)}
 .qprofil-liste b{color:var(--fg);white-space:nowrap}
 .qresult .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+
+/* Bloc auteur (accueil) : emplacement de la photo prévu, initiale en attendant */
+.auteur-sec{padding-block:24px 64px}
+.auteur{display:flex;gap:22px;align-items:flex-start;padding:24px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--glass)}
+.auteur-photo{flex:none;width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--turf-deep),var(--turf));color:var(--cat-fg);font-family:var(--display);font-weight:900;font-size:2.4rem}
+.auteur h2{font-size:1.8rem;margin:6px 0 8px}
+.auteur p:last-child{color:var(--muted);margin:0;max-width:68ch}
+@media (max-width:560px){.auteur{flex-direction:column;gap:14px;padding:18px}.auteur-photo{width:64px;height:64px;font-size:1.8rem}}

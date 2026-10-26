@@ -1,6 +1,6 @@
 ---
 name: relecteur
-description: Relecteur orthographe, typographie française et cohérence de ton pour Padel Academy. Lecture seule, ne modifie rien, rend une liste de corrections. À utiliser avant chaque publication.
+description: Relecteur orthographe, typographie française et cohérence de ton pour Apprendre Padel. Lecture seule, ne modifie rien, rend une liste de corrections. À utiliser avant chaque publication.
 tools: Read, Grep, Glob
 model: haiku
 ---

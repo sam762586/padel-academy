@@ -1,10 +1,10 @@
-/* SERVICE WORKER de Padel Academy.
+/* SERVICE WORKER de Apprendre Padel.
    - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation, servi en « stale-while-revalidate ».
    - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v13-niveau";
+const CACHE = "pa-v14-apprendre-padel";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [

@@ -1,4 +1,4 @@
-# Padel Academy — site d'apprentissage du padel
+# Apprendre Padel — site d'apprentissage du padel
 
 ## Ce que c'est
 Site statique multi-pages en français (HTML/CSS/JS vanilla, aucun build). Public : joueurs amateurs, du débutant au P500.
@@ -12,7 +12,8 @@ Pages : index, technique, tactique, tutos, niveau, entrainement, videos, regles,
 ## Règles de travail
 - Français partout (contenu, commentaires, commits). Tutoiement dans le contenu.
 - Pas de framework, pas de bundler, pas de dépendance npm : on doit pouvoir ouvrir index.html en double-cliquant.
-- Nouvelle page = copier le squelette d'une page existante (nav + footer identiques), ajouter le lien dans la nav de TOUTES les pages.
+- Menu et pied de page : une seule source, `scripts/gabarit.js`. Pour changer le menu (ou ajouter une page au menu), modifier `MENU` puis lancer `node scripts/appliquer-gabarit.js` : toutes les pages de la racine sont mises à jour, et les pages tournois le seront à la prochaine génération (`node scripts/generer-pages.js`).
+- Nouvelle page = copier le squelette d'une page existante (entre `<nav class="nav"` … `</nav>` et `<footer>` … `</footer>`, le script remet le gabarit).
 - Responsive obligatoire (tester à 400 px). Gouttière 16 px minimum.
 - Pas d'images externes ni de iframes YouTube dans le dépôt : liens sortants uniquement, sauf si des photos sont ajoutées dans `assets/img/`.
 - Contenu padel : vérifier les règles contre le règlement FFT/FIP avant de modifier `regles.html`. Prix des raquettes : indicatifs, à dater.

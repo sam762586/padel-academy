@@ -104,7 +104,7 @@ const FAV_ID_VALIDE=/^[0-9A-Za-z_-]{1,20}$/;
   const lieu=[t.club,fiche&&fiche.adresse?fiche.adresse:t.ville].filter(Boolean).join(", ");
   const description=[`Tournoi de padel ${t.categorie||""}`.trim(),t.limite_inscription?"Inscriptions jusqu'au "+lireJour(t.limite_inscription).toLocaleDateString("fr-FR"):"",
    lien?"Fiche Ten'Up : "+lien:"","Vérifie les horaires et les conditions sur la fiche du tournoi.","Ajouté depuis apprendre-padel.fr"].filter(Boolean).join("\n");
-  const lignes=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Padel Academy//apprendre-padel.fr//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+  const lignes=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Apprendre Padel//apprendre-padel.fr//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH",
    "BEGIN:VEVENT",`UID:tournoi-${String(t.id||versIsoJour(debut))}@apprendre-padel.fr`,`DTSTAMP:${horodatageUtc(new Date())}`,
    `DTSTART;VALUE=DATE:${versIsoJour(debut)}`,`DTEND;VALUE=DATE:${versIsoJour(lendemain)}`,
    `SUMMARY:${echapper([t.categorie,t.nom&&t.nom!==t.categorie?t.nom:"",t.ville].filter(Boolean).join(" · "))}`,

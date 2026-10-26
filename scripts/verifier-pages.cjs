@@ -20,6 +20,7 @@ function copie(){
  fs.mkdirSync(path.join(dir,'assets/data/fiches'),{recursive:true});
  fs.mkdirSync(path.join(dir,'scripts/cache'),{recursive:true});
  fs.copyFileSync(path.join(__dirname,'generer-pages.js'),path.join(dir,'scripts/generer-pages.js'));
+ fs.copyFileSync(path.join(__dirname,'gabarit.js'),path.join(dir,'scripts/gabarit.js'));
  // Données réduites : 3 tournois en Seine-Maritime, 1 dans l'Eure
  const t=(id,dep,debut,fin,cat)=>({id,nom:'Tournoi '+id,categorie:cat,club:'CLUB '+id,ville:'ROUEN',cp:'76000',dep,lat:49.44,lng:1.1,date_debut:debut,date_fin:fin,sexes:['messieurs']});
  const tournois=[t('900001','76','2026-11-10','2026-11-10','P100'),t('900002','76','2026-11-20','2026-11-21','P25'),t('900003','76','2026-12-05','2026-12-05','P250'),t('900004','27','2026-11-15','2026-11-15','P50')];
@@ -45,6 +46,17 @@ function generation(){
  const sortie=lancer('--date','2026-10-26');
  assert.match(sortie,/Pages écrites : 0/);assert.equal(lire('tournoi/900002.html'),avant);
  ok('sortie déterministe : rien n\'est réécrit sans changement');
+ // Gabarit commun : menu et pied de page des pages générées = ceux de scripts/gabarit.js (liens « ../ »)
+ const G=require('./gabarit');
+ assert.ok(fiche.includes(G.nav('tournois.html','../')));assert.ok(fiche.includes(G.footer('../')));
+ assert.match(fiche,/Apprendre <span>Padel<\/span>/);assert.ok(!fiche.includes('Padel Academy'));
+ // Pages de la racine : à jour avec le gabarit ; l'ancien nom n'apparaît plus (sauf « anciennement » et la chaîne Hello Padel Academy)
+ execFileSync(process.execPath,[path.join(__dirname,'appliquer-gabarit.js'),'--verifier'],{encoding:'utf8'});
+ for(const f of fs.readdirSync(racine).filter(n=>n.endsWith('.html'))){
+  const html=fs.readFileSync(path.join(racine,f),'utf8').replace('anciennement Padel Academy','').replace('Hello Padel Academy','');
+  assert.ok(!html.includes('Padel Academy'),f);
+ }
+ ok('gabarit commun : pages générées et pages de la racine identiques au gabarit, ancien nom absent');
  // Le 900001 disparaît de Ten'Up après sa date : bandeau « Terminé », toujours indexé
  ecrireDonnees(tournois.slice(1));
  lancer('--date','2026-11-20');

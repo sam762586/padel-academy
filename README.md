@@ -1,4 +1,4 @@
-# Padel Academy
+# Apprendre Padel
 
 Site d'apprentissage du padel (français) : coups, tactique, tutos interactifs, test de niveau, plan 8 semaines, règles, lexique, compétition et sélecteur de raquette.
 
