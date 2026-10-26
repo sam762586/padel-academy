@@ -746,3 +746,14 @@ details.geste summary{color:var(--turf)}
 .tcard-lien:hover{text-decoration:underline}
 .tliens .tfiche{color:var(--fg)}
 .pdt .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+/* ---- Photos dans le contenu ---- */
+.home-grid .card .thumb{margin:-22px -22px 4px;aspect-ratio:16/9;overflow:hidden;border-bottom:1px solid var(--line)}
+.home-grid .card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.home-grid .card:hover .thumb img{transform:scale(1.05)}
+.photo-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:-10px 0 40px}
+.photo-row.two{grid-template-columns:repeat(2,1fr)}
+.photo-row figure{margin:0;position:relative;aspect-ratio:4/3;border-radius:var(--r-s);overflow:hidden;border:1px solid var(--line)}
+.photo-row img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-row figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;background:linear-gradient(180deg,transparent,rgba(7,11,20,.9));color:#fff;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
+.photo-row a{text-decoration:none}
+@media (max-width:860px){.photo-row{grid-template-columns:repeat(2,1fr);gap:10px}}
