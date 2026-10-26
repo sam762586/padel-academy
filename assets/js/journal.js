@@ -27,18 +27,24 @@ const JN_CLE_VALIDE=/^[0-9A-Za-z-]{8,40}$/;
  // Ancien match du compteur sans identifiant : identifiant déduit de sa date de fin (toujours le même)
  const cleDe=m=>typeof m.cle==="string"&&JN_CLE_VALIDE.test(m.cle)?m.cle:"m-"+Date.parse(m.fin).toString(36);
 
+ // Points perdus par motif : { faute: 4, smash: 2, ... } (paire 1 = le joueur, g === 1 = point de l'adversaire)
+ function motifsPerdus(points){
+  const r={};
+  (Array.isArray(points)?points:[]).forEach(p=>{if(p&&p.g===1&&typeof p.m==="string")r[p.m]=(r[p.m]||0)+1;});
+  return r;
+ }
  // Match de l'appareil (format score.js) -> entrée du journal
  function depuisAppareil(m,manuel){
   const g=m.points.filter(p=>p.g===0).length;
   return {cle:cleDe(m),fin:m.fin,partenaire:m.partenaire||null,adversaires:m.config.nomB,score:m.score||"",vainqueur:m.vainqueur===0||m.vainqueur===1?m.vainqueur:null,
    interrompu:!!m.interrompu,type:JN_TYPES[m.type]?m.type:(manuel?"amical":null),saisie:manuel?"manuelle":"compteur",
-   pointsGagnes:g,pointsTotal:m.points.length,origine:m};
+   pointsGagnes:g,pointsTotal:m.points.length,motifsPerdus:motifsPerdus(m.points),origine:m};
  }
  // Ligne du compte -> entrée du journal
  function depuisCompte(l){
   const pts=Array.isArray(l.points)?l.points:[];
   return {cle:l.cle||l.id,fin:l.joue_le,partenaire:l.partenaire||null,adversaires:l.nom_b,score:l.score||"",vainqueur:l.vainqueur===0||l.vainqueur===1?l.vainqueur:null,
-   interrompu:!!l.interrompu,type:JN_TYPES[l.type_match]?l.type_match:null,saisie:l.saisie||"compteur",pointsGagnes:pts.filter(p=>p&&p.g===0).length,pointsTotal:pts.length,origine:null};
+   interrompu:!!l.interrompu,type:JN_TYPES[l.type_match]?l.type_match:null,saisie:l.saisie||"compteur",pointsGagnes:pts.filter(p=>p&&p.g===0).length,pointsTotal:pts.length,motifsPerdus:motifsPerdus(pts),origine:null};
  }
  const valideAppareil=m=>m&&S.configValide(m.config)&&S.pointsValides(m.points)&&!Number.isNaN(Date.parse(m.fin));
  function locaux(){

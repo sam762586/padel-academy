@@ -860,3 +860,19 @@ details.geste summary{color:var(--turf)}
 .esp-tbl-compact table{width:100%;min-width:0}
 .esp-tbl-compact th,.esp-tbl-compact td{padding:8px 10px;white-space:nowrap}
 .esp-tbl-compact td:first-child{white-space:normal}
+
+/* Espace joueur : exercices recommandés */
+.ex-theme{margin-top:18px}
+.ex-theme h3{font-size:1.25rem;text-transform:uppercase;margin-bottom:6px}
+.ex-raisons{margin:0 0 10px;padding-left:18px;color:var(--muted);font-size:.9rem}
+.ex-carte{padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2);margin-top:10px}
+.ex-tete{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ex-tete h4{font-size:1.1rem;text-transform:uppercase}
+.ex-meta{color:var(--sand);font-weight:700;font-size:.85rem;white-space:nowrap}
+.ex-carte p{margin:8px 0 0}
+.ex-reussite{color:var(--muted)}
+.ex-reussite b{color:var(--fg)}
+.ex-pied{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px}
+.ex-pied a{min-height:40px;display:inline-flex;align-items:center}
+.ex-fait{min-height:44px}
+.ex-fait[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}

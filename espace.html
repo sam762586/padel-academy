@@ -42,7 +42,7 @@
       <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. Tout marche sans compte ; connecté, tu retrouves tout sur tes autres appareils.</p>
     </div>
     <div id="esp-statut" class="esp-statut"></div>
-    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
     <div class="acc-card mp" id="mon-padel">
       <h2 class="mp-titre">Mon padel</h2>
       <div class="mp-grille">
@@ -91,6 +91,11 @@
         <p class="note" id="esp-aide-objectif"></p>
         <button type="submit" class="btn primary">Ajouter l'objectif</button>
       </form>
+    </div>
+    <div class="acc-card esp-carte" id="esp-bloc-exercices">
+      <h2 class="esp-titre">Exercices recommandés</h2>
+      <div id="esp-exercices"></div>
+      <p class="note">Les exercices changent avec ton dernier test de niveau et tes derniers matchs comptés. Pour un programme complet : le <a href="entrainement.html">plan 8 semaines</a>.</p>
     </div>
     <div class="acc-card esp-carte" id="esp-bloc-matchs">
       <h2 class="esp-titre">Mes matchs</h2>
@@ -157,6 +162,8 @@
 <script src="assets/js/journal.js"></script>
 <script src="assets/js/mon-padel.js"></script>
 <script src="assets/js/espace.js"></script>
+<script src="assets/js/exercices-donnees.js"></script>
+<script src="assets/js/exercices.js"></script>
 <script src="assets/js/nav.js"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

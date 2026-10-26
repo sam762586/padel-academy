@@ -41,6 +41,8 @@ function qResult(){
  ${uniq.length?`<h4 style="margin-top:18px">À travailler en priorité</h4><ul class="steps">${uniq.map(t=>`<li><a href="${QL_THEMES[t][1]}">${QL_THEMES[t][0]}</a></li>`).join("")}</ul>`:`<p style="margin-top:12px">Aucun point faible marqué. Passe au plan d'entraînement pour affiner.</p>`}
  <div class="btns" style="margin-top:20px"><a class="btn primary" href="entrainement.html">Voir le plan 8 semaines</a><a class="btn ghost" href="materiel.html#raquette">Choisir ma raquette</a><button type="button" class="btn ghost" id="qagain">Refaire le test</button></div>
  <div class="acc-save" id="qsave" hidden></div>`;
+ // Dernier résultat gardé sur l'appareil : l'espace joueur s'en sert pour recommander des exercices
+ try{localStorage.setItem("pa-quiz-dernier",JSON.stringify({date:new Date().toISOString(),score:total,niveau:niveau,reponses:qa}));}catch(e){}
  qCompte(document.getElementById("qsave"),{score:total,niveau:niveau,reponses:qa});
  document.getElementById("qagain").addEventListener("click",()=>{qi=0;qa=[];r.hidden=true;document.getElementById("qcard").hidden=false;qRender();});
 }

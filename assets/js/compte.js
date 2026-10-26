@@ -125,7 +125,7 @@
  compte.loadQuizzes=async function(){
   if(!compte.user) return nonConnecte();
   try{
-   const {data,error}=await client.from("quiz_results").select("id,score,niveau,created_at").eq("user_id",compte.user.id).order("created_at",{ascending:false}).limit(50);
+   const {data,error}=await client.from("quiz_results").select("id,score,niveau,reponses,created_at").eq("user_id",compte.user.id).order("created_at",{ascending:false}).limit(50);
    if(error) return echec(error,"Impossible de charger ton historique.");
    return {ok:true,results:data||[]};
   }catch(e){ return echec(e,"Impossible de charger ton historique."); }
