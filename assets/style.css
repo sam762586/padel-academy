@@ -2,7 +2,7 @@
 /* Layout : « night session » — fond nuit profond, projecteurs (halos radiaux), cartes en verre, typographie display XXL. Design dark assumé, identique dans les deux thèmes. */
 :root{
   --bg:#070b14; --bg-2:#0c1322; --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.08); --line:rgba(255,255,255,.1); --line-2:rgba(255,255,255,.2);
-  --fg:#f3f5f9; --muted:#97a3b6; --dim:#5f6b7d;
+  --fg:#f3f5f9; --muted:#97a3b6; --dim:#8590a2;
   --turf:#35e27f; --turf-deep:#139c56; --sand:#ffb547; --coral:#ff5d4a; --sky:#5ab0ff;
   --accent:var(--turf); --accent-fg:#06110b;
   --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --body:"Manrope","Segoe UI",Helvetica,Arial,sans-serif;
@@ -311,11 +311,13 @@ a.card.link:hover h4{color:var(--turf)}
 .tfiltres fieldset{border:0;margin:0;padding:0;min-width:0}
 .tfiltres input[type=search],.tfiltres input[type=date],.tfiltres select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
 .tfiltres input:focus-visible,.tfiltres select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
-.tperiode{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tperiode{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tperiode>div{min-width:0}
+@media (max-width:420px){.tperiode{grid-template-columns:minmax(0,1fr)}}
 .tchips{display:flex;flex-wrap:wrap;gap:6px}
 .tchip{position:relative;display:inline-flex;cursor:pointer}
 .tchip input{position:absolute;opacity:0;width:0;height:0}
-.tchip span{display:inline-block;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);background:rgba(0,0,0,.25);color:var(--muted);font-size:.85rem;font-weight:700;transition:all .15s}
+.tchip span{display:inline-flex;align-items:center;min-height:40px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);background:rgba(0,0,0,.25);color:var(--muted);font-size:.85rem;font-weight:700;transition:all .15s}
 .tchip input:checked+span{background:var(--turf);border-color:var(--turf);color:var(--accent-fg)}
 .tchip input:focus-visible+span{outline:3px solid var(--sand);outline-offset:2px}
 .tbarre{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0 14px}
@@ -365,10 +367,10 @@ a.card.link:hover h4{color:var(--turf)}
 .tpanneau label{display:block}
 .tville{position:relative}
 .tsuggest{list-style:none;margin:6px 0 0;padding:4px;position:absolute;left:0;right:0;z-index:5;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-s);box-shadow:var(--shadow);max-height:260px;overflow-y:auto}
-.tsuggest button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--fg);font-family:var(--body);font-size:.95rem;padding:10px 12px;border-radius:8px;cursor:pointer}
+.tsuggest button{display:block;width:100%;min-height:40px;text-align:left;background:none;border:0;color:var(--fg);font-family:var(--body);font-size:.95rem;padding:10px 12px;border-radius:8px;cursor:pointer}
 .tsuggest button:hover,.tsuggest button:focus-visible{background:var(--glass-2);outline:none}
 .tzone input[type=text]{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
-.tzone input[type=range]{width:100%;accent-color:var(--turf)}
+.tzone input[type=range]{width:100%;min-height:40px;margin:0;accent-color:var(--turf)}
 .tzone output{color:var(--sand);font-weight:800}
 .tzone .acc-msg{margin:0}
 .tbarre-btns{display:flex;gap:10px;flex-wrap:wrap}

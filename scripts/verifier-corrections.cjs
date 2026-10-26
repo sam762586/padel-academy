@@ -136,7 +136,7 @@ async function compteUnitaires(){
   await page.evaluate(()=>{mock.offline=false;window.dispatchEvent(new Event('online'));});
   await page.waitForFunction(()=>mock.db.A.includes(5)&&Object.keys(wEtat.pending).length===0);ok('retour du réseau : reprise automatique des changements en attente');
   await page.locator('#w1').focus();await page.keyboard.press('Space');
-  assert.equal(await page.locator('#w1').getAttribute('aria-label'),'Valider la semaine 2');
+  assert.equal(await page.locator('#w1').getAttribute('aria-label'),'Valider la semaine 2 : Volée de blocage');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'w1');ok('cases accessibles au clavier et focus conservé');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:path.join(captures,'entrainement-mobile.png'),fullPage:true});

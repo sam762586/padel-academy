@@ -42,7 +42,7 @@ wEtat=wLire(null);
 function wRender(){
  const focus=wk.contains(document.activeElement)?document.activeElement.id:null;
  wk.innerHTML=WEEKS.map((w,i)=>`<article class="week ${wEtat.done.includes(i)?'done':''}">
-  <label class="wcheck"><input type="checkbox" id="w${i}" aria-label="Valider la semaine ${i+1}" ${wEtat.done.includes(i)?'checked':''} ${wPret?'':'disabled'} data-i="${i}"><span></span></label>
+  <label class="wcheck"><input type="checkbox" id="w${i}" aria-label="Valider la semaine ${i+1} : ${w.t}" ${wEtat.done.includes(i)?'checked':''} ${wPret?'':'disabled'} data-i="${i}"><span></span></label>
   <div class="wnum">S${i+1}</div>
   <div class="wbody"><h3>${w.t}</h3><p class="wobj"><b>Objectif :</b> ${w.obj}</p>
   <details><summary>Exercice clé + consigne match</summary><p><b>Exercice (45 min) :</b> ${w.ex}</p><p style="margin-top:8px"><b>${w.match.split(":")[0].trim()} :</b>${w.match.split(":").slice(1).join(":")}</p></details></div>

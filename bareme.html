@@ -53,13 +53,13 @@
     <div class="sel-grid">
       <form class="quiz" id="b-form" onsubmit="return false">
         <fieldset><legend>Catégorie du tournoi</legend>
-          <select id="b-cat" class="bsel">
+          <select id="b-cat" class="bsel" aria-label="Catégorie du tournoi">
             <option value="P25">P25</option><option value="P50">P50</option><option value="P100" selected>P100</option><option value="P250">P250</option>
             <option value="P500">P500</option><option value="P1000">P1000</option><option value="P2000">P2000</option><option value="P3000">P3000</option>
           </select>
         </fieldset>
         <fieldset id="b-nb-row"><legend>Nombre de paires inscrites</legend>
-          <div class="range"><input type="range" id="b-nb" min="4" max="40" step="1" value="16"><output id="b-nb-out" for="b-nb">16 paires</output></div>
+          <div class="range"><input type="range" id="b-nb" aria-label="Nombre de paires inscrites" min="4" max="40" step="1" value="16"><output id="b-nb-out" for="b-nb">16 paires</output></div>
         </fieldset>
         <fieldset id="b-sexe-row" style="display:none"><legend>Tableau</legend>
           <div class="opts">
@@ -68,7 +68,7 @@
           </div>
         </fieldset>
         <fieldset><legend>Ma place finale</legend>
-          <div class="range"><input type="range" id="b-place" min="1" max="32" step="1" value="5"><output id="b-place-out" for="b-place">5e</output></div>
+          <div class="range"><input type="range" id="b-place" aria-label="Ma place finale" min="1" max="32" step="1" value="5"><output id="b-place-out" for="b-place">5e</output></div>
         </fieldset>
         <div class="verdict" id="b-verdict" style="min-height:0"></div>
         <label for="sim-date">Date du tournoi</label>
@@ -117,13 +117,13 @@
         </ul>
       </div>
     </div>
-    <p class="note" style="margin-top:20px">Source : règlement sportif FFT padel 2026/2027, Chapitre II « Classements, barèmes &amp; assimilations » (publié juillet 2026, applicable au 1er septembre 2026). Relevé le 26/10/2026. En cas de doute, seul le règlement publié par la FFT fait foi : <a href="https://www.fft.fr/nos-sports/padel/competitions-padel" target="_blank" rel="noopener">fft.fr/padel</a>.</p>
+    <p class="note" style="margin-top:20px">Source : règlement sportif FFT padel 2026/2027, Chapitre II « Classements, barèmes &amp; assimilations » (publié juillet 2026, applicable au 1er septembre 2026). Relevé le 26/10/2026. En cas de doute, seul le règlement publié par la FFT fait foi : <a href="https://www.fft.fr/nos-sports/padel/competitions-padel" target="_blank" rel="noopener">fft.fr</a>.</p>
   </div>
 </section>
 <footer>
   <div class="wrap">
     <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
-    <div>Sources utiles : <a href="https://www.fft.fr/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
     <div><a href="confidentialite.html">Confidentialité</a></div>
   </div>
 </footer>

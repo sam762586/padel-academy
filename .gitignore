@@ -8,3 +8,6 @@ scripts/debug/
 scripts/import/
 scripts/logs/
 scripts/maj-tournois.lock
+
+# Worktrees des agents Claude Code
+.claude/worktrees/
