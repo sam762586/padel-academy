@@ -42,3 +42,7 @@ Notes :
 # Validation des résultats du quiz
 
 Après le schéma initial, appliquer `supabase/migrations/20261026_validation_quiz.sql` dans le SQL Editor. Cette migration contrôle le score (0 à 30), sa cohérence avec le niveau et les réponses fournies. Elle ne supprime ni ne réécrit les résultats existants. La contrainte `NOT VALID` contrôle les nouvelles écritures ; les anciennes lignes sont à examiner avant validation globale. Cette migration doit aussi être appliquée sur une nouvelle base.
+
+# Sauvegarde des matchs du compteur (score.html)
+
+Le compteur fonctionne sans compte : les matchs restent sur l'appareil. Pour que les joueurs connectés retrouvent leurs matchs sur tous leurs appareils, applique `supabase/migrations/20261026_matchs.sql` dans le SQL Editor (après `schema.sql`, relançable sans risque). Il crée la table `matchs` avec les règles RLS (chacun ne voit que ses matchs, pas de modification après enregistrement). Tant que ce n'est pas fait, la fin de match affiche « La sauvegarde des matchs n'est pas encore activée » et le match reste enregistré sur l'appareil. Suppression de compte : les matchs partent en cascade, `delete_my_account()` ne change pas.

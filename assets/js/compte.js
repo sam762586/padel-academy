@@ -164,6 +164,40 @@
   }catch(e){ return echec(e,"Impossible de synchroniser ta progression."); }
  };
 
+ // Matchs du compteur (score.html) : match = { config, points, fin, interrompu, score, vainqueur }
+ compte.saveMatch=async function(match){
+  if(!compte.user) return nonConnecte();
+  const moteur=window.PA_SCORE;
+  if(!match||!moteur||!moteur.configValide(match.config)||!moteur.pointsValides(match.points)||!match.points.length||
+     !(match.vainqueur===0||match.vainqueur===1||match.vainqueur===null)||typeof match.score!=="string"||match.score.length>60||
+     Number.isNaN(Date.parse(match.fin))){
+   return {ok:false,message:"Ce match est invalide et n'a pas été enregistré."};
+  }
+  const c=match.config;
+  try{
+   const {error}=await client.from("matchs").insert({
+    user_id:compte.user.id,joue_le:match.fin,nom_a:c.nomA,nom_b:c.nomB,
+    format:{egalite:c.egalite,dernierSet:c.dernierSet,serveur:c.serveur},
+    points:match.points,score:match.score,vainqueur:match.vainqueur,interrompu:!!match.interrompu
+   });
+   if(error){
+    // Table absente : la migration n'a pas encore été appliquée dans Supabase
+    if(error.code==="42P01"||error.code==="PGRST205") return {ok:false,message:"La sauvegarde des matchs n'est pas encore activée. Le match reste enregistré sur cet appareil."};
+    return echec(error,"Impossible d'enregistrer ce match. Il reste enregistré sur cet appareil.");
+   }
+   return {ok:true};
+  }catch(e){ return echec(e,"Impossible d'enregistrer ce match. Il reste enregistré sur cet appareil."); }
+ };
+ compte.loadMatches=async function(limite=20){
+  if(!compte.user) return nonConnecte();
+  try{
+   const {data,error}=await client.from("matchs").select("id,joue_le,nom_a,nom_b,format,points,score,vainqueur,interrompu")
+    .eq("user_id",compte.user.id).order("joue_le",{ascending:false}).limit(Math.min(Math.max(1,limite|0),100));
+   if(error) return echec(error,"Impossible de charger tes matchs.");
+   return {ok:true,matchs:data||[]};
+  }catch(e){ return echec(e,"Impossible de charger tes matchs."); }
+ };
+
  // Suppression définitive (fonction SQL delete_my_account), puis fin de session locale
  compte.deleteAccount=async function(){
   if(!compte.user) return nonConnecte();

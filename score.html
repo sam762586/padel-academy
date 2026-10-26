@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Compteur de score padel : sets, point décisif et statistiques</title>
+<meta name="description" content="Compte les points de ton match de padel sur ton téléphone : point décisif ou avantages, tie-break, super tie-break, et le récap de la façon dont chaque point a été gagné.">
+<link rel="canonical" href="https://apprendre-padel.fr/score.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padel Academy · apprendre-padel.fr">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://apprendre-padel.fr/score.html">
+<meta property="og:title" content="Compteur de score padel : sets, point décisif et statistiques">
+<meta property="og:description" content="Compte les points de ton match de padel sur ton téléphone : point décisif ou avantages, tie-break, super tie-break, et le récap de la façon dont chaque point a été gagné.">
+<meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Compteur de match", "item": "https://apprendre-padel.fr/score.html"}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js" defer></script>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Padel <span>Academy</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <ul id="nav-menu"><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Entraînement</a></li><li><a href="score.html" class="active">Compteur</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="regles.html">Règles</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="materiel.html">Matériel</a></li><li><a href="competition.html">Compétition</a></li><li><a href="bareme.html">Barème</a></li><li><a href="tournois.html">Tournois</a></li><li><a href="partenaires.html">Partenaires</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="compte.html">Mon compte</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="score-app" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Sur le terrain · Outil</p><h1>Compteur de match</h1></div>
+      <p>Pose ton téléphone près du terrain : un tap pour la paire qui gagne le point, un tap pour dire comment. À la fin, tu sais où se sont joués tes points. Tout reste sur ton téléphone ; avec un compte, tes matchs te suivent sur tous tes appareils.</p>
+    </div>
+    <p class="acc-msg" id="sc-message" role="status" hidden></p>
+
+    <div id="sc-reglages" class="sc-carte">
+      <form id="sc-form" novalidate>
+        <div class="sc-noms">
+          <div><label for="sc-nom-a">Paire 1</label><input type="text" id="sc-nom-a" name="sc-nom-a" value="Nous" maxlength="30" autocomplete="off"></div>
+          <div><label for="sc-nom-b">Paire 2</label><input type="text" id="sc-nom-b" name="sc-nom-b" value="Eux" maxlength="30" autocomplete="off"></div>
+        </div>
+        <fieldset><legend>Qui sert en premier ?</legend>
+          <div class="tchips">
+            <label class="tchip"><input type="radio" name="sc-serveur" value="0" checked><span id="sc-serveur-a">Nous</span></label>
+            <label class="tchip"><input type="radio" name="sc-serveur" value="1"><span id="sc-serveur-b">Eux</span></label>
+          </div>
+        </fieldset>
+        <fieldset><legend>À 40-40</legend>
+          <div class="tchips">
+            <label class="tchip"><input type="radio" name="sc-egalite" value="decisif" checked><span>Point décisif</span></label>
+            <label class="tchip"><input type="radio" name="sc-egalite" value="avantages"><span>Avantages</span></label>
+          </div>
+        </fieldset>
+        <fieldset><legend>Si un set partout</legend>
+          <div class="tchips">
+            <label class="tchip"><input type="radio" name="sc-dernier" value="super" checked><span>Super tie-break à 10</span></label>
+            <label class="tchip"><input type="radio" name="sc-dernier" value="set"><span>3e set complet</span></label>
+          </div>
+        </fieldset>
+        <button type="submit" class="btn primary sc-gros">Commencer le match</button>
+        <p class="note">Sets en 6 jeux avec 2 jeux d'écart, tie-break en 7 points à 6-6, match en 2 sets gagnants. Le point décisif et le super tie-break sont le format le plus courant en tournoi FFT.</p>
+      </form>
+    </div>
+
+    <div id="sc-match" hidden>
+      <div class="sc-tableau" id="sc-tableau" tabindex="-1" aria-describedby="sc-situation">
+        <div class="sc-ligne sc-entete" aria-hidden="true"><span></span><span></span><span class="sc-sets">Sets</span><span class="sc-jeux">Jeux</span><span class="sc-pts">Pts</span></div>
+        <div class="sc-ligne"><span class="sc-service" id="sc-service-0" title="Au service">●</span><span class="sc-nom" id="sc-nom-0">Nous</span><span class="sc-sets" id="sc-sets-0"></span><span class="sc-jeux" id="sc-jeux-0">0</span><span class="sc-pts" id="sc-pts-0">0</span></div>
+        <div class="sc-ligne"><span class="sc-service" id="sc-service-1" title="Au service" hidden>●</span><span class="sc-nom" id="sc-nom-1">Eux</span><span class="sc-sets" id="sc-sets-1"></span><span class="sc-jeux" id="sc-jeux-1">0</span><span class="sc-pts" id="sc-pts-1">0</span></div>
+      </div>
+      <p class="sc-situation" id="sc-situation"></p>
+      <p class="sr-only" id="sc-annonce" aria-live="polite"></p>
+
+      <div id="sc-gagnants" class="sc-gagnants">
+        <button type="button" class="sc-point" id="sc-point-0">Point<span>Nous</span></button>
+        <button type="button" class="sc-point b" id="sc-point-1">Point<span>Eux</span></button>
+      </div>
+      <div id="sc-motifs" class="sc-motifs" hidden>
+        <p class="sc-motifs-titre" id="sc-motifs-titre"></p>
+        <div class="sc-motifs-grille">
+          <button type="button" data-motif="faute">Faute directe</button>
+          <button type="button" data-motif="gagnant">Coup gagnant</button>
+          <button type="button" data-motif="smash">Smash</button>
+          <button type="button" data-motif="volee">Volée</button>
+          <button type="button" data-motif="lob">Lob</button>
+          <button type="button" data-motif="vitre">Sortie de vitre</button>
+          <button type="button" data-motif="double">Double faute</button>
+          <button type="button" data-motif="aucun">Sans précision</button>
+        </div>
+        <button type="button" class="btn ghost sc-retour" data-motif="retour">Retour</button>
+      </div>
+
+      <div class="sc-outils">
+        <button type="button" class="btn ghost" id="sc-annuler" disabled>Annuler le dernier point</button>
+        <button type="button" class="btn ghost" id="sc-arreter">Arrêter le match</button>
+      </div>
+      <div class="sc-confirmation" id="sc-arret-confirmation" hidden>
+        <p>Arrêter maintenant ? Le match sera gardé avec le score actuel.</p>
+        <button type="button" class="btn primary" id="sc-arret-oui">Oui, arrêter</button>
+        <button type="button" class="btn ghost" id="sc-arret-non">Continuer le match</button>
+      </div>
+    </div>
+
+    <div id="sc-fin" hidden>
+      <div class="sc-carte">
+        <h2 id="sc-fin-titre" tabindex="-1">Récap du match</h2>
+        <div id="sc-recap" class="sc-recap"></div>
+        <p class="acc-muted" id="sc-compte" aria-live="polite"></p>
+        <div class="sc-outils">
+          <button type="button" class="btn primary" id="sc-revanche">Revanche</button>
+          <button type="button" class="btn ghost" id="sc-nouveau">Nouveau match</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="subhead">Mes derniers matchs <small>· sur cet appareil</small></p>
+    <p class="acc-muted" id="sc-historique-vide">Aucun match terminé pour l'instant.</p>
+    <ul class="sc-historique" id="sc-historique"></ul>
+    <button type="button" class="btn ghost" id="sc-effacer" hidden>Effacer l'historique</button>
+    <div class="sc-confirmation" id="sc-effacer-confirmation" hidden>
+      <p>Effacer tous les matchs gardés sur cet appareil ? Les matchs enregistrés dans ton compte ne sont pas touchés.</p>
+      <button type="button" class="btn primary" id="sc-effacer-oui">Oui, effacer</button>
+      <button type="button" class="btn ghost" id="sc-effacer-non">Annuler</button>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Padel Academy</b> · Guide d'apprentissage et de choix de matériel · Contenu rédigé en français pour les joueurs amateurs.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/compte.js"></script>
+<script src="assets/js/score.js"></script>
+<script src="assets/js/nav.js"></script>
+<script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
