@@ -43,5 +43,16 @@
     { "t": 2.4, "titre": "Demi-tour adverse", "texte": "L'adversaire 2, lobé, fait demi-tour ; son partenaire recule aussi." },
     { "t": 4.5, "titre": "Défense depuis le fond", "texte": "Après la vitre, l'adversaire 2 ne peut que remettre une balle lente vers vous." },
     { "t": 5.7, "titre": "La volée dans l'angle", "texte": "Placé au filet, tu conclus d'une volée croisée courte, vers la vitre latérale." }
+  ],
+  "questions": [
+    { "t": 1.1, "question": "L'adversaire a servi et monte au filet, où l'attend son partenaire. Quel retour ?",
+      "choix": ["Un lob haut et profond par-dessus le joueur au filet", "Un amorti", "Un retour fort à plat au centre"],
+      "bonne": 0, "explication": "Le retour fort à plat est ce qu'attend le joueur au filet. Le lob profond par-dessus lui le force à faire demi-tour." },
+    { "t": 1.8, "question": "Ton lob passe au-dessus du filet. Et vous ?",
+      "choix": ["On monte à deux", "On reste au fond", "Seul mon partenaire monte"],
+      "bonne": 0, "explication": "Pendant que le lob vole, vous montez ensemble : le filet change de camp." },
+    { "t": 5.2, "question": "Au filet, la balle arrive lente. Les adversaires sont au fond. Où vises-tu ?",
+      "choix": ["Lob", "Volée croisée courte, vers la vitre latérale", "Volée profonde vers la vitre du fond"],
+      "bonne": 1, "explication": "Adversaires au fond : la volée courte et croisée meurt dans l'angle avant qu'ils n'arrivent." }
   ]
 }

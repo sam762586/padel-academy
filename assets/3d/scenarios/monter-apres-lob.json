@@ -43,5 +43,16 @@
     { "t": 2.4, "titre": "Les adversaires reculent", "texte": "L'adversaire 1, lobé, fait demi-tour ; son partenaire recule avec lui. Au fond, ils ne peuvent plus attaquer." },
     { "t": 4.0, "titre": "Défense depuis le fond", "texte": "L'adversaire 1 remet la balle après la vitre : une balle lente, sans angle." },
     { "t": 5.25, "titre": "La volée gagnante", "texte": "Placé au filet, tu choisis l'angle : volée croisée courte, la balle meurt dans le double vitre." }
+  ],
+  "questions": [
+    { "t": 0.6, "question": "La volée adverse file vers la vitre du fond, dans le coin de ton partenaire. Que doit-il faire ?",
+      "choix": ["La laisser toucher la vitre et la jouer à la sortie", "Monter au filet tout de suite", "La frapper avant qu'elle touche la vitre"],
+      "bonne": 0, "explication": "Une balle qui va dans la vitre se joue à la sortie : on se place derrière elle et on la laisse revenir, on a alors le temps et l'élan." },
+    { "t": 1.45, "question": "Le lob de ton partenaire passe au-dessus des volleyeurs. Que faites-vous ?",
+      "choix": ["On reste au fond et on attend", "On monte au filet, ensemble", "Toi seul montes, ton partenaire reste au fond"],
+      "bonne": 1, "explication": "Le lob qui fait reculer les volleyeurs est le signal : on monte à deux, comme reliés par une corde." },
+    { "t": 4.7, "question": "Tu es au filet, la balle de défense arrive lente. Où vises-tu ?",
+      "choix": ["En lob", "Au centre, fort, sur l'adversaire", "En volée croisée courte, vers la vitre latérale"],
+      "bonne": 2, "explication": "Les adversaires sont au fond : la volée croisée courte, dans l'angle, meurt dans la vitre latérale avant qu'ils n'arrivent." }
   ]
 }

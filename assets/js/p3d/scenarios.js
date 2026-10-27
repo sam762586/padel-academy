@@ -18,7 +18,7 @@ export const PORTEE = Object.freeze({ horizontale: 1.2, hauteurMin: 0.15, hauteu
 export function valider(s) {
   const e = [];
   if (!s || typeof s !== 'object' || Array.isArray(s)) return ['Le scénario doit être un objet JSON.'];
-  const autorisees = ['id', 'titre', 'niveau', 'duree', 'situation', 'explication', 'erreurs', 'conclusion', 'exercice', 'lien', 'joueurs', 'positions', 'frappes', 'etapes'];
+  const autorisees = ['id', 'titre', 'niveau', 'duree', 'situation', 'explication', 'erreurs', 'conclusion', 'exercice', 'lien', 'joueurs', 'positions', 'frappes', 'etapes', 'questions'];
   Object.keys(s).forEach(k => { if (!autorisees.includes(k)) e.push('Champ inconnu : ' + k); });
   if (!(typeof s.id === 'string' && /^[a-z0-9-]{3,60}$/.test(s.id))) e.push('id invalide');
   ['titre', 'niveau', 'situation', 'conclusion', 'exercice'].forEach(k => { if (!texte(s[k])) e.push(k + ' manquant ou trop long'); });
@@ -70,6 +70,21 @@ export function valider(s) {
       if (!(x && estNombre(x.t) && x.t > avant && x.t <= s.duree && texte(x.titre, 80) && texte(x.texte))) e.push('étape ' + (i + 1) + ' invalide');
       else avant = x.t;
     });
+  }
+  // Questions du mode quiz (facultatives) : la scène se fige à l'instant t, 2 à 4 choix, une seule bonne réponse
+  if (s.questions !== undefined) {
+    if (!(Array.isArray(s.questions) && s.questions.length <= 6)) e.push('questions : 0 à 6');
+    else {
+      let avant = -1;
+      s.questions.forEach((q, i) => {
+        const ok = q && typeof q === 'object' && estNombre(q.t) && q.t > avant && q.t > 0 && q.t < s.duree && texte(q.question, 160) &&
+          Array.isArray(q.choix) && q.choix.length >= 2 && q.choix.length <= 4 && q.choix.every(c => texte(c, 120)) &&
+          Number.isInteger(q.bonne) && q.bonne >= 0 && q.bonne < q.choix.length && texte(q.explication) &&
+          Object.keys(q).every(k => ['t', 'question', 'choix', 'bonne', 'explication'].includes(k));
+        if (!ok) e.push('question ' + (i + 1) + ' invalide');
+        else avant = q.t;
+      });
+    }
   }
   return e;
 }

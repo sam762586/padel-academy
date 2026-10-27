@@ -100,7 +100,21 @@ async function horsNavigateur(){
  assert.ok(essai(s=>{s.titre='x'.repeat(5000);}).length);
  assert.ok(essai(s=>{s.duree=Infinity;}).length);
  assert.deepEqual(valider(null),['Le scénario doit être un objet JSON.']);
- ok('validation stricte : champ inconnu, lien externe, geste inconnu, nombres invalides, positions incohérentes refusés');
+ // Questions du quiz
+ assert.ok(essai(s=>{s.questions[0].bonne=7;}).length);
+ assert.ok(essai(s=>{s.questions[0].choix=['seul'];}).length);
+ assert.ok(essai(s=>{s.questions[0].t=s.duree+1;}).length);
+ assert.ok(essai(s=>{s.questions[0].html='<b>';}).length);
+ assert.ok(essai(s=>{s.questions[1].t=s.questions[0].t;}).length);
+ assert.deepEqual(essai(s=>{delete s.questions;}),[],'questions facultatives');
+ ok('validation stricte : champ inconnu, lien externe, geste inconnu, nombres invalides, positions incohérentes, questions mal formées refusés');
+ // Chaque scénario a 2 à 6 questions, posées avant la frappe dont elles parlent (le geste n'est pas encore affiché)
+ for(const id of SCENARIOS){
+  const s=lireScenario(id);
+  assert.ok(s.questions&&s.questions.length>=2,id+' : au moins 2 questions');
+  s.questions.forEach(q=>assert.ok(!s.frappes.some(f=>q.t>f.t-0.4&&q.t<f.t),id+' question à '+q.t+' : geste déjà annoncé'));
+ }
+ ok('quiz : chaque scénario pose 2 à 6 questions, avant que le geste ne soit annoncé à l\'écran');
 
  for(const [id,g] of Object.entries(GESTES)){
   assert.equal(g.statut,'simplifie',id);
@@ -169,7 +183,7 @@ async function dansLeNavigateur(base){
   assert.equal(await page.evaluate(()=>P3D.etat.modele),true,'modèle 3D chargé');
   assert.equal(await page.isHidden('#p3d-chargement'),true);
   assert.equal(await page.isHidden('#p3d-sans-3d'),true);
-  assert.equal(await page.locator('#p3d-scenarios button').count(),SCENARIOS.length);
+  assert.equal(await page.locator('#p3d-scenarios option').count(),SCENARIOS.length);
   assert.equal(await page.locator('#p3d-etiquettes .p3d-etiquette').count(),4);
   assert.match(await page.textContent('#p3d-titre-scenario'),/bandeja/i);
   assert.equal(await page.locator('#p3d-explication li').count(),3);
@@ -219,7 +233,7 @@ async function dansLeNavigateur(base){
   assert.match(await page.textContent('#p3d-aide-libre'),/Fais glisser/);
   ok('six caméras : tactique, aérienne, derrière toi, latérale, suivi balle, libre');
 
-  await page.click('#p3d-scenarios button[data-id="monter-apres-lob"]');
+  await page.selectOption('#p3d-scenarios','monter-apres-lob');
   await page.waitForFunction(()=>P3D.etat.scenario.id==='monter-apres-lob');
   assert.equal(await page.evaluate(()=>location.hash),'#monter-apres-lob');
   assert.equal(await page.evaluate(()=>P3D.etat.t),0);
@@ -230,7 +244,7 @@ async function dansLeNavigateur(base){
   ok('changement de scénario : textes, joueurs, adresse (#monter-apres-lob), geste en cours affiché avec son statut');
   // Chaque scénario se charge et affiche, à chaque frappe, le joueur et le geste joués
   for(const id of SCENARIOS){
-   await page.click(`#p3d-scenarios button[data-id="${id}"]`);
+   await page.selectOption('#p3d-scenarios',id);
    await page.waitForFunction(id=>P3D.etat.scenario.id===id,id);
    for(const f of await page.evaluate(()=>P3D.etat.scenario.frappes)){
     await page.evaluate(t=>P3D.aller(t),f.t);
@@ -241,6 +255,37 @@ async function dansLeNavigateur(base){
    }
   }
   ok('les '+SCENARIOS.length+' scénarios se jouent : à chaque frappe, joueur et geste affichés');
+
+  // Mode quiz : la scène se fige, on répond, l'explication s'affiche, la lecture reprend, score final
+  await page.selectOption('#p3d-scenarios','smash-lob-court');
+  await page.waitForFunction(()=>P3D.etat.scenario.id==='smash-lob-court');
+  await page.click('#p3d-mode button[data-mode="quiz"]');
+  assert.equal(await page.isHidden('#p3d-etapes'),true,'quiz : étapes masquées (elles donnent les réponses)');
+  assert.match(await page.textContent('#p3d-quiz-question'),/s'arrêtera 2 fois/);
+  const qs=await page.evaluate(()=>P3D.etat.scenario.questions);
+  await page.click('#p3d-lecture');
+  await page.waitForFunction(()=>P3D.quiz.enCours===0,null,{timeout:20000});
+  assert.equal(await page.evaluate(()=>P3D.etat.t),qs[0].t,'scène figée à l\'instant de la question');
+  assert.equal(await page.evaluate(()=>P3D.etat.lecture),false);
+  assert.equal(await page.textContent('#p3d-quiz-question'),qs[0].question);
+  await page.click('#p3d-lecture');await page.waitForTimeout(300);
+  assert.equal(await page.evaluate(()=>P3D.etat.t),qs[0].t,'lecture bloquée tant que la question attend');
+  const fausse=(qs[0].bonne+1)%qs[0].choix.length;
+  await page.click(`#p3d-quiz-choix button[data-k="${fausse}"]`);
+  assert.match(await page.getAttribute(`#p3d-quiz-choix button[data-k="${fausse}"]`,'class'),/fausse/);
+  assert.match(await page.getAttribute(`#p3d-quiz-choix button[data-k="${qs[0].bonne}"]`,'class'),/bonne/);
+  assert.match(await page.textContent('#p3d-quiz-explication'),/^Pas tout à fait/);
+  await page.click('#p3d-quiz-suite');
+  await page.waitForFunction(()=>P3D.quiz.enCours===1,null,{timeout:20000});
+  await page.click(`#p3d-quiz-choix button[data-k="${qs[1].bonne}"]`);
+  assert.match(await page.textContent('#p3d-quiz-explication'),/^Bonne réponse/);
+  await page.click('#p3d-quiz-suite');
+  await page.waitForFunction(()=>P3D.etat.t>=P3D.etat.scenario.duree,null,{timeout:20000});
+  assert.match(await page.textContent('#p3d-quiz-question'),/Score : 1 sur 2/);
+  await page.click('#p3d-mode button[data-mode="regarder"]');
+  assert.equal(await page.isHidden('#p3d-quiz'),true);
+  assert.equal(await page.isHidden('#p3d-etapes'),false);
+  ok('mode quiz : scène figée avant la frappe, réponse corrigée et expliquée, reprise, score final, retour au mode regarder');
   await ctx.close();
 
   // Téléphone : 390 px, pas de débordement, lien direct vers un scénario

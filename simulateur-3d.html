@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css?v=bb94aee7ea">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=751173be44">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=642af386e2">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -40,12 +40,26 @@
       <div><p class="eyebrow">Apprendre · Tactique</p><h1>Simulateur 3D</h1></div>
       <p>Revois une situation de jeu sous tous les angles : quatre joueurs, une balle dont la trajectoire est calculée (gravité, freinage de l'air, rebonds au sol et sur les vitres), et une explication à chaque étape. Mets en pause, avance pas à pas, ralentis.</p>
     </div>
-    <div class="phases p3d-choix" id="p3d-scenarios" role="group" aria-label="Scénario"></div>
+    <div class="p3d-choix">
+      <label class="p3d-label" for="p3d-scenarios">Scénario</label>
+      <select id="p3d-scenarios"></select>
+      <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
+        <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
+        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+      </div>
+    </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
       <canvas id="p3d-canvas" aria-hidden="true"></canvas>
       <div class="p3d-etiquettes" id="p3d-etiquettes" aria-hidden="true"></div>
       <p class="p3d-geste" id="p3d-geste" hidden></p>
       <p class="p3d-chargement" id="p3d-chargement">Chargement de la scène…</p>
+    </div>
+    <div class="p3d-quiz" id="p3d-quiz" hidden>
+      <p class="p3d-quiz-score" id="p3d-quiz-score"></p>
+      <h3 id="p3d-quiz-question" tabindex="-1"></h3>
+      <div class="p3d-quiz-choix" id="p3d-quiz-choix" role="group" aria-label="Réponses"></div>
+      <p class="p3d-quiz-explication" id="p3d-quiz-explication" aria-live="polite" hidden></p>
+      <button type="button" class="btn primary" id="p3d-quiz-suite" hidden>Voir la suite</button>
     </div>
     <div class="p3d-sans-3d" id="p3d-sans-3d" hidden>
       <h3>La 3D n'est pas disponible ici</h3>
@@ -105,7 +119,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=11aec3dfc3","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=a94c681b95","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=f147f029f6","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=11aec3dfc3","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d0f6ba6d28","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

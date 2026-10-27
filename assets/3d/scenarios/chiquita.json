@@ -42,5 +42,16 @@
     { "t": 2.05, "titre": "Volée vers le haut", "texte": "La balle arrive dans ses pieds : l'adversaire 1 doit la remonter, sans puissance." },
     { "t": 3.15, "titre": "La volée d'attaque", "texte": "Tu es monté à temps : volée vers le bas, dans les pieds de l'adversaire 2." },
     { "t": 3.65, "titre": "Le point", "texte": "Balle basse aux pieds d'un volleyeur : impossible à remettre proprement." }
+  ],
+  "questions": [
+    { "t": 0.55, "question": "Les adversaires tiennent le filet ; la balle arrive au fond pour ton partenaire. Que doit-il jouer ?",
+      "choix": ["Un smash", "Une frappe fort sur le volleyeur", "Une balle lente et basse dans les pieds du volleyeur"],
+      "bonne": 2, "explication": "La chiquita, lente et basse, oblige le volleyeur à jouer vers le haut : c'est elle qui ouvre le filet." },
+    { "t": 1.4, "question": "La chiquita est partie. Que faites-vous ?",
+      "choix": ["On monte tous les deux", "On recule contre la vitre", "On reste au fond"],
+      "bonne": 0, "explication": "Pendant que la balle vole lentement, on monte : la volée adverse, forcément haute, sera pour vous." },
+    { "t": 2.7, "question": "La volée adverse arrive haute, au-dessus du filet. Où la joues-tu ?",
+      "choix": ["Vers le bas, dans les pieds de l'adversaire", "En lob", "Doucement au centre"],
+      "bonne": 0, "explication": "Une balle haute au filet s'attaque vers le bas, dans les pieds : impossible à remettre proprement." }
   ]
 }

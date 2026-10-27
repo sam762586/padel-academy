@@ -6,21 +6,25 @@ import { valider, calculer, positionJoueur, positionBalle, frappeProche } from '
 import { GESTES } from './gestes.js';
 import { BALLE } from './constantes.js';
 
+// Classés comme sur la page Technique (les coups y renvoient par simulateur-3d.html#id)
 const SCENARIOS = [
-  { id: 'bandeja-garder-filet', nom: 'Bandeja : garder le filet' },
-  { id: 'monter-apres-lob', nom: 'Monter après un lob' },
-  { id: 'servir-monter', nom: 'Servir et monter' },
-  { id: 'smash-lob-court', nom: 'Smash sur lob court' },
-  { id: 'defendre-double-vitre', nom: 'Défendre la double vitre' },
-  { id: 'retour-lob', nom: 'Retourner en lob' },
-  { id: 'chiquita', nom: 'La chiquita' },
-  { id: 'duel-filet', nom: 'Duel au filet' },
+  { id: 'bandeja-garder-filet', nom: 'Bandeja : garder le filet', groupe: 'Filet et attaque' },
+  { id: 'monter-apres-lob', nom: 'Monter après un lob', groupe: 'Fond de court et défense' },
+  { id: 'servir-monter', nom: 'Servir et monter', groupe: 'Service et retour' },
+  { id: 'smash-lob-court', nom: 'Smash sur lob court', groupe: 'Filet et attaque' },
+  { id: 'defendre-double-vitre', nom: 'Défendre la double vitre', groupe: 'Fond de court et défense' },
+  { id: 'retour-lob', nom: 'Retourner en lob', groupe: 'Service et retour' },
+  { id: 'chiquita', nom: 'La chiquita', groupe: 'Transition et coups spéciaux' },
+  { id: 'duel-filet', nom: 'Duel au filet', groupe: 'Filet et attaque' },
 ];
+const GROUPES = ['Fond de court et défense', 'Transition et coups spéciaux', 'Filet et attaque', 'Service et retour'];
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
 
-const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false };
-window.P3D = { etat, aller: t => aller(t) }; // utilisé par les tests (scripts/verifier-simulateur-3d.cjs)
+const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false, mode: 'regarder' };
+// Quiz : réponse choisie pour chaque question (null = pas encore posée), question affichée
+const quiz = { reponses: [], enCours: null };
+window.P3D = { etat, quiz, aller: t => aller(t) }; // utilisé par les tests (scripts/verifier-simulateur-3d.cjs)
 
 /* ---------- Interface (indépendante de la 3D) ---------- */
 function texte(el, valeur) { el.textContent = valeur; }
@@ -81,12 +85,107 @@ function majInterface() {
   } else badge.hidden = true;
 }
 function aller(t) { etat.t = Math.max(0, Math.min(etat.scenario.duree, t)); majInterface(); }
-function lecture() { if (etat.t >= etat.scenario.duree) etat.t = 0; etat.lecture = true; majInterface(); }
+function lecture() {
+  if (quiz.enCours !== null) return; // une question attend sa réponse
+  if (etat.t >= etat.scenario.duree) { etat.t = 0; if (etat.mode === 'quiz') reinitialiserQuiz(); }
+  etat.lecture = true; majInterface();
+}
 function pause() { etat.lecture = false; majInterface(); }
+
+// Avance la lecture de dt secondes (temps réel). En mode quiz, la scène se fige sur la prochaine question non posée.
+function avancer(dt) {
+  const s = etat.scenario, suivant = Math.min(s.duree, etat.t + dt * etat.vitesse);
+  if (etat.mode === 'quiz') {
+    const i = (s.questions || []).findIndex((q, k) => quiz.reponses[k] === null && q.t > etat.t - 1e-9 && q.t <= suivant);
+    if (i >= 0) { etat.t = s.questions[i].t; etat.lecture = false; poserQuestion(i); majInterface(); return; }
+  }
+  etat.t = suivant;
+  if (etat.t >= s.duree) { etat.lecture = false; if (etat.mode === 'quiz') afficherScore(); }
+  majInterface();
+}
+
+/* ---------- Mode quiz ---------- */
+function reinitialiserQuiz() {
+  quiz.reponses = (etat.scenario.questions || []).map(() => null);
+  quiz.enCours = null;
+  if (etat.mode === 'quiz') introQuiz();
+}
+function bonnesReponses() { return quiz.reponses.filter((r, k) => r !== null && r === etat.scenario.questions[k].bonne).length; }
+function introQuiz() {
+  const n = (etat.scenario.questions || []).length;
+  $('p3d-quiz').hidden = false;
+  texte($('p3d-quiz-score'), 'Mode quiz');
+  texte($('p3d-quiz-question'), n ? 'Lance la lecture : la scène s\'arrêtera ' + (n > 1 ? n + ' fois' : 'une fois') + ' pour te demander ce que tu ferais.' : 'Pas de question pour ce scénario.');
+  $('p3d-quiz-choix').replaceChildren();
+  $('p3d-quiz-explication').hidden = true;
+  $('p3d-quiz-suite').hidden = true;
+}
+function poserQuestion(i) {
+  const q = etat.scenario.questions[i], n = etat.scenario.questions.length;
+  quiz.enCours = i;
+  $('p3d-quiz').hidden = false;
+  texte($('p3d-quiz-score'), 'Question ' + (i + 1) + ' sur ' + n);
+  texte($('p3d-quiz-question'), q.question);
+  $('p3d-quiz-choix').replaceChildren(...q.choix.map((c, k) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = c; b.dataset.k = k;
+    b.addEventListener('click', () => repondre(k));
+    return b;
+  }));
+  $('p3d-quiz-explication').hidden = true;
+  $('p3d-quiz-suite').hidden = true;
+  $('p3d-quiz-question').focus({ preventScroll: true });
+}
+function repondre(k) {
+  const i = quiz.enCours;
+  if (i === null || quiz.reponses[i] !== null) return;
+  const q = etat.scenario.questions[i];
+  quiz.reponses[i] = k;
+  $('p3d-quiz-choix').querySelectorAll('button').forEach((b, j) => {
+    b.disabled = true;
+    if (j === q.bonne) b.classList.add('bonne');
+    else if (j === k) b.classList.add('fausse');
+  });
+  const ex = $('p3d-quiz-explication');
+  ex.hidden = false;
+  texte(ex, (k === q.bonne ? 'Bonne réponse. ' : 'Pas tout à fait. ') + q.explication);
+  $('p3d-quiz-suite').hidden = false;
+}
+function suiteQuiz() {
+  quiz.enCours = null;
+  introQuiz();
+  texte($('p3d-quiz-score'), 'Score : ' + bonnesReponses() + ' sur ' + quiz.reponses.filter(r => r !== null).length);
+  texte($('p3d-quiz-question'), 'La lecture reprend : regarde la bonne réponse jouée sur le terrain.');
+  lecture();
+}
+function afficherScore() {
+  const n = (etat.scenario.questions || []).length;
+  if (!n) return;
+  quiz.enCours = null;
+  $('p3d-quiz').hidden = false;
+  $('p3d-quiz-choix').replaceChildren();
+  $('p3d-quiz-explication').hidden = true;
+  $('p3d-quiz-suite').hidden = true;
+  const b = bonnesReponses();
+  texte($('p3d-quiz-score'), 'Quiz terminé');
+  texte($('p3d-quiz-question'), 'Score : ' + b + ' sur ' + n + (b === n ? '. Tu lis le jeu comme en match.' : '. Relance la lecture pour réessayer.'));
+}
+function choisirMode(mode) {
+  etat.mode = mode === 'quiz' ? 'quiz' : 'regarder';
+  $('p3d-mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === etat.mode)));
+  // En quiz, la liste des étapes (qui donne les réponses) est masquée
+  $('p3d-etapes').hidden = etat.mode === 'quiz';
+  pause();
+  if (etat.mode === 'quiz') { aller(0); reinitialiserQuiz(); }
+  else { quiz.enCours = null; $('p3d-quiz').hidden = true; }
+}
 
 function brancherCommandes() {
   $('p3d-lecture').addEventListener('click', () => (etat.lecture ? pause() : lecture()));
-  $('p3d-debut').addEventListener('click', () => { aller(0); pause(); });
+  $('p3d-debut').addEventListener('click', () => { aller(0); pause(); if (etat.mode === 'quiz') reinitialiserQuiz(); });
+  $('p3d-mode').querySelectorAll('button').forEach(b => b.addEventListener('click', () => choisirMode(b.dataset.mode)));
+  $('p3d-quiz-suite').addEventListener('click', suiteQuiz);
+  $('p3d-scenarios').addEventListener('change', ev => choisirScenario(ev.target.value).catch(erreurScenario));
   $('p3d-prec').addEventListener('click', () => {
     pause();
     const i = etapeCourante(etat.t), e = etat.scenario.etapes;
@@ -120,8 +219,9 @@ async function chargerScenario(id) {
 async function choisirScenario(id) {
   const s = await chargerScenario(id);
   etat.scenario = s; etat.calcul = calculer(s); etat.t = 0; etat.lecture = false; etapeAffichee = -1;
-  document.querySelectorAll('#p3d-scenarios button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  $('p3d-scenarios').value = id;
   afficherScenario(s);
+  reinitialiserQuiz();
   majInterface();
   if (scene3d) scene3d.nouveauScenario(s);
   try { history.replaceState(null, '', '#' + id); } catch (e) { /* adresse inchangée */ }
@@ -137,6 +237,9 @@ function webglDisponible() {
 function sans3d(raison) {
   $('p3d-scene').hidden = true;
   $('p3d-vues').hidden = true;
+  // Le quiz suit la lecture de la scène : sans 3D, seul le mode « Regarder » (étapes en texte) reste
+  $('p3d-mode').hidden = true;
+  if (etat.mode === 'quiz') choisirMode('regarder');
   $('p3d-sans-3d').hidden = false;
   if (raison) texte($('p3d-sans-3d-raison'), raison);
 }
@@ -240,11 +343,7 @@ async function demarrer3d() {
     const dt = Math.min(0.1, (maintenant - precedent) / 1000);
     precedent = maintenant;
     if (!etat.scenario) return;
-    if (etat.lecture) {
-      etat.t += dt * etat.vitesse;
-      if (etat.t >= etat.scenario.duree) { etat.t = etat.scenario.duree; etat.lecture = false; }
-      majInterface();
-    }
+    if (etat.lecture) avancer(dt);
     if (!visible || document.hidden) return;
     const s = etat.scenario, c = etat.calcul, t = etat.t;
     // Temps du scénario écoulé depuis l'image précédente (négatif en arrière) : les jambes suivent le curseur
@@ -292,11 +391,13 @@ async function demarrer3d() {
 
 /* ---------- Démarrage ---------- */
 async function demarrer() {
-  $('p3d-scenarios').replaceChildren(...SCENARIOS.map(x => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.dataset.id = x.id; b.textContent = x.nom; b.setAttribute('aria-pressed', 'false');
-    b.addEventListener('click', () => choisirScenario(x.id).catch(erreurScenario));
-    return b;
+  $('p3d-scenarios').replaceChildren(...GROUPES.map(g => {
+    const groupe = document.createElement('optgroup');
+    groupe.label = g;
+    groupe.append(...SCENARIOS.filter(x => x.groupe === g).map(x => {
+      const o = document.createElement('option'); o.value = x.id; o.textContent = x.nom; return o;
+    }));
+    return groupe;
   }));
   $('p3d-vitesse').replaceChildren(...VITESSES.map(v => {
     const o = document.createElement('option'); o.value = String(v); o.textContent = '× ' + String(v).replace('.', ','); o.selected = v === 1; return o;
@@ -317,6 +418,6 @@ async function demarrer() {
 function erreurScenario(e) {
   console.error(e);
   texte($('p3d-etape-titre'), 'Scénario indisponible');
-  texte($('p3d-etape-texte'), 'Ce scénario n\'a pas pu être chargé. Recharge la page ou choisis l\'autre scénario.');
+  texte($('p3d-etape-texte'), 'Ce scénario n\'a pas pu être chargé. Recharge la page ou choisis un autre scénario.');
 }
 demarrer();

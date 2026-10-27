@@ -43,5 +43,13 @@
     { "t": 2.3, "titre": "Défense en urgence", "texte": "L'adversaire 1 remet la balle comme il peut, sans vitesse ni angle." },
     { "t": 2.6, "titre": "Retour au filet", "texte": "Pendant ce temps, tu remontes au filet : ton partenaire et toi êtes de nouveau en ligne." },
     { "t": 3.6, "titre": "La volée finale", "texte": "Ton partenaire conclut d'une volée de revers croisée, dans le coin opposé." }
+  ],
+  "questions": [
+    { "t": 1.0, "question": "Le lob adverse est court : il retombera devant ta ligne de service. Que joues-tu ?",
+      "choix": ["Une bandeja lente", "Un smash", "Je le laisse rebondir"],
+      "bonne": 1, "explication": "Lob court, balle haute et proche du filet : c'est la balle d'attaque, on smashe. Sur un lob profond, on jouerait la bandeja." },
+    { "t": 1.9, "question": "Ton smash est parti au centre. Et toi ?",
+      "choix": ["Je recule au fond", "Je reste où j'ai frappé pour admirer", "Je remonte au filet"],
+      "bonne": 2, "explication": "Après le smash, on revient au filet : la défense adverse sera une balle molle à finir à la volée." }
   ]
 }

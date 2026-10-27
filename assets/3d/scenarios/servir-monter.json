@@ -45,5 +45,16 @@
     { "t": 4.0, "titre": "Le lob adverse", "texte": "Sa seule solution : un lob au-dessus de ton partenaire." },
     { "t": 5.5, "titre": "La víbora", "texte": "Ton partenaire recule de deux pas et coupe la balle sur le côté : víbora croisée, vers la vitre latérale." },
     { "t": 6.2, "titre": "Double vitre", "texte": "La balle touche la vitre latérale puis celle du fond : très difficile à défendre." }
+  ],
+  "questions": [
+    { "t": 0.25, "question": "Ton service est parti. Que fais-tu ?",
+      "choix": ["J'avance vers le filet pour rejoindre mon partenaire", "Je vais au centre du fond", "Je reste au fond pour défendre"],
+      "bonne": 0, "explication": "Le serveur monte tout de suite : c'est à deux au filet que l'équipe qui sert a l'avantage." },
+    { "t": 2.0, "question": "Le retour arrive bas, dans tes pieds, pendant ta montée. Que joues-tu ?",
+      "choix": ["Une volée de contrôle, profonde et au centre", "Une volée fort dans l'angle", "Un amorti juste derrière le filet"],
+      "bonne": 0, "explication": "À mi-terrain, on ne cherche pas le point : volée profonde au centre, puis on finit de monter." },
+    { "t": 5.0, "question": "Le lob adverse est un peu court, au-dessus de ton partenaire. Quel coup ?",
+      "choix": ["Il laisse passer et défend du fond", "Une víbora coupée vers la vitre latérale", "Un lob en retour"],
+      "bonne": 1, "explication": "Sur un lob un peu court, la víbora coupe la balle sur le côté et l'envoie mourir dans le coin, vers la vitre latérale." }
   ]
 }

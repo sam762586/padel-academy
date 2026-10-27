@@ -1,6 +1,25 @@
 /* SIMULATEUR 3D (simulateur-3d.html) : styles propres à la page, chargés seulement par elle.
    Les jetons (couleurs, polices, rayons) sont ceux de style.css. */
-.p3d-choix{margin-bottom:12px}
+.p3d-choix{margin-bottom:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.p3d-label{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--muted)}
+#p3d-scenarios{flex:1 1 260px;min-width:0;max-width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line-2);border-radius:999px;padding:10px 14px;font:inherit;font-weight:700}
+.p3d-mode{margin:0}
+.p3d-mode[hidden]{display:none}
+/* Mode quiz : la question s'affiche sous la scène, la lecture reprend après la réponse */
+.p3d-quiz{margin-top:12px;padding:16px 18px;border:1px solid var(--sand);border-radius:var(--r);background:rgba(255,181,71,.07)}
+.p3d-quiz[hidden],.p3d-quiz-explication[hidden],#p3d-quiz-suite[hidden]{display:none}
+.p3d-quiz-score{margin:0 0 4px;color:var(--sand);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+.p3d-quiz h3{margin:0 0 12px;outline:none}
+.p3d-quiz-choix{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.p3d-quiz-choix button{font:inherit;font-weight:700;text-align:left;color:var(--fg);background:var(--bg);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;cursor:pointer;min-height:44px}
+.p3d-quiz-choix button:hover:not(:disabled){border-color:var(--turf)}
+.p3d-quiz-choix button:disabled{cursor:default;opacity:.75}
+.p3d-quiz-choix button.bonne{border-color:var(--turf);color:var(--turf);opacity:1}
+.p3d-quiz-choix button.fausse{border-color:var(--coral);color:var(--coral);opacity:1}
+.p3d-quiz-choix button.bonne::before{content:"✓ "}
+.p3d-quiz-choix button.fausse::before{content:"✗ "}
+.p3d-quiz-explication{margin:12px 0 0;color:var(--fg)}
+#p3d-quiz-suite{margin-top:12px}
 .p3d-scene{position:relative;width:100%;aspect-ratio:16/9;max-height:78vh;min-height:260px;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#0b1019;touch-action:none;outline:none}
 .p3d-scene:focus-visible{box-shadow:0 0 0 3px var(--turf)}
 .p3d-scene canvas{display:block;width:100%;height:100%}
@@ -27,6 +46,7 @@
 .p3d-etapes button{counter-increment:etape;font:inherit;font-size:.78rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer}
 .p3d-etapes button::before{content:counter(etape) " · "}
 .p3d-etapes button[aria-current="step"]{border-color:var(--turf);color:var(--turf)}
+.p3d-etapes[hidden]{display:none}
 .p3d-sans-3d{padding:18px;border:1px solid var(--sand);border-radius:var(--r);background:rgba(255,181,71,.08)}
 .p3d-sans-3d[hidden],.p3d-scene[hidden],.p3d-vues[hidden],.p3d-chargement[hidden]{display:none}
 .p3d-fiche{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}

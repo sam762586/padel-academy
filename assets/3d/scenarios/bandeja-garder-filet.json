@@ -42,5 +42,16 @@
     { "t": 2.0, "titre": "Remonter ensemble", "texte": "Dès la frappe, tu remontes vers le filet. Ton partenaire, resté au centre, remonte avec toi." },
     { "t": 3.35, "titre": "Une défense sans vitesse", "texte": "La balle ressort de la vitre basse et lente : l'adversaire 1 ne peut que la remettre en jeu." },
     { "t": 4.45, "titre": "La volée qui conclut", "texte": "Au filet, tu joues une volée profonde au centre, entre les deux adversaires." }
+  ],
+  "questions": [
+    { "t": 1.2, "question": "Le lob arrive mi-profond, au-dessus de toi. Que joues-tu ?",
+      "choix": ["Je laisse passer et je recule au fond", "Un smash à plat, de toutes tes forces", "Une bandeja coupée vers la vitre du fond"],
+      "bonne": 2, "explication": "Sur un lob mi-profond, le smash à plat revient facilement après la vitre, et laisser passer te fait perdre le filet. La bandeja, coupée et contrôlée, garde l'avantage." },
+    { "t": 2.3, "question": "Ta bandeja est partie. Et maintenant ?",
+      "choix": ["Je remonte au filet avec mon partenaire", "Je recule au fond pour défendre", "Je reste à l'endroit où j'ai frappé"],
+      "bonne": 0, "explication": "La bandeja sert à garder le filet : on remonte tout de suite, à deux, avant que les adversaires ne rejouent." },
+    { "t": 3.9, "question": "La défense adverse arrive lente, à hauteur de filet. Tu la joues comment ?",
+      "choix": ["Volée profonde, au centre du terrain adverse", "Lob par-dessus les adversaires", "Je la laisse rebondir pour la jouer après la vitre"],
+      "bonne": 0, "explication": "Une balle lente au filet se volée tout de suite, profonde et au centre : les adversaires, au fond, ne peuvent pas attaquer." }
   ]
 }

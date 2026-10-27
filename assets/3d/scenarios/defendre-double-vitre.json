@@ -46,5 +46,16 @@
     { "t": 4.95, "titre": "La volée faible", "texte": "Gêné, l'adversaire 2 ne peut remettre qu'une balle molle et courte." },
     { "t": 6.55, "titre": "L'accélération", "texte": "C'est la balle attendue : coup droit à plat par le centre, entre les deux adversaires." },
     { "t": 7.4, "titre": "Le point", "texte": "La balle passe entre eux et rebondit près de la vitre du fond : les adversaires sont pris." }
+  ],
+  "questions": [
+    { "t": 0.5, "question": "La volée adverse part dans ton coin, elle va toucher les deux vitres. Que fais-tu ?",
+      "choix": ["Je cours la frapper avant la vitre", "Je recule dans le coin et j'attends qu'elle sorte des deux vitres", "Je la laisse, elle est perdue"],
+      "bonne": 1, "explication": "On ne court pas vers la balle : on la laisse toucher les deux vitres et on la suit. Elle revient vers toi avec le temps de bien la jouer." },
+    { "t": 0.8, "question": "La balle sort du coin. Quelle défense ?",
+      "choix": ["Une balle dans l'angle de la vitre latérale", "Une frappe fort au centre", "Une balle lente et basse au centre"],
+      "bonne": 2, "explication": "En défense, on joue lentement et bas au centre : les volleyeurs doivent jouer vers le haut. Une balle forte revient encore plus vite." },
+    { "t": 6.0, "question": "La volée adverse est molle et courte. C'est le moment ?",
+      "choix": ["Non : je rejoue une balle lente", "Non : je lobe", "Oui : j'accélère à plat par le centre"],
+      "bonne": 2, "explication": "C'est la balle attendue : faible, à bonne hauteur. On accélère par le centre, là où les deux adversaires hésitent." }
   ]
 }

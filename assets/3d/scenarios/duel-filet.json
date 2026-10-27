@@ -41,5 +41,13 @@
     { "t": 1.15, "titre": "La balle qui monte", "texte": "Gêné, l'adversaire 1 remonte la balle : elle passe au-dessus du filet." },
     { "t": 1.85, "titre": "L'attaque", "texte": "Ton partenaire attend cette balle haute et frappe vers le bas, entre les deux adversaires." },
     { "t": 2.2, "titre": "Le point", "texte": "La balle rebondit au centre, aux pieds : les deux adversaires hésitent, personne ne la touche." }
+  ],
+  "questions": [
+    { "t": 0.05, "question": "La volée adverse arrive dans tes pieds, sous le niveau du filet. Que fais-tu ?",
+      "choix": ["Je la remets basse, au centre", "Je lobe", "Je l'attaque fort"],
+      "bonne": 0, "explication": "Une balle sous le niveau du filet ne s'attaque pas : on la remet basse, au centre ou aux pieds, et on attend la balle qui monte." },
+    { "t": 1.4, "question": "L'adversaire remonte la balle au-dessus du filet, vers ton partenaire. Que doit-il faire ?",
+      "choix": ["L'attaquer vers le bas, au centre entre les deux adversaires", "La remettre basse", "La viser sur la tête de l'adversaire"],
+      "bonne": 0, "explication": "La balle haute est celle qu'on attend : on l'attaque vers le bas, au centre, là où les deux adversaires hésitent." }
   ]
 }
