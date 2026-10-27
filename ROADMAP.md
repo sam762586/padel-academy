@@ -43,7 +43,7 @@ Search Console.
   l'espace joueur, parcours de l'accueil mis à jour. Test : `scripts/verifier-contenus.cjs`.
 - [ ] Relecture de Samuel (passages d'expérience : partenaire de niveau différent, moments importants,
   communication ; gestes techniques des fiches). BLOQUÉ : captures du parcours Ten'Up (compte de Samuel).
-- [ ] Validation de Samuel.
+- [x] Validation de Samuel (27/10/2026), publiée.
 
 ## Phase 3 — Simulateur 3D v2
 Qualité économique / équilibrée / élevée ; boutons trajectoires et placements ; erreurs, conseil et exercice sur
