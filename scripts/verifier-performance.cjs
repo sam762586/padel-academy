@@ -15,7 +15,7 @@ let nb=0;
 function ok(nom){nb++;console.log('OK '+nom);}
 const lire=f=>fs.readFileSync(path.join(racine,f),'utf8');
 const BUDGET={lcp:2500,cls:0.02};
-const PAGES=['index.html','technique.html','tactique.html','regles.html','simulateur-3d.html','simulateur-3d-vibora.html','tournois.html','tournois/76.html','niveau.html','score.html'];
+const PAGES=['index.html','technique.html','tactique.html','regles.html','simulateur-3d.html','simulateur-3d-vibora.html','tournois.html','tournois/76.html','niveau.html','score.html','academie.html'];
 const POLICES=['manrope-latin.woff2','big-shoulders-display-latin.woff2'];
 
 function toutesLesPages(){

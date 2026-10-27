@@ -89,6 +89,20 @@ async function dansLeNavigateur(base){
    assert.match(await page.textContent('.ac-moi-titre'),/Ton niveau déclaré : 5/,'le choix du niveau marche toujours');
    await ctx.close();}
   ok('stockage bloqué et questions indisponibles : messages clairs, choix du niveau toujours possible');
+  // Clavier seul : choisir son niveau, lancer le quiz, répondre, passer à la suite
+  {const {ctx,page}=await contexte(1280,900);
+   await page.goto(base+'/academie.html');await page.mouse.move(5,890);
+   const focusSur=async sel=>{for(let i=0;i<80;i++){if(await page.evaluate(s=>document.activeElement&&document.activeElement.matches(s),sel))return;await page.keyboard.press('Tab');}throw new Error('focus jamais atteint : '+sel);};
+   await focusSur('.ac-rapide-btn[data-choisir="4"]');await page.keyboard.press('Enter');
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-academie')).niveau),4);
+   await focusSur('#aq-nouveau');await page.keyboard.press('Enter');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'aq-intitule','focus sur la question');
+   await focusSur('.qt-reponse');await page.keyboard.press('Enter');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'aq-suite','focus sur « Question suivante »');
+   await page.keyboard.press('Enter');
+   assert.match(await page.textContent('.aq-avancement'),/^Question 2 sur 10/);
+   await ctx.close();}
+  ok('clavier seul : choix du niveau, lancement du quiz, réponse et question suivante, focus toujours au bon endroit');
  }finally{await browser.close();}
  assert.deepEqual(erreurs,[]);
  ok('aucune erreur dans la console');

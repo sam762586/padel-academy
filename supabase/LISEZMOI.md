@@ -108,3 +108,16 @@ Le compte sert d'archive : effacer l'historique du compteur sur un téléphone n
 # Diagnostic après match (bilan)
 
 `2026-10-27-diagnostic-01` ajoute la colonne `diagnostic` (objet JSON limité) à la table `matchs` : le bilan reste attaché à son match, sans second journal. `-02` ajoute la règle qui manquait pour modifier une ligne de `matchs` : chaque joueur peut modifier ses propres matchs, et uniquement la colonne `diagnostic` (le score et les points restent figés). À exécuter après les migrations journal, puis ajoute `"diagnostic"` (avec `"journal"`). Avant ça, les bilans sont gardés sur l'appareil.
+
+# Mon académie (niveau déclaré et quiz) — PRÉPARÉ, NON APPLIQUÉ
+
+`2026-10-27-academie-01` à `-03` créent `academie_niveaux` (historique des niveaux déclarés, 1 à 10 de la grille FFT)
+et `academie_quiz` (séances terminées du quiz adaptatif), avec le garde-fou de 300 lignes par joueur (fonction
+`espace_limite_lignes` de `espace-02`). Chaque joueur ne voit, n'ajoute et ne supprime que ses lignes ; rien n'est
+modifiable après coup ; la suppression du compte efface tout en cascade. Ce niveau est une autre échelle que
+`quiz_results.niveau` et `profiles.niveau_declare` (1 à 4) : aucune conversion, aucune donnée existante touchée.
+
+**Ne pas exécuter sans l'accord de Samuel.** Ces migrations sont vérifiées hors ligne sur un Postgres en mémoire
+(`scripts/verifier-academie-sql.mjs`). La synchronisation côté site (copier `pa-academie` et `pa-academie-quiz` vers ces
+tables) reste à écrire : tant qu'elle ne l'est pas, Mon académie marche entièrement sur l'appareil, et ajouter
+"academie" à `PA_SUPABASE.activees` n'aurait aucun effet.

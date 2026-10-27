@@ -162,7 +162,12 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   sommaire de la page, reprise d'un quiz interrompu proposée en haut, niveau changé pendant un quiz signalé, messages si
   le stockage est bloqué ou si les questions ne se chargent pas. Test : `scripts/verifier-academie-ux.cjs`.
 - [x] Validation de la phase 5 par Samuel (27/10/2026).
-- [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
+- [x] Phase 6 (27/10/2026) : migrations `2026-10-27-academie-01` à `-03` préparées, NON APPLIQUÉES (`academie_niveaux`,
+  `academie_quiz`, RLS chacun ses lignes, aucune modification, 300 lignes au plus, cascade), vérifiées sur Postgres en
+  mémoire (`scripts/verifier-academie-sql.mjs`, pglite installé hors package.json) ; synchronisation côté site à écrire
+  plus tard ; Mon académie dans le test de performance ; quiz au clavier seul ; 38 suites de tests.
+- [ ] Validation de la phase 6 par Samuel ; puis, sur son accord seulement : publication du site, et plus tard
+  application des migrations et synchronisation.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
