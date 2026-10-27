@@ -73,7 +73,7 @@ function texteLien(href) {
 }
 function afficherScenario(s) {
   texte($('p3d-titre-scenario'), s.titre);
-  texte($('p3d-niveau'), s.niveau);
+  texte($('p3d-niveau'), 'Niveau de la scène : ' + s.niveau);
   texte($('p3d-situation'), s.situation);
   liste($('p3d-explication'), s.explication);
   liste($('p3d-erreurs'), s.erreurs);
@@ -476,6 +476,21 @@ async function demarrer3d() {
 }
 
 /* ---------- Démarrage ---------- */
+// Pages d'un scénario : la 3D (environ 1,5 Mo) ne démarre qu'à la demande, une image de la scène en attendant.
+// Demande : clic sur l'image, Lecture, Quiz, Trajectoire, Placements ou lien vers le quiz. Renvoie l'élément cliqué.
+const DEMANDES = '#p3d-affiche, #p3d-lecture, #p3d-mode [data-mode="quiz"], #p3d-trajectoire, #p3d-placements, a[href="#mode-quiz"]';
+function attendreDemande() {
+  return new Promise(ok => {
+    const demande = ev => {
+      const el = ev.target.closest(DEMANDES);
+      if (!el) return;
+      document.removeEventListener('click', demande, true);
+      $('p3d-affiche').hidden = true;
+      ok(el);
+    };
+    document.addEventListener('click', demande, true);
+  });
+}
 async function demarrer() {
   $('p3d-scenarios').replaceChildren(...GROUPES.map(g => {
     const groupe = document.createElement('optgroup');
@@ -504,10 +519,14 @@ async function demarrer() {
     if (SCENARIOS.some(x => x.id === id) && id !== etat.scenario?.id) choisirScenario(id).catch(erreurScenario);
   });
   if (!webglDisponible()) { sans3d('Ton navigateur ou ton appareil n\'affiche pas la 3D (WebGL indisponible).'); return; }
+  const affiche = $('p3d-affiche');
+  const clic = affiche && !quizDemande ? await attendreDemande() : null;
+  $('p3d-chargement').hidden = false;
   try {
     scene3d = await demarrer3d();
     if (etat.scenario) scene3d.nouveauScenario(etat.scenario);
-    if (quizDemande) choisirMode('quiz');
+    if (quizDemande || clic?.matches('a[href="#mode-quiz"]')) choisirMode('quiz');
+    else if (clic && clic === affiche && !etat.lecture) $('p3d-lecture').click();
   } catch (e) {
     console.error(e);
     sans3d('La scène 3D n\'a pas pu démarrer sur cet appareil.');

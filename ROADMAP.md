@@ -58,9 +58,12 @@ Search Console.
   - [x] Validation du groupe 2 par Samuel (27/10/2026).
 - [x] 3C (27/10/2026). Scénarios « partenaire lobé (cambio) » et « couverture du centre » ; conseil sur les 6 scénarios prioritaires
   (cambio, bandeja-garder-filet, servir-monter, sortie-vitre-fond, couverture-centre, retour-lob).
-- [ ] Validation du 3C par Samuel.
-- [ ] 3D. Fiches : la 3D démarre au clic (image de la scène en attendant), page Simulateur inchangée ; niveaux
+- [x] Validation du 3C par Samuel (27/10/2026).
+- [x] 3D (27/10/2026). Fiches : la 3D démarre au clic (image de la scène en attendant), page Simulateur inchangée ; niveaux
   « du coup » et « de la scène » distingués.
+  Images : `scripts/generer-affiches-3d.cjs` (captures de la vraie scène, 23 × environ 31 Ko). three.js et le modèle ne sont
+  téléchargés qu'au clic (image, Lecture, Quiz, Trajectoire, Placements) ; lien direct vers le quiz : démarrage immédiat.
+- [ ] Validation du 3D par Samuel, puis de la phase 3.
 Limite gardée : pas d'effet de balle (slice, lift), affichée sur la page.
 
 ## Phase 4 — Outils interactifs (ordre proposé)

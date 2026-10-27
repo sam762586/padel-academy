@@ -427,20 +427,35 @@ async function dansLeNavigateur(base){
    const id=(l.href.match(/^simulateur-3d-([a-z0-9-]+)\.html$/)||[])[1];
    assert.ok(SCENARIOS.includes(id),l.coup+' : scénario '+id+' introuvable');
   });
+  // Fiche d'un coup : image de la scène, la 3D (three.js) n'est téléchargée qu'au clic ; deux niveaux distincts
+  const demandes3d=[];page.on('request',r=>{if(/three\.module|joueur\.glb/.test(r.url()))demandes3d.push(r.url());});
   await page.click('#coups .card a.coup-3d[href="simulateur-3d-vibora.html"]');
+  await page.waitForFunction(()=>window.P3D&&P3D.etat.scenario?.id==='vibora');
+  await page.waitForTimeout(1500);
+  assert.equal(await page.evaluate(()=>P3D.etat.pret3d),false,'3D non démarrée avant le clic');
+  assert.deepEqual(demandes3d,[],'three.js et le modèle ne sont pas téléchargés avant le clic');
+  assert.equal(await page.isVisible('#p3d-affiche'),true);
+  assert.equal(await page.isHidden('#p3d-chargement'),true);
+  assert.ok(await page.$eval('#p3d-affiche img',i=>i.complete&&i.naturalWidth===960),'image de la scène chargée');
+  assert.equal(await page.textContent('.fiche-tete .lvl'),'Niveau du coup : Avancé');
+  assert.equal(await page.textContent('#p3d-niveau'),'Niveau de la scène : Avancé');
+  await page.click('#p3d-affiche');
   await pret(page);
+  assert.equal(await page.isHidden('#p3d-affiche'),true);
+  assert.equal(await page.evaluate(()=>P3D.etat.lecture),true,'le clic sur l’image lance la lecture');
   assert.match(page.url(),/simulateur-3d-vibora\.html$/);
   assert.equal(await page.evaluate(()=>P3D.etat.scenario.id),'vibora');
   assert.equal(await page.inputValue('#p3d-scenarios'),'vibora');
   // Sur une page de scénario, choisir un autre scénario mène à sa page
   await Promise.all([page.waitForURL(/simulateur-3d-gancho\.html$/),page.selectOption('#p3d-scenarios','gancho')]);
+  await page.click('#p3d-lecture'); // Lecture démarre aussi la 3D
   await pret(page);
   assert.equal(await page.evaluate(()=>P3D.etat.scenario.id),'gancho');
   // Sur la page principale, l'ancre de l'adresse choisit le scénario
   await page.goto(base+'/simulateur-3d.html#amorti');await pret(page);
   await page.evaluate(()=>{location.hash='gancho';});
   await page.waitForFunction(()=>P3D.etat.scenario.id==='gancho');
-  ok('page Technique : les '+liens.length+' coups ouvrent la page de leur scénario ; autre scénario = autre page ; ancre suivie sur la page principale');
+  ok('page Technique : les '+liens.length+' coups ouvrent la page de leur scénario (image, 3D au clic, niveau du coup et de la scène) ; autre scénario = autre page ; ancre suivie sur la page principale');
   await ctx.close();
 
   // Sans WebGL : message, lien vers le 2D, étapes lisibles

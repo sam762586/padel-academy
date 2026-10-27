@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css?v=9f8de25073">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=0ac1f4ea94">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=21fecc5846">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="gancho">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>Le gancho</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Garder le filet sur un lob très profond que tu ne peux plus jouer en bandeja.</p></div>
+      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>Le gancho</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Niveau du coup : Avancé</span> <b>Objectif :</b> Garder le filet sur un lob très profond que tu ne peux plus jouer en bandeja.</p></div>
       <p>Tu es au filet. L'adversaire 1 lobe très haut et profond : trop haut pour une bandeja. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -52,7 +52,8 @@
       <canvas id="p3d-canvas" aria-hidden="true"></canvas>
       <div class="p3d-etiquettes" id="p3d-etiquettes" aria-hidden="true"></div>
       <p class="p3d-geste" id="p3d-geste" hidden></p>
-      <p class="p3d-chargement" id="p3d-chargement">Chargement de la scène…</p>
+      <p class="p3d-chargement" id="p3d-chargement" hidden>Chargement de la scène…</p>
+      <button type="button" class="p3d-affiche" id="p3d-affiche"><img src="assets/3d/affiches/gancho.jpg" alt="Scène 3D : Le gancho" width="960" height="540" decoding="async"><span class="btn primary">Lancer la scène 3D</span></button>
     </div>
     <div class="p3d-quiz" id="p3d-quiz" hidden>
       <p class="p3d-quiz-score" id="p3d-quiz-score"></p>
@@ -96,7 +97,7 @@
 <section id="comprendre">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow" id="p3d-niveau">Avancé</p><h2 id="p3d-titre-scenario">Ce qu'il faut retenir</h2></div>
+      <div><p class="eyebrow" id="p3d-niveau">Niveau de la scène : Avancé</p><h2 id="p3d-titre-scenario">Ce qu'il faut retenir</h2></div>
       <p id="p3d-situation">Lob très haut et profond : gancho lent et profond, puis retour au filet.</p>
     </div>
     <div class="p3d-fiche">
@@ -177,7 +178,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=052b6ea83b","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=95cc965c46","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=ca6c906fa2","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=37dc280ade","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=963a04eb12"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=052b6ea83b","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=95cc965c46","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=ca6c906fa2","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=1d93105475","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=963a04eb12"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

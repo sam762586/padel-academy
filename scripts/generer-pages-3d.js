@@ -150,7 +150,7 @@ const remplacer = (texte, motif, valeur) => {
 };
 
 // En-tête d'une fiche : niveau, et objectif quand la page ne traite qu'un coup (sinon, objectif dans chaque fiche)
-const tete = cartes => !cartes.length ? "" : `<p class="fiche-tete"><span class="lvl" data-l="${html(cartes[0].lvl)}">${html(cartes[0].lvl)}</span>${cartes.length === 1 ? ` <b>Objectif :</b> ${html(nbsp(cartes[0].obj))}` : ""}</p>`;
+const tete = cartes => !cartes.length ? "" : `<p class="fiche-tete"><span class="lvl" data-l="${html(cartes[0].lvl)}">Niveau du coup : ${html(cartes[0].lvl)}</span>${cartes.length === 1 ? ` <b>Objectif :</b> ${html(nbsp(cartes[0].obj))}` : ""}</p>`;
 
 const ecrites = [];
 for (const x of SCENARIOS) {
@@ -177,11 +177,15 @@ for (const x of SCENARIOS) {
   t = remplacer(t, /<div><p class="eyebrow">[^<]*<\/p><h1>[^<]*<\/h1><\/div>\n      <p>[^<]*<\/p>/,
     `<div><p class="eyebrow">${cartes.length ? "Technique" : "Tactique 3D"} · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1>${tete(cartes)}</div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
   if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes, s, x.id) + `<section id="tous-les-coups">`);
+  // La 3D démarre au clic : image de la scène en attendant (assets/3d/affiches, faite par generer-affiches-3d.cjs)
+  if (!fs.existsSync(path.join(RACINE, `assets/3d/affiches/${x.id}.jpg`))) throw new Error(`Image manquante : assets/3d/affiches/${x.id}.jpg (lancer node scripts/generer-affiches-3d.cjs)`);
+  t = remplacer(t, /<p class="p3d-chargement" id="p3d-chargement">[^<]*<\/p>/, `<p class="p3d-chargement" id="p3d-chargement" hidden>Chargement de la scène…</p>
+      <button type="button" class="p3d-affiche" id="p3d-affiche"><img src="assets/3d/affiches/${x.id}.jpg" alt="${html("Scène 3D : " + s.titre)}" width="960" height="540" decoding="async"><span class="btn primary">Lancer la scène 3D</span></button>`);
   // Textes du scénario écrits dans la page (le script les remplace par les mêmes)
   const li = l => l.map(e => `<li>${html(e)}</li>`).join("");
   t = remplacer(t, /<h2 id="p3d-etape-titre">[^<]*<\/h2>/, `<h2 id="p3d-etape-titre">${html(s.etapes[0].titre)}</h2>`);
   t = remplacer(t, /<p class="p3d-etape-texte" id="p3d-etape-texte" aria-live="polite"><\/p>/, `<p class="p3d-etape-texte" id="p3d-etape-texte" aria-live="polite">${html(s.etapes[0].texte)}</p>`);
-  t = remplacer(t, /<p class="eyebrow" id="p3d-niveau">[^<]*<\/p><h2 id="p3d-titre-scenario">[^<]*<\/h2>/, `<p class="eyebrow" id="p3d-niveau">${html(s.niveau)}</p><h2 id="p3d-titre-scenario">Ce qu'il faut retenir</h2>`);
+  t = remplacer(t, /<p class="eyebrow" id="p3d-niveau">[^<]*<\/p><h2 id="p3d-titre-scenario">[^<]*<\/h2>/, `<p class="eyebrow" id="p3d-niveau">Niveau de la scène : ${html(s.niveau)}</p><h2 id="p3d-titre-scenario">Ce qu'il faut retenir</h2>`);
   t = remplacer(t, /<p id="p3d-situation"><\/p>/, `<p id="p3d-situation">${html(s.conclusion)}</p>`);
   t = remplacer(t, /<ul id="p3d-explication"><\/ul>/, `<ul id="p3d-explication">${li(s.explication)}</ul>`);
   t = remplacer(t, /<ul id="p3d-erreurs"><\/ul>/, `<ul id="p3d-erreurs">${li(s.erreurs)}</ul>`);

@@ -48,7 +48,13 @@
 .p3d-etapes button[aria-current="step"]{border-color:var(--turf);color:var(--turf)}
 .p3d-etapes[hidden]{display:none}
 .p3d-sans-3d{padding:18px;border:1px solid var(--sand);border-radius:var(--r);background:rgba(255,181,71,.08)}
-.p3d-sans-3d[hidden],.p3d-scene[hidden],.p3d-vues[hidden],.p3d-chargement[hidden]{display:none}
+.p3d-sans-3d[hidden],.p3d-scene[hidden],.p3d-vues[hidden],.p3d-chargement[hidden],.p3d-affiche[hidden]{display:none}
+/* Pages d'un scénario : image de la scène, la 3D démarre au clic */
+.p3d-affiche{position:absolute;inset:0;display:grid;place-items:center;padding:0;border:0;background:#0b1019;cursor:pointer}
+.p3d-affiche img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .2s}
+.p3d-affiche .btn{position:relative}
+.p3d-affiche:hover img,.p3d-affiche:focus-visible img{opacity:1}
+.p3d-affiche:focus-visible{outline:3px solid var(--turf);outline-offset:-3px}
 .p3d-fiche{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
 .p3d-fiche > div{padding:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass)}
 .p3d-fiche h3{margin-bottom:8px}
