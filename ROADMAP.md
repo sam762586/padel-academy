@@ -77,7 +77,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   déplacer (doigt, souris, clavier), flèches de déplacement et de balle (glisser ou deux touchers), départ depuis les
   4 phases de Placement ou les 55 scènes du quiz, 5 tableaux sauvegardés sur l'appareil, export PNG 580 × 1220.
   Tests : `scripts/verifier-tableau-tactique.cjs`.
-- [ ] Validation du 4B par Samuel.
+- [x] Validation du 4B par Samuel (27/10/2026).
 - [ ] 4C. Labo des trajectoires (page Simulateur 3D) : curseurs, vues de profil et de dessus, limites affichées.
 - [ ] 4D. Diagnostic de paire (`tactique.html#construire`) : règles fixes, jamais présenté comme un avis professionnel.
 - [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
