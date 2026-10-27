@@ -192,7 +192,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   lexique.html ; pas d'exercice pour Matériel et Culture). Thème des questions [Technique] / [Tactique] : table THEMES_TT.
 - [ ] 9 questions de Samuel en brouillon (fait daté ou chiffré à confirmer : Star Point, saison FFT 2026/2027, barème
   P100, Premier Padel, championnat du monde, FIP à Acapulco, Corcuera, « Interdit au top 1 000 »).
-- [ ] Validation du lot 3b par Samuel.
+- [x] Validation du lot 3b par Samuel (27/10/2026) ; les 9 brouillons attendent sa confirmation.
 - [x] Lot 3a (27/10/2026) : « Pour revoir ce point » après chaque erreur (quiz de l'académie, quiz tactique, mode quiz
   3D) : section d'article du thème couvrant les niveaux de la question, exercice, scène 3D ; calculé par
   generer-academie-questions.mjs (champ revoir, assets/3d/revoir.json chargé à la première erreur dans le simulateur).
