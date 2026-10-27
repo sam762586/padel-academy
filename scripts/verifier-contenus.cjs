@@ -23,9 +23,14 @@ const ARTICLES = {
   'regles.html': { sections: ['regles', 'points', 'service', 'litiges'], liens: 5 },
   'conseils.html': { sections: ['erreurs'], liens: 10 },
   'technique.html': { sections: ['coups', 'vitres'], liens: 5 },
-  'tactique.html': { sections: ['placement', 'schemas', 'construire', 'partenaire-niveau'], liens: 8 },
+  'tactique.html': { sections: ['placement', 'schemas', 'construire', 'partenaire-niveau', 'adversaire', 'moments', 'communication'], liens: 8 },
   'tutos.html': { sections: ['tutos', 'face-lob', 'defendre-filet'], liens: 8 },
+  'premier-tournoi.html': { sections: ['premier-tournoi', 'inscription', 'jour-j', 'points-classement'], liens: 8 },
+  'score.html': { sections: ['score-app', 'analyser'], liens: 5 },
+  'entrainement.html': { sections: ['entrainement', 'physique'], liens: 1 },
 };
+// Exercices de l'espace joueur cités par leur nom dans un encadré : le nom doit exister (assets/js/exercices-donnees.js)
+const TITRES_EXOS = new Function(lire('assets/js/exercices-donnees.js') + ';return EXERCICES;')().map(e => texte(e.titre).trim());
 
 for (const [f, a] of Object.entries(ARTICLES)) {
   const h = lire(f);
@@ -35,7 +40,12 @@ for (const [f, a] of Object.entries(ARTICLES)) {
   const l = liensInternes(h);
   assert.ok(l.length >= a.liens, `${f} : ${l.length} liens internes dans le contenu (minimum ${a.liens})`);
   assert.ok(!/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(h), f + ' : caractère de contrôle');
-  assert.ok(!/\b\d+\s?%|\d+\s?(joueurs|utilisateurs|membres) (nous font|utilisent|inscrits)|témoign/i.test(texte(c)), f + ' : chiffre ou témoignage invérifiable');
+  // Un objectif d'entraînement (« 8 fois sur 10 », « 100 % des fois ») est permis ; une statistique sur des joueurs, non
+  assert.ok(!/\d+\s?% des (joueurs|points|matchs|gens|amateurs)|\d+\s?(joueurs|utilisateurs|membres) (nous font|utilisent|inscrits)|témoign/i.test(texte(c)), f + ' : chiffre ou témoignage invérifiable');
+  for (const m of c.matchAll(/<p class="exo">([\s\S]*?)<\/p>/g)) {
+    const cite = texte(m[1]).match(/Exercice « ([^»]+) » de ton/);
+    if (cite) assert.ok(TITRES_EXOS.includes(cite[1].trim()), f + ' : exercice inconnu « ' + cite[1] + ' »');
+  }
   assert.ok(!h.includes('"FAQPage"'), f + ' : FAQPage');
 }
 ok(`articles (${Object.keys(ARTICLES).join(', ')}) : sections, exemple ou exercice, liens internes, aucun chiffre invérifiable`);
@@ -95,6 +105,22 @@ ok(`articles (${Object.keys(ARTICLES).join(', ')}) : sections, exemple ou exerci
   lignes.forEach(l => assert.match(l, /href="simulateur-3d-[a-z0-9-]+\.html"/, 'situation sans fiche : ' + texte(l).slice(0, 30)));
   for (const id of ['monter-apres-lob', 'chiquita', 'contre-pied']) assert.ok(section(t, 'defendre-filet').includes(`simulateur-3d-${id}.html`), 'défendre contre le filet : ' + id);
   ok('tactique : 4 schémas accessibles (description, deux paires), construire le point, partenaire de niveau différent ; tutos : face au lob (5 situations reliées aux fiches), défendre contre deux volleyeurs');
+}
+
+// Parcours compétiteur
+{
+  const h = lire('tactique.html'), adv = texte(section(h, 'adversaire'));
+  assert.ok(adv.includes('Gaucher à gauche, droitier à droite : leurs deux revers sont au centre'), 'gaucher : revers au centre');
+  assert.ok(adv.includes('Gaucher à droite, droitier à gauche : leurs deux coups droits sont au centre'), 'gaucher : coups droits au centre');
+  const p = lire('premier-tournoi.html');
+  assert.match(p, /<h1>Ton premier tournoi de padel<\/h1>/);
+  assert.equal((section(p, 'inscription').match(/<li class="bloc">/g) || []).length, 5, 'inscription en 5 étapes');
+  for (const l of ['bareme.html', 'partenaires.html', 'tournois.html', 'regles.html#points', 'competition.html']) assert.ok(p.includes('href="' + l + '"'), 'premier tournoi : lien ' + l);
+  assert.ok(lire('competition.html').includes('href="premier-tournoi.html"'), 'competition → premier tournoi');
+  assert.ok(lire('sitemap.xml').includes('<loc>https://apprendre-padel.fr/premier-tournoi.html</loc>'), 'premier tournoi dans le sitemap');
+  assert.ok(lire('sw.js').includes('"premier-tournoi.html"'), 'premier tournoi hors connexion');
+  assert.ok(texte(section(lire('entrainement.html'), 'physique')).includes('consulte un médecin ou un kinésithérapeute'), 'physique : renvoi vers un professionnel');
+  ok('compétiteur : adversaire (gaucher selon la configuration), score et moments importants, communication, premier tournoi (5 étapes, liens, sitemap, hors connexion), analyse de match, préparation physique');
 }
 
 console.log(`\n${nb} vérifications réussies.`);

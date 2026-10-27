@@ -18,7 +18,7 @@ const MENU = [
     ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
   { id: "entrainer", nom: "S'entraîner", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
   ["simulateur-3d.html", "Tactique 3D"],
-  { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
+  { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["premier-tournoi.html", "Ton premier tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
 ];
