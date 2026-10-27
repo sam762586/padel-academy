@@ -53,8 +53,9 @@ Search Console.
 - [x] Validation du prototype par Samuel (27/10/2026, gestes coup droit et bandeja compris).
 - [ ] 3B. Autres gestes en v2, par groupes validés :
   - [x] Groupe 1 (27/10/2026) : revers, volée de coup droit, volée de revers, lob, víbora, smash, défense après double vitre.
-  - [ ] Validation du groupe 1 par Samuel.
-  - [ ] Groupe 2 : le reste (sortie de vitre, service, retour, gancho, bajada, amorti, volée basse).
+  - [x] Validation du groupe 1 par Samuel (27/10/2026).
+  - [x] Groupe 2 (27/10/2026) : sortie de vitre, service, retour, gancho, bajada, amorti, volée basse.
+  - [ ] Validation du groupe 2 par Samuel.
 - [ ] 3C. Scénarios « partenaire lobé (cambio) » et « couverture du centre » ; conseil sur les 6 scénarios prioritaires.
 - [ ] 3D. Fiches : la 3D démarre au clic (image de la scène en attendant), page Simulateur inchangée ; niveaux
   « du coup » et « de la scène » distingués.
