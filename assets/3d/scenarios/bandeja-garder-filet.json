@@ -1,0 +1,46 @@
+{
+  "id": "bandeja-garder-filet",
+  "titre": "La bandeja pour garder le filet",
+  "niveau": "Intermédiaire",
+  "duree": 6.4,
+  "situation": "Ton partenaire et toi tenez le filet. Les adversaires, au fond, cherchent à vous en déloger avec un lob mi-profond au-dessus de toi.",
+  "explication": [
+    "Un lob mi-profond ne se laisse pas passer : si tu recules jusqu'au fond, vous perdez le filet.",
+    "La bandeja n'est pas un coup gagnant : c'est une frappe coupée, contrôlée, qui envoie la balle dans la vitre du fond adverse sans leur donner de balle facile.",
+    "Pendant ta bandeja, ton partenaire tient le centre ; dès la frappe, vous remontez ensemble."
+  ],
+  "erreurs": [
+    "Smasher à plat une balle mi-profonde : la balle revient après la vitre et vous perdez le filet.",
+    "Reculer de face, en courant en arrière : on perd l'équilibre et la balle passe derrière soi.",
+    "Rester au fond après la bandeja au lieu de remonter tout de suite."
+  ],
+  "conclusion": "La bandeja sert à garder l'avantage du filet : coupée, profonde, vers la vitre, puis on remonte.",
+  "exercice": "Sur le terrain : un partenaire te lance des lobs mi-profonds depuis le fond. Bandeja vers la vitre du fond, puis touche la ligne de service et remonte au filet. 3 séries de 10.",
+  "lien": "tutos.html",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.4, -2.7], [0.3, -2.4, -2.75], [1.7, -1.95, -5.95], [1.95, -1.95, -5.85], [3.3, -1.6, -3.0], [4.4, -1.5, -2.8], [4.8, -1.5, -2.75], [6.4, -1.8, -2.8]],
+    "A2": [[0, 2.4, -2.7], [0.5, 2.3, -2.8], [1.7, 1.4, -3.6], [3.3, 1.9, -2.8], [4.5, 1.7, -2.6], [6.4, 1.6, -2.6]],
+    "B1": [[0, 2.0, 8.75], [0.4, 2.0, 8.75], [1.8, 2.4, 8.0], [2.9, 2.9, 8.4], [3.3, 2.88, 8.69], [3.6, 2.8, 8.5], [4.5, 1.6, 8.1], [6.4, 1.0, 8.2]],
+    "B2": [[0, -2.4, 8.5], [1.8, -1.6, 8.0], [3.3, -1.0, 8.2], [4.5, -0.4, 8.4], [6.4, 0.2, 8.0]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "lob", "depart": [2.5, 0.95, 8.4], "cible": [-2.3, 2.15, -5.7], "vol": 1.75 },
+    { "t": 1.75, "joueur": "A1", "geste": "bandeja", "cible": [1.9, 0.033, 7.4], "vol": 1.05 },
+    { "t": 3.35, "joueur": "B1", "geste": "sortie_vitre", "cible": [-2.0, 0.95, -2.4], "vol": 1.1 },
+    { "t": 4.45, "joueur": "A1", "geste": "volee_cd", "cible": [0.4, 0.033, 8.0], "vol": 0.8 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob adverse", "texte": "L'adversaire 1 lobe au-dessus de toi. Mi-profond : pas assez pour te forcer à le laisser passer, trop haut pour une volée." },
+    { "t": 0.35, "titre": "Split step, puis recul", "texte": "Petit saut d'arrêt pendant la frappe adverse, puis tu recules de profil, épaule gauche vers le filet, pour garder la balle devant toi." },
+    { "t": 1.75, "titre": "La bandeja", "texte": "Frappe au-dessus de la tête, sur ton côté droit, en coupant la balle. Cible : la vitre du fond, côté adversaire 1." },
+    { "t": 2.0, "titre": "Remonter ensemble", "texte": "Dès la frappe, tu remontes vers le filet. Ton partenaire, resté au centre, remonte avec toi." },
+    { "t": 3.35, "titre": "Une défense sans vitesse", "texte": "La balle ressort de la vitre basse et lente : l'adversaire 1 ne peut que la remettre en jeu." },
+    { "t": 4.45, "titre": "La volée qui conclut", "texte": "Au filet, tu joues une volée profonde au centre, entre les deux adversaires." }
+  ]
+}
