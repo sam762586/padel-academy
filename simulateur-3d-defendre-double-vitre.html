@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Double vitre","item":"https://apprendre-padel.fr/simulateur-3d-defendre-double-vitre.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="defendre-double-vitre">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Fond de court et défense</p><h1>Défendre la double vitre</h1></div>
+      <div><p class="eyebrow">Technique · Fond de court et défense</p><h1>Défendre la double vitre</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Survivre à une balle difficile dans le coin et te donner le temps de te replacer.</p></div>
       <p>Les adversaires tiennent le filet. L'adversaire 2 volée dans ton coin : la balle va toucher la vitre du fond puis la vitre latérale. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,34 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Double vitre (doble pared) <span class="lvl" data-l="Avancé">Avancé</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>La balle touche la vitre latérale puis la vitre du fond (ou l'inverse). La trajectoire se « casse » : attends la seconde vitre, la balle revient vers toi.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Balle dans le coin après rebond</dd><dt>Où viser</dt><dd>Lob, le temps de se replacer</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Jouer entre les deux vitres</li><li>Bouger avant la deuxième vitre</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Balle dans le coin après rebond</dd><dt>Où viser</dt><dd>Lob, le temps de se replacer</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Va vers le coin sans t'en approcher trop : la balle va changer de direction.</li><li><b>Armé</b> Attends la deuxième vitre, raquette basse, léger sur tes appuis.</li><li><b>Frappe</b> Frappe quand la balle sort de la seconde vitre et revient vers toi, en lob ou en balle lente au centre.</li><li><b>Accompagnement</b> Repars vers le centre de ta zone pendant que ta balle traverse.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-fond">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Jouer entre les deux vitres</p><p class="fiche-correction"><span>Correction</span> Compte les vitres : tant que la balle n'a pas touché la seconde, ne la joue pas.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Bouger avant la deuxième vitre</p><p class="fiche-correction"><span>Correction</span> Reste à distance du coin et ne bouge tes pieds qu'après la seconde vitre : la balle revient toujours vers le terrain.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Sortie de vitre en lob profond</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Ton partenaire, au filet, t'envoie des balles qui rebondissent dans ton carré de service puis touchent la vitre du fond. Tu pivotes, tu accompagnes la balle en reculant à peine, et tu joues un lob qui doit retomber derrière la ligne de service adverse. Pose une serviette 1 m devant la vitre adverse comme cible. 3 séries de 15 balles, en alternant coup droit et revers.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 7 sorties de vitre sur 10 qui retombent au-delà de la ligne de service adverse, dont au moins 2 dans le mètre devant la vitre.</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Sortie de vitre : bajada ou lob selon la balle</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau intermédiaire à P500 et +</p>
+        <p>Ton partenaire varie : balles hautes qui rebondissent fort sur la vitre, et balles plus courtes. Sur une balle qui ressort haute, tu attaques en bajada à plat dans les pieds du volleyeur ou au centre ; sur une balle qui ressort basse, tu lobes. Annonce « bajada » ou « lob » à voix haute avant la frappe. 4 séries de 12 balles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 10 décisions justes sur 12 par série (choix validé par le partenaire) et pas plus de 2 fautes directes par série.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : un partenaire au filet volée dans ton coin. Laisse toucher les deux vitres, puis renvoie une balle lente au centre, à ses pieds. 3 séries de 10.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-coup-droit-fond.html">Coup droit de fond</a></li><li><a href="simulateur-3d-revers-fond.html">Revers de fond</a></li><li><a href="simulateur-3d-monter-apres-lob.html">Lob (globo)</a></li><li><a href="simulateur-3d-sortie-vitre-fond.html">Sortie de vitre de fond</a></li><li><a href="technique.html#coups-fond">Fond de court et défense : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +169,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

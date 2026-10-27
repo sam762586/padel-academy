@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Bandeja","item":"https://apprendre-padel.fr/simulateur-3d-bandeja-garder-filet.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="bandeja-garder-filet">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>La bandeja pour garder le filet</h1></div>
+      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>La bandeja pour garder le filet</h1><p class="fiche-tete"><span class="lvl" data-l="Intermédiaire">Intermédiaire</span> <b>Objectif :</b> Rester au filet face à un lob, en renvoyant une balle lente et précise plutôt qu'en cherchant le point.</p></div>
       <p>Ton partenaire et toi tenez le filet. Les adversaires, au fond, cherchent à vous en déloger avec un lob mi-profond au-dessus de toi. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,34 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Bandeja <span class="lvl" data-l="Intermédiaire">Intermédiaire</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>Le coup signature. Sur un lob, frappe à hauteur d'épaule, raquette coupée (effet slice), balle lente qui rebondit puis touche la vitre basse. Objectif : rester au filet, pas gagner le point.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob adverse moyennement profond</dd><dt>Où viser</dt><dd>Croisé vers la vitre latérale adverse, ou au centre</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Vouloir smasher</li><li>Reculer au lieu de se déplacer latéralement</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob adverse moyennement profond</dd><dt>Où viser</dt><dd>Croisé vers la vitre latérale adverse, ou au centre</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Dès que le lob part, place-toi de profil (épaule gauche vers le filet pour un droitier) et recule en pas chassés.</li><li><b>Armé</b> Raquette haute derrière la tête, coude levé, main libre qui pointe la balle.</li><li><b>Frappe</b> Contact devant toi et sur le côté, plus bas qu'un smash, en coupant la balle : geste de haut en bas, tamis légèrement ouvert.</li><li><b>Accompagnement</b> Le bras finit devant toi et vers le bas, puis tu reviens tout de suite à ta place au filet.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-filet">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Vouloir smasher</p><p class="fiche-correction"><span>Correction</span> Garde le smash pour les lobs courts : sur un lob mi-profond, la bandeja te garde au filet sans risque.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Reculer au lieu de se déplacer latéralement</p><p class="fiche-correction"><span>Correction</span> Recule de profil, en pas chassés, pour garder la balle devant toi et rester en équilibre au moment de frapper.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Bandeja sur lancer à la main</p>
+        <p class="fiche-exo-meta">15 min · seul · niveau débutant à loisir</p>
+        <p>Place-toi à 3 m du filet, de profil, épaule gauche vers le filet si tu es droitier. Lance la balle haut devant toi, recule en pas chassés (jamais de dos), et frappe à hauteur d'épaule en coupant la balle, raquette qui finit vers le filet. Cible : la moitié adverse côté vitre latérale. 3 séries de 10 balles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 7 bandejas sur 10 qui rebondissent avant la vitre du fond adverse et restent sous la hauteur de ta hanche après le rebond.</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Bandeja et retour au filet</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Ton partenaire, au fond, te lobe à mi-court. Tu recules de côté, tu joues la bandeja vers la vitre latérale adverse, puis tu reviens à 2–2,5 m du filet avant sa frappe suivante. Il te renvoie une balle basse que tu bloques en volée. 4 séries de 10.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 8 bandejas sur 10 qui gardent le filet : rebond avant la vitre du fond, et toi revenu dans la zone des 2–2,5 m pour la volée suivante.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : un partenaire te lance des lobs mi-profonds depuis le fond. Bandeja vers la vitre du fond, puis touche la ligne de service et remonte au filet. 3 séries de 10.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-volee-coup-droit.html">Volée de coup droit</a></li><li><a href="simulateur-3d-volee-revers.html">Volée de revers</a></li><li><a href="simulateur-3d-vibora.html">Víbora</a></li><li><a href="simulateur-3d-smash-lob-court.html">Smash plat (remate)</a></li><li><a href="technique.html#coups-filet">Au filet : tous les coups</a></li><li><a href="tutos.html">Les tutos tactiques</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +169,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

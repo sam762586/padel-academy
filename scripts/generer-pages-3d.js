@@ -35,17 +35,55 @@ const nbsp = t => String(t).replace(/[  ]/g, " ");
 const NOMS_COMMUNS = { "smash-par-3": "Smash par 3 et rulo", "servir-monter": "Service et montée au filet" };
 const nomCourt = (id, cartes) => NOMS_COMMUNS[id] || (cartes[0] ? nbsp(cartes[0].n).replace(/\s*\(.*\)$/, "").replace(/\s*\/.*$/, "") : null);
 const ANCRES = { fond: "coups-fond", trans: "coups-trans", filet: "coups-filet", service: "coups-service" };
-function ficheCoup(cartes) {
-  return `<section id="fiche-coup" class="alt">
-  <div class="wrap">
-    <h2>${cartes.length > 1 ? "Les fiches des coups" : "La fiche du coup"}</h2>
-    <div class="p3d-fiche">${cartes.map(c => `
-      <div><h3>${html(nbsp(c.n))} <span class="lvl" data-l="${html(c.lvl)}">${html(c.lvl)}</span></h3>
+const FAMILLES = { fond: "Fond de court et défense", trans: "Transition", filet: "Au filet", service: "Service et retour" };
+// Exercices de l'espace joueur (assets/js/exercices-donnees.js), cités par les coups (champ ex)
+const EXERCICES = new Function(lire("assets/js/exercices-donnees.js") + ";return EXERCICES;")();
+const PALIERS = ["", "débutant", "loisir", "intermédiaire", "P500 et +"];
+const exercice = id => {
+  const e = EXERCICES.find(x => x.id === id);
+  if (!e) throw new Error("Exercice inconnu : " + id);
+  return e;
+};
+/* FICHE DU COUP : structure commune à toutes les fiches (mission v3, phase 2)
+   1 titre, 2 niveau, 3 objectif (en-tête de la page ; dans chaque fiche quand la page réunit deux coups),
+   4 explication, 5 animation (le simulateur, plus haut), 6 étapes du geste, 7 erreurs fréquentes, 8 corrections,
+   9 exercice pratique, 10 lien vers le simulateur (revoir, quiz), 11 contenus associés. */
+function ficheUnCoup(c, s, plusieurs) {
+  const exos = c.ex.map(exercice);
+  return `${plusieurs ? `<h2>${html(nbsp(c.n))}</h2>
+    <p class="fiche-tete"><span class="lvl" data-l="${html(c.lvl)}">${html(c.lvl)}</span> <b>Objectif :</b> ${html(nbsp(c.obj))}</p>
+    ` : ""}<div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>${html(nbsp(c.q))}</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>${html(nbsp(c.quand))}</dd><dt>Où viser</dt><dd>${html(nbsp(c.cible))}</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul>${c.err.map(e => `<li>${html(nbsp(e))}</li>`).join("")}</ul></div>`).join("")}
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>${html(nbsp(c.quand))}</dd><dt>Où viser</dt><dd>${html(nbsp(c.cible))}</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes">${c.etapes.map(([t, x]) => `<li><b>${html(t)}</b> ${html(nbsp(x))}</li>`).join("")}</ol></div>
     </div>
-    <p class="note"><a href="technique.html#${ANCRES[cartes[0].cle]}">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs">${c.err.map((e, i) => `<li><p class="fiche-erreur"><span>Erreur</span> ${html(nbsp(e))}</p><p class="fiche-correction"><span>Correction</span> ${html(nbsp(c.corr[i]))}</p></li>`).join("")}</ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos">${exos.map(e => `<article class="fiche-exo">
+        <p class="fiche-exo-titre">${html(nbsp(e.titre))}</p>
+        <p class="fiche-exo-meta">${html(e.duree)} · ${html(e.joueurs)} · niveau ${html(e.niveaux.map(n => PALIERS[n]).join(" à "))}</p>
+        <p>${html(nbsp(e.consigne))}</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> ${html(nbsp(e.reussite))}</p></article>`).join("")}${!plusieurs && s.exercice ? `
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>${html(s.exercice)}</p></article>` : ""}</div></div>`;
+}
+function ficheCoup(cartes, s, id) {
+  const plusieurs = cartes.length > 1;
+  // Contenus associés : les autres coups de la même famille (avec leur fiche), la famille, et la page liée au scénario
+  const famille = cartes[0].cle;
+  const voisins = COUPS[famille].filter(c => c.p3d && c.p3d !== id).filter((c, i, l) => l.findIndex(x => x.p3d === c.p3d) === i).slice(0, 4);
+  const lienScene = s.lien && !s.lien.startsWith("technique.html") ? `<li><a href="${html(s.lien)}">${html({ "tutos.html": "Les tutos tactiques", "regles.html": "Les règles", "tactique.html": "Le placement en double" }[s.lien.split("#")[0]] || "En savoir plus")}</a></li>` : "";
+  return `<section id="fiche-coup" class="alt">
+  <div class="wrap fiche">
+    ${plusieurs ? "" : "<h2>La fiche du coup</h2>\n    "}${cartes.map(c => ficheUnCoup(c, s, plusieurs)).join("\n    ")}
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens">${voisins.map(c => `<li><a href="${page(c.p3d)}">${html(nbsp(c.n))}</a></li>`).join("")}<li><a href="technique.html#${ANCRES[famille]}">${html(FAMILLES[famille])} : tous les coups</a></li>${lienScene}</ul></div>
+    </div>
   </div>
 </section>
 `;
@@ -111,6 +149,9 @@ const remplacer = (texte, motif, valeur) => {
   return texte.replace(motif, () => valeur);
 };
 
+// En-tête d'une fiche : niveau, et objectif quand la page ne traite qu'un coup (sinon, objectif dans chaque fiche)
+const tete = cartes => !cartes.length ? "" : `<p class="fiche-tete"><span class="lvl" data-l="${html(cartes[0].lvl)}">${html(cartes[0].lvl)}</span>${cartes.length === 1 ? ` <b>Objectif :</b> ${html(nbsp(cartes[0].obj))}` : ""}</p>`;
+
 const ecrites = [];
 for (const x of SCENARIOS) {
   const s = fiches[x.id], f = page(x.id), url = SITE + f;
@@ -134,8 +175,8 @@ for (const x of SCENARIOS) {
   // En-tête : titre du coup, situation ; le simulateur s'ouvre sur ce scénario
   t = remplacer(t, /<section id="simulateur" class="alt">/, `<section id="simulateur" class="alt" data-scenario="${x.id}">`);
   t = remplacer(t, /<div><p class="eyebrow">[^<]*<\/p><h1>[^<]*<\/h1><\/div>\n      <p>[^<]*<\/p>/,
-    `<div><p class="eyebrow">${cartes.length ? "Technique" : "Simulateur 3D"} · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1></div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
-  if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes) + `<section id="tous-les-coups">`);
+    `<div><p class="eyebrow">${cartes.length ? "Technique" : "Tactique 3D"} · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1>${tete(cartes)}</div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
+  if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes, s, x.id) + `<section id="tous-les-coups">`);
   // Textes du scénario écrits dans la page (le script les remplace par les mêmes)
   const li = l => l.map(e => `<li>${html(e)}</li>`).join("");
   t = remplacer(t, /<h2 id="p3d-etape-titre">[^<]*<\/h2>/, `<h2 id="p3d-etape-titre">${html(s.etapes[0].titre)}</h2>`);

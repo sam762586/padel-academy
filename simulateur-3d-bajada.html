@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Bajada","item":"https://apprendre-padel.fr/simulateur-3d-bajada.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="bajada">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>La bajada</h1></div>
+      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>La bajada</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Profiter d'un lob trop long pour attaquer et reprendre le filet.</p></div>
       <p>Ton partenaire et toi tenez le filet. L'adversaire 1 lobe trop long : la balle va toucher ta vitre du fond et ressortir haut. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,30 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Bajada (balle descendante) <span class="lvl" data-l="Avancé">Avancé</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>La balle adverse (un lob trop long) touche ta vitre et ressort haute : tu la frappes en descendant, fort, en avançant pour reprendre le filet.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob adverse qui ressort haut de la vitre du fond</dd><dt>Où viser</dt><dd>Croisé fort vers la grille, ou centre</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Frapper trop tôt</li><li>Rester au fond après la bajada</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob adverse qui ressort haut de la vitre du fond</dd><dt>Où viser</dt><dd>Croisé fort vers la grille, ou centre</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Laisse le lob trop long taper ta vitre du fond et recule pour avoir la balle devant toi quand elle ressort.</li><li><b>Armé</b> De profil, raquette haute derrière toi, comme pour un smash, mais plus compact.</li><li><b>Frappe</b> Frappe la balle en descendant, entre l'épaule et la tête, devant toi, croisé vers la grille ou au centre.</li><li><b>Accompagnement</b> Le poids passe vers l'avant : enchaîne directement ta montée au filet.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-trans">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Frapper trop tôt</p><p class="fiche-correction"><span>Correction</span> Attends que la balle redescende devant toi : frappée trop tôt, elle est trop haute et trop près de la vitre.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Rester au fond après la bajada</p><p class="fiche-correction"><span>Correction</span> Monte après la bajada : c'est une attaque, elle te donne le temps de reprendre le filet.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Sortie de vitre : bajada ou lob selon la balle</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau intermédiaire à P500 et +</p>
+        <p>Ton partenaire varie : balles hautes qui rebondissent fort sur la vitre, et balles plus courtes. Sur une balle qui ressort haute, tu attaques en bajada à plat dans les pieds du volleyeur ou au centre ; sur une balle qui ressort basse, tu lobes. Annonce « bajada » ou « lob » à voix haute avant la frappe. 4 séries de 12 balles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 10 décisions justes sur 12 par série (choix validé par le partenaire) et pas plus de 2 fautes directes par série.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : un partenaire lobe long dans ta vitre. Laisse taper, frappe la balle qui redescend, croisé vers la grille, puis monte. 3 séries de 8.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-chiquita.html">Chiquita</a></li><li><a href="simulateur-3d-volee-basse-transition.html">Volée basse de transition</a></li><li><a href="simulateur-3d-amorti.html">Amorti (dejada)</a></li><li><a href="technique.html#coups-trans">Transition : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +165,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

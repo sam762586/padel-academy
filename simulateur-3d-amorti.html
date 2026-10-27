@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Amorti","item":"https://apprendre-padel.fr/simulateur-3d-amorti.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="amorti">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>L'amorti (dejada)</h1></div>
+      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>L'amorti (dejada)</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Gagner le point quand les adversaires sont loin au fond, en faisant mourir la balle près du filet.</p></div>
       <p>Tu es au filet. Les deux adversaires sont loin derrière, contre leur vitre du fond, et te renvoient une balle facile. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,30 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Amorti (dejada) <span class="lvl" data-l="Avancé">Avancé</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>Volée amortie qui tombe juste derrière le filet quand les adversaires sont au fond. Rare mais dévastateur.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Adversaires loin derrière, balle facile au filet</dd><dt>Où viser</dt><dd>Juste derrière le filet, côté vitre</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Trop long : balle facile</li><li>Trop utilisé : prévisible</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Adversaires loin derrière, balle facile au filet</dd><dt>Où viser</dt><dd>Juste derrière le filet, côté vitre</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Au filet, choisis l'amorti seulement si les deux adversaires sont au fond et si la balle t'arrive lente.</li><li><b>Armé</b> Prépare comme une volée ordinaire, pour ne pas annoncer le coup.</li><li><b>Frappe</b> Au contact, relâche la main et ouvre le tamis : la balle perd sa vitesse et tombe juste derrière le filet.</li><li><b>Accompagnement</b> Presque pas d'accompagnement ; reste prêt, l'adversaire peut encore courir et la remettre.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-trans">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Trop long : balle facile</p><p class="fiche-correction"><span>Correction</span> Amortis vraiment : relâche la prise au contact, la balle doit rebondir deux fois avant la ligne de service.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Trop utilisé : prévisible</p><p class="fiche-correction"><span>Correction</span> Garde-le comme surprise, quand les adversaires sont collés à leur vitre : trop utilisé, il est attendu.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Volée de blocage à la bonne distance</p>
+        <p class="fiche-exo-meta">15 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Tu te places à 2–2,5 m du filet, ton partenaire au fond. Il t'envoie des balles à mi-hauteur, alternant coup droit et revers ; tu bloques, geste court, raquette ouverte, long au centre. Après chaque volée, tu reviens à ta position de base. 3 séries de 15 balles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 12 volées sur 15 qui retombent dans le tiers du fond adverse (derrière la ligne de service), sans que tu avances à moins d'1,5 m du filet.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : au filet, un partenaire au fond te renvoie des balles lentes. Amorti qui rebondit deux fois avant la ligne de service. 3 séries de 10.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-chiquita.html">Chiquita</a></li><li><a href="simulateur-3d-volee-basse-transition.html">Volée basse de transition</a></li><li><a href="simulateur-3d-bajada.html">Bajada (balle descendante)</a></li><li><a href="technique.html#coups-trans">Transition : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +165,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Volée de revers","item":"https://apprendre-padel.fr/simulateur-3d-volee-revers.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="volee-revers">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>La volée de revers</h1></div>
+      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>La volée de revers</h1><p class="fiche-tete"><span class="lvl" data-l="Débutant">Débutant</span> <b>Objectif :</b> Neutraliser une balle côté revers au filet et la placer basse.</p></div>
       <p>Ton partenaire et toi êtes au filet. L'adversaire 2, au fond, joue vers le revers de ton partenaire. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,34 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Volée de revers <span class="lvl" data-l="Débutant">Débutant</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>Même principe, coude devant, raquette coupée. Souvent plus sûre que le coup droit car plus compacte.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Au filet côté revers</dd><dt>Où viser</dt><dd>Croisé bas ou au centre</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Raquette trop basse en attente</li><li>Reculer le poids du corps</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Au filet côté revers</dd><dt>Où viser</dt><dd>Croisé bas ou au centre</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> En attente, raquette haute devant toi, prête à partir côté revers.</li><li><b>Armé</b> Coude devant le corps, raquette au-dessus de la balle, épaules de profil.</li><li><b>Frappe</b> Geste court de haut en bas, contact devant toi, le poids vers l'avant.</li><li><b>Accompagnement</b> Arrête le geste vers la cible et reviens en position d'attente.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-filet">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Raquette trop basse en attente</p><p class="fiche-correction"><span>Correction</span> Garde la raquette haute entre deux coups : au filet, tu n'as pas le temps de la remonter.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Reculer le poids du corps</p><p class="fiche-correction"><span>Correction</span> Va vers la balle ou reste stable : au contact, le poids du corps part vers le filet, pas vers l'arrière.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Volée de blocage à la bonne distance</p>
+        <p class="fiche-exo-meta">15 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Tu te places à 2–2,5 m du filet, ton partenaire au fond. Il t'envoie des balles à mi-hauteur, alternant coup droit et revers ; tu bloques, geste court, raquette ouverte, long au centre. Après chaque volée, tu reviens à ta position de base. 3 séries de 15 balles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 12 volées sur 15 qui retombent dans le tiers du fond adverse (derrière la ligne de service), sans que tu avances à moins d'1,5 m du filet.</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Split step à 2,5 m du filet</p>
+        <p class="fiche-exo-meta">10 min · seul · niveau débutant à loisir</p>
+        <p>Trace un repère au sol à 2,5 m du filet. Sans balle, pars de ce repère, fais 2 pas vers le filet, revient à petits pas, et fais un petit saut d'arrêt (split step) en imaginant la frappe adverse, raquette haute devant toi. Enchaîne vers la gauche, la droite et un demi-pas en arrière. 5 séries de 1 min avec 30 s de repos.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> Sur 20 split steps, 18 posés sur le repère des 2,5 m (à un demi-pas près) avec la raquette au-dessus de la hauteur du filet.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : au filet, un partenaire au fond joue vers ton revers. 10 volées croisées basses, 10 au centre.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-volee-coup-droit.html">Volée de coup droit</a></li><li><a href="simulateur-3d-bandeja-garder-filet.html">Bandeja</a></li><li><a href="simulateur-3d-vibora.html">Víbora</a></li><li><a href="simulateur-3d-smash-lob-court.html">Smash plat (remate)</a></li><li><a href="technique.html#coups-filet">Au filet : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +169,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

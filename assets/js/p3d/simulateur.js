@@ -432,6 +432,12 @@ async function demarrer() {
     const o = document.createElement('option'); o.value = String(v); o.textContent = '× ' + String(v).replace('.', ','); o.selected = v === 1; return o;
   }));
   brancherCommandes();
+  // Lien « #mode-quiz » (fiches de coups) : la scène s'ouvre en mode quiz, une fois la 3D prête
+  const quizDemande = location.hash === '#mode-quiz';
+  const versQuiz = () => { if (scene3d && !$('p3d-mode').hidden && etat.mode !== 'quiz') choisirMode('quiz'); };
+  addEventListener('hashchange', () => { if (location.hash === '#mode-quiz') versQuiz(); });
+  // Clic sur le lien alors que l'adresse se termine déjà par #mode-quiz : pas de hashchange
+  document.addEventListener('click', ev => { if (ev.target.closest('a[href="#mode-quiz"]')) versQuiz(); });
   const demande = location.hash.slice(1);
   const premier = SCENARIOS.some(x => x.id === PAGE_SCENARIO) ? PAGE_SCENARIO : SCENARIOS.some(x => x.id === demande) ? demande : DEFAUT;
   await choisirScenario(premier).catch(erreurScenario);
@@ -444,6 +450,7 @@ async function demarrer() {
   try {
     scene3d = await demarrer3d();
     if (etat.scenario) scene3d.nouveauScenario(etat.scenario);
+    if (quizDemande) choisirMode('quiz');
   } catch (e) {
     console.error(e);
     sans3d('La scène 3D n\'a pas pu démarrer sur cet appareil.');

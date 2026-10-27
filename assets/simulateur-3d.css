@@ -61,6 +61,41 @@
 .p3d-cle dd{margin:0;font-weight:700}
 .p3d-cle-titre{margin:0 0 6px;color:var(--coral);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
 #fiche-coup .lvl{vertical-align:middle;margin-left:6px}
+/* Fiche du coup (pages simulateur-3d-<id>.html, générées par scripts/generer-pages-3d.js) : en-tête niveau + objectif,
+   puis explication, étapes du geste, erreurs et corrections, exercices, revoir en 3D, contenus associés */
+.fiche-tete{margin-top:14px;color:var(--muted);max-width:40em}
+.fiche-tete .lvl{display:inline-block;margin-right:8px;vertical-align:1px}
+.fiche-tete b{color:var(--fg)}
+.fiche > h2{margin-bottom:var(--s-5)}
+.fiche > h2:not(:first-child){margin-top:var(--s-7)}
+.fiche > .fiche-tete{margin:calc(-1 * var(--s-3)) 0 var(--s-5)}
+.fiche-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:var(--s-4)}
+.fiche-bloc{padding:var(--s-5);border:1px solid var(--line);border-radius:var(--r);background:var(--glass);margin-bottom:var(--s-4);min-width:0}
+.fiche-grille > .fiche-bloc{margin-bottom:0}
+.fiche-grille + .fiche-bloc,.fiche-bloc + .fiche-grille{margin-top:var(--s-4)}
+.fiche-bloc h3{margin-bottom:var(--s-3)}
+.fiche-bloc > p{color:var(--muted)}
+.fiche-etapes{margin:0;padding:0;list-style:none;counter-reset:geste;display:grid;gap:var(--s-3)}
+.fiche-etapes li{counter-increment:geste;position:relative;padding-left:42px;color:var(--muted)}
+.fiche-etapes li::before{content:counter(geste);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(var(--turf-rgb),.14);color:var(--turf);font-weight:800;font-size:.85rem}
+.fiche-etapes b{display:block;color:var(--fg)}
+.fiche-erreurs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:var(--s-3)}
+.fiche-erreurs li{display:grid;gap:var(--s-2);padding:var(--s-4);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.fiche-erreurs p{margin:0;color:var(--muted)}
+.fiche-erreurs span{display:block;font-size:var(--fs-xs);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.fiche-erreur span{color:var(--coral)}
+.fiche-erreur{color:var(--fg)!important;font-weight:700}
+.fiche-correction span{color:var(--turf)}
+.fiche-exos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--s-3)}
+.fiche-exo{display:grid;align-content:start;gap:var(--s-2);padding:var(--s-4);border-left:3px solid var(--turf);border-radius:0 var(--r-s) var(--r-s) 0;background:rgba(0,0,0,.2)}
+.fiche-exo p{margin:0;color:var(--muted)}
+.fiche-exo .fiche-exo-titre{color:var(--fg);font-weight:800}
+.fiche-exo-meta{font-size:var(--fs-s)}
+.fiche-exo-reussite b{color:var(--fg)}
+.fiche-liens{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-1)}
+.fiche-liens a{display:inline-block;padding-block:6px;color:var(--fg);font-weight:700}
+.fiche-liens a::after{content:" →";color:var(--turf)}
+.fiche-liens a:hover{color:var(--turf)}
 .p3d-deroule{max-width:52em;padding-left:1.4em;color:var(--muted)}
 .p3d-deroule li+li{margin-top:8px}
 .p3d-deroule b{color:var(--fg)}

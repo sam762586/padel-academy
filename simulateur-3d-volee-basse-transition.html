@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Volée basse de transition","item":"https://apprendre-padel.fr/simulateur-3d-volee-basse-transition.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="volee-basse-transition">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>La volée basse de transition</h1></div>
+      <div><p class="eyebrow">Technique · Transition et coups spéciaux</p><h1>La volée basse de transition</h1><p class="fiche-tete"><span class="lvl" data-l="Intermédiaire">Intermédiaire</span> <b>Objectif :</b> Remettre la balle profond pour finir ta montée au filet, sans chercher le point.</p></div>
       <p>Tu viens de lober et tu montes au filet avec ton partenaire. L'adversaire 1 répond par une balle basse dans tes pieds. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,15 +101,34 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
+  <div class="wrap fiche">
     <h2>La fiche du coup</h2>
-    <div class="p3d-fiche">
-      <div><h3>Volée basse de transition <span class="lvl" data-l="Intermédiaire">Intermédiaire</span></h3>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>Tu montes, la balle arrive dans tes pieds avant le filet. Volée courte, raquette ouverte, juste remettre long et continuer à avancer.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Pendant la montée, balle basse</dd><dt>Où viser</dt><dd>Long, au centre</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Vouloir gagner le point</li><li>S'arrêter dans la zone de la mort</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Pendant la montée, balle basse</dd><dt>Où viser</dt><dd>Long, au centre</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> En montant, fais un arrêt (split step) quand l'adversaire frappe : tu peux partir des deux côtés.</li><li><b>Armé</b> Fléchis les jambes pour descendre à la balle, raquette devant toi, tamis ouvert.</li><li><b>Frappe</b> Bloque la balle devant toi, presque sans geste, en visant long au centre.</li><li><b>Accompagnement</b> Continue d'avancer jusqu'à ta place au filet, à 2 à 2,5 m.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-trans">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Vouloir gagner le point</p><p class="fiche-correction"><span>Correction</span> Accepte de seulement remettre : long et au centre, la balle ne donne pas d'angle à l'adversaire.</p></li><li><p class="fiche-erreur"><span>Erreur</span> S'arrêter dans la zone de la mort</p><p class="fiche-correction"><span>Correction</span> Ne t'arrête pas entre la ligne de service et le filet : remets la balle, puis termine ta montée.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Chiquita puis montée</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Depuis le fond, tu joues une chiquita dans les pieds de ton partenaire au filet, tu avances de 2–3 m derrière, tu joues sa réponse en volée basse ou demi-volée, puis tu finis au filet. 3 séries de 12. Variante : il se décale et tu vises le centre.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> Finir au filet (à moins de 3 m) sur 7 enchaînements sur 10, sans faute sur la volée basse de transition.</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Lob, on monte, split step</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau loisir à intermédiaire</p>
+        <p>Ton partenaire est au filet et te donne une balle. Tu lobes par-dessus lui, tu dis « on monte ! », tu avances à petits pas et tu fais un split step au moment où il frappe la balle qui revient (il joue une bandeja). Tu finis par une volée longue au centre. 3 séries de 10, puis vous inversez.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> Sur 10 lobs, monter à chaque lob qui passe le volleyeur, ne jamais monter sur un lob court, et être à moins de 3 m du filet au moment de la volée 7 fois sur 10.</p></article>
+        <article class="fiche-exo"><p class="fiche-exo-titre">L'exercice de la scène</p><p>Sur le terrain : pars du fond, monte ; un partenaire envoie une balle dans tes pieds à mi-terrain. Volée basse longue au centre, puis finis la montée. 3 séries de 8.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-chiquita.html">Chiquita</a></li><li><a href="simulateur-3d-bajada.html">Bajada (balle descendante)</a></li><li><a href="simulateur-3d-amorti.html">Amorti (dejada)</a></li><li><a href="technique.html#coups-trans">Transition : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -150,7 +169,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

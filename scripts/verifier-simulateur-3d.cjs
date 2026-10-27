@@ -170,6 +170,42 @@ async function horsNavigateur(){
  }
  assert.deepEqual(fs.readdirSync(racine).filter(n=>/^simulateur-3d-.+\.html$/.test(n)&&!SCENARIOS.includes(n.slice(14,-5))),[],'pages de scénarios disparus');
  ok('une page par scénario ('+SCENARIOS.length+') : adresse, titre et description uniques, textes dans le HTML, sitemap, liste sur la page principale');
+
+ // Fiches de coups : la structure commune en 11 parties (scripts/generer-pages-3d.js), pour chaque coup de la page Technique
+ const COUPS=new Function(fs.readFileSync(path.join(racine,'assets/js/coups.js'),'utf8').split('function cardCoup')[0]+';return COUPS;')();
+ const EXOS=new Function(fs.readFileSync(path.join(racine,'assets/js/exercices-donnees.js'),'utf8')+';return EXERCICES;')();
+ const parPage={};
+ for(const c of Object.values(COUPS).flat())(parPage[c.p3d]=parPage[c.p3d]||[]).push(c);
+ const sansBalise=t=>decoder(t.replace(/<[^>]+>/g,' ')).replace(/\s+/g,' ');
+ let nbCoups=0;
+ for(const [id,cartes] of Object.entries(parPage)){
+  const f='simulateur-3d-'+id+'.html',h=fs.readFileSync(path.join(racine,f),'utf8');
+  assert.ok(!/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(h),f+' : caractère de contrôle');
+  const tete=h.slice(h.indexOf('<section id="simulateur"'),h.indexOf('id="p3d-mode"'));
+  const fiche=h.slice(h.indexOf('<section id="fiche-coup"'),h.indexOf('</section>',h.indexOf('<section id="fiche-coup"')));
+  // 1-3 : titre (h1), niveau, objectif
+  assert.match(tete,/<h1>[^<]+<\/h1><p class="fiche-tete"><span class="lvl" data-l="(Débutant|Intermédiaire|Avancé)">/,f+' : niveau dans l\'en-tête');
+  for(const c of cartes){
+   nbCoups++;
+   const t=sansBalise(cartes.length>1?fiche:tete+fiche);
+   assert.ok(t.includes('Objectif : '+sansBalise(c.obj)),f+' : objectif de '+c.n);
+   // 4, 6, 7, 8 : explication, 4 étapes, chaque erreur suivie de sa correction
+   assert.ok(t.includes(sansBalise(c.q)),f+' : explication');
+   c.etapes.forEach(([titre,x])=>assert.ok(t.includes(titre+' '+sansBalise(x)),f+' : étape '+titre));
+   c.err.forEach((e,i)=>assert.ok(t.includes('Erreur '+sansBalise(e)+' Correction '+sansBalise(c.corr[i])),f+' : erreur et correction '+(i+1)));
+   // 9 : exercices de l'espace joueur cités
+   c.ex.forEach(x=>assert.ok(t.includes(EXOS.find(e=>e.id===x).titre.replace(/\s+/g,' ')),f+' : exercice '+x));
+  }
+  const titres=[...fiche.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]);
+  const attendus=['Explication','Les étapes du geste','Erreurs fréquentes et corrections','Exercice pratique'];
+  assert.deepEqual(titres,[...cartes.flatMap(()=>attendus),'Revoir en 3D','Contenus associés'],f+' : parties et ordre');
+  // 5 : l'animation est plus haut (le simulateur) ; 10 : revoir, quiz, déroulé ; 11 : au moins 3 contenus associés
+  for(const a of ['#simulateur','#mode-quiz','#deroule'])assert.ok(fiche.includes('href="'+a+'"'),f+' : lien '+a);
+  const associes=fiche.slice(fiche.indexOf('<h3>Contenus associés</h3>'));
+  assert.ok((associes.match(/<a href=/g)||[]).length>=3,f+' : contenus associés');
+ }
+ assert.equal(nbCoups,Object.values(COUPS).flat().length);
+ ok('fiches de coups ('+nbCoups+' coups, '+Object.keys(parPage).length+' pages) : titre, niveau, objectif, explication, animation, 4 étapes, erreurs et corrections, exercices, revoir en 3D, contenus associés');
 }
 
 /* ---- 2. Dans le navigateur ---- */
@@ -308,6 +344,16 @@ async function dansLeNavigateur(base){
   assert.equal(await page.isHidden('#p3d-quiz'),true);
   assert.equal(await page.isHidden('#p3d-etapes'),false);
   ok('mode quiz : scène figée avant la frappe, réponse corrigée et expliquée, reprise, score final, retour au mode regarder');
+  // Lien « Te tester en mode quiz » d'une fiche de coup : la page s'ouvre en mode quiz, étapes (les réponses) masquées
+  await page.goto(base+'/simulateur-3d-vibora.html#mode-quiz');
+  await pret(page);
+  await page.waitForFunction(()=>P3D.etat.mode==='quiz',null,{timeout:20000});
+  assert.equal(await page.getAttribute('#mode-quiz','aria-pressed'),'true');
+  assert.equal(await page.isHidden('#p3d-etapes'),true);
+  await page.click('#p3d-mode button[data-mode="regarder"]');
+  await page.click('a[href="#mode-quiz"]');
+  await page.waitForFunction(()=>P3D.etat.mode==='quiz',null,{timeout:20000});
+  ok('lien direct vers le quiz depuis une fiche (#mode-quiz), à l\'ouverture et depuis la fiche');
   await ctx.close();
 
   // Téléphone : 390 px, pas de débordement, lien direct vers un scénario

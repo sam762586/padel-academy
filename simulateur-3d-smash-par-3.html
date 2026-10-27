@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Smash par 3 et rulo","item":"https://apprendre-padel.fr/simulateur-3d-smash-par-3.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="smash-par-3">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>Le smash par 3 (et le rulo)</h1></div>
+      <div><p class="eyebrow">Technique · Filet et attaque</p><h1>Le smash par 3 (et le rulo)</h1><p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span></p></div>
       <p>Tu es au filet. L'adversaire 2 lobe court, du côté croisé : c'est une balle pour le smash qui sort du terrain. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,19 +101,47 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
-    <h2>Les fiches des coups</h2>
-    <div class="p3d-fiche">
-      <div><h3>Smash par 3 (por tres) <span class="lvl" data-l="Avancé">Avancé</span></h3>
+  <div class="wrap fiche">
+    <h2>Smash par 3 (por tres)</h2>
+    <p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Faire sortir la balle par le côté sur un lob court, pour finir le point.</p>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>Smash croisé avec angle : la balle rebondit, touche la vitre latérale et sort par-dessus la grille latérale. Imparable si réussi.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob court côté croisé</dd><dt>Où viser</dt><dd>Rebond près de la ligne de fond côté croisé</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Pas assez d'angle</li><li>Risque de faute dans la grille</li></ul></div>
-      <div><h3>Smash lifté / « rulo » <span class="lvl" data-l="Avancé">Avancé</span></h3>
-        <p>Smash avec effet lifté qui accélère au rebond et saute haut sur la vitre : sort souvent du terrain ou devient injouable.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Balle haute mi-court</dd><dt>Où viser</dt><dd>Rebond au niveau de la ligne de service adverse</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Trop court</li><li>Pas assez d'effet</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Lob court côté croisé</dd><dt>Où viser</dt><dd>Rebond près de la ligne de fond côté croisé</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Place-toi pour avoir la balle devant toi, légèrement côté coup droit.</li><li><b>Armé</b> Armé complet de smash, raquette derrière la tête.</li><li><b>Frappe</b> Frappe fort et croisé, avec un angle marqué : après le rebond, la balle doit toucher la vitre latérale adverse et sortir par le côté.</li><li><b>Accompagnement</b> Termine le geste et reste prêt : si l'adversaire peut la jouer à l'extérieur, le point continue.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-filet">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Pas assez d'angle</p><p class="fiche-correction"><span>Correction</span> Prends plus d'angle : vise le côté croisé, assez près de la vitre latérale.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Risque de faute dans la grille</p><p class="fiche-correction"><span>Correction</span> Ne le tente que sur une balle courte et haute ; sinon, joue la bandeja.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Smash, bandeja ou víbora : décider vite</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau intermédiaire à P500 et +</p>
+        <p>Ton partenaire envoie 20 lobs de profondeurs variées. Tu annonces avant la frappe : « smash » seulement sur un lob court où tu es sous la balle, « víbora » sur un lob mi-court à hauteur d'épaule, « bandeja » sinon, ou « laisse » s'il faut jouer après la vitre. Smash plat vers le fond, víbora latéralisée vers la vitre latérale. 2 séries de 20.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 17 décisions justes sur 20 (validées par le partenaire) et pas plus de 3 smashs ou víboras dans le filet ou dehors par série.</p></article></div></div>
+    <h2>Smash lifté / « rulo »</h2>
+    <p class="fiche-tete"><span class="lvl" data-l="Avancé">Avancé</span> <b>Objectif :</b> Rendre la balle injouable grâce à l'effet lifté qui la fait sauter haut sur la vitre.</p>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
+        <p>Smash avec effet lifté qui accélère au rebond et saute haut sur la vitre : sort souvent du terrain ou devient injouable.</p>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Balle haute mi-court</dd><dt>Où viser</dt><dd>Rebond au niveau de la ligne de service adverse</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Sous la balle, de profil, un peu plus en arrière que pour le smash plat.</li><li><b>Armé</b> Raquette derrière la tête, poignet relâché.</li><li><b>Frappe</b> Brosse la balle vers le haut et vers l'avant au contact pour lui donner un effet lifté, en visant la ligne de service adverse.</li><li><b>Accompagnement</b> Le geste continue vers l'avant et le bas ; reviens au filet.</li></ol></div>
+    </div>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Trop court</p><p class="fiche-correction"><span>Correction</span> Allonge la trajectoire : le rebond doit être près de la ligne de service adverse, pas devant elle.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Pas assez d'effet</p><p class="fiche-correction"><span>Correction</span> Accélère la tête de raquette et brosse la balle : sans effet, elle ne saute pas sur la vitre.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Smash, bandeja ou víbora : décider vite</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau intermédiaire à P500 et +</p>
+        <p>Ton partenaire envoie 20 lobs de profondeurs variées. Tu annonces avant la frappe : « smash » seulement sur un lob court où tu es sous la balle, « víbora » sur un lob mi-court à hauteur d'épaule, « bandeja » sinon, ou « laisse » s'il faut jouer après la vitre. Smash plat vers le fond, víbora latéralisée vers la vitre latérale. 2 séries de 20.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 17 décisions justes sur 20 (validées par le partenaire) et pas plus de 3 smashs ou víboras dans le filet ou dehors par série.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-volee-coup-droit.html">Volée de coup droit</a></li><li><a href="simulateur-3d-volee-revers.html">Volée de revers</a></li><li><a href="simulateur-3d-bandeja-garder-filet.html">Bandeja</a></li><li><a href="simulateur-3d-vibora.html">Víbora</a></li><li><a href="technique.html#coups-filet">Au filet : tous les coups</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -154,7 +182,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>

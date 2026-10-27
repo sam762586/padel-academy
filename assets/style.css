@@ -1157,6 +1157,9 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
    - .chargement : indicateur de chargement (texte + rond qui tourne ; fixe si mouvement réduit) ;
    - .lvl[data-l] : badge de difficulté (Débutant, Intermédiaire, Avancé) ; .tag : catégorie de contenu ; .cat-* : catégorie de tournoi ;
    - .icone : pictogramme SVG en ligne (trait, couleur du texte). */
+/* Page Technique : objectif du coup en tête de carte */
+.card .coup-obj{color:var(--fg);font-size:.92rem}
+.card .coup-obj b{color:var(--turf)}
 /* Grilles : un bloc peut rétrécir sous la largeur de son plus long mot (sinon un titre ou un tableau élargit la page sur mobile) */
 :where(.sec-head,.grid,.two,.home-grid,.profils,.outils,.progression)>*{min-width:0}
 :where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid var(--focus);outline-offset:2px}

@@ -29,7 +29,7 @@ Search Console.
 - [x] Accueil : « Progresse au padel, point après point. », trois accès (apprendre, simulateur 3D, niveau),
   parcours Débutant / Intermédiaire / Compétiteur, vitrine du simulateur 3D.
 - [x] Icônes, image de partage, couleur du navigateur et manifeste aux nouvelles couleurs ; cache hors ligne pa-v20.
-- [ ] Validation de Samuel.
+- [x] Validation de Samuel (27/10/2026).
 
 ## Phase 2 — Académie pédagogique (à planifier après validation de la phase 1)
 - Fiches de coups en 11 parties (titre, niveau, objectif, explication, animation, étapes, erreurs, corrections,

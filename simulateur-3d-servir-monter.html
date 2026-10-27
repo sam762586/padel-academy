@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://apprendre-padel.fr/"},{"@type":"ListItem","position":2,"name":"Les coups du padel","item":"https://apprendre-padel.fr/technique.html"},{"@type":"ListItem","position":3,"name":"Service et montée au filet","item":"https://apprendre-padel.fr/simulateur-3d-servir-monter.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=174430dfb1">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=017cb472d5">
+<link rel="stylesheet" href="assets/style.css?v=c1feb6a00d">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <section id="simulateur" class="alt" data-scenario="servir-monter">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">Technique · Service et retour</p><h1>Servir et prendre le filet</h1></div>
+      <div><p class="eyebrow">Technique · Service et retour</p><h1>Servir et prendre le filet</h1><p class="fiche-tete"><span class="lvl" data-l="Débutant">Débutant</span></p></div>
       <p>Tu sers. Ton partenaire t'attend au filet ; en face, l'adversaire 1 retourne et l'adversaire 2 est au filet. Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>
     </div>
     <div class="p3d-choix">
@@ -45,7 +45,7 @@
       <select id="p3d-scenarios"></select>
       <div class="phases p3d-mode" id="p3d-mode" role="group" aria-label="Mode">
         <button type="button" data-mode="regarder" aria-pressed="true">Regarder</button>
-        <button type="button" data-mode="quiz" aria-pressed="false">Quiz</button>
+        <button type="button" id="mode-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
       </div>
     </div>
     <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
@@ -101,19 +101,55 @@
   </div>
 </section>
 <section id="fiche-coup" class="alt">
-  <div class="wrap">
-    <h2>Les fiches des coups</h2>
-    <div class="p3d-fiche">
-      <div><h3>Service (saque) <span class="lvl" data-l="Débutant">Débutant</span></h3>
+  <div class="wrap fiche">
+    <h2>Service (saque)</h2>
+    <p class="fiche-tete"><span class="lvl" data-l="Débutant">Débutant</span> <b>Objectif :</b> Mettre la balle en jeu sans risque et préparer ta montée au filet.</p>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
         <p>À la cuillère, après rebond, en dessous de la taille. Cherche la longueur et l'effet (slice) pour que la balle meure dans la vitre latérale, pas la vitesse.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Début du point</dd><dt>Où viser</dt><dd>Le « T » (croisement ligne de service / ligne centrale) ou la vitre latérale</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Trop fort</li><li>Frapper au-dessus de la taille = faute</li></ul></div>
-      <div><h3>Montée après service <span class="lvl" data-l="Débutant">Débutant</span></h3>
-        <p>Le serveur monte immédiatement après son service pour prendre le filet. Le partenaire est déjà au filet.</p>
-        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Juste après avoir servi</dd><dt>Où viser</dt><dd>Position à 2–2,5 m du filet</dd></dl>
-        <p class="p3d-cle-titre">Erreurs à éviter</p><ul><li>Rester au fond après le service</li><li>Monter trop vite sans fente d'arrêt</li></ul></div>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Début du point</dd><dt>Où viser</dt><dd>Le « T » (croisement ligne de service / ligne centrale) ou la vitre latérale</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Préparation</b> Derrière la ligne de service, de profil, pieds stables, regard sur la zone visée.</li><li><b>Armé</b> Laisse rebondir la balle à côté de toi, raquette préparée basse.</li><li><b>Frappe</b> Frappe la balle à hauteur de taille ou en dessous, devant toi, en la coupant légèrement vers le T ou la vitre latérale.</li><li><b>Accompagnement</b> Termine vers la cible et pars vers le filet.</li></ol></div>
     </div>
-    <p class="note"><a href="technique.html#coups-service">Tous les coups du padel</a></p>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Trop fort</p><p class="fiche-correction"><span>Correction</span> Cherche la longueur et l'effet plutôt que la vitesse : un service lent et long gêne davantage le retour.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Frapper au-dessus de la taille = faute</p><p class="fiche-correction"><span>Correction</span> Frappe toujours la balle à hauteur de taille ou en dessous : au-dessus, c'est faute.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Service régulier dans le carré</p>
+        <p class="fiche-exo-meta">15 min · seul · niveau débutant à loisir</p>
+        <p>Prends un panier de 20 balles. Laisse rebondir la balle derrière ta ligne de service, frappe sous la ceinture, en diagonale, sans chercher la vitesse. Sers 10 balles depuis le côté droit, puis 10 depuis le côté gauche, et recommence.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 18 services sur 20 qui rebondissent dans le bon carré, avec zéro double faute sur une série de 10 doubles tentatives (premier et second service).</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Service ciblé : vitre latérale et T</p>
+        <p class="fiche-exo-meta">15 min · seul · niveau loisir à intermédiaire</p>
+        <p>Pose deux cibles dans le carré adverse : une à 1 m de la vitre latérale, l'autre près du T (le centre de la ligne de service). Sers avec un peu de slice pour que la balle reste basse après le rebond. 4 séries de 10 services, en alternant les deux cibles.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 6 services sur 10 qui rebondissent à moins d'1 m de la cible annoncée, et 9 sur 10 dans le carré.</p></article></div></div>
+    <h2>Montée après service</h2>
+    <p class="fiche-tete"><span class="lvl" data-l="Débutant">Débutant</span> <b>Objectif :</b> Prendre le filet tout de suite après ton service, à côté de ton partenaire.</p>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Explication</h3>
+        <p>Le serveur monte immédiatement après son service pour prendre le filet. Le partenaire est déjà au filet.</p>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>Juste après avoir servi</dd><dt>Où viser</dt><dd>Position à 2–2,5 m du filet</dd></dl></div>
+      <div class="fiche-bloc"><h3>Les étapes du geste</h3>
+        <ol class="fiche-etapes"><li><b>Départ</b> Dès la frappe de ton service, avance vers le filet en pas rapides.</li><li><b>Arrêt</b> Fais un arrêt (split step) quand le relanceur frappe : tu peux partir des deux côtés.</li><li><b>Première volée</b> Joue-la profonde, au centre ou sur le relanceur, puis termine ta montée.</li><li><b>Position</b> Arrête-toi à 2 à 2,5 m du filet, à la hauteur de ton partenaire.</li></ol></div>
+    </div>
+    <div class="fiche-bloc"><h3>Erreurs fréquentes et corrections</h3>
+      <ul class="fiche-erreurs"><li><p class="fiche-erreur"><span>Erreur</span> Rester au fond après le service</p><p class="fiche-correction"><span>Correction</span> Monte à chaque service : en restant au fond, tu laisses le filet à la paire adverse.</p></li><li><p class="fiche-erreur"><span>Erreur</span> Monter trop vite sans fente d'arrêt</p><p class="fiche-correction"><span>Correction</span> Fais ton arrêt au moment où le relanceur frappe, même si tu n'es pas encore arrivé au filet.</p></li></ul></div>
+    <div class="fiche-bloc"><h3>Exercice pratique</h3>
+      <div class="fiche-exos"><article class="fiche-exo">
+        <p class="fiche-exo-titre">Service, montée et première volée</p>
+        <p class="fiche-exo-meta">20 min · à 2 · niveau intermédiaire à P500 et +</p>
+        <p>Tu sers, puis tu montes en diagonale vers ta zone de filet, à petits pas, avec un split step au moment où le relanceur frappe. Ton partenaire relance en croisé, bas ou dans les pieds ; tu joues une première volée longue au centre ou vers la vitre latérale. 4 séries de 8 services, en variant zone et effet à chaque balle.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> 6 premières volées sur 8 jouées à 2–3 m du filet (pas à mi-court) et qui retombent derrière la ligne de service adverse.</p></article><article class="fiche-exo">
+        <p class="fiche-exo-titre">Split step à 2,5 m du filet</p>
+        <p class="fiche-exo-meta">10 min · seul · niveau débutant à loisir</p>
+        <p>Trace un repère au sol à 2,5 m du filet. Sans balle, pars de ce repère, fais 2 pas vers le filet, revient à petits pas, et fais un petit saut d'arrêt (split step) en imaginant la frappe adverse, raquette haute devant toi. Enchaîne vers la gauche, la droite et un demi-pas en arrière. 5 séries de 1 min avec 30 s de repos.</p>
+        <p class="fiche-exo-reussite"><b>Réussi si :</b> Sur 20 split steps, 18 posés sur le repère des 2,5 m (à un demi-pas près) avec la raquette au-dessus de la hauteur du filet.</p></article></div></div>
+    <div class="fiche-grille">
+      <div class="fiche-bloc"><h3>Revoir en 3D</h3>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+      <div class="fiche-bloc"><h3>Contenus associés</h3>
+        <ul class="fiche-liens"><li><a href="simulateur-3d-retour-lob.html">Retour de service</a></li><li><a href="technique.html#coups-service">Service et retour : tous les coups</a></li><li><a href="regles.html">Les règles</a></li></ul></div>
+    </div>
   </div>
 </section>
 <section id="deroule">
@@ -154,7 +190,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=96b1ef5210","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>
