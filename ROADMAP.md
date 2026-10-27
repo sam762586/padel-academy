@@ -157,7 +157,7 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   choisies (3), articles, exercices, scènes 3D, défi de la semaine, historique) ; moteur d'exercices commun avec Mon
   espace (thèmes faibles des quiz en entrée), niveau d'exercice et défi tirés du niveau déclaré dans les deux pages ;
   lien de Mon espace vers l'académie. Test : `scripts/verifier-academie-parcours.cjs`.
-- [ ] Validation de la phase 4 par Samuel (dont le tableau de classement des contenus).
+- [x] Validation de la phase 4 par Samuel (27/10/2026), tableau de classement compris.
 - [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).
 - [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
 
