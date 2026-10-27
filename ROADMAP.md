@@ -207,7 +207,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   niveau » (accueil, compte, tableau de bord, 942 pages tournois relibellées sans régénération) ; .btn.petit unique à la
   place de 7 réglages locaux ; un seul style de choix de réponse (test de niveau, quiz, mode quiz 3D) ; un seul style
   de bouton-lien ; verifier-design.cjs refuse les réglages locaux et les libellés hors liste.
-- [ ] Validation du lot 5 par Samuel ; publication sur son accord.
+- [x] Validation du lot 5 par Samuel et accord de publication (27/10/2026) : lots 0 à 5 publiés.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
