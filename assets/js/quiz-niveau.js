@@ -244,7 +244,7 @@ function qCompte(zone,resultat){
  compte.ready.then(()=>{
   zone.hidden=false;zone.textContent="";
   if(!compte.user){
-   const lien=document.createElement("a");lien.href="compte.html";lien.textContent="Crée un compte pour garder ton résultat";
+   const lien=document.createElement("a");lien.href="connexion.html?suite=niveau.html&onglet=inscription";lien.textContent="Crée un compte pour garder ton résultat";
    zone.appendChild(lien);return;
   }
   const bouton=document.createElement("button");bouton.type="button";bouton.className="btn solid";bouton.textContent="Enregistrer dans mon profil";

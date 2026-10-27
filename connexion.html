@@ -22,7 +22,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Connexion", "item": "https://apprendre-padel.fr/connexion.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=0b5cbbfac8">
+<link rel="stylesheet" href="assets/style.css?v=053ac53ed4">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -31,30 +31,9 @@
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Apprendre <span>Padel</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu"><li><a href="index.html">Accueil</a></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="regles.html">Règles</a></li><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="materiel.html">Matériel</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-entrainer">S'entraîner</button><ul class="nav-sous" id="nav-entrainer"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Plan d'entraînement</a></li><li><a href="score.html">Compteur de match</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-competition">Compétition</button><ul class="nav-sous" id="nav-competition"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html">Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+    <ul id="nav-menu"><li><a href="index.html">Accueil</a></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="regles.html">Règles</a></li><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="materiel.html">Matériel</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-entrainer">S'entraîner</button><ul class="nav-sous" id="nav-entrainer"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Plan d'entraînement</a></li><li><a href="score.html">Compteur de match</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-competition">Compétition</button><ul class="nav-sous" id="nav-competition"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html" class="active" data-espace>Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
-<style>
-.cx-wrap{max-width:520px;margin:0 auto}
-.cx-onglets{display:flex;gap:6px;padding:6px;background:var(--glass);border:1px solid var(--line);border-radius:999px;margin-bottom:22px}
-.cx-onglet{flex:1;border:0;border-radius:999px;padding:12px 10px;background:transparent;color:var(--muted);font-family:var(--body);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
-.cx-onglet.actif{background:var(--turf);color:var(--accent-fg)}
-.cx-champ{position:relative}
-.cx-champ input{width:100%;padding-right:96px}
-.cx-oeil{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--turf);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;padding:6px}
-.cx-aide{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
-.cx-aide a{color:var(--turf);font-weight:700}
-.cx-sep{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;margin:18px 0}
-.cx-sep::before,.cx-sep::after{content:"";flex:1;height:1px;background:var(--line)}
-.cx-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#1a1a1a;border-color:#fff}
-.cx-google svg{width:18px;height:18px}
-.cx-case{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;color:var(--muted)}
-.cx-case input{width:auto;margin-top:4px}
-.cx-lien-magique{margin-top:16px}
-.cx-lien-magique summary{cursor:pointer;color:var(--turf);font-weight:700;font-size:.9rem}
-.cx-lien-magique form{margin-top:12px}
-.cx-pied{text-align:center;color:var(--dim);font-size:.82rem;margin-top:22px}
-</style>
 <div class="banner"><img src="assets/img/photos/compte.webp" width="1600" height="650" alt="Raquette de padel et balle sur un terrain indoor" fetchpriority="high"></div>
 <section id="connexion">
   <div class="wrap">
@@ -153,8 +132,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js?v=cc5da3451c"></script>
 <script src="assets/js/compte.js?v=ffad71675c"></script>
-<script src="assets/js/connexion.js?v=660a2ae0d5"></script>
-<script src="assets/js/nav.js?v=b8eca33cb2"></script>
+<script src="assets/js/connexion.js?v=ac5b8c7744"></script>
+<script src="assets/js/nav.js?v=96aeac0ac8"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

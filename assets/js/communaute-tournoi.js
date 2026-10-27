@@ -52,7 +52,7 @@ const CT_INSULTES=/(connard|connasse|salop|encul|enfoir|putain|\bpute|abruti|cr�
  function message(zone,texte,erreur){let p=zone.querySelector(":scope > .ct-msg");if(!p){p=el("p","acc-msg ct-msg");p.setAttribute("role","status");zone.appendChild(p);}p.textContent=texte||"";p.hidden=!texte;p.classList.toggle("acc-err",!!erreur);}
  // Lien vers « Mon compte » depuis une page en sous-dossier (tournoi/) ou à la racine
  const racine=/\/tournois?\//.test(location.pathname)?"../":"";
- function lienCompte(texte){const a=el("a","",texte);a.href=racine+"compte.html";return a;}
+ function lienCompte(texte){const a=el("a","",texte);const fiche=(location.pathname.match(/tournoi\/\d+\.html$/)||[])[0];a.href=racine+"connexion.html?suite="+encodeURIComponent(fiche||"tournois.html");return a;}
 
  /* ===================== Fiche tournoi ===================== */
  // Rien n'est appelé tant que le SQL n'est pas exécuté (PA_SUPABASE.activees, supabase-config.js)

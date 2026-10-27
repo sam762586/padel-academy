@@ -12,7 +12,6 @@ const NB_SEMAINES_PLAN=8;
  const zoneMessage=document.getElementById("compte-msg");
  if(!zoneMessage) return; // page sans bloc compte : on ne fait rien
  const compte=window.PA_COMPTE;
- const blocConnexion=document.getElementById("compte-connexion");
  const blocProfil=document.getElementById("compte-profil");
  let versionSession=0;
 
@@ -52,21 +51,19 @@ const NB_SEMAINES_PLAN=8;
  const champMain=document.getElementById("pf-main");
  const champClub=document.getElementById("pf-club");
 
- // --- Connexion par lien magique ---
- const formMail=document.getElementById("compte-form-mail");
- const champEmail=document.getElementById("compte-email");
- const boutonEnvoyer=document.getElementById("compte-envoyer");
- const messageMail=document.getElementById("compte-mail-msg");
- formMail.addEventListener("submit",async e=>{
-  e.preventDefault();
-  const adresse=champEmail.value.trim();
-  if(!adresse||!champEmail.checkValidity()){afficher(messageMail,"Saisis une adresse e-mail valide.","err");return;}
-  boutonEnvoyer.disabled=true;afficher(messageMail,"Envoi du lien…","");
-  const reponse=await compte.signIn(adresse);
-  boutonEnvoyer.disabled=false;
-  if(reponse.ok) afficher(messageMail,"Lien envoyé. Ouvre ta boîte mail (pense aux spams) et clique sur le lien pour te connecter.","ok");
-  else afficher(messageMail,reponse.message,"err");
- });
+ // --- Première visite après l'inscription (compte.html?bienvenue=1) : le profil passe en premier ---
+ const params=new URLSearchParams(location.search);
+ let bienvenue=params.get("bienvenue")==="1";
+ function accueillir(){
+  if(!bienvenue) return;
+  bienvenue=false;
+  const carteEspace=document.querySelector(".esp-lien-carte");
+  if(carteEspace&&carteEspace.parentNode===blocProfil.parentNode) blocProfil.parentNode.insertBefore(blocProfil,carteEspace);
+  afficher(zoneMessage,"Bienvenue ! Commence par ton profil : un pseudo, ton niveau et ton côté de jeu. Ils servent aux annonces de partenaires et à ton espace joueur.","ok");
+  champPseudo.focus({preventScroll:true});
+  blocProfil.scrollIntoView({block:"start"});
+  try{history.replaceState(null,"",location.pathname+location.hash);}catch(e){} // un rechargement ne répète pas l'accueil
+ }
 
  // --- Déconnexion ---
  document.getElementById("compte-deco").addEventListener("click",async()=>{
@@ -193,14 +190,19 @@ const NB_SEMAINES_PLAN=8;
   document.getElementById("compte-quiz").textContent="";
   document.getElementById("compte-plan").textContent="";
   if(compte.user){
-   blocConnexion.hidden=true;blocProfil.hidden=false;
-   zoneMessage.hidden=true;
+   blocProfil.hidden=false;
+   if(!bienvenue) zoneMessage.hidden=true;
    document.getElementById("compte-adresse").textContent=compte.user.email||"";
    afficher(messageProfil,"","");afficher(messageSuppression,"","");modeConfirmation(false);
    chargerProfil();chargerQuiz();chargerPlan();chargerPartenaires();
+   accueillir();
   }else{
-   blocProfil.hidden=true;blocConnexion.hidden=false;
-   if(!zoneMessage.classList.contains("acc-ok")) zoneMessage.hidden=true;
+   blocProfil.hidden=true;
+   // Compte supprimé : le message de confirmation reste affiché, avec un lien ; sinon, direction la page de connexion
+   if(zoneMessage.classList.contains("acc-ok")&&!zoneMessage.hidden){
+    const a=document.createElement("a");a.href="connexion.html";a.textContent="Revenir à la connexion";
+    zoneMessage.append(" ",a);
+   }else location.replace("connexion.html?suite=compte.html");
   }
  }
  compte.ready.then(()=>{

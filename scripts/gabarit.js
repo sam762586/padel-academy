@@ -22,12 +22,15 @@ const MENU = [
   ["espace.html", "Mon espace"],
 ];
 const APPEL = ["materiel.html#raquette", "Choisir sa raquette"];
+// Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »
+const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html" };
 // Toutes les pages du menu (contrôles, sitemap éventuel)
 const PAGES_MENU = MENU.flatMap(e => Array.isArray(e) ? [e] : e.liens);
 
 // prefixe : "" (racine), "../" (sous-dossier) ou "/" (404.html, servie à n'importe quelle adresse)
 function nav(actif, prefixe = "") {
-  const lien = ([href, nom]) => `<li><a href="${prefixe}${href}"${href === actif ? ' class="active" aria-current="page"' : ""}>${nom}</a></li>`;
+  // « Mon espace » porte data-espace : nav.js le fait pointer vers connexion.html?suite=espace.html si le visiteur n'est pas connecté
+  const lien = ([href, nom]) => `<li><a href="${prefixe}${href}"${href === actif ? ' class="active" aria-current="page"' : SECTIONS[actif] === href ? ' class="active"' : ""}${href === "espace.html" ? " data-espace" : ""}>${nom}</a></li>`;
   const entree = e => {
     if (Array.isArray(e)) return lien(e);
     const dedans = e.liens.some(([href]) => href === actif);
@@ -71,4 +74,4 @@ function versionner(html) {
   return html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:style\.css|js\/[\w-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
     (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`);
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, PAGES_MENU, nav, footer, versionner, empreinte };
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, PAGES_MENU, nav, footer, versionner, empreinte };

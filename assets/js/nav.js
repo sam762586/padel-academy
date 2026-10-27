@@ -1,7 +1,7 @@
 /* Menu : hamburger sur mobile, groupes dépliables (menu déroulant sur ordinateur, accordéon sur mobile).
    Le menu lui-même vient du gabarit commun (scripts/gabarit.js). La classe .nav-js sur <html> active le menu replié :
    sans ce script, le CSS laisse tous les liens visibles (navigation possible même si ce fichier ne charge pas).
-   Aussi : les zones qui défilent (tableaux .tbl, .acc-scroll) deviennent atteignables au clavier. */
+   Aussi : lien « Mon espace » selon la connexion, et zones qui défilent (tableaux .tbl, .acc-scroll) atteignables au clavier. */
 (function(){
   document.documentElement.classList.add('nav-js');
   var btn=document.querySelector('.nav-toggle'), ul=document.getElementById('nav-menu');
@@ -29,6 +29,23 @@
       if(ouvert&&innerWidth>860){fermerGroupes(null);ouvert.querySelector('.nav-titre').focus();return;}
       if(btn.getAttribute('aria-expanded')==='true'){set(false);btn.focus();}
     });
+  }
+  // « Mon espace » : connexion.html?suite=espace.html pour un visiteur non connecté, espace.html sinon.
+  // Pages avec compte.js : PA_COMPTE.user (et ses changements) ; autres pages : session Supabase gardée dans le navigateur.
+  var lienEspace=document.querySelector('#nav-menu a[data-espace]');
+  if(lienEspace){
+    var racineLien=lienEspace.getAttribute('href').replace(/espace\.html$/,'');
+    var pointer=function(connecte){lienEspace.setAttribute('href',racineLien+(connecte?'espace.html':'connexion.html?suite=espace.html'));};
+    var sessionGardee=function(){
+      try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(/^sb-.+-auth-token$/.test(k)){var v=JSON.parse(localStorage.getItem(k)||'null');if(v&&(v.access_token||v.refresh_token||v.currentSession)) return true;}}}catch(e){}
+      return false;
+    };
+    var compte=window.PA_COMPTE;
+    if(compte&&compte.actif){
+      pointer(sessionGardee());
+      compte.ready.then(function(){pointer(!!compte.user);});
+      compte.onChange(function(){pointer(!!compte.user);});
+    }else pointer(sessionGardee());
   }
   // Zones qui défilent horizontalement : tabindex pour le clavier, nom tiré du titre ou de la légende le plus proche
   var nommer=function(z){

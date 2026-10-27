@@ -3,7 +3,8 @@
    Google si PA_SUPABASE.google === true (fournisseur à activer dans Supabase avant).
    S'appuie sur le client partagé PA_COMPTE.client (compte.js). Ne modifie aucune table : la ligne
    profiles est créée par le trigger handle_new_user à l'inscription.
-   Paramètres d'URL : ?suite=espace.html (page à ouvrir après connexion, même site uniquement). */
+   Paramètres d'URL : ?suite=espace.html (page à ouvrir après connexion, même site uniquement : page de la racine ou
+   fiche tournoi/<id>.html) ; ?confirme=1 (retour du lien de confirmation : premier passage par compte.html?bienvenue=1). */
 (function(){
  const $=id=>document.getElementById(id);
  const compte=window.PA_COMPTE;
@@ -13,7 +14,7 @@
  // Page de retour : uniquement un chemin relatif du site (jamais une URL externe)
  const params=new URLSearchParams(location.search);
  let suite=params.get("suite")||"espace.html";
- if(!/^[a-z0-9_-]+\.html(#[a-z0-9_-]+)?$/i.test(suite)) suite="espace.html";
+ if(!/^([a-z0-9_-]+|tournoi\/\d+)\.html(#[a-z0-9_-]+)?$/i.test(suite)) suite="espace.html";
  const ici=new URL("connexion.html",location.href); ici.search=""; ici.hash="";
 
  if(!compte||!compte.actif){
@@ -75,7 +76,7 @@
 
  // Déjà connecté (hors récupération) : on file vers la suite
  compte.ready.then(()=>{
-  if(compte.user&&!modeRecup){ location.replace(suite); return; }
+  if(compte.user&&!modeRecup){ location.replace(params.get("confirme")==="1"?"compte.html?bienvenue=1":suite); return; }
   if(modeRecup) montrer("nouveau");
   else if(params.get("onglet")==="inscription") montrer("inscription");
   if(params.get("confirme")==="1") afficher(msgGlobal,"Ton e-mail est confirmé. Tu peux te connecter.","ok");

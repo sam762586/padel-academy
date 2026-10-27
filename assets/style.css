@@ -966,3 +966,24 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 /* Compteur : liste « Type de match » au même style que les champs (.sc-noms input) */
 .sc-noms select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
 .sc-noms select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+
+/* Page de connexion (connexion.html) */
+.cx-wrap{max-width:520px;margin:0 auto}
+.cx-onglets{display:flex;gap:6px;padding:6px;background:var(--glass);border:1px solid var(--line);border-radius:999px;margin-bottom:22px}
+.cx-onglet{flex:1;border:0;border-radius:999px;padding:12px 10px;background:transparent;color:var(--muted);font-family:var(--body);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+.cx-onglet.actif{background:var(--turf);color:var(--accent-fg)}
+.cx-champ{position:relative}
+.cx-champ input{width:100%;padding-right:96px}
+.cx-oeil{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--turf);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;padding:6px}
+.cx-aide{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.cx-aide a{color:var(--turf);font-weight:700}
+.cx-sep{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;margin:18px 0}
+.cx-sep::before,.cx-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.cx-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#1a1a1a;border-color:#fff}
+.cx-google svg{width:18px;height:18px}
+.cx-case{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;color:var(--muted)}
+.cx-case input{width:auto;margin-top:4px}
+.cx-lien-magique{margin-top:16px}
+.cx-lien-magique summary{cursor:pointer;color:var(--turf);font-weight:700;font-size:.9rem}
+.cx-lien-magique form{margin-top:12px}
+.cx-pied{text-align:center;color:var(--dim);font-size:.82rem;margin-top:22px}

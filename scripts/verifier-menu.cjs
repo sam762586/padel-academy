@@ -32,7 +32,7 @@ function gabarit(){
  assert.match(G.nav('404.html','/'),/href="\/index\.html"/);
  // Pages de contenu absentes du menu : seulement les pages de service
  const hors=fs.readdirSync(racine).filter(n=>n.endsWith('.html')&&!G.PAGES_MENU.some(p=>p[0]===n));
- assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','hors-ligne.html','mentions-legales.html']);
+ assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
  ok('gabarit : Accueil, Apprendre, S\'entraîner, Compétition, Mon espace + bouton raquette ; pages actives ; aucune page oubliée');
 }
 

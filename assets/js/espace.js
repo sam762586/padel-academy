@@ -26,7 +26,7 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
  function rendreStatut(){
   const zone=$("esp-statut"),c=window.PA_COMPTE;zone.textContent="";
   if(!c||!c.actif||!c.user){
-   const p=el("p","acc-muted");const a=el("a","","Connecte-toi");a.href="compte.html";
+   const p=el("p","acc-muted");const a=el("a","","Connecte-toi");a.href="connexion.html?suite=espace.html";
    p.append("Tes données sont gardées sur cet appareil. ",a," pour les retrouver sur ton téléphone et ton ordinateur.");zone.appendChild(p);return;
   }
   const e=J.etat();
