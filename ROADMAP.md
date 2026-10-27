@@ -151,7 +151,7 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   une question à la fois, schéma 2D pour les questions de scène, progression, reprise après interruption ; bilan
   (score, réussite par thème, erreurs expliquées, points forts, à renforcer, 3 recommandations avec exercice, article et
   scène 3D, « Refaire un quiz ») ; niveau déclaré jamais modifié. Test : `scripts/verifier-academie-quiz.cjs`.
-- [ ] Validation de la phase 3 par Samuel.
+- [x] Validation de la phase 3 par Samuel (27/10/2026).
 - [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
   Mon espace.
 - [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).
