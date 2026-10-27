@@ -124,7 +124,7 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   regles.html (rien à ajouter) ; conseils.html enrichi d'« Avant ton premier match » (trouver un club, matériel minimal,
   règles du premier match), uniquement à partir des règles déjà vérifiées de regles.html et des conseils de
   materiel.html, H1 « Débuter au padel : les 20 erreurs à corriger ».
-- [ ] Relecture et validation du 5D par Samuel, avant publication.
+- [x] Relecture et validation du 5D par Samuel (27/10/2026), publié.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
