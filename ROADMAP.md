@@ -98,7 +98,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   des comptes seulement) ; dans le diagnostic après match, scène 3D et « Te tester » pour chaque axe. Le bilan par
   partenaire et par type existait déjà : gardé tel quel. Corrigé : barre vide sous chaque match du journal (bilan
   fermé encore affiché). Tests : `scripts/verifier-carnet.cjs`.
-- [ ] Validation du 4F par Samuel, puis de la phase 4.
+- [x] Validation du 4F et de la phase 4 par Samuel (27/10/2026).
 
 ## Phase 5 — SEO et performance (continu)
 Suivi dans SEO.md ; `verifier-seo.cjs` à chaque livraison ; mesures réelles via Search Console et PageSpeed.
