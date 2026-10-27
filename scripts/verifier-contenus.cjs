@@ -23,6 +23,8 @@ const ARTICLES = {
   'regles.html': { sections: ['regles', 'points', 'service', 'litiges'], liens: 5 },
   'conseils.html': { sections: ['erreurs'], liens: 10 },
   'technique.html': { sections: ['coups', 'vitres'], liens: 5 },
+  'tactique.html': { sections: ['placement', 'schemas', 'construire', 'partenaire-niveau'], liens: 8 },
+  'tutos.html': { sections: ['tutos', 'face-lob', 'defendre-filet'], liens: 8 },
 };
 
 for (const [f, a] of Object.entries(ARTICLES)) {
@@ -77,6 +79,22 @@ ok(`articles (${Object.keys(ARTICLES).join(', ')}) : sections, exemple ou exerci
   const pre = lire('lexique.html');
   assert.ok((pre.match(/class="lex-lien"/g) || []).length === LEX.length - sansLien.length, 'liens du lexique pré-rendus');
   ok(`technique : section vitres reliée aux 4 fiches ; lexique : ${LEX.length - sansLien.length} termes sur ${LEX.length} reliés à leur page`);
+}
+
+// Tactique et tutos (parcours intermédiaire)
+{
+  const h = lire('tactique.html'), s = section(h, 'schemas');
+  const svgs = [...s.matchAll(/<svg class="schema"[^>]*aria-label="([^"]+)"[\s\S]*?<\/svg>/g)];
+  assert.equal(svgs.length, 4, '4 schémas tactiques');
+  const ids = [...h.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(new Set(ids).size, ids.length, 'identifiants en double dans tactique.html');
+  svgs.forEach(m => { assert.match(m[0], /class="st-nous"[\s\S]*class="st-eux"/, 'schéma : les deux paires'); assert.ok(m[1].length > 30, 'schéma : description'); });
+  const t = lire('tutos.html'), lob = section(t, 'face-lob');
+  const lignes = [...lob.matchAll(/<tr><td>[\s\S]*?<\/tr>/g)].map(m => m[0]);
+  assert.equal(lignes.length, 5, 'face au lob : 5 situations');
+  lignes.forEach(l => assert.match(l, /href="simulateur-3d-[a-z0-9-]+\.html"/, 'situation sans fiche : ' + texte(l).slice(0, 30)));
+  for (const id of ['monter-apres-lob', 'chiquita', 'contre-pied']) assert.ok(section(t, 'defendre-filet').includes(`simulateur-3d-${id}.html`), 'défendre contre le filet : ' + id);
+  ok('tactique : 4 schémas accessibles (description, deux paires), construire le point, partenaire de niveau différent ; tutos : face au lob (5 situations reliées aux fiches), défendre contre deux volleyeurs');
 }
 
 console.log(`\n${nb} vérifications réussies.`);
