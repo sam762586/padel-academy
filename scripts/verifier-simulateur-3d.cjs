@@ -153,8 +153,9 @@ async function horsNavigateur(){
   if(s.conseil)assert.ok(h.includes('<div id="p3d-conseil-bloc"><h3>Le conseil</h3><p id="p3d-conseil">'),id+' : conseil absent du HTML');
   else assert.ok(h.includes('<div id="p3d-conseil-bloc" hidden>'),id+' : bloc conseil visible sans conseil');
  }
- assert.ok(lireScenario('bandeja-garder-filet').conseil&&lireScenario('sortie-vitre-fond').conseil,'conseil des scénarios du prototype');
- ok('conseil : bandeja et sortie de vitre de fond, écrit dans le HTML de leur page');
+ // Les 6 scénarios prioritaires (défense de lob, bandeja, montée au filet, sortie de vitre, centre, défense-attaque) ont leur conseil
+ ['partenaire-lobe-cambio','bandeja-garder-filet','servir-monter','sortie-vitre-fond','couverture-centre','retour-lob'].forEach(id=>assert.ok(lireScenario(id).conseil,id+' : conseil manquant'));
+ ok('conseil : les 6 scénarios prioritaires, écrit dans le HTML de leur page');
 
  const licences=fs.readFileSync(path.join(racine,'assets/3d/LICENCES-3D.md'),'utf8');
  for(const dossier of ['assets/3d/vendor','assets/3d/modeles'])

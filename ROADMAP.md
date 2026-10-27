@@ -51,12 +51,14 @@ Search Console.
   boutons Trajectoire et Placements, couleurs d'équipe du site, pieds qui glissent moins, gestes v2 coup droit et
   bandeja (buste, bras gauche), champ « conseil » (bandeja, sortie de vitre de fond).
 - [x] Validation du prototype par Samuel (27/10/2026, gestes coup droit et bandeja compris).
-- [ ] 3B. Autres gestes en v2, par groupes validés :
+- [x] 3B. Autres gestes en v2, par groupes validés :
   - [x] Groupe 1 (27/10/2026) : revers, volée de coup droit, volée de revers, lob, víbora, smash, défense après double vitre.
   - [x] Validation du groupe 1 par Samuel (27/10/2026).
   - [x] Groupe 2 (27/10/2026) : sortie de vitre, service, retour, gancho, bajada, amorti, volée basse.
-  - [ ] Validation du groupe 2 par Samuel.
-- [ ] 3C. Scénarios « partenaire lobé (cambio) » et « couverture du centre » ; conseil sur les 6 scénarios prioritaires.
+  - [x] Validation du groupe 2 par Samuel (27/10/2026).
+- [x] 3C (27/10/2026). Scénarios « partenaire lobé (cambio) » et « couverture du centre » ; conseil sur les 6 scénarios prioritaires
+  (cambio, bandeja-garder-filet, servir-monter, sortie-vitre-fond, couverture-centre, retour-lob).
+- [ ] Validation du 3C par Samuel.
 - [ ] 3D. Fiches : la 3D démarre au clic (image de la scène en attendant), page Simulateur inchangée ; niveaux
   « du coup » et « de la scène » distingués.
 Limite gardée : pas d'effet de balle (slice, lift), affichée sur la page.

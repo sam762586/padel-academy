@@ -1,0 +1,60 @@
+{
+  "id": "couverture-centre",
+  "titre": "Couvrir le centre à deux",
+  "niveau": "Intermédiaire",
+  "duree": 5.0,
+  "situation": "Ton partenaire et toi êtes au filet. Les adversaires, au fond, visent le milieu, entre vous deux, pour créer le doute : « à toi ? à moi ? ».",
+  "explication": [
+    "Au filet, vous bougez ensemble, comme reliés par une corde imaginaire de 3 à 4 m : quand la balle va d'un côté, vous vous décalez tous les deux de ce côté.",
+    "Entre deux droitiers, la balle au centre se prend en coup droit : c'est le joueur de gauche qui la joue, il l'annonce d'un « mía ! ».",
+    "Le joueur qui ne frappe pas ne reste pas immobile : il se rapproche du centre pour fermer le trou.",
+    "Ta réponse aussi peut viser le centre : une volée profonde au milieu supprime les angles des adversaires."
+  ],
+  "erreurs": [
+    "Rester collé à sa ligne latérale : un trou s'ouvre au milieu, la balle y passe.",
+    "Hésiter tous les deux, ou se gêner avec les raquettes, faute d'annonce.",
+    "Prendre la balle du centre en revers alors que le partenaire pouvait la jouer en coup droit.",
+    "Laisser la corde se tendre : quand ton partenaire se décale vers le centre, tu dois suivre de ton côté."
+  ],
+  "conclusion": "Au filet, on se décale ensemble vers la balle, le centre se prend en coup droit et s'annonce, et l'autre ferme le trou.",
+  "conseil": "Pense « corde de 3 à 4 m » : quand la balle part au milieu, vous vous rapprochez tous les deux du centre. Le joueur qui a son coup droit au centre l'annonce et la joue ; l'autre suit le mouvement pour qu'aucun trou ne s'ouvre.",
+  "exercice": "À quatre : les joueurs du fond alternent une balle au centre et une balle le long de la vitre latérale. Au filet, annoncez chaque balle (« mía » ou « tuya ») et gardez 3 à 4 m entre vous. 3 séries de 12, puis changez de rôle.",
+  "lien": "tactique.html#placement",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.4, -2.9], [0.3, -2.4, -3.0], [1.0, -1.5, -2.8], [1.6, -1.5, -2.8], [3.55, -2.85, -2.75], [5.0, -2.2, -2.6]],
+    "A2": [[0, 2.4, -2.9], [0.3, 2.3, -3.0], [1.0, 0.45, -2.75], [1.6, 0.5, -2.8], [3.55, -0.4, -2.8], [5.0, 0.2, -2.7]],
+    "B1": [[0, 2.25, 8.2], [0.3, 2.2, 8.3], [1.6, 1.7, 7.6], [3.55, 1.6, 7.0], [5.0, 2.2, 7.2]],
+    "B2": [[0, -2.3, 8.3], [0.3, -2.2, 8.4], [2.45, -0.35, 8.75], [2.8, -0.6, 8.4], [5.0, -1.4, 7.8]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "coup_droit", "depart": [2.0, 0.9, 8.0], "cible": [0.0, 0.95, -2.6], "vol": 1.0 },
+    { "t": 1.0, "joueur": "A2", "geste": "volee_cd", "cible": [0.2, 0.033, 7.4], "vol": 0.9 },
+    { "t": 2.45, "joueur": "B2", "geste": "sortie_vitre", "cible": [-3.3, 0.85, -2.8], "vol": 1.1 },
+    { "t": 3.55, "joueur": "A1", "geste": "volee_cd", "cible": [3.2, 0.033, 4.6], "vol": 0.6 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La balle au centre", "texte": "L'adversaire 1 joue en coup droit, au milieu, entre ton partenaire et toi." },
+    { "t": 0.3, "titre": "Se décaler ensemble", "texte": "Vous vous rapprochez tous les deux du centre. Ton partenaire, à gauche, a son coup droit au milieu : il annonce « mía »." },
+    { "t": 1.0, "titre": "La volée au centre", "texte": "Ton partenaire volée en coup droit, profond et au centre : pas d'angle pour les adversaires." },
+    { "t": 1.9, "titre": "Une balle dans la vitre", "texte": "La volée profonde rebondit et frappe la vitre du fond : l'adversaire 2 doit jouer une sortie de vitre." },
+    { "t": 2.45, "titre": "La balle part sur le côté", "texte": "Il vise ton côté, le long de la vitre latérale. Tu te décales vers la balle, et ton partenaire revient vers le centre : la corde ne se tend pas." },
+    { "t": 3.55, "titre": "La volée qui conclut", "texte": "Bien placé, tu volées croisé, loin des deux adversaires." }
+  ],
+  "questions": [
+    { "t": 0.25, "question": "La balle part au milieu, entre vous deux. Qui la joue ?",
+      "choix": ["Moi, en revers", "Mon partenaire, à gauche, en coup droit", "Le premier qui y arrive, sans rien dire"],
+      "bonne": 1, "explication": "Entre deux droitiers, le joueur de gauche a son coup droit au centre : il la joue et l'annonce. Sans annonce, on hésite ou on se gêne." },
+    { "t": 0.5, "question": "Ton partenaire prend la balle au centre. Toi, que fais-tu ?",
+      "choix": ["Je me rapproche du centre avec lui", "Je reste collé à ma vitre latérale", "Je recule au fond"],
+      "bonne": 0, "explication": "Vous bougez comme reliés par une corde de 3 à 4 m : si tu restes sur ta ligne, un trou s'ouvre entre vous." },
+    { "t": 2.9, "question": "La balle part vers ta vitre latérale. Où va ton partenaire ?",
+      "choix": ["Il reste à gauche", "Il vient vers le centre, avec toi", "Il recule pour couvrir le lob"],
+      "bonne": 1, "explication": "Tu te décales vers la balle, il te suit vers le centre : la distance entre vous reste la même et le milieu reste fermé." }
+  ]
+}

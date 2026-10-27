@@ -1,0 +1,65 @@
+{
+  "id": "partenaire-lobe-cambio",
+  "titre": "Partenaire lobé : le cambio",
+  "niveau": "Intermédiaire",
+  "duree": 8.2,
+  "situation": "Ton partenaire et toi tenez le filet. L'adversaire 2 joue un lob profond au-dessus de ton partenaire, côté gauche : il ne peut pas reculer à temps.",
+  "explication": [
+    "Quand ton partenaire est lobé, c'est toi qui vas chercher la balle : tu cours en diagonale vers l'arrière, pendant qu'il te regarde déjà partir.",
+    "Ton partenaire annonce « cambio » et change de côté : il recule en diagonale vers ta place, pour que votre terrain ne reste jamais vide.",
+    "Tu laisses la balle rebondir puis sortir de la vitre : courir en diagonale te donne du temps et te place derrière elle.",
+    "Sur cette balle, ne cherche pas à attaquer : un lob haut par-dessus les adversaires, montés au filet, vous permet de reprendre le filet ensemble."
+  ],
+  "erreurs": [
+    "Le partenaire lobé recule de face pour rattraper la balle : il arrive en retard, déséquilibré, et la balle passe.",
+    "Ne rien annoncer : les deux joueurs courent vers la même balle, ou aucun.",
+    "Rester du même côté après le cambio : tout un côté du terrain est vide.",
+    "Vouloir frapper fort après la vitre, en courant : la balle part dans le grillage ou reste basse pour les adversaires au filet."
+  ],
+  "conclusion": "Partenaire lobé : tu cours en diagonale, il annonce « cambio » et change de côté, tu lobes, puis vous remontez ensemble.",
+  "conseil": "Dès que le lob passe au-dessus de ton partenaire, cours en diagonale vers l'angle opposé. Ton partenaire annonce « cambio » et part de son côté, vers ta place. Laisse la balle sortir de la vitre et réponds par un lob haut : vous remontez au filet pendant qu'il vole.",
+  "exercice": "À quatre : un joueur au fond lobe au-dessus du joueur au filet côté gauche. Son partenaire, à droite, court en diagonale et relobe après la vitre ; le joueur lobé annonce « cambio » et change de côté. 3 séries de 8, puis inversez les côtés.",
+  "lien": "tactique.html#communication",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.4, -2.7], [0.35, -2.3, -2.8], [2.95, 3.3, -7.9], [3.3, 3.2, -7.6], [5.2, 2.3, -3.2], [6.1, 2.1, -3.0], [8.2, 1.9, -2.9]],
+    "A2": [[0, 2.4, -2.7], [0.35, 2.4, -2.9], [0.9, 2.2, -3.8], [2.95, -2.0, -6.3], [3.3, -2.0, -6.0], [5.2, -1.9, -3.2], [7.05, -1.15, -2.75], [8.2, -1.3, -2.8]],
+    "B1": [[0, -2.2, 8.4], [0.4, -2.2, 8.2], [2.5, -2.3, 3.4], [3.5, -2.3, 3.2], [4.0, -2.4, 3.5], [6.1, -3.55, 7.75], [6.5, -3.3, 7.4], [8.2, -2.4, 6.8]],
+    "B2": [[0, 0.9, 8.6], [0.4, 1.2, 8.0], [2.5, 2.2, 3.2], [3.5, 2.2, 3.1], [4.0, 2.2, 3.5], [6.0, 1.0, 7.6], [8.2, 1.3, 7.3]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "lob", "depart": [0.8, 0.9, 8.3], "cible": [2.3, 0.033, -7.7], "vol": 1.9 },
+    { "t": 2.95, "joueur": "A1", "geste": "sortie_vitre", "cible": [-1.6, 0.033, 8.0], "vol": 2.0 },
+    { "t": 6.1, "joueur": "B1", "geste": "sortie_vitre", "cible": [-1.6, 1.0, -2.6], "vol": 0.95 },
+    { "t": 7.05, "joueur": "A2", "geste": "volee_cd", "cible": [3.6, 0.033, 5.8], "vol": 0.7 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob au-dessus du partenaire", "texte": "L'adversaire 2 lobe profond, côté gauche. Ton partenaire est trop près du filet pour reculer à temps." },
+    { "t": 0.35, "titre": "Tu pars en diagonale", "texte": "Dès que tu vois le lob passer au-dessus de lui, tu cours en diagonale vers l'angle du fond gauche." },
+    { "t": 0.9, "titre": "« Cambio ! »", "texte": "Ton partenaire annonce le changement et recule en diagonale vers ta place, côté droit : le terrain reste couvert." },
+    { "t": 1.9, "titre": "Laisser la vitre travailler", "texte": "La balle rebondit puis frappe la vitre du fond. Tu te places derrière elle, sans la poursuivre." },
+    { "t": 2.95, "titre": "Le lob de défense", "texte": "Après la vitre, tu relobes haut par-dessus les adversaires, qui sont montés au filet." },
+    { "t": 3.3, "titre": "Remonter ensemble", "texte": "Pendant que le lob vole, ton partenaire et toi remontez au filet, chacun de son nouveau côté." },
+    { "t": 6.1, "titre": "Une défense sans danger", "texte": "L'adversaire 1, repoussé au fond, ne peut que remettre une balle lente au filet." },
+    { "t": 7.05, "titre": "La volée qui conclut", "texte": "Ton partenaire, maintenant à droite, conclut d'une volée croisée." }
+  ],
+  "questions": [
+    { "t": 0.5, "question": "Le lob passe au-dessus de ton partenaire, côté gauche. Qui va chercher la balle ?",
+      "choix": ["Mon partenaire, il recule de face", "Moi, en courant en diagonale", "Personne, la balle sera dehors"],
+      "bonne": 1, "explication": "Le partenaire lobé est mal placé pour reculer : c'est le joueur en diagonale qui va chercher la balle. Il la voit arriver de face et a plus de temps." },
+    { "t": 1.4, "question": "Tu cours chercher la balle. Que fait ton partenaire ?",
+      "choix": ["Il reste au filet, côté gauche", "Il te suit vers la même balle", "Il annonce « cambio » et recule vers ta place, côté droit"],
+      "bonne": 2, "explication": "Il change de côté pour couvrir le terrain que tu as laissé : sans ça, tout le côté droit est vide." },
+    { "t": 2.4, "question": "La balle va sortir de la vitre et les adversaires sont au filet. Quel coup choisis-tu ?",
+      "choix": ["Un lob haut par-dessus eux", "Une frappe forte à plat", "Une balle courte juste derrière le filet"],
+      "bonne": 0, "explication": "Contre deux joueurs au filet, en courant, le lob haut est le coup le plus sûr : il les repousse au fond et vous laisse reprendre le filet." },
+    { "t": 4.2, "question": "Ton lob passe au-dessus des adversaires. Et maintenant ?",
+      "choix": ["On reste au fond pour défendre", "On remonte au filet ensemble, chacun de son nouveau côté", "On revient chacun à son côté de départ"],
+      "bonne": 1, "explication": "Le lob vous donne le temps de remonter. Chacun garde son nouveau côté : revenir en croisant au milieu ferait perdre du temps." }
+  ]
+}
