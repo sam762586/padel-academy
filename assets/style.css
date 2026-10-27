@@ -940,3 +940,14 @@ details.geste summary{color:var(--turf)}
 .rk-plus li>span{display:block}
 .rk-plus li b{color:var(--fg)}
 .rk-plus-meta{font-size:.85rem}
+
+/* Tournois : états du chargement (chargement, erreur) — le squelette réserve la place de la liste */
+.tetat-chargement{min-height:70vh}
+.tetat-squelette{display:grid;gap:12px;margin-top:8px}
+.tetat-squelette i{display:block;height:132px;border-radius:var(--r);border:1px solid var(--line);background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(255,255,255,.07),rgba(255,255,255,.03));background-size:200% 100%;animation:tetat-lueur 1.4s ease-in-out infinite}
+@keyframes tetat-lueur{from{background-position:100% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.tetat-squelette i{animation:none}}
+.tetat-erreur{margin:12px 0;padding:16px 18px;border:1px solid rgba(255,93,74,.45);border-radius:var(--r);background:rgba(255,93,74,.08)}
+.tetat-erreur p{margin:0;color:var(--muted)}
+.tetat-erreur b{color:var(--fg)}
+.tetat-erreur .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}

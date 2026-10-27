@@ -24,35 +24,74 @@ const TOURNOIS_DEPARTEMENTS=[
 (function(){
  const racine=document.getElementById("tournois-app");
  if(!racine) return; // page sans bloc tournois : on ne fait rien
- const messageVide=document.getElementById("tournois-vide");
- const vide=()=>{if(messageVide) messageVide.hidden=false;};
+ /* États du chargement, un seul visible à la fois :
+    chargement → contenu (tournois disponibles ; « aucun résultat » pour les filtres est géré dans la liste)
+               → vide (données reçues mais aucun tournoi : vraie absence)
+               → erreur (réseau, HTTP, fichier illisible, délai dépassé : jamais présentée comme une absence de tournois). */
+ const ETATS={chargement:"tournois-chargement",erreur:"tournois-erreur",vide:"tournois-vide",contenu:"tournois-contenu"};
+ function etat(nom){Object.entries(ETATS).forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.hidden=k!==nom;});}
+ const MESSAGES_ERREUR={reseau:"Vérifie ta connexion puis réessaie.",delai:"Le chargement a pris trop de temps : réessaie.",
+  http:"Le serveur n'a pas pu envoyer la liste : réessaie dans un instant.",format:"Le fichier reçu est illisible : réessaie dans un instant."};
+ function erreur(type){
+  const d=document.getElementById("tournois-erreur-detail");
+  if(d) d.textContent=MESSAGES_ERREUR[type]||MESSAGES_ERREUR.reseau;
+  etat("erreur");
+ }
  const enHttp=/^https?:$/.test(location.protocol);
+ const DELAI_MS=20000;
+ let demarre=false,enCours=false;
 
- // Injection d'un <script> de données (seul moyen de charger un fichier en file://)
+ // Injection d'un <script> de données (seul moyen de charger un fichier en file://, et repli si le .json échoue)
  function chargerScript(url){
   return new Promise((resolve,reject)=>{
    const s=document.createElement("script");s.src=url;
-   s.onload=resolve;s.onerror=()=>reject(new Error("script"));
+   s.onload=resolve;s.onerror=()=>reject(Object.assign(new Error("script"),{type:"reseau"}));
    document.body.appendChild(s);
   });
  }
- function repliScript(){
-  chargerScript("assets/data/tournois.js").then(()=>window.TOURNOIS_DATA?demarrer(window.TOURNOIS_DATA):vide()).catch(vide);
+ async function chargerJson(){
+  const ctrl=typeof AbortController==="function"?new AbortController():null;
+  const minuteur=ctrl?setTimeout(()=>ctrl.abort(),DELAI_MS):null;
+  try{
+   let r;
+   try{ r=await fetch("assets/data/tournois.json",{cache:"no-cache",signal:ctrl?ctrl.signal:undefined}); }
+   catch(e){ throw Object.assign(new Error("fetch"),{type:e&&e.name==="AbortError"?"delai":"reseau"}); }
+   if(!r.ok) throw Object.assign(new Error("http "+r.status),{type:"http"});
+   const horsConnexion=r.headers.get("X-Depuis-Cache")==="1"; // copie du service worker, hors connexion
+   let d;
+   try{ d=await r.json(); }catch(e){ throw Object.assign(new Error("json"),{type:"format"}); }
+   return {donnees:d,horsConnexion};
+  }finally{ if(minuteur) clearTimeout(minuteur); }
  }
- if(enHttp){
-  let depuisCache=false; // vrai si le service worker a répondu avec la copie hors connexion
-  fetch("assets/data/tournois.json",{cache:"no-cache"}).then(r=>{if(!r.ok) throw new Error(r.status);depuisCache=r.headers.get("X-Depuis-Cache")==="1";return r.json();})
-   .then(d=>demarrer(d,depuisCache)).catch(repliScript);
- } else repliScript();
+ async function charger(){
+  if(demarre||enCours) return;
+  enCours=true;etat("chargement");
+  try{
+   let resultat=null,premiereErreur=null;
+   if(enHttp){ try{ resultat=await chargerJson(); }catch(e){ premiereErreur=e; } }
+   if(!resultat||!donneesValides(resultat.donnees)){
+    // Repli : copie .js (indispensable en file://, utile si le .json est illisible)
+    try{ await chargerScript("assets/data/tournois.js"); }catch(e){}
+    if(donneesValides(window.TOURNOIS_DATA)) resultat={donnees:window.TOURNOIS_DATA,horsConnexion:false};
+   }
+   if(!resultat||!donneesValides(resultat.donnees)){ erreur(premiereErreur&&premiereErreur.type||(resultat?"format":"reseau")); return; }
+   demarrer(resultat.donnees,resultat.horsConnexion);
+  }finally{ enCours=false; }
+ }
+ const donneesValides=d=>!!d&&typeof d==="object"&&Array.isArray(d.tournois);
+ const boutonReessayer=document.getElementById("tournois-reessayer");
+ if(boutonReessayer) boutonReessayer.addEventListener("click",charger);
+ charger();
 
 function demarrer(donnees,horsConnexion){
  const contenu=document.getElementById("tournois-contenu");
- if(!donnees||!Array.isArray(donnees.tournois)){ vide(); return; }
- try{ initialiser(donnees,contenu,!!horsConnexion); }catch(e){ vide(); }
+ const valables=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
+ if(!valables.length){ etat("vide"); return; }
+ try{ initialiser(donnees,contenu,!!horsConnexion); demarre=true; etat("contenu"); }
+ catch(e){ console.error("Tournois : affichage impossible",e); erreur("format"); }
 }
 
 function initialiser(donnees,contenu,horsConnexion){
- if(messageVide) messageVide.hidden=true;
  contenu.hidden=false;
 
  const CLE_STOCKAGE="pa-tournois-filtres";

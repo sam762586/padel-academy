@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Tournois de padel près de chez moi", "item": "https://apprendre-padel.fr/tournois.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=6360c2b99f">
+<link rel="stylesheet" href="assets/style.css?v=3822f4161a">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -40,7 +40,16 @@
       <div><p class="eyebrow">Compétition · Toute la France</p><h1 id="tournois-titre">Tournois de padel en France</h1></div>
       <p><span id="tournois-maj"></span>Source : <a href="https://tenup.fft.fr/" target="_blank" rel="noopener"><span id="tournois-source">Ten'Up (FFT)</span></a>. Vérifie toujours les dates et les conditions sur la fiche du tournoi avant de t'inscrire.</p>
     </div>
-    <p class="acc-msg" id="tournois-vide" role="status" hidden>Pas encore de tournois chargés. La liste sera disponible dès qu'elle aura été mise à jour. En attendant, tu peux chercher sur <a href="https://tenup.fft.fr/" target="_blank" rel="noopener">Ten'Up</a>.</p>
+    <!-- États du chargement (tournois.js) : un seul visible à la fois -->
+    <div class="tetat tetat-chargement" id="tournois-chargement" role="status">
+      <p class="acc-msg">Chargement des tournois…</p>
+      <div class="tetat-squelette" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+    <div class="tetat tetat-erreur" id="tournois-erreur" role="alert" hidden>
+      <p><b>Les tournois n'ont pas pu être chargés.</b> <span id="tournois-erreur-detail">Vérifie ta connexion puis réessaie.</span> Ce n'est pas une absence de tournois : la liste est mise à jour chaque semaine.</p>
+      <div class="btns"><button type="button" class="btn primary" id="tournois-reessayer">Réessayer</button><a class="btn ghost" href="https://tenup.fft.fr/" target="_blank" rel="noopener">Chercher sur Ten'Up</a></div>
+    </div>
+    <p class="acc-msg" id="tournois-vide" role="status" hidden>Aucun tournoi n'est annoncé pour le moment. La liste est mise à jour chaque semaine ; en attendant, tu peux chercher sur <a href="https://tenup.fft.fr/" target="_blank" rel="noopener">Ten'Up</a>.</p>
     <div id="tournois-contenu" hidden>
       <p class="acc-msg" id="tournois-fav-msg" role="status" hidden></p>
       <div class="tmes" id="tournois-mes" hidden>
@@ -132,7 +141,7 @@
 <script src="assets/js/favoris.js?v=564271dd7d"></script>
 <script src="assets/data/pages-tournois.js"></script>
 <script src="assets/js/carte-france.js?v=0111471a5c"></script>
-<script src="assets/js/tournois.js?v=3a9ffc1210"></script>
+<script src="assets/js/tournois.js?v=5afc44a6a6"></script>
 <script src="assets/js/nav.js?v=bcab64c766"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

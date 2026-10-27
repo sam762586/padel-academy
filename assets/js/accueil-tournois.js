@@ -49,7 +49,9 @@ const AT_NB=5;
   });
   contenu.appendChild(svg);
  }
+ let derniereDemande=0;
  async function afficher(dep){
+  const demande=++derniereDemande;
   if(!dep){afficherCarte();return;}
   titre.textContent="Cette semaine près de chez toi";
   contenu.textContent="";
@@ -59,11 +61,24 @@ const AT_NB=5;
   changer.addEventListener("click",()=>{contenu.textContent="";contenu.append(selecteur(dep));contenu.querySelector("select").focus();});
   tete.append(" ",changer);
   contenu.appendChild(tete);
+  // Chargement, puis : liste, vraie absence de tournoi, ou erreur (réseau, HTTP, fichier illisible) avec « Réessayer »
+  const attente=el("p","acc-muted","Chargement des prochains tournois…");attente.setAttribute("role","status");
+  contenu.appendChild(attente);
   let donnees=null;
-  try{const r=await fetch("assets/data/prochains/"+dep+".json",{cache:"no-cache"});if(r.ok)donnees=await r.json();}catch(e){}
+  try{
+   const r=await fetch("assets/data/prochains/"+dep+".json",{cache:"no-cache"});
+   if(r.ok){const d=await r.json();if(d&&Array.isArray(d.tournois))donnees=d;}
+  }catch(e){}
+  attente.remove();
+  if(demande!==derniereDemande)return; // un autre département a été choisi pendant le chargement
   const aujourdhui=iso(new Date());
-  const liste=donnees&&Array.isArray(donnees.tournois)?donnees.tournois.filter(t=>t.date_fin>=aujourdhui).slice(0,AT_NB):[];
-  if(!liste.length){contenu.append(el("p","acc-muted",donnees?"Aucun tournoi annoncé pour le moment dans ce département.":"Liste indisponible pour le moment."));}
+  const liste=donnees?donnees.tournois.filter(t=>t.date_fin>=aujourdhui).slice(0,AT_NB):[];
+  if(!donnees){
+   const p=el("p","acc-err","La liste n'a pas pu être chargée (connexion ou serveur). ");
+   const re=el("button","pdt-changer","Réessayer");re.type="button";re.addEventListener("click",()=>afficher(dep));
+   p.appendChild(re);p.setAttribute("role","alert");contenu.appendChild(p);
+  }
+  else if(!liste.length){contenu.append(el("p","acc-muted","Aucun tournoi annoncé pour le moment dans ce département."));}
   else{
    const ul=el("ul","pdt-liste"),pos=position();
    liste.forEach(t=>{
