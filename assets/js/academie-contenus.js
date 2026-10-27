@@ -30,9 +30,14 @@ const ACADEMIE_ARTICLES=[
  {id:"adversaire",titre:"S'adapter à l'adversaire",url:"tactique.html#adversaire",niveaux:[5,10],themes:["construction"],difficulte:3,prerequis:["construire"]},
  {id:"moments",titre:"Jouer selon le score et les moments importants",url:"tactique.html#moments",niveaux:[5,10],themes:["construction","communication"],difficulte:3,prerequis:["construire"]},
  {id:"communication",titre:"Parler avec son partenaire",url:"tactique.html#communication",niveaux:[1,6],themes:["communication"],difficulte:1,prerequis:[]},
- {id:"premier-tournoi",titre:"Ton premier tournoi",url:"premier-tournoi.html#premier-tournoi",niveaux:[3,6],themes:["regles"],difficulte:1,prerequis:["regles-points"]},
+ {id:"premier-tournoi",titre:"Ton premier tournoi",url:"premier-tournoi.html#premier-tournoi",niveaux:[3,6],themes:["regles","competition"],difficulte:1,prerequis:["regles-points"]},
  {id:"plan-8-semaines",titre:"Plan de progression 8 semaines",url:"entrainement.html#entrainement",niveaux:[2,6],themes:["vitres","lob","volee","placement"],difficulte:1,prerequis:[]},
  {id:"analyser-matchs",titre:"Analyser tes matchs pour progresser",url:"score.html#analyser",niveaux:[4,10],themes:["construction"],difficulte:2,prerequis:[]},
+ {id:"choisir-raquette",titre:"Quelle raquette pour moi ?",url:"materiel.html#raquette",niveaux:[1,10],themes:["materiel"],difficulte:1,prerequis:[]},
+ {id:"comprendre-materiel",titre:"Comprendre une raquette",url:"materiel.html#materiel",niveaux:[3,10],themes:["materiel"],difficulte:2,prerequis:[]},
+ {id:"competition",titre:"Jouer en compétition en France",url:"competition.html#competition",niveaux:[3,10],themes:["competition"],difficulte:1,prerequis:[]},
+ {id:"bareme",titre:"Combien de points rapporte un tournoi ?",url:"bareme.html#bareme",niveaux:[4,10],themes:["competition"],difficulte:2,prerequis:["competition"]},
+ {id:"lexique",titre:"Lexique du padel",url:"lexique.html#lexique",niveaux:[1,10],themes:["culture"],difficulte:1,prerequis:[]},
  {id:"labo",titre:"Le labo des trajectoires",url:"simulateur-3d.html#labo",niveaux:[3,10],themes:["lob","bandeja","vitres"],difficulte:2,prerequis:[]},
 ];
 // Intitulés des niveaux de la grille FFT (cartes de academie.html)
@@ -41,9 +46,9 @@ const ACADEMIE_NIVEAUX_NOMS={1:"Débutant",2:"Débutant +",3:"Élémentaire",4:"
 const ACADEMIE_NIVEAUX_THEMES={1:["regles","volee","transition"],2:["vitres","defense"],3:["lob","bandeja","vitres"],4:["vitres","defense","transition","construction"],
  5:["lob","volee","defense","bandeja","vibora"],6:["construction","volee","bandeja","vibora"],7:["defense","vitres","bandeja","vibora","construction"],8:["construction","defense"],9:[],10:[]};
 // Thème d'exercices (exercices-donnees.js) de chaque thème de l'académie, et l'inverse pour classer les exercices
-const ACADEMIE_THEME_EXERCICES={placement:"placement",defense:"vitre",vitres:"vitre",bandeja:"aerien",vibora:"aerien",volee:"placement",lob:"montee",transition:"transition",communication:"communication",construction:"regularite",regles:"service"};
+const ACADEMIE_THEME_EXERCICES={placement:"placement",defense:"vitre",vitres:"vitre",bandeja:"aerien",vibora:"aerien",volee:"placement",lob:"montee",transition:"transition",communication:"communication",construction:"regularite",regles:"service",competition:"compet",materiel:null,culture:null};
 const AC_EXERCICE_THEMES={vitre:["vitres","defense"],service:["transition"],aerien:["bandeja","vibora"],couple:["placement","communication"],placement:["placement","volee"],
- montee:["lob","transition"],regularite:["construction","defense"],transition:["transition","volee"],communication:["communication"],compet:["construction"]};
+ montee:["lob","transition"],regularite:["construction","defense"],transition:["transition","volee"],communication:["communication"],compet:["construction","competition"]};
 const AC_PLAGES_EXERCICE={1:[1,3],2:[4,5],3:[6,7],4:[8,10]};
 
 // Niveau d'exercice (1 à 4) d'un niveau de la grille (1 à 10)

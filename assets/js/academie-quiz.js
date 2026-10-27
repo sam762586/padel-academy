@@ -157,7 +157,7 @@ function aqDemarrer(){
    <div class="aq-tete"><p class="aq-avancement">Question ${i+1} sur ${total} · ${esc(T[q.theme].nom)} ${type}</p>
    <div class="aq-barre" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${i}" aria-label="Progression du quiz"><span style="width:${Math.round(100*i/total)}%"></span></div></div>
    ${schema}
-   <div class="aq-texte"><p class="qt-scenario">${esc(q.situation)}</p>
+   <div class="aq-texte">${q.situation?`<p class="qt-scenario">${esc(q.situation)}</p>`:""}
    <h3 id="aq-intitule" tabindex="-1">${esc(q.question)}</h3>
    <div class="qt-choix" role="group" aria-labelledby="aq-intitule">${item.ordre.map(k=>`<button type="button" class="qt-reponse" data-k="${k}">${esc(q.choix[k])}</button>`).join("")}</div>
    <div class="qt-correction" id="aq-correction" aria-live="polite"></div></div></div>`;
@@ -196,7 +196,7 @@ function aqDemarrer(){
    <h4>Réussite par thème</h4><div class="tbl esp-tbl-compact"><table><tbody>${Object.keys(b.parTheme).map(ligne).join("")}</tbody></table></div>
    ${b.forts.length?`<p><b>Tes points forts :</b> ${b.forts.map(t=>esc(T[t].nom.toLowerCase())).join(", ")}.</p>`:""}
    ${b.aRenforcer.length?`<p><b>À renforcer :</b> ${b.aRenforcer.map(t=>esc(T[t].nom.toLowerCase())).join(", ")}.</p>`:"<p><b>Sans faute :</b> rien à renforcer sur ces questions.</p>"}
-   ${b.erreurs.length?`<h4>Tes erreurs, expliquées</h4><ol class="aq-erreurs">${b.erreurs.map(x=>`<li><p class="qt-scenario">${esc(x.question.situation)}</p><p><b>${esc(x.question.question)}</b></p><p>Ta réponse : ${esc(x.question.choix[x.choix])}. Bonne réponse : ${esc(x.question.choix[x.question.bonne])}.</p><p class="note">${esc(x.question.explication)}</p></li>`).join("")}</ol>`:""}
+   ${b.erreurs.length?`<h4>Tes erreurs, expliquées</h4><ol class="aq-erreurs">${b.erreurs.map(x=>`<li>${x.question.situation?`<p class="qt-scenario">${esc(x.question.situation)}</p>`:""}<p><b>${esc(x.question.question)}</b></p><p>Ta réponse : ${esc(x.question.choix[x.choix])}. Bonne réponse : ${esc(x.question.choix[x.question.bonne])}.</p><p class="note">${esc(x.question.explication)}</p></li>`).join("")}</ol>`:""}
    ${reco?`<h4>Pour progresser</h4><div class="aq-recos">${reco}</div>`:""}
    <p class="aq-actions"><button type="button" class="btn primary" id="aq-refaire">Refaire un quiz</button><a class="btn ghost" href="simulateur-3d.html">Ouvrir le simulateur 3D</a></p></div>`;
   zone.querySelector("#aq-refaire").addEventListener("click",()=>{

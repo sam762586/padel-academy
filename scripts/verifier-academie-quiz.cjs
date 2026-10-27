@@ -52,7 +52,7 @@ function horsNavigateur(){
    assert.equal(b.total,s.questions.length);assert.equal(b.score,s.reponses.filter(r=>r.juste).length);
    assert.equal(Object.values(b.parTheme).reduce((a,t)=>a+t.total,0),b.total);
    assert.equal(b.forts.length+b.aRenforcer.length,Object.keys(b.parTheme).length);
-   assert.ok(b.recommandations.length<=3&&b.recommandations.every(r=>r.article&&r.exercice));
+   assert.ok(b.recommandations.length<=3&&b.recommandations.every(r=>r.article&&(r.exercice||["materiel","culture"].includes(r.theme))));
    if(strat==='juste'){assert.equal(b.score,b.total);assert.equal(b.aRenforcer.length,0);}
   }
  }
@@ -65,7 +65,10 @@ function horsNavigateur(){
   const seances=[];
   for(let k=0;k<3;k++){const s=jouer(n,seances,'hasard');prerequisRespectes(s,seances);
    const vues=new Set(seances.slice(-C.seancesSansRepetition).flatMap(x=>x.reponses.map(r=>r.id)));
-   const disponibles=Q.filter(q=>posable(q,n)&&!vues.has(q.id)).length;
+   // Inédites réellement posables : prérequis maîtrisés ou eux-mêmes inédits (une question dont le prérequis a été raté
+   // récemment attend qu'on le repose : la reprendre est alors voulu)
+   const {maitrisees}=A.memoire(seances,C),inedites=new Set(Q.filter(q=>posable(q,n)&&!vues.has(q.id)).map(q=>q.id));
+   const disponibles=[...inedites].filter(id=>Q.find(q=>q.id===id).prerequis.every(p=>maitrisees.has(p)||inedites.has(p))).length;
    const repetees=s.questions.slice(0,C.reference).filter(x=>vues.has(x.id)).length;
    assert.ok(repetees<=Math.max(0,C.reference-disponibles),'niveau '+n+', séance '+(k+1)+' : '+repetees+' question(s) répétée(s) alors que '+disponibles+' restaient');
    seances.push(s);}

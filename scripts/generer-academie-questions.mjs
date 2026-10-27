@@ -3,7 +3,10 @@
      - les questions des scénarios 3D (assets/3d/scenarios/*.json) : texte, choix, explication, situation de la scène ;
        leur classement (thème, niveaux 1 à 10, difficulté) est dans scripts/donnees/academie-classement.json ;
      - les questions rédigées pour l'académie (scripts/donnees/academie-questions-redigees.json), chacune reprise d'une
-       phrase publiée sur le site (champ source) ; statut « brouillon » tant que Samuel ne les a pas relues.
+       phrase publiée sur le site (champ source) ; statut « brouillon » tant que Samuel ne les a pas relues ;
+     - les 120 questions de Samuel (scripts/donnees/academie-questions-samuel.json, converti depuis son texte par
+       scripts/convertir-questions-samuel.py) : texte tel quel, sans situation de jeu, niveau unique ; « brouillon »
+       pour les faits datés ou chiffrés à confirmer (a_confirmer).
    Pour chaque question : article (page du thème ou source), exercice de l'espace joueur du thème au niveau correspondant,
    scène 3D (celle de la question, ou celle du thème). Seules les questions « validee » sont posées par le quiz.
    « À revoir » après une erreur (lot 3a) : revoir.article = la section d'article (ACADEMIE_ARTICLES) du thème de la
@@ -34,6 +37,10 @@ export const THEMES = {
   communication: { nom: 'Communication', article: 'tactique.html#communication', exercices: 'communication', scene: 'partenaire-lobe-cambio' },
   construction: { nom: 'Construction du point', article: 'tactique.html#construire', exercices: 'regularite', scene: 'contre-pied' },
   regles: { nom: 'Règles', article: 'regles.html', exercices: 'service', scene: 'servir-monter' },
+  // Thèmes des questions de Samuel ; pas d'exercice pour le matériel et la culture
+  materiel: { nom: 'Matériel', article: 'materiel.html#raquette', exercices: null, scene: null },
+  competition: { nom: 'Compétition', article: 'competition.html#competition', exercices: 'compet', scene: null },
+  culture: { nom: 'Culture padel', article: 'lexique.html#lexique', exercices: null, scene: null },
 };
 
 const ctx = {}; vm.createContext(ctx);
@@ -55,6 +62,7 @@ export function articleARevoir(q) {
 // Niveau d'exercice (1 à 4) correspondant au milieu de la plage de la question (grille 1 à 10) : correspondance de contenus
 const niveauExercice = (min, max) => { const m = (min + max) / 2; return m <= 3 ? 1 : m <= 5 ? 2 : m <= 7 ? 3 : 4; };
 function exercice(theme, min, max) {
+  if (!THEMES[theme].exercices) return null;
   const n = niveauExercice(min, max), l = EXERCICES.filter(e => e.theme === THEMES[theme].exercices);
   return (l.find(e => e.niveaux.includes(n)) || l[0]).id;
 }
@@ -86,6 +94,15 @@ export function construire() {
       article: r.source.split('#')[0] === 'regles.html' || r.source.startsWith('tactique.html') ? r.source : THEMES[r.theme].article,
       exercice: exercice(r.theme, ...r.niveaux), scenario: r.scenario || (scenarios.has(THEMES[r.theme].scene) ? THEMES[r.theme].scene : null),
       prerequis: r.prerequis || [] });
+  }
+  const samuel = JSON.parse(lire('scripts/donnees/academie-questions-samuel.json')).questions;
+  for (const r of samuel) {
+    questions.push({ id: r.id, statut: r.statut, origine: 'samuel', source: 'Samuel (' + r.categorie + ')', theme: r.theme,
+      niveauMin: r.niveaux[0], niveauMax: r.niveaux[1], difficulte: r.difficulte, situation: '',
+      question: r.question, choix: r.choix, bonne: r.bonne, explication: r.explication,
+      article: THEMES[r.theme].article, exercice: exercice(r.theme, ...r.niveaux),
+      scenario: scenarios.has(THEMES[r.theme].scene) ? THEMES[r.theme].scene : null, prerequis: [],
+      ...(r.a_confirmer ? { aConfirmer: r.a_confirmer } : {}) });
   }
   construire.titres = titres; // titres des scènes 3D (ACADEMIE_SCENES)
   questions.forEach(q => { q.revoir = { article: articleARevoir(q) }; });
@@ -131,7 +148,7 @@ function relecture(questions) {
 <h1>Mon académie : banque de questions à relire</h1>
 <p>${questions.length} questions : ${questions.length - brouillons.length} validées (questions des scénarios 3D, déjà relues), ${brouillons.length} brouillons à relire. Pour chaque brouillon : la phrase du site dont il vient (source). Pour les questions des scénarios : le classement proposé (thème, niveaux, difficulté).</p>
 <h2>Couverture par niveau</h2><table><tr><th>Niveau</th><th>Questions validées posables</th><th>Thèmes couverts</th><th>Brouillons en attente</th></tr>${cov.map(c => `<tr><td>${c.niveau}</td><td>${c.validees}</td><td>${c.themes} / 11</td><td>${c.brouillons}</td></tr>`).join('')}</table>
-<h2>Brouillons à relire (${brouillons.length})</h2>${brouillons.map(q => `<div class="q"><h3>${e(q.question)} <small>· ${e(THEMES[q.theme].nom)} · niveaux ${q.niveauMin}–${q.niveauMax} · difficulté ${q.difficulte} · <code>${e(q.id)}</code></small></h3><p><b>Situation :</b> ${e(q.situation)}</p><ol>${q.choix.map((c, i) => `<li${i === q.bonne ? ' class="ok"' : ''}>${e(c)}${i === q.bonne ? ' ✓' : ''}</li>`).join('')}</ol><p><b>Explication :</b> ${e(q.explication)}</p><p><small>Source : ${e(q.source)} · article : ${e(q.article)} · exercice : ${e(q.exercice)} · scène 3D : ${e(q.scenario || '—')}</small></p></div>`).join('')}
+<h2>Brouillons à relire (${brouillons.length})</h2>${brouillons.map(q => `<div class="q"><h3>${e(q.question)} <small>${q.aConfirmer ? 'À confirmer : ' + e(q.aConfirmer) + ' · ' : ''}· ${e(THEMES[q.theme].nom)} · niveaux ${q.niveauMin}–${q.niveauMax} · difficulté ${q.difficulte} · <code>${e(q.id)}</code></small></h3><p><b>Situation :</b> ${e(q.situation)}</p><ol>${q.choix.map((c, i) => `<li${i === q.bonne ? ' class="ok"' : ''}>${e(c)}${i === q.bonne ? ' ✓' : ''}</li>`).join('')}</ol><p><b>Explication :</b> ${e(q.explication)}</p><p><small>Source : ${e(q.source)} · article : ${e(q.article)} · exercice : ${e(q.exercice)} · scène 3D : ${e(q.scenario || '—')}</small></p></div>`).join('')}
 <h2>Classement des questions des scénarios (${questions.length - brouillons.length})</h2><table><tr><th>Question</th><th>Thème</th><th>Niveaux</th><th>Diff.</th><th>Texte</th></tr>${questions.filter(q => q.statut === 'validee').map(ligne).join('')}</table>
 </body></html>`;
 }
