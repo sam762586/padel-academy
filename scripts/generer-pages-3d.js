@@ -176,6 +176,9 @@ for (const x of SCENARIOS) {
   t = remplacer(t, /<section id="simulateur" class="alt">/, `<section id="simulateur" class="alt" data-scenario="${x.id}">`);
   t = remplacer(t, /<div><p class="eyebrow">[^<]*<\/p><h1>[^<]*<\/h1><\/div>\n      <p>[^<]*<\/p>/,
     `<div><p class="eyebrow">${cartes.length ? "Technique" : "Tactique 3D"} · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1>${tete(cartes)}</div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
+  // Le labo des trajectoires reste sur la page principale
+  t = remplacer(t, /<!-- labo:debut -->[\s\S]*?<!-- labo:fin -->\n/, "");
+  t = remplacer(t, /<script type="module">import "\.\/assets\/js\/p3d\/labo\.js";<\/script>\n/, "");
   if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes, s, x.id) + `<section id="tous-les-coups">`);
   // La 3D démarre au clic : image de la scène en attendant (assets/3d/affiches, faite par generer-affiches-3d.cjs)
   if (!fs.existsSync(path.join(RACINE, `assets/3d/affiches/${x.id}.jpg`))) throw new Error(`Image manquante : assets/3d/affiches/${x.id}.jpg (lancer node scripts/generer-affiches-3d.cjs)`);

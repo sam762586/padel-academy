@@ -128,3 +128,46 @@
 .p3d-legende .zone-filet::before{background:#c8f14b}
 .p3d-legende .zone-eviter::before{background:#ff6b57}
 .p3d-legende .zone-defense::before{background:#5cb2e3}
+
+/* Labo des trajectoires (page principale, labo.js) : vues de dessus et de côté, réglages, chiffres */
+.labo{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5)}
+.labo-prereglages{margin-bottom:var(--s-4)}
+.labo-grille{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:var(--s-5);align-items:start}
+.labo figure{margin:0}
+.labo figcaption{color:var(--muted);font-size:var(--fs-xs);margin-top:var(--s-2);text-align:center}
+#labo-svg-dessus{display:block;width:100%;max-width:240px;margin:0 auto;cursor:crosshair}
+.labo-cote{margin-top:var(--s-5)!important}
+#labo-svg-cote{display:block;width:100%;height:auto;background:rgba(0,0,0,.18);border-radius:var(--r-s)}
+.labo-reglages{display:grid;gap:var(--s-4);min-width:0}
+.labo-reglages fieldset{border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-3) var(--s-4);margin:0;display:grid;gap:var(--s-3);min-width:0}
+.labo-reglages legend{font-weight:800;font-size:var(--fs-s);padding:0 var(--s-2)}
+.labo-mode{margin:0}
+.labo-curseur[hidden]{display:none}
+.labo-curseur label{display:flex;justify-content:space-between;gap:var(--s-2)}
+.labo-curseur output{color:var(--turf);font-weight:700}
+.labo-curseur input[type=range]{padding:0;accent-color:var(--turf)}
+.labo-trace{fill:none;stroke:var(--sand);stroke-width:.08;stroke-linejoin:round}
+#labo-svg-cote .labo-trace{stroke-width:.06}
+.labo-ev{stroke:var(--navy);stroke-width:.04}
+.labo-ev-sol{fill:var(--fg)}.labo-ev-vitre,.labo-ev-grille{fill:var(--sky)}.labo-ev-filet{fill:var(--coral)}
+.labo-cible{fill:none;stroke:var(--coral);stroke-width:.12}
+.labo-frappeur{fill:var(--turf);stroke:var(--navy);stroke-width:.06}
+.labo-sol{stroke:var(--fg);stroke-width:.05}
+.labo-vitre{stroke:var(--sky);stroke-width:.12}
+.labo-grillage{stroke:var(--sky);stroke-width:.06;stroke-dasharray:.12 .1}
+.labo-filet{stroke:var(--fg);stroke-width:.1}
+.labo-ligne-service{stroke:var(--muted);stroke-width:.05}
+.labo-grad{stroke:var(--line);stroke-width:.02}
+.labo-grad-txt{font:600 .32px var(--body);fill:var(--dim);text-anchor:end}
+.labo-resultat{margin-top:var(--s-4)}
+.labo-chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:var(--s-3);margin:var(--s-3) 0 0}
+.labo-chiffres div{background:var(--glass-2);border-radius:var(--r-s);padding:var(--s-3)}
+.labo-chiffres dt{font-size:var(--fs-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.labo-chiffres dd{margin:var(--s-1) 0 0;font-weight:700}
+.labo-suite{margin:var(--s-3) 0 0;color:var(--muted)}
+.labo-limites{margin-top:var(--s-4)}
+@media (max-width:720px){
+  .labo{padding:var(--s-4)}
+  .labo-grille{grid-template-columns:1fr}
+  #labo-svg-dessus{max-width:200px}
+}

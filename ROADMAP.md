@@ -78,7 +78,11 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   4 phases de Placement ou les 55 scènes du quiz, 5 tableaux sauvegardés sur l'appareil, export PNG 580 × 1220.
   Tests : `scripts/verifier-tableau-tactique.cjs`.
 - [x] Validation du 4B par Samuel (27/10/2026).
-- [ ] 4C. Labo des trajectoires (page Simulateur 3D) : curseurs, vues de profil et de dessus, limites affichées.
+- [x] 4C. Labo des trajectoires (27/10/2026) : `simulateur-3d.html#labo` (page principale seulement), moteur physique du
+  simulateur sans 3D ; point de frappe, cible (rebond ou passage), temps de vol ; vues de dessus et de côté ; vitesse,
+  marge au-dessus du filet, hauteur maximale, rebond, suite (vitre, grillage, sortie), faute reconnue ; 6 préréglages
+  copiés des scénarios ; limites affichées. Tests : `scripts/verifier-labo-trajectoires.cjs`.
+- [ ] Validation du 4C par Samuel.
 - [ ] 4D. Diagnostic de paire (`tactique.html#construire`) : règles fixes, jamais présenté comme un avis professionnel.
 - [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
 - [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
