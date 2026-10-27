@@ -98,6 +98,9 @@ groupes de joueurs quand c'est utile à la discussion. Pas d'échange de liens n
 Aucun script de suivi supplémentaire n'est ajouté au site (GoatCounter reste le seul compteur).
 
 ### Google Search Console
+**Configuré le 27/10/2026** : propriété « Domaine » `apprendre-padel.fr`, vérifiée par un enregistrement TXT dans la zone
+DNS OVH (ne pas le supprimer : la propriété serait perdue), sitemap envoyé par Samuel. Les premières données
+(Performances, Pages) arrivent en quelques jours ; les Signaux Web essentiels réels seulement avec assez de visiteurs.
 1. https://search.google.com/search-console → « Ajouter une propriété ».
 2. Choisir **Domaine** et saisir `apprendre-padel.fr` (couvre http, https, www). Google donne un enregistrement
    **TXT** : l'ajouter dans la zone DNS chez le registraire du domaine, puis « Valider » (quelques minutes à 48 h).

@@ -116,7 +116,10 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   entraînement, « À voir aussi » sur 4 pages peu reliées ; plan des titres corrigé sur 13 modèles de page (intertitres
   invisibles) ; `verifier-seo.cjs` : titres sans saut et 3 pages liées au moins (1 060 pages).
 - [x] Validation du 5B par Samuel (27/10/2026).
-- [ ] 5C. Search Console (vérification du domaine par DNS, à faire avec Samuel) puis suivi mensuel dans SEO.md.
+- [x] 5C. Search Console (27/10/2026) : propriété « Domaine » vérifiée par TXT dans la zone DNS OVH (fait par Samuel,
+  enregistrement contrôlé sur 8.8.8.8, 1.1.1.1 et ns103.ovh.net), sitemap envoyé.
+- [ ] Suivi mensuel : tableau de SEO.md § 4 à remplir le 1er du mois (première ligne : 1er décembre 2026, données de
+  novembre) ; relire alors les vrais LCP / CLS (point ouvert Tactique et Tournois).
 - [ ] 5D. Contenus de novembre (SEO.md § 2) : débuter au padel, compter les points, le service ; règles vérifiées
   FFT/FIP, relues par Samuel.
 
