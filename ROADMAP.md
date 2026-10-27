@@ -88,7 +88,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   avec un exercice de l'espace joueur au niveau de la paire ; règles fixes reprises des textes du site ; présenté comme
   une aide, pas un avis de professionnel ; réponses gardées sur l'appareil. Tests : `scripts/verifier-diagnostic-paire.cjs`
   (toutes les combinaisons de réponses).
-- [ ] Validation du 4D par Samuel.
+- [x] Validation du 4D par Samuel (27/10/2026).
 - [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
 - [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
 
