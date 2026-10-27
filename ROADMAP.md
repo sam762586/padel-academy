@@ -169,6 +169,20 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
 - [x] Validation de la phase 6 par Samuel et accord de publication (27/10/2026) : académie publiée.
 - [ ] Plus tard, sur accord de Samuel : synchronisation côté site, puis application des migrations academie-01 à 03.
 
+## Expérience joueur personnalisée (audit du 27/10/2026, plan validé par Samuel)
+Constats vérifiés : accueil en « 6 paliers » à côté du 1 à 10 (vrai) ; menu identique sur les 1 068 pages mais 9 libellés
+pour le test de niveau ; plan 8 semaines commun à tous (vrai) ; Mon espace en 8 blocs, académie secondaire (vrai) ;
+quiz reliés aux contenus seulement au bilan (vrai en partie) ; banque déséquilibrée (niveaux 8–10, difficulté 3).
+Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un lot à la fois.
+- [ ] Lot 0 : test des parcours complets (nouvel utilisateur, niveaux 2 / 5 / 8, connecté, non connecté, retour après
+  plusieurs jours, conservation des données).
+- [ ] Lot 1 : le 1 à 10 comme référence (accueil, tableau de bord : niveau déclaré / quiz / classement FFT, fin du test).
+- [ ] Lot 2 : « Ta semaine » en tête de Mon académie et de Mon espace (niveau, quiz, 3 priorités, 1 exercice, 1 scène, objectif).
+- [ ] Lot 3a : contenu recommandé après chaque erreur (quiz de l'académie, quiz tactique, mode quiz 3D).
+- [ ] Lot 4 : « Mon plan » personnalisé, plan générique et progression préservés.
+- [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
+- [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).
+
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
 
