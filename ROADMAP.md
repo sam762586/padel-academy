@@ -138,7 +138,7 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   proposées par le site, bouton de sélection), niveau déclaré et historique sur l'appareil (`pa-academie`), ancien test
   affiché à part ; « Mon académie » dans le menu S'entraîner (« Mon niveau » devient « Test de niveau »), accès depuis
   l'accueil. Test : `scripts/verifier-academie.cjs`.
-- [ ] Validation de la phase 1 par Samuel.
+- [x] Validation de la phase 1 par Samuel (27/10/2026).
 - [ ] Phase 2 : banque de questions (55 questions existantes reclassées 1–10 et par thème ; nouvelles questions en
   « brouillon » jusqu'à relecture de Samuel).
 - [ ] Phase 3 : quiz adaptatif (référence N, consolidation N−1, découverte N+1, bornes 1 et 10, non-répétition, reprise).
