@@ -23,6 +23,8 @@ const QL_THEMES={vitre:["Sorties de vitre","technique.html#coups"],service:["Ser
 // Poids dans la moyenne technique : les coups qui décident des matchs amateurs comptent plus
 const PN_POIDS={vitre:1.5,aerien:1.5,regularite:1.5,placement:1,couple:1,montee:1,service:.75,transition:.75,communication:.5};
 const PN_CLES=["vitre","aerien","regularite"]; // un trou sur l'un d'eux limite le palier (au plus 2 au-dessus)
+// Ordre des priorités pour les paliers Découverte et P25 : d'abord défendre, sortir de la vitre et se placer ; le jeu aérien vient après
+const PN_POIDS_DEBUT={regularite:1.6,vitre:1.5,placement:1.2,couple:1.1,service:1,communication:.8,montee:.7,transition:.6,aerien:.5};
 
 // Repères : chaque option porte sa valeur (v)
 const PN_REPERES=[
@@ -145,7 +147,7 @@ function pnEstimer(e){
  const paliers={...t,compet:R===null?palier:R};
  const themes=PN_THEMES.map(th=>({theme:th,palier:paliers[th],pts:Math.max(0,Math.min(3,3-(palier+1-paliers[th])))}));
  const priorites=themes.filter(x=>x.theme!=="compet"&&x.palier<=palier)
-  .sort((a,b)=>a.palier-b.palier||PN_POIDS[b.theme]-PN_POIDS[a.theme]||PN_THEMES.indexOf(a.theme)-PN_THEMES.indexOf(b.theme))
+  .sort((a,b)=>{const P=palier<=1?PN_POIDS_DEBUT:PN_POIDS;return a.palier-b.palier||P[b.theme]-P[a.theme]||PN_THEMES.indexOf(a.theme)-PN_THEMES.indexOf(b.theme);})
   .slice(0,3).map(x=>x.theme);
  return {palier,source,moyenne,notes,themes,priorites};
 }
@@ -221,7 +223,8 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   });
   det.appendChild(ul);z.appendChild(det);
   const btns=el("div","btns");
-  const plan=el("a","btn primary","Voir le plan 8 semaines");plan.href="entrainement.html";btns.appendChild(plan);
+  const prog=el("a","btn primary","Voir mon programme");prog.href="espace.html#esp-bord";btns.appendChild(prog);
+  const plan=el("a","btn ghost","Le plan 8 semaines");plan.href="entrainement.html";btns.appendChild(plan);
   if(r.palier>=1){const t=el("a","btn ghost","Trouver un tournoi");t.href="tournois.html";btns.appendChild(t);}
   const raq=el("a","btn ghost","Choisir ma raquette");raq.href="materiel.html#raquette";btns.appendChild(raq);
   const encore=el("button","btn ghost","Refaire le test");encore.type="button";btns.appendChild(encore);
@@ -230,22 +233,32 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   const resume={version:2,score:r.themes.reduce((s,x)=>s+x.pts,0),niveau:PN_NIVEAU_EXERCICES[r.palier],palier:r.palier,
    reponses:r.themes.map(x=>({theme:x.theme,pts:x.pts,palier:x.palier}))};
   // Dernier résultat gardé sur l'appareil : l'espace joueur s'en sert pour recommander des exercices
-  try{localStorage.setItem("pa-quiz-dernier",JSON.stringify({date:new Date().toISOString(),...resume,priorites:r.priorites}));}catch(e){}
+  // methode et reperes : l'espace joueur affiche comment le niveau a été estimé et règle le programme sur la fréquence de jeu
+  try{localStorage.setItem("pa-quiz-dernier",JSON.stringify({date:new Date().toISOString(),...resume,priorites:r.priorites,methode:"test-niveau-v2",source:r.source,
+   reperes:{anciennete:rep.anciennete,frequence:rep.frequence,raquette:rep.raquette,resultats:rep.resultats===undefined?null:rep.resultats}}));}catch(e){}
   qCompte(save,resume);
   encore.addEventListener("click",()=>{i=0;rep={};z.hidden=true;carte.hidden=false;rendre();});
   z.querySelector(".vtag").scrollIntoView({block:"nearest"});
  }
  rendre();
 })();
-/* Enregistrement dans le profil : comptes actifs et SQL du test v2 appliqué ("quiz2" dans PA_SUPABASE.activees) */
+/* Après le résultat : non connecté, invitation à créer un compte ; connecté, enregistrement dans le profil si le SQL du test v2
+   est appliqué ("quiz2" dans PA_SUPABASE.activees), sinon le résultat reste sur l'appareil (et dans l'espace joueur). */
 function qCompte(zone,resultat){
  const compte=window.PA_COMPTE;
- if(!zone||!compte||!compte.actif||!((window.PA_SUPABASE||{}).activees||[]).includes("quiz2")) return;
+ if(!zone||!compte||!compte.actif) return;
+ const enregistrable=((window.PA_SUPABASE||{}).activees||[]).includes("quiz2");
  compte.ready.then(()=>{
   zone.hidden=false;zone.textContent="";
   if(!compte.user){
-   const lien=document.createElement("a");lien.href="connexion.html?suite=niveau.html&onglet=inscription";lien.textContent="Crée un compte pour garder ton résultat";
-   zone.appendChild(lien);return;
+   const lien=document.createElement("a");lien.href="connexion.html?suite=niveau.html&onglet=inscription";lien.textContent="Crée un compte gratuit";
+   const p=document.createElement("p");p.append(lien," pour retrouver ton niveau et ton programme sur tous tes appareils. Sans compte, ils restent sur cet appareil.");
+   zone.appendChild(p);return;
+  }
+  if(!enregistrable){
+   const p=document.createElement("p");p.className="acc-muted";
+   p.textContent="Ton résultat est gardé sur cet appareil et apparaît dans ton espace joueur. L'enregistrement dans ton compte arrive bientôt.";
+   zone.appendChild(p);return;
   }
   const bouton=document.createElement("button");bouton.type="button";bouton.className="btn solid";bouton.textContent="Enregistrer dans mon profil";
   const retour=document.createElement("p");retour.setAttribute("role","status");

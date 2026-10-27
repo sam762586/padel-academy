@@ -4,12 +4,16 @@
      - résultats de tournois (simulateur du barème)  localStorage pa-sim-resultats  <-> table resultats_tournois
      - objectifs                                       localStorage pa-objectifs     <-> table objectifs
      - rang FFT déclaré                                localStorage pa-classement-fft <-> profiles.rang_fft (le plus récent gagne)
+     - objectifs de jeu (défense, vitre, bandeja…)     localStorage pa-objectifs-jeu  <-> table objectifs_jeu
+       (seulement si "progression" est aussi dans activees : SQL 2026-10-27-progression-*)
    Fusion à trois voies : on compare l'appareil, le compte et la dernière version synchronisée (pa-synchro-<liste>:<compte>).
    Un ajout, une modification ou une suppression faits d'un côté sont donc reportés de l'autre, même faits hors connexion.
    Rien n'est appelé tant que "espace" n'est pas dans PA_SUPABASE.activees (SQL : supabase/migrations/2026-10-26-espace-*). */
 const JS_CLE_OBJECTIFS="pa-objectifs";
 const JS_CLE_RANG="pa-classement-fft";
 const JS_TYPES_OBJECTIF=["points","rang","victoires","tournois"];
+const JS_CLE_OBJECTIFS_JEU="pa-objectifs-jeu";
+const JS_OBJECTIFS_JEU=["defense","vitre","volees","bandeja","placement","fautes","tournoi"]; // mêmes valeurs que OBJECTIFS_JEU et la contrainte SQL
 
 (function(){
  const B=window.PA_BAREME;
@@ -33,6 +37,15 @@ const JS_TYPES_OBJECTIF=["points","rang","victoires","tournois"];
   }));
  }
 
+ // Objectifs de jeu : un seul exemplaire par objectif
+ function normaliserObjectifsJeu(liste){
+  if(!Array.isArray(liste))return [];
+  const vus=new Set();
+  return liste.filter(o=>o&&JS_OBJECTIFS_JEU.includes(o.objectif)&&jourValide(o.depuis)&&!vus.has(o.objectif)&&vus.add(o.objectif)).map(o=>({
+   cle:typeof o.cle==="string"&&B.SIM_CLE_VALIDE.test(o.cle)?o.cle:B.simNouvelleCle(),objectif:o.objectif,depuis:o.depuis
+  }));
+ }
+
  /* ---------- Description des listes synchronisées ---------- */
  const LISTES={
   resultats:{
@@ -48,8 +61,16 @@ const JS_TYPES_OBJECTIF=["points","rang","victoires","tournois"];
    versLigne:o=>({cle:o.cle,type:o.type,cible:o.cible,echeance:o.echeance,depuis:o.depuis}),
    depuisLigne:l=>({cle:l.cle,type:l.type,cible:l.cible,echeance:l.echeance||null,depuis:l.depuis}),
    empreinte:o=>[o.type,o.cible,o.echeance||"",o.depuis].join("|")
+  },
+  objectifsJeu:{
+   cleLocale:JS_CLE_OBJECTIFS_JEU,table:"objectifs_jeu",drapeau:"progression",
+   normaliser:normaliserObjectifsJeu,
+   versLigne:o=>({cle:o.cle,objectif:o.objectif,depuis:o.depuis}),
+   depuisLigne:l=>({cle:l.cle,objectif:l.objectif,depuis:l.depuis}),
+   empreinte:o=>[o.objectif,o.depuis].join("|")
   }
  };
+ const listeActive=nom=>!LISTES[nom].drapeau||((window.PA_SUPABASE||{}).activees||[]).includes(LISTES[nom].drapeau);
  const cleSynchro=(nom,id)=>"pa-synchro-"+nom+":"+id;
 
  // Fusion à trois voies d'une liste : renvoie { liste fusionnée, opérations à faire sur le compte }
@@ -127,7 +148,7 @@ const JS_TYPES_OBJECTIF=["points","rang","victoires","tournois"];
     let encore=true,tours=0;
     while(encore&&tours++<3){
      encore=false;
-     for(const nom of Object.keys(LISTES))if(await synchroniserListe(nom,id))encore=true;
+     for(const nom of Object.keys(LISTES))if(listeActive(nom)&&await synchroniserListe(nom,id))encore=true;
     }
     await synchroniserRang(id);
     etat={texte:"",erreur:false,derniere:new Date().toISOString()};
@@ -147,6 +168,8 @@ const JS_TYPES_OBJECTIF=["points","rang","victoires","tournois"];
   etat:()=>etat,
   lireObjectifs:()=>normaliserObjectifs(lire(JS_CLE_OBJECTIFS,[])),
   ecrireObjectifs:liste=>ecrire(JS_CLE_OBJECTIFS,normaliserObjectifs(liste)),
+  lireObjectifsJeu:()=>normaliserObjectifsJeu(lire(JS_CLE_OBJECTIFS_JEU,[])),
+  ecrireObjectifsJeu:liste=>ecrire(JS_CLE_OBJECTIFS_JEU,normaliserObjectifsJeu(liste)),
   _fusionner:fusionner,_LISTES:LISTES // pour les tests
  };
  const c=compte();

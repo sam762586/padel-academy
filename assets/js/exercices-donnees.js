@@ -139,3 +139,15 @@ const MOTIF_EXPLICATION={
  vitre:"finissent sur une sortie de vitre adverse : tes attaques leur laissent des balles faciles",
  gagnant:"finissent sur un coup gagnant adverse, souvent dans un trou entre toi et ton partenaire",
 };
+
+// Objectifs de jeu choisis dans l'espace joueur (progression.js) : chacun oriente le programme vers 1 ou 2 thèmes d'exercices.
+// Identifiants identiques à la contrainte SQL (supabase/migrations/2026-10-27-progression-01) et à joueur-sync.js.
+const OBJECTIFS_JEU=[
+ {id:"defense",libelle:"Améliorer ma défense",themes:["regularite","vitre"],lien:"conseils.html#erreurs"},
+ {id:"vitre",libelle:"Réussir mes sorties de vitre",themes:["vitre"],lien:"technique.html#coups"},
+ {id:"volees",libelle:"Améliorer mes volées",themes:["placement","transition"],lien:"technique.html#coups"},
+ {id:"bandeja",libelle:"Maîtriser la bandeja",themes:["aerien"],lien:"tutos.html"},
+ {id:"placement",libelle:"Mieux me placer",themes:["placement","couple"],lien:"tactique.html#placement"},
+ {id:"fautes",libelle:"Réduire mes fautes directes",themes:["regularite"],lien:"conseils.html#erreurs"},
+ {id:"tournoi",libelle:"Préparer un tournoi",themes:["compet","communication"],lien:"competition.html"},
+];

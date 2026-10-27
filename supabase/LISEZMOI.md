@@ -86,6 +86,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 4. `2026-10-26-t4-01` à `-12`, puis ajoute `"communaute"` à `PA_SUPABASE.activees`.
 5. `2026-10-26-espace-01` à `-06`, puis ajoute `"espace"` à `PA_SUPABASE.activees`.
 6. `2026-10-26-journal-01` à `-03` (après `20261026_matchs.sql`, déjà exécuté), puis ajoute `"journal"` à `PA_SUPABASE.activees`.
+7. `2026-10-27-progression-01` et `-02` (après les migrations espace), puis ajoute `"progression"` à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
@@ -98,3 +99,7 @@ Tant que ce n'est pas fait, l'espace joueur marche entièrement sur l'appareil. 
 `2026-10-26-journal-01` à `-03` complètent la table `matchs` : identifiant `cle` (un match du téléphone n'est jamais copié deux fois ; les anciens matchs prennent leur `id`), `partenaire`, `type_match` (amical, tournoi, entraînement), `saisie` (compteur ou manuelle) ; la liste des points peut être vide pour un match saisi après coup. Ajoute ensuite `"journal"` à `PA_SUPABASE.activees`.
 
 Le compte sert d'archive : effacer l'historique du compteur sur un téléphone ne supprime rien dans le compte. Seule la suppression d'un match depuis le journal de l'espace joueur l'efface partout (mise en attente si le téléphone est hors connexion).
+
+# Progression (tableau de bord de l'espace joueur)
+
+`2026-10-27-progression-01` crée la table `objectifs_jeu` (objectifs de jeu choisis dans l'espace : défense, sorties de vitre, volées, bandeja, placement, fautes directes, préparer un tournoi), avec RLS : chaque joueur ne lit et ne modifie que ses lignes. `-02` ajoute la limite de 300 lignes (fonction commune `espace_limite_lignes`). À exécuter après les migrations espace (avec `"espace"` dans `activees`), puis ajoute `"progression"`. Avant ça, les objectifs de jeu, le programme de la semaine et le tableau de bord fonctionnent sur l'appareil.
