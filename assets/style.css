@@ -146,10 +146,6 @@ dl.lex{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%
 dl.lex div{border-bottom:1px solid var(--line);padding:14px 0;min-width:0}
 dl.lex dt{font-family:var(--display);font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em;color:var(--sand)}
 dl.lex dd{margin:4px 0 0;font-size:.9rem;color:var(--muted)}
-.err{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr))}
-.err div{background:var(--glass);border:1px solid var(--line);border-left:4px solid var(--coral);border-radius:var(--r-s);padding:16px 18px;min-width:0}
-.err b{display:block;font-family:var(--display);font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em;color:#fff}
-.err span{color:var(--muted);font-size:.92rem}
 
 /* SELECTOR */
 .selector{background:radial-gradient(900px 500px at 100% 0%,rgba(255,181,71,.14),transparent 60%),radial-gradient(800px 500px at 0% 100%,rgba(var(--turf-rgb),.1),transparent 60%),var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -1189,3 +1185,42 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 .msg-erreur{border-left-color:var(--erreur);color:var(--fg)}
 .msg b:first-child{margin-right:6px}
 .icone{width:1.25em;height:1.25em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em}
+/* ===== CONTENUS PÉDAGOGIQUES (design system v3, phase 2) =====
+   Pour les pages d'articles (règles, conseils, tactique, tutos…) :
+   - .grille-blocs > .bloc : blocs de contenu côte à côte (une colonne sur mobile) ;
+   - .exemple / .exo : encadré « exemple concret » (bleu) ou « exercice » (vert), avec <span class="etiquette"> ;
+   - .cas : liste de questions-réponses (cas litigieux, situations), chaque réponse peut citer sa source (.ref) ;
+   - .intro : paragraphe d'introduction de section ; .tbl : tableau (déjà défini plus haut). */
+.intro{color:var(--muted);max-width:44em;margin:0 0 var(--s-6)}
+h2+.intro{margin-top:var(--s-4)}
+.grille-blocs+.grille-blocs{margin-top:var(--s-4)}
+.grille-blocs.quatre{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.grille-blocs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:var(--s-4)}
+.bloc{padding:var(--s-5);border:1px solid var(--line);border-radius:var(--r);background:var(--glass);min-width:0}
+.bloc h3{margin-bottom:var(--s-3)}
+.bloc p,.bloc li{color:var(--muted)}
+.bloc p+p{margin-top:var(--s-2)}
+.bloc ul,.bloc ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.bloc b,.bloc strong{color:var(--fg)}
+.exemple,.exo{margin-top:var(--s-4);padding:var(--s-4) var(--s-5);border-left:4px solid var(--sky);border-radius:0 var(--r-s) var(--r-s) 0;background:rgba(0,0,0,.2);color:var(--muted);max-width:52em}
+.exo{border-left-color:var(--turf)}
+.exemple b,.exo b{color:var(--fg)}
+.etiquette{display:block;margin-bottom:4px;color:var(--sky);font-size:var(--fs-xs);font-weight:800;text-transform:uppercase;letter-spacing:.12em}
+.exo .etiquette{color:var(--turf)}
+.cas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:var(--s-3)}
+.cas li{display:grid;align-content:start;gap:6px;padding:var(--s-4) var(--s-5);border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass);color:var(--muted)}
+.cas b{color:var(--fg)}
+.cas .ref{font-size:var(--fs-xs);color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.tbl-legende{margin-top:var(--s-2);font-size:var(--fs-s);color:var(--dim)}
+.tbl-formats td:first-child{color:var(--fg);font-weight:700;white-space:nowrap}
+/* Liste d'erreurs numérotée (conseils.html) : la numérotation continue d'une famille à l'autre */
+section:has(.erreurs-liste){counter-reset:erreur}
+.erreurs-liste{list-style:none;margin:var(--s-3) 0 var(--s-6);padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:var(--s-3)}
+.erreurs-liste li{counter-increment:erreur;position:relative;padding-top:var(--s-4)}
+.erreurs-liste li::before{content:counter(erreur,decimal-leading-zero);display:block;font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;color:var(--coral);margin-bottom:var(--s-2)}
+.erreurs-liste h3{margin-bottom:var(--s-2)}
+.erreurs-liste .correction{margin-top:var(--s-3);color:var(--fg)}
+.erreurs-liste .correction b{color:var(--turf)}
+/* Lexique : lien vers la page qui explique le terme */
+.lex-lien{font-weight:700;white-space:nowrap}
+.lex-lien::after{content:" →"}
