@@ -108,8 +108,14 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   640 / 960 / 1280 / 1600 px ; date des tournois avec sa place réservée. Labo (téléphone, 4G lente, CPU ×4) : LCP de
   2,5–3,7 s à 1,4–2,4 s, CLS de 0,05–0,08 à 0. Test : `scripts/verifier-performance.cjs` (budget LCP < 2,5 s, CLS < 0,02).
 - [x] Validation du 5A par Samuel (27/10/2026).
-- [ ] 5B. SEO des nouveautés : titres et descriptions des pages Tactique et Simulateur (quiz, tableau, labo,
-  diagnostic), liens internes vers ces outils, règle « 3 pages liées » dans `verifier-seo.cjs`, sauts de titres.
+- [ ] Point ouvert (mesure en ligne après publication) : CLS 0 partout, mais LCP encore au-dessus de 2,5 s sur Tactique
+  (3,7 s) et Tournois (3,5 s) ; le test local ne reproduit pas le coût réseau réel de ces pages (nombreux fichiers,
+  données des tournois). À analyser plus tard (choix de Samuel : 5B d'abord).
+- [x] 5B. SEO des nouveautés (27/10/2026) : titres et descriptions de tactique.html et simulateur-3d.html (quiz, tableau,
+  diagnostic, labo), sommaire des outils en tête de ces pages, liens vers les outils depuis tutos, technique et
+  entraînement, « À voir aussi » sur 4 pages peu reliées ; plan des titres corrigé sur 13 modèles de page (intertitres
+  invisibles) ; `verifier-seo.cjs` : titres sans saut et 3 pages liées au moins (1 060 pages).
+- [ ] Validation du 5B par Samuel.
 - [ ] 5C. Search Console (vérification du domaine par DNS, à faire avec Samuel) puis suivi mensuel dans SEO.md.
 - [ ] 5D. Contenus de novembre (SEO.md § 2) : débuter au padel, compter les points, le service ; règles vérifiées
   FFT/FIP, relues par Samuel.

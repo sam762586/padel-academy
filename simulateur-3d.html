@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Simulateur padel 3D : tous les coups et placements | Apprendre Padel</title>
-<meta name="description" content="Tous les coups du padel en 3D, un scénario par coup : regarde-les sous tous les angles, pas à pas, puis teste-toi en mode quiz. Gratuit, sans inscription.">
+<title>Simulateur padel 3D : coups, placements et trajectoires | Apprendre Padel</title>
+<meta name="description" content="Tous les coups du padel en 3D, pas à pas ou en mode quiz, et un labo des trajectoires : règle une frappe, vois où va la balle. Gratuit, sans inscription.">
 <link rel="canonical" href="https://apprendre-padel.fr/simulateur-3d.html">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -13,8 +13,8 @@
 <meta property="og:site_name" content="Apprendre Padel">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:url" content="https://apprendre-padel.fr/simulateur-3d.html">
-<meta property="og:title" content="Simulateur padel 3D : tous les coups et placements">
-<meta property="og:description" content="Tous les coups du padel en 3D, un scénario par coup : regarde-les sous tous les angles, pas à pas, puis teste-toi en mode quiz. Gratuit, sans inscription.">
+<meta property="og:title" content="Simulateur padel 3D : coups, placements et trajectoires | Apprendre Padel">
+<meta property="og:description" content="Tous les coups du padel en 3D, pas à pas ou en mode quiz, et un labo des trajectoires : règle une frappe, vois où va la balle. Gratuit, sans inscription.">
 <meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -39,6 +39,7 @@
     <div class="sec-head">
       <div><p class="eyebrow">Tactique 3D</p><h1>Simulateur 3D de padel</h1></div>
       <p>Revois une situation de jeu sous tous les angles : quatre joueurs, une balle dont la trajectoire est calculée (gravité, freinage de l'air, rebonds au sol et sur les vitres), et une explication à chaque étape. Mets en pause, avance pas à pas, ralentis. En mode quiz, la scène s'arrête avant les frappes clés : à toi de dire ce que tu jouerais.</p>
+      <p class="note">Et en bas de page : <a href="#labo">le labo des trajectoires</a>, pour régler une frappe et voir où va la balle.</p>
     </div>
     <div class="p3d-choix">
       <label class="p3d-label" for="p3d-scenarios">Scénario</label>
@@ -56,7 +57,7 @@
     </div>
     <div class="p3d-quiz" id="p3d-quiz" hidden>
       <p class="p3d-quiz-score" id="p3d-quiz-score"></p>
-      <h3 id="p3d-quiz-question" tabindex="-1"></h3>
+      <h2 class="sr-only">Le mode quiz</h2><h3 id="p3d-quiz-question" tabindex="-1"></h3>
       <div class="p3d-quiz-choix" id="p3d-quiz-choix" role="group" aria-label="Réponses"></div>
       <p class="p3d-quiz-explication" id="p3d-quiz-explication" aria-live="polite" hidden></p>
       <button type="button" class="btn primary" id="p3d-quiz-suite" hidden>Voir la suite</button>

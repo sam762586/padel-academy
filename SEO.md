@@ -26,9 +26,13 @@ Vérifié en ligne le 27/10 : HTTP, www et sam762586.github.io redirigent (301) 
 la page 404 répond bien 404. GitHub Pages sert aussi `/tactique` sans `.html` : sans conséquence, l'URL canonique
 désigne l'adresse avec `.html`.
 
+Lot 5B (27/10/2026) : plan des titres sans saut sur toutes les pages (intertitres `h2` invisibles, classe sr-only, là
+où des cartes en `h3` suivaient directement le H1) ; maillage contrôlé (chaque page indexable renvoie vers 3 autres
+pages au moins dans son contenu, pages légales exceptées) ; titres et descriptions de tactique.html et
+simulateur-3d.html orientés vers les outils (quiz tactique, tableau tactique, diagnostic de paire, labo des trajectoires) ;
+liens vers ces outils depuis tutos, technique et entraînement ; « À voir aussi » sur barème, matériel, compétition, vidéos.
+
 ### Restent à traiter (mineur)
-- Sauts de niveau de titres (h1 → h3) dans des cartes sur une dizaine de pages : sans effet sur le référencement,
-  à corriger au fil des refontes visuelles (changer le niveau change le style).
 - `tournois.html` : la liste nationale reste construite en JavaScript (fichier de 310 Ko) ; les pages départements
   et région × catégorie, en HTML, sont liées en bas de page.
 - Performances (lot 5A, 27/10/2026) : polices hébergées sur le site, préchargées, repli aux mêmes dimensions ; bandeaux

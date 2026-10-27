@@ -1,6 +1,7 @@
 /* Vérification SEO de toutes les pages (racine, tournoi/, tournois/), statique sauf le point 8 (navigateur) :
    1) title et meta description présents et uniques, description de 160 caractères au plus (pages indexables) ;
-   2) un seul H1, lang="fr", viewport, URL canonique = adresse de la page ;
+   2) un seul H1, lang="fr", viewport, URL canonique = adresse de la page ; plan des titres sans saut (h1 → h3) et
+      maillage : chaque page indexable (hors pages légales) renvoie dans son contenu vers 3 autres pages au moins ;
    3) liens internes et ancres : aucun lien cassé ;
    4) images : alt et dimensions ;
    5) sitemap : seulement des pages existantes, indexables et canoniques ; toute page indexable y figure ;
@@ -57,6 +58,21 @@ for (const p of pages) {
   if (!p.noindex) assert.equal(p.canonical, p.url, p.f + " : canonique");
 }
 ok("un H1 par page, lang fr, viewport, URL canonique = adresse de la page");
+
+// 2 bis) plan des titres sans saut et maillage interne (contenu seulement : ni le menu ni le pied de page)
+const LEGALES = ["confidentialite.html", "mentions-legales.html"];
+for (const p of indexables) {
+  const corps = (p.h.split(/<body[^>]*>/)[1] || "").replace(/<nav class="nav"[\s\S]*?<\/nav>/, "").replace(/<footer>[\s\S]*?<\/footer>/, "");
+  const niveaux = [...corps.matchAll(/<h([1-6])\b/g)].map(m => Number(m[1]));
+  assert.equal(niveaux[0], 1, p.f + " : le premier titre est le H1");
+  niveaux.forEach((v, i) => { if (i) assert.ok(v <= niveaux[i - 1] + 1, p.f + " : saut de titre h" + niveaux[i - 1] + " → h" + v); });
+  if (LEGALES.includes(p.f)) continue;
+  const dossier = path.posix.dirname(p.f);
+  const liees = new Set([...corps.matchAll(/href="([^"#:?]+\.html)(?:#[^"]*)?"/g)].map(m => path.posix.normalize(path.posix.join(dossier, m[1]))));
+  liees.delete(p.f);
+  assert.ok(liees.size >= 3, p.f + " : " + liees.size + " page(s) liée(s) dans le contenu, 3 au moins");
+}
+ok(`plan des titres sans saut ; maillage : ${indexables.length - LEGALES.length} pages renvoient chacune vers 3 autres pages au moins`);
 
 // 3) liens internes
 const ids = {};

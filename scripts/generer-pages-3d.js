@@ -179,6 +179,7 @@ for (const x of SCENARIOS) {
   // Le labo des trajectoires reste sur la page principale
   t = remplacer(t, /<!-- labo:debut -->[\s\S]*?<!-- labo:fin -->\n/, "");
   t = remplacer(t, /<script type="module">import "\.\/assets\/js\/p3d\/labo\.js";<\/script>\n/, "");
+  t = remplacer(t, /\n      <p class="note">Et en bas de page : <a href="#labo">[^\n]*<\/p>/, "");
   if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes, s, x.id) + `<section id="tous-les-coups">`);
   // La 3D démarre au clic : image de la scène en attendant (assets/3d/affiches, faite par generer-affiches-3d.cjs)
   if (!fs.existsSync(path.join(RACINE, `assets/3d/affiches/${x.id}.jpg`))) throw new Error(`Image manquante : assets/3d/affiches/${x.id}.jpg (lancer node scripts/generer-affiches-3d.cjs)`);
