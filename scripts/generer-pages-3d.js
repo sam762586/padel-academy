@@ -186,6 +186,7 @@ for (const x of SCENARIOS) {
   t = remplacer(t, /<ul id="p3d-explication"><\/ul>/, `<ul id="p3d-explication">${li(s.explication)}</ul>`);
   t = remplacer(t, /<ul id="p3d-erreurs"><\/ul>/, `<ul id="p3d-erreurs">${li(s.erreurs)}</ul>`);
   t = remplacer(t, /<p id="p3d-conclusion"><\/p>/, `<p id="p3d-conclusion">${html(s.conclusion)}</p>`);
+  if (s.conseil) t = remplacer(t, /<div id="p3d-conseil-bloc" hidden><h3>Le conseil<\/h3><p id="p3d-conseil"><\/p><\/div>/, `<div id="p3d-conseil-bloc"><h3>Le conseil</h3><p id="p3d-conseil">${html(s.conseil)}</p></div>`);
   t = remplacer(t, /<p id="p3d-exercice"><\/p>/, `<p id="p3d-exercice">${html(s.exercice)}</p>`);
   if (s.lien) {
     const libelle = { "technique.html": "Tous les coups du padel", "tutos.html": "Voir les tutos", "regles.html": "Voir les règles", "tactique.html": "Voir le placement" }[s.lien.split("#")[0]] || "En savoir plus";

@@ -39,7 +39,23 @@ const GROUPES = ['Fond de court et défense', 'Transition et coups spéciaux', '
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
 
-const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false, mode: 'regarder' };
+const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false, mode: 'regarder', trajectoire: false, placements: false };
+
+/* Qualité d'affichage, choisie par le visiteur (mémorisée sur l'appareil) ; par défaut économique sur mobile, élevée
+   sur ordinateur. Le lissage des bords se règle à la création du rendu : changer de qualité recharge la scène. */
+const CLE_QUALITE = 'pa-p3d-qualite';
+const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
+function qualiteChoisie() {
+  let nom = null;
+  try { nom = localStorage.getItem(CLE_QUALITE); } catch (e) { /* stockage indisponible */ }
+  if (!['economique', 'equilibree', 'elevee'].includes(nom)) nom = MOBILE ? 'economique' : 'elevee';
+  const dpr = devicePixelRatio || 1;
+  return {
+    economique: { nom, ombres: false, tailleOmbres: 0, pixelRatio: Math.min(dpr, 1.25), lissage: false },
+    equilibree: { nom, ombres: true, tailleOmbres: 1024, pixelRatio: Math.min(dpr, 1.5), lissage: !MOBILE },
+    elevee: { nom, ombres: true, tailleOmbres: 2048, pixelRatio: Math.min(dpr, 2), lissage: true },
+  }[nom];
+}
 // Quiz : réponse choisie pour chaque question (null = pas encore posée), question affichée
 const quiz = { reponses: [], enCours: null };
 window.P3D = { etat, quiz, aller: t => aller(t) }; // utilisé par les tests (scripts/verifier-simulateur-3d.cjs)
@@ -60,6 +76,8 @@ function afficherScenario(s) {
   liste($('p3d-explication'), s.explication);
   liste($('p3d-erreurs'), s.erreurs);
   texte($('p3d-conclusion'), s.conclusion);
+  texte($('p3d-conseil'), s.conseil || '');
+  $('p3d-conseil-bloc').hidden = !s.conseil;
   texte($('p3d-exercice'), s.exercice);
   const lien = $('p3d-lien');
   lien.hidden = !s.lien; if (s.lien) { lien.href = s.lien; texte(lien, texteLien(s.lien)); }
@@ -204,6 +222,19 @@ function choisirMode(mode) {
 }
 
 function brancherCommandes() {
+  // Affichage : trajectoire complète, zones de placement, qualité
+  [['p3d-trajectoire', 'trajectoire'], ['p3d-placements', 'placements']].forEach(([id, cle]) => {
+    $(id).addEventListener('click', () => {
+      etat[cle] = !etat[cle];
+      $(id).setAttribute('aria-pressed', String(etat[cle]));
+      if (cle === 'placements') $('p3d-legende').hidden = !etat.placements;
+    });
+  });
+  $('p3d-qualite').value = qualiteChoisie().nom;
+  $('p3d-qualite').addEventListener('change', ev => {
+    try { localStorage.setItem(CLE_QUALITE, ev.target.value); } catch (e) { /* stockage indisponible : choix pour cette visite */ }
+    location.reload();
+  });
   $('p3d-lecture').addEventListener('click', () => (etat.lecture ? pause() : lecture()));
   $('p3d-debut').addEventListener('click', () => { aller(0); pause(); if (etat.mode === 'quiz') reinitialiserQuiz(); });
   $('p3d-mode').querySelectorAll('button').forEach(b => b.addEventListener('click', () => choisirMode(b.dataset.mode)));
@@ -265,6 +296,7 @@ function sans3d(raison) {
   $('p3d-vues').hidden = true;
   // Le quiz suit la lecture de la scène : sans 3D, seul le mode « Regarder » (étapes en texte) reste
   $('p3d-mode').hidden = true;
+  $('p3d-affichage').hidden = true;
   if (etat.mode === 'quiz') choisirMode('regarder');
   $('p3d-sans-3d').hidden = false;
   if (raison) texte($('p3d-sans-3d-raison'), raison);
@@ -273,25 +305,27 @@ function sans3d(raison) {
 let scene3d = null;
 async function demarrer3d() {
   const THREE = await import('three');
-  const { creerTerrain, creerLumieres } = await import('./terrain.js');
+  const { creerTerrain, creerLumieres, creerZones } = await import('./terrain.js');
   const { creerCameras, VUES } = await import('./cameras.js');
   const { chargerModele, creerJoueurs, poserJoueur } = await import('./joueurs.js');
 
   const conteneur = $('p3d-scene'), canvas = $('p3d-canvas');
-  const mobile = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
-  const qualite = { ombres: !mobile, tailleOmbres: 2048, pixelRatio: Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2) };
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, powerPreference: 'high-performance' });
+  const qualite = qualiteChoisie();
+  etat.qualite = qualite.nom;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: qualite.lissage, powerPreference: 'high-performance' });
   renderer.setPixelRatio(qualite.pixelRatio);
   renderer.shadowMap.enabled = qualite.ombres;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.type = qualite.nom === 'elevee' ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b1019);
-  scene.fog = new THREE.Fog(0x0b1019, 30, 60);
+  scene.background = new THREE.Color(0x141c2b);
+  scene.fog = new THREE.Fog(0x141c2b, 34, 64);
   const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 120);
   scene.add(creerTerrain(qualite));
+  const zones = creerZones(); scene.add(zones);
   creerLumieres(scene, qualite);
   const cameras = creerCameras(camera, canvas);
+  window.P3D.vue3d = { camera, cameras }; // gros plans des tests et des captures de gestes
 
   // Balle et son ombre (disque au sol, utile même sans ombres portées)
   // Balle grossie deux fois à l'affichage pour rester visible de loin (la physique garde le vrai diamètre)
@@ -305,6 +339,12 @@ async function demarrer3d() {
   geoTrainee.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX_TRAINEE * 3), 3));
   const trainee = new THREE.Line(geoTrainee, new THREE.LineBasicMaterial({ color: 0xe4ff3a, transparent: true, opacity: 0.45 }));
   trainee.frustumCulled = false; scene.add(trainee);
+  // Trajectoire complète de la frappe en cours (bouton « Trajectoire ») : pointillés jusqu'à la fin de la frappe
+  const geoComplete = new THREE.BufferGeometry();
+  geoComplete.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX_TRAINEE * 3), 3));
+  const complete = new THREE.Line(geoComplete, new THREE.LineDashedMaterial({ color: 0xf4f7fa, transparent: true, opacity: 0.55, dashSize: 0.18, gapSize: 0.12 }));
+  complete.frustumCulled = false; complete.visible = false; scene.add(complete);
+  let segmentComplet = null;
   // Rebonds : anneau qui s'efface (sol) ou éclat sur la paroi
   const anneaux = [];
   function preparerRebonds(calcul) {
@@ -389,7 +429,21 @@ async function demarrer3d() {
     let k = 0;
     for (let i = 0; i <= fin && k < MAX_TRAINEE; i = i < fin && i + 2 > fin ? fin : i + 2, k++) { const p = seg.points[i]; tab[k * 3] = p[0]; tab[k * 3 + 1] = p[1]; tab[k * 3 + 2] = p[2]; }
     geoTrainee.setDrawRange(0, k); geoTrainee.attributes.position.needsUpdate = true;
-    anneaux.forEach(a => { const age = t - a.t; a.mesh.material.opacity = age >= 0 && age < 0.7 ? 0.9 * (1 - age / 0.7) : 0; a.mesh.scale.setScalar(1 + Math.max(0, age) * 2.5); });
+    complete.visible = etat.trajectoire;
+    if (etat.trajectoire && segmentComplet !== seg) {
+      segmentComplet = seg;
+      const tc = geoComplete.attributes.position.array; let n = 0;
+      for (let i = 0; i < seg.points.length && n < MAX_TRAINEE; i += 2, n++) { const q = seg.points[i]; tc[n * 3] = q[0]; tc[n * 3 + 1] = q[1]; tc[n * 3 + 2] = q[2]; }
+      geoComplete.setDrawRange(0, n); geoComplete.attributes.position.needsUpdate = true; complete.computeLineDistances();
+    }
+    // Rebonds : éclat qui s'efface ; avec « Trajectoire », les rebonds de la frappe en cours restent marqués
+    const finSeg = seg.t + seg.points.length / 240;
+    anneaux.forEach(a => {
+      const age = t - a.t, marque = etat.trajectoire && a.t >= seg.t && a.t <= finSeg;
+      a.mesh.material.opacity = age >= 0 && age < 0.7 ? 0.9 * (1 - age / 0.7) : marque ? 0.55 : 0;
+      a.mesh.scale.setScalar(age >= 0 && age < 0.7 ? 1 + age * 2.5 : 1);
+    });
+    zones.visible = etat.placements;
     // Joueurs : position, allure (vitesse estimée sur ±0,05 s), geste
     joueurs.forEach((j, i) => {
       const cles = s.positions[j.id];
@@ -410,6 +464,7 @@ async function demarrer3d() {
     cameras.mettreAJour(dt, { joueur: a1, balle: b });
     renderer.render(scene, camera);
     etat.images = (etat.images || 0) + 1;
+    etat.appels = renderer.info.render.calls; // appels de dessin de la dernière image (suivi des performances)
   }
   requestAnimationFrame(image);
   $('p3d-chargement').hidden = true;

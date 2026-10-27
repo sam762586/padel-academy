@@ -23,7 +23,7 @@ async function horsNavigateur(){
  const {TERRAIN,BALLE,PHYSIQUE,RAQUETTE,hauteurFilet,paroiLaterale}=await module3d('constantes.js');
  const {pas,trajectoire,viser}=await module3d('physique.js');
  const {valider,calculer,ecartsHorsPortee,positionBalle,positionJoueur,frappeProche}=await module3d('scenarios.js');
- const {GESTES,INSTANTS,angles}=await module3d('gestes.js');
+ const {GESTES,INSTANTS,angles,V2}=await module3d('gestes.js');
 
  assert.equal(TERRAIN.longueur,20);assert.equal(TERRAIN.largeur,10);assert.equal(TERRAIN.ligneService,6.95);
  assert.equal(hauteurFilet(0),0.88);assert.equal(hauteurFilet(5),0.92);assert.equal(hauteurFilet(-5),0.92);
@@ -131,6 +131,27 @@ async function horsNavigateur(){
  const utilises=new Set(SCENARIOS.flatMap(id=>lireScenario(id).frappes.map(f=>f.geste)));
  assert.deepEqual([...utilises].sort(),Object.keys(GESTES).sort(),'chaque geste est montré dans au moins un scénario');
  ok('gestes : les '+Object.keys(GESTES).length+' coups construits (statut « simplifié »), chacun montré dans un scénario');
+ // Gestes v2 (buste et bras gauche) : toutes les valeurs ou aucune ; prototype 3A : coup droit et bandeja seulement
+ for(const [id,g] of Object.entries(GESTES)){
+  const n=V2.filter(k=>g[k]).length;
+  assert.ok(n===0||n===V2.length,id+' : valeurs v2 incomplètes');
+  V2.filter(k=>g[k]).forEach(k=>assert.equal(g[k].length,INSTANTS.length,id+' '+k));
+ }
+ assert.deepEqual(Object.keys(GESTES).filter(id=>GESTES[id].penche).sort(),['bandeja','coup_droit']);
+ assert.ok(angles('bandeja',0).gAvant>90,'bandeja : la main gauche pointe la balle au contact');
+ assert.ok(angles('coup_droit',-0.4).penche>0,'coup droit : buste penché vers la balle à la préparation');
+ const srcJoueurs=fs.readFileSync(path.join(racine,'assets/js/p3d/joueurs.js'),'utf8');
+ assert.match(srcJoueurs,/COULEURS = \{ A: 0xc8f14b, B: 0xff6b57 \}/,'couleurs d\'équipe du site');
+ assert.match(srcJoueurs,/j\.repos\.forEach\(\(\[o, q\]\) => o\.quaternion\.copy\(q\)\)/,'vertèbres remises au repos à chaque image');
+ ok('gestes v2 : coup droit et bandeja (buste, bras gauche), valeurs complètes ; couleurs d\'équipe du site ; colonne remise au repos à chaque image');
+ // Conseil (facultatif) : affiché sur la page des scénarios qui en ont un, bloc masqué sinon
+ for(const id of SCENARIOS){
+  const s=lireScenario(id),h=fs.readFileSync(path.join(racine,'simulateur-3d-'+id+'.html'),'utf8');
+  if(s.conseil)assert.ok(h.includes('<div id="p3d-conseil-bloc"><h3>Le conseil</h3><p id="p3d-conseil">'),id+' : conseil absent du HTML');
+  else assert.ok(h.includes('<div id="p3d-conseil-bloc" hidden>'),id+' : bloc conseil visible sans conseil');
+ }
+ assert.ok(lireScenario('bandeja-garder-filet').conseil&&lireScenario('sortie-vitre-fond').conseil,'conseil des scénarios du prototype');
+ ok('conseil : bandeja et sortie de vitre de fond, écrit dans le HTML de leur page');
 
  const licences=fs.readFileSync(path.join(racine,'assets/3d/LICENCES-3D.md'),'utf8');
  for(const dossier of ['assets/3d/vendor','assets/3d/modeles'])
@@ -246,6 +267,27 @@ async function dansLeNavigateur(base){
   assert.match(await page.textContent('#p3d-titre-scenario'),/bandeja/i);
   assert.equal(await page.locator('#p3d-explication li').count(),3);
   ok('chargement : terrain, quatre joueurs animés, balle, textes du scénario');
+
+  // Affichage : qualité élevée par défaut sur ordinateur, appels de dessin limités, trajectoire et placements, qualité mémorisée
+  assert.equal(await page.evaluate(()=>P3D.etat.qualite),'elevee');
+  const appels=await page.evaluate(()=>P3D.etat.appels);
+  assert.ok(appels>0&&appels<80,'appels de dessin par image : '+appels);
+  await page.click('#p3d-trajectoire');
+  assert.equal(await page.getAttribute('#p3d-trajectoire','aria-pressed'),'true');
+  assert.equal(await page.evaluate(()=>P3D.etat.trajectoire),true);
+  await page.click('#p3d-placements');
+  assert.equal(await page.isVisible('#p3d-legende'),true);
+  assert.equal(await page.locator('#p3d-legende span').count(),3);
+  await page.click('#p3d-placements');
+  assert.equal(await page.isHidden('#p3d-legende'),true);
+  await page.click('#p3d-trajectoire');
+  await Promise.all([page.waitForNavigation(),page.selectOption('#p3d-qualite','economique')]);
+  await pret(page);
+  assert.equal(await page.evaluate(()=>P3D.etat.qualite),'economique');
+  assert.equal(await page.inputValue('#p3d-qualite'),'economique');
+  await Promise.all([page.waitForNavigation(),page.selectOption('#p3d-qualite','elevee')]);
+  await pret(page);
+  ok('affichage : '+appels+' appels de dessin par image, trajectoire complète, zones de placement et légende, qualité économique / élevée mémorisée');
 
   await page.click('#p3d-lecture');
   await page.waitForFunction(()=>P3D.etat.t>0.3);

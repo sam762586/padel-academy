@@ -11,6 +11,9 @@ export const INSTANTS = [-1, -0.4, 0, 0.5, 1];
 // tronc : rotation des épaules (négatif = épaules tournées vers la droite, préparation coup droit)
 // avant : bras levé vers l'avant ; cote : bras écarté sur le côté ; coude : flexion ; poignet : raquette relevée par rapport
 // à l'avant-bras ; genoux : flexion
+// Gestes « v2 » (facultatif, tous ensemble) : penche (buste vers l'avant, négatif vers l'arrière), inclinaison (épaule droite
+// qui descend), gAvant / gCote / gCoude (bras gauche, mêmes conventions que le bras droit, en miroir) ; avec eux, la rotation
+// des épaules est répartie sur toute la colonne (joueurs.js).
 export const GESTES = Object.freeze({
   lob: {
     nom: 'Lob', statut: 'simplifie',
@@ -20,7 +23,9 @@ export const GESTES = Object.freeze({
   bandeja: {
     nom: 'Bandeja', statut: 'simplifie',
     phases: ['Profil, épaule gauche vers le filet, raquette armée derrière la tête', 'Contact devant et sur le côté droit, bras presque tendu', 'Accompagnement en travers vers le bas, sans casser le poignet'],
-    tronc: [0, -70, -25, 10, 0], avant: [15, 80, 150, 70, 20], cote: [15, 70, 30, 25, 15], coude: [40, 110, 15, 30, 50], poignet: [45, 40, 5, 10, 45], genoux: [10, 15, 10, 10, 10],
+    tronc: [0, -80, -30, 10, 0], avant: [15, 80, 150, 70, 20], cote: [15, 70, 30, 25, 15], coude: [40, 110, 15, 30, 50], poignet: [45, 40, 5, 10, 45], genoux: [10, 20, 10, 10, 10],
+    // v2 : buste légèrement en arrière à l'armé, main gauche qui pointe la balle, puis le buste revient vers l'avant
+    penche: [0, -10, -4, 8, 0], inclinaison: [0, 10, 4, -4, 0], gAvant: [20, 135, 110, 40, 20], gCote: [10, 15, 25, 10, 10], gCoude: [45, 15, 25, 60, 50],
   },
   sortie_vitre: {
     nom: 'Sortie de vitre', statut: 'simplifie',
@@ -35,7 +40,9 @@ export const GESTES = Object.freeze({
   coup_droit: {
     nom: 'Coup droit', statut: 'simplifie',
     phases: ['Épaules tournées, raquette en arrière à hauteur de hanche', 'Contact devant la jambe avant, genoux fléchis', 'Accompagnement vers l\'avant et en travers, vers la cible'],
-    tronc: [0, -60, -10, 35, 0], avant: [15, -20, 45, 80, 20], cote: [15, 60, 50, -30, 15], coude: [40, 40, 15, 75, 50], poignet: [45, 30, 10, 30, 45], genoux: [10, 30, 25, 15, 10],
+    tronc: [0, -70, -10, 40, 0], avant: [15, -20, 45, 60, 20], cote: [15, 60, 50, -30, 15], coude: [40, 40, 15, 55, 50], poignet: [45, 30, 10, 30, 45], genoux: [10, 35, 30, 15, 10],
+    // v2 : buste penché vers la balle, main gauche devant (elle accompagne la rotation), qui revient contre le corps à la frappe
+    penche: [5, 14, 18, 10, 5], inclinaison: [0, 6, 8, 0, 0], gAvant: [20, 55, 30, 45, 20], gCote: [10, -20, 25, 5, 10], gCoude: [45, 25, 50, 70, 50],
   },
   revers: {
     nom: 'Revers', statut: 'simplifie',
@@ -94,6 +101,9 @@ export const GESTES = Object.freeze({
   },
 });
 
+// Valeurs des gestes v2 (facultatives)
+export const V2 = Object.freeze(['penche', 'inclinaison', 'gAvant', 'gCote', 'gCoude']);
+
 // Garde (position d'attente) : raquette devant la poitrine
 export const GARDE = Object.freeze({ tronc: 0, avant: 20, cote: 15, coude: 55, poignet: 45, genoux: 12 });
 
@@ -106,6 +116,6 @@ export function angles(geste, p) {
   while (i < INSTANTS.length - 2 && q > INSTANTS[i + 1]) i++;
   const u = (q - INSTANTS[i]) / (INSTANTS[i + 1] - INSTANTS[i]), s = u * u * (3 - 2 * u);
   const r = {};
-  ['tronc', 'avant', 'cote', 'coude', 'poignet', 'genoux'].forEach(k => { r[k] = g[k][i] + (g[k][i + 1] - g[k][i]) * s; });
+  ['tronc', 'avant', 'cote', 'coude', 'poignet', 'genoux'].concat(V2.filter(k => g[k])).forEach(k => { r[k] = g[k][i] + (g[k][i + 1] - g[k][i]) * s; });
   return r;
 }

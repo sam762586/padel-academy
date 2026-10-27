@@ -9,7 +9,7 @@ import { GLTFLoader, SkeletonUtils } from 'three/addons';
 import { RAQUETTE } from './constantes.js';
 import { angles } from './gestes.js';
 
-export const COULEURS = { A: 0x35e27f, B: 0xff5d4a }; // turf et corail, comme le site
+export const COULEURS = { A: 0xc8f14b, B: 0xff6b57 }; // vert énergie et corail, comme le site
 const ALLURES = [ // [nom de l'animation, vitesse (m/s) à laquelle elle est naturelle]
   ['Idle_Loop', 0], ['Walk_Loop', 1.4], ['Jog_Fwd_Loop', 3.2], ['Sprint_Loop', 5.5],
 ];
@@ -91,8 +91,13 @@ export function creerJoueurs(scene, definitions, gltf, qualite) {
     // GLTFLoader retire les points des noms de nœuds : « DEF-upper_arm.R » devient « DEF-upper_armR »
     const os = n => corps.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(n));
     j.os = {
-      colonne: os('DEF-spine.001'), epaule: os('DEF-upper_arm.R'), avantBras: os('DEF-forearm.R'), main: os('DEF-hand.R'),
+      colonne: os('DEF-spine.001'), colonne2: os('DEF-spine.002'), colonne3: os('DEF-spine.003'),
+      epaule: os('DEF-upper_arm.R'), avantBras: os('DEF-forearm.R'), main: os('DEF-hand.R'),
+      epauleG: os('DEF-upper_arm.L'), avantBrasG: os('DEF-forearm.L'), mainG: os('DEF-hand.L'),
     };
+    // Pose de repos des vertèbres : celles que l'animation ne pilote pas sont remises à zéro à chaque image (sinon les
+    // rotations des gestes s'additionneraient d'une image à l'autre)
+    j.repos = ['colonne', 'colonne2', 'colonne3'].map(n => [j.os[n], j.os[n].quaternion.clone()]);
     const raquette = creerRaquette(0x20242b);
     // Raquette dans l'axe de la main (l'axe Y de l'os de la main suit l'avant-bras), tamis perpendiculaire à la paume
     raquette.position.set(0, 0.06, 0);
@@ -150,14 +155,28 @@ export function poserJoueur(j, position, vitesse, cibleRegard, geste, dtScene, d
     const w = n === 'Crouch_Idle_Loop' ? accroupi * (poids.Idle_Loop || 0) : (poids[n] || 0) * (n === 'Idle_Loop' ? 1 - accroupi : 1);
     a.setEffectiveWeight(w);
     const vn = (ALLURES.find(x => x[0] === n) || [n, 0])[1];
-    a.setEffectiveTimeScale(vn ? sens * Math.max(0.6, Math.min(1.5, v / vn)) : 1);
+    // Cadence des pas proportionnelle à la vitesse réelle : les pieds glissent moins sur le sol
+    a.setEffectiveTimeScale(vn ? sens * Math.max(0.3, Math.min(2, v / vn)) : 1);
   });
+  j.repos.forEach(([o, q]) => o.quaternion.copy(q));
   j.mixer.update(dtScene);
   j.racine.updateMatrixWorld(true);
   // Bras droit et épaules : garde ou geste en cours
   const p = g || angles(null, 0);
   const torsion = p.tronc * RAD;
-  tournerMonde(j.os.colonne, new THREE.Vector3(0, 1, 0), torsion);
+  const haut = new THREE.Vector3(0, 1, 0);
+  // Gestes « v2 » (penche, inclinaison, bras gauche) : rotation des épaules répartie sur les trois vertèbres, buste qui
+  // penche et s'incline. Les autres gestes gardent la rotation sur une seule vertèbre.
+  const v2 = p.penche !== undefined;
+  if (v2) {
+    tournerMonde(j.os.colonne, haut, torsion * 0.5);
+    tournerMonde(j.os.colonne2, haut, torsion * 0.3);
+    tournerMonde(j.os.colonne3, haut, torsion * 0.2);
+    const cap = j.cap + torsion;
+    // penche : buste vers l'avant (positif) ou l'arrière ; inclinaison : épaule droite qui descend (positif)
+    tournerMonde(j.os.colonne2, new THREE.Vector3(-Math.cos(cap), 0, Math.sin(cap)), p.penche * RAD);
+    tournerMonde(j.os.colonne2, new THREE.Vector3(Math.sin(cap), 0, Math.cos(cap)), p.inclinaison * RAD);
+  } else tournerMonde(j.os.colonne, haut, torsion);
   // Direction du bras dans le repère du joueur (avant +Z, droite -X, haut +Y), tournée avec les épaules
   const av = p.avant * RAD, co = p.cote * RAD;
   const bras = new THREE.Vector3(-Math.sin(co), -Math.cos(av) * Math.cos(co), Math.sin(av) * Math.cos(co)).normalize();
@@ -172,4 +191,14 @@ export function poserJoueur(j, position, vitesse, cibleRegard, geste, dtScene, d
   orienter(j.os.avantBras, j.os.main, avantBras.clone().applyQuaternion(tourner));
   // Poignet : la raquette se relève dans le même plan que le coude
   orienter(j.os.main, j.pointe, avantBras.applyAxisAngle(axe, p.poignet * RAD).applyQuaternion(tourner));
+  // Bras gauche (gestes v2) : même convention que le bras droit, en miroir (gauche = +X) ; sinon, l'animation le garde
+  if (v2 && p.gAvant !== undefined) {
+    const ga = p.gAvant * RAD, gc = p.gCote * RAD;
+    const brasG = new THREE.Vector3(Math.sin(gc), -Math.cos(ga) * Math.cos(gc), Math.sin(ga) * Math.cos(gc)).normalize();
+    orienter(j.os.epauleG, j.os.avantBrasG, brasG.clone().applyQuaternion(tourner));
+    const axeG = new THREE.Vector3().crossVectors(brasG, indice); // le miroir d'une rotation garde cette formule
+    if (axeG.lengthSq() < 1e-6) axeG.set(1, 0, 0);
+    axeG.normalize();
+    orienter(j.os.avantBrasG, j.os.mainG, brasG.applyAxisAngle(axeG, p.gCoude * RAD).applyQuaternion(tourner));
+  }
 }

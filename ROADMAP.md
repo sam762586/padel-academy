@@ -46,10 +46,16 @@ Search Console.
 - [x] Validation de Samuel (27/10/2026), publiée.
 
 ## Phase 3 — Simulateur 3D v2
-Qualité économique / équilibrée / élevée ; boutons trajectoires et placements ; erreurs, conseil et exercice sur
-les 6 scénarios prioritaires (défense de lob, bandeja, montée au filet, sortie de vitre, centre, défense-attaque) ;
-matériaux et éclairage ; couleurs d'équipe alignées sur la palette. Gestes toujours marqués « simplifiés ».
-Limite connue : pas d'effet de balle (par 3, rulo).
+- [x] 3A. Prototype (27/10/2026) : terrain (vitres lisibles et cadre acier, salle éclairée, parois regroupées :
+  appels de dessin par image 194 → 65 sur ordinateur, 147 → 45 sur mobile), qualité économique / équilibrée / élevée,
+  boutons Trajectoire et Placements, couleurs d'équipe du site, pieds qui glissent moins, gestes v2 coup droit et
+  bandeja (buste, bras gauche), champ « conseil » (bandeja, sortie de vitre de fond).
+- [ ] Validation du prototype par Samuel (gestes coup droit et bandeja compris).
+- [ ] 3B. Autres gestes en v2, par groupes validés : revers, volée, lob, víbora, smash, défense après vitre, puis le reste.
+- [ ] 3C. Scénarios « partenaire lobé (cambio) » et « couverture du centre » ; conseil sur les 6 scénarios prioritaires.
+- [ ] 3D. Fiches : la 3D démarre au clic (image de la scène en attendant), page Simulateur inchangée ; niveaux
+  « du coup » et « de la scène » distingués.
+Limite gardée : pas d'effet de balle (slice, lift), affichée sur la page.
 
 ## Phase 4 — Outils interactifs (ordre proposé)
 Quiz tactique hors 3D (réutilise les questions des scénarios) → tableau tactique (export image, sauvegarde locale)

@@ -109,3 +109,16 @@
   .p3d-etiquette{font-size:.6rem;padding:2px 6px;letter-spacing:.03em}
   .p3d-geste{font-size:.7rem;padding:4px 10px;left:8px;top:8px}
 }
+/* Affichage : trajectoire complète, zones de placement, qualité */
+.p3d-affichage{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.p3d-affichage[hidden],.p3d-legende[hidden]{display:none}
+.p3d-bascule{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:40px}
+.p3d-bascule[aria-pressed="true"]{color:var(--accent-fg);background:var(--turf);border-color:var(--turf)}
+.p3d-bascule:hover{border-color:var(--turf)}
+.p3d-affichage .p3d-label{margin-left:auto}
+.p3d-affichage select{background:var(--bg);color:var(--fg);border:1px solid var(--line-2);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700;min-height:40px}
+.p3d-legende{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-size:.82rem;color:var(--muted)}
+.p3d-legende span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.p3d-legende .zone-filet::before{background:#c8f14b}
+.p3d-legende .zone-eviter::before{background:#ff6b57}
+.p3d-legende .zone-defense::before{background:#5cb2e3}

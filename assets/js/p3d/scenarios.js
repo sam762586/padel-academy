@@ -18,10 +18,11 @@ export const PORTEE = Object.freeze({ horizontale: 1.2, hauteurMin: 0.15, hauteu
 export function valider(s) {
   const e = [];
   if (!s || typeof s !== 'object' || Array.isArray(s)) return ['Le scénario doit être un objet JSON.'];
-  const autorisees = ['id', 'titre', 'niveau', 'duree', 'situation', 'explication', 'erreurs', 'conclusion', 'exercice', 'lien', 'joueurs', 'positions', 'frappes', 'etapes', 'questions'];
+  const autorisees = ['id', 'titre', 'niveau', 'duree', 'situation', 'explication', 'erreurs', 'conclusion', 'conseil', 'exercice', 'lien', 'joueurs', 'positions', 'frappes', 'etapes', 'questions'];
   Object.keys(s).forEach(k => { if (!autorisees.includes(k)) e.push('Champ inconnu : ' + k); });
   if (!(typeof s.id === 'string' && /^[a-z0-9-]{3,60}$/.test(s.id))) e.push('id invalide');
   ['titre', 'niveau', 'situation', 'conclusion', 'exercice'].forEach(k => { if (!texte(s[k])) e.push(k + ' manquant ou trop long'); });
+  if (s.conseil !== undefined && !texte(s.conseil)) e.push('conseil trop long ou vide'); // facultatif
   if (s.lien !== undefined && !(typeof s.lien === 'string' && /^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/.test(s.lien))) e.push('lien invalide (page du site uniquement)');
   ['explication', 'erreurs'].forEach(k => { if (!(Array.isArray(s[k]) && s[k].length >= 1 && s[k].length <= 8 && s[k].every(x => texte(x)))) e.push(k + ' : 1 à 8 textes'); });
   if (!(estNombre(s.duree) && s.duree > 1 && s.duree <= MAX_DUREE)) e.push('duree invalide');

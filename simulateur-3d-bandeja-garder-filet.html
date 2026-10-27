@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css?v=9f8de25073">
-<link rel="stylesheet" href="assets/simulateur-3d.css?v=b3bdd4dd8e">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=0ac1f4ea94">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -77,6 +77,13 @@
       <select id="p3d-vitesse" title="Vitesse de lecture"></select>
     </div>
     <div class="phases p3d-vues" id="p3d-vues" role="group" aria-label="Caméra"></div>
+    <div class="p3d-affichage" id="p3d-affichage" role="group" aria-label="Affichage">
+      <button type="button" class="p3d-bascule" id="p3d-trajectoire" aria-pressed="false">Trajectoire</button>
+      <button type="button" class="p3d-bascule" id="p3d-placements" aria-pressed="false">Placements</button>
+      <label class="p3d-label" for="p3d-qualite">Qualité</label>
+      <select id="p3d-qualite" title="Qualité d'affichage (recharge la scène)"><option value="economique">Économique</option><option value="equilibree">Équilibrée</option><option value="elevee">Élevée</option></select>
+    </div>
+    <p class="p3d-legende" id="p3d-legende" hidden><span class="zone-filet">Au filet : 2 à 2,5 m</span><span class="zone-eviter">Zone à éviter</span><span class="zone-defense">Défense : 1 à 1,5 m de la vitre</span></p>
     <p class="p3d-aide-libre" id="p3d-aide-libre"></p>
     <div class="p3d-panneau">
       <p class="p3d-etape-num" id="p3d-etape-num"></p>
@@ -95,6 +102,7 @@
     <div class="p3d-fiche">
       <div><h3>Ce qu'il faut retenir</h3><ul id="p3d-explication"><li>Un lob mi-profond ne se laisse pas passer : si tu recules jusqu'au fond, vous perdez le filet.</li><li>La bandeja n'est pas un coup gagnant : c'est une frappe coupée, contrôlée, qui envoie la balle dans la vitre du fond adverse sans leur donner de balle facile.</li><li>Pendant ta bandeja, ton partenaire tient le centre ; dès la frappe, vous remontez ensemble.</li></ul></div>
       <div><h3>Les erreurs fréquentes</h3><ul id="p3d-erreurs"><li>Smasher à plat une balle mi-profonde : la balle revient après la vitre et vous perdez le filet.</li><li>Reculer de face, en courant en arrière : on perd l'équilibre et la balle passe derrière soi.</li><li>Rester au fond après la bandeja au lieu de remonter tout de suite.</li></ul></div>
+      <div id="p3d-conseil-bloc"><h3>Le conseil</h3><p id="p3d-conseil">Pense « bandeja = garder le filet » : dès que le lob part, tourne-toi de profil et recule en pas chassés. Vise la profondeur et la vitre plutôt que la vitesse, puis reviens à 2–2,5 m du filet pendant que la balle traverse.</p></div>
       <div><h3>En résumé</h3><p id="p3d-conclusion">La bandeja sert à garder l'avantage du filet : coupée, profonde, vers la vitre, puis on remonte.</p></div>
       <div><h3>L'exercice</h3><p id="p3d-exercice">Sur le terrain : un partenaire te lance des lobs mi-profonds depuis le fond. Bandeja vers la vitre du fond, puis touche la ligne de service et remonte au filet. 3 séries de 10.</p><p class="note"><a id="p3d-lien" href="tutos.html">Voir les tutos</a></p></div>
     </div>
@@ -169,7 +177,7 @@
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
-<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=6ae5b1eea9","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=37c58b8a84","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=d9f69d2b6b","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=fca88c3163","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=95cc965c46","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=ca6c906fa2","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=796add282f","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=963a04eb12"}}</script>
 <script type="module">import "./assets/js/p3d/simulateur.js";</script>
 <script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>
