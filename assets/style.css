@@ -1305,3 +1305,34 @@ section:has(.erreurs-liste){counter-reset:erreur}
   .qt-question{grid-template-columns:1fr}
   .qt-schema{max-width:220px}
 }
+
+/* TABLEAU TACTIQUE (tactique.html#tableau, tableau-tactique.js) : même terrain que le quiz, pions déplaçables */
+.tb{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5)}
+.tb-grille{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:var(--s-6);align-items:start}
+.tb-svg{display:block;width:100%;max-width:300px;height:auto;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.tb-pion{cursor:grab;outline:none}
+.tb-pion:active{cursor:grabbing}
+.tb-pion text{font:700 .62px var(--body);fill:var(--fg);text-anchor:middle;pointer-events:none}
+.tb-pion:focus-visible circle{stroke:var(--focus);stroke-width:.14}
+.tb-pion.qt-balle circle{fill:var(--sand);stroke:var(--navy);stroke-width:.06}
+.tb-fleche{stroke-width:.1;stroke-linecap:round}
+.tb-depl{stroke:var(--fg)}
+.tb-balle{stroke:var(--sand);stroke-dasharray:.3 .2}
+.tb-pointe-depl{fill:var(--fg)}.tb-pointe-balle{fill:var(--sand)}
+.tb-outils{display:grid;gap:var(--s-4);min-width:0}
+.tb-label{display:block;font-size:var(--fs-xs);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s-2)}
+.tb-modes{margin:0}
+.tb-aide{color:var(--muted);font-size:var(--fs-s);margin:0}
+.tb-actions{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0}
+.tb-actions .btn{padding:10px 16px;font-size:.78rem}
+.tb-actions .btn:disabled{opacity:.45;cursor:default;transform:none}
+.tb-statut{min-height:1.4em;margin:0;font-size:var(--fs-s);color:var(--fg)}
+.tb-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.tb-liste li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);padding:var(--s-2) var(--s-3);border:1px solid var(--line);border-radius:var(--r-s)}
+.tb-liste span{flex:1 1 8em;min-width:0;overflow-wrap:anywhere;font-weight:600}
+.tb-liste .btn{padding:8px 12px;font-size:.72rem}
+@media (max-width:720px){
+  .tb{padding:var(--s-4)}
+  .tb-grille{grid-template-columns:1fr;gap:var(--s-5)}
+  .tb-svg{max-width:240px}
+}

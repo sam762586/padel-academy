@@ -90,7 +90,7 @@ async function dansLeNavigateur(base,Q){
     if(i===0&&largeur===1280){
      // Placement : « Toi » (A1) dessiné à -x, -z du repère du simulateur
      const toi=q.joueurs.find(j=>j[0]==='A1');
-     const cx=Number(await page.getAttribute('.qt-nous circle >> nth=0','cx')),cy=Number(await page.getAttribute('.qt-nous circle >> nth=0','cy'));
+     const cx=Number(await page.getAttribute('#qt .qt-nous circle >> nth=0','cx')),cy=Number(await page.getAttribute('#qt .qt-nous circle >> nth=0','cy'));
      assert.ok(Math.abs(cx+toi[2])<0.01&&Math.abs(cy+toi[3])<0.01,'position de Toi sur le schéma');
     }
     // Réponse : la bonne à la première question, une fausse ensuite

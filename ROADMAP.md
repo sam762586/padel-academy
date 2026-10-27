@@ -73,8 +73,11 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   réponses mélangées, correction, lien vers la scène en 3D, scénarios à revoir, meilleur score sur l'appareil ;
   lien depuis l'espace joueur. Tests : `scripts/verifier-quiz-tactique.cjs`.
 - [x] Validation du 4A par Samuel (27/10/2026).
-- [ ] 4B. Tableau tactique (`tactique.html`, à partir du schéma 2D) : joueurs et balle déplaçables, flèches, export PNG,
-  sauvegarde sur l'appareil.
+- [x] 4B. Tableau tactique (27/10/2026) : `tactique.html#tableau`, même terrain que le quiz ; joueurs et balle à
+  déplacer (doigt, souris, clavier), flèches de déplacement et de balle (glisser ou deux touchers), départ depuis les
+  4 phases de Placement ou les 55 scènes du quiz, 5 tableaux sauvegardés sur l'appareil, export PNG 580 × 1220.
+  Tests : `scripts/verifier-tableau-tactique.cjs`.
+- [ ] Validation du 4B par Samuel.
 - [ ] 4C. Labo des trajectoires (page Simulateur 3D) : curseurs, vues de profil et de dessus, limites affichées.
 - [ ] 4D. Diagnostic de paire (`tactique.html#construire`) : règles fixes, jamais présenté comme un avis professionnel.
 - [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
