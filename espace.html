@@ -22,7 +22,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Mon espace joueur", "item": "https://apprendre-padel.fr/espace.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=6dcc6c0f80">
+<link rel="stylesheet" href="assets/style.css?v=92fe3d94bb">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -42,7 +42,11 @@
       <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. Tout marche sans compte ; connecté, tu retrouves tout sur tes autres appareils.</p>
     </div>
     <div id="esp-statut" class="esp-statut"></div>
-    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bloc-semaine">Ta semaine</a><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <div class="acc-card esp-carte ac-semaine-carte" id="esp-bloc-semaine" data-semaine-bloc>
+      <h2 class="esp-titre">Ta semaine</h2>
+      <div id="ac-semaine"><p class="note">Ta semaine a besoin de JavaScript.</p></div>
+    </div>
     <div class="acc-card esp-carte bord-carte">
       <h2 class="esp-titre">Mon tableau de bord</h2>
       <div class="bord" id="esp-bord"></div>
@@ -177,12 +181,14 @@
 <script src="assets/js/diagnostic.js?v=7701bc9541"></script>
 <script src="assets/js/mon-padel.js?v=4fd190996e"></script>
 <script src="assets/js/exercices-donnees.js?v=0db011324b"></script>
-<script src="assets/js/academie-contenus.js?v=8bad8e12ed"></script>
+<script src="assets/js/academie-questions.js?v=09b5081d78"></script>
+<script src="assets/js/academie-contenus.js?v=345f39f0fb"></script>
 <script src="assets/js/carnet-outils.js?v=7d8ce92702"></script>
 <script src="assets/js/espace.js?v=169baf987c"></script>
 <script src="assets/js/exercices.js?v=cb5733677f"></script>
 <script src="assets/js/defis.js?v=268125c535"></script>
-<script src="assets/js/progression.js?v=1beb15cd2c"></script>
+<script src="assets/js/academie-parcours.js?v=c74d7e953f"></script>
+<script src="assets/js/progression.js?v=96a779af3f"></script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

@@ -35,6 +35,8 @@ const ACADEMIE_ARTICLES=[
  {id:"analyser-matchs",titre:"Analyser tes matchs pour progresser",url:"score.html#analyser",niveaux:[4,10],themes:["construction"],difficulte:2,prerequis:[]},
  {id:"labo",titre:"Le labo des trajectoires",url:"simulateur-3d.html#labo",niveaux:[3,10],themes:["lob","bandeja","vitres"],difficulte:2,prerequis:[]},
 ];
+// Intitulés des niveaux de la grille FFT (cartes de academie.html)
+const ACADEMIE_NIVEAUX_NOMS={1:"Débutant",2:"Débutant +",3:"Élémentaire",4:"Intermédiaire",5:"Confirmé",6:"Avancé",7:"Avancé +",8:"Expert",9:"Expert +",10:"Élite"};
 // Compétences associées à chaque niveau (cartes de academie.html, proposition du site)
 const ACADEMIE_NIVEAUX_THEMES={1:["regles","volee","transition"],2:["vitres","defense"],3:["lob","bandeja","vitres"],4:["vitres","defense","transition","construction"],
  5:["lob","volee","defense","bandeja","vibora"],6:["construction","volee","bandeja","vibora"],7:["defense","vitres","bandeja","vibora","construction"],8:["construction","defense"],9:[],10:[]};
@@ -73,7 +75,7 @@ function acPourExercices(seances){
  const noms=typeof ACADEMIE_THEMES!=="undefined"?ACADEMIE_THEMES:{};
  return acThemesFaibles(seances).map(t=>({theme:ACADEMIE_THEME_EXERCICES[t.theme],points:2,raison:"Quiz de l'académie : "+t.bonnes+" sur "+t.total+(noms[t.theme]?" en "+noms[t.theme].nom.toLowerCase():"")})).filter(x=>x.theme);
 }
-window.PA_ACADEMIE_CONTENUS={ARTICLES:ACADEMIE_ARTICLES,NIVEAUX_THEMES:ACADEMIE_NIVEAUX_THEMES,THEME_EXERCICES:ACADEMIE_THEME_EXERCICES,
+window.PA_ACADEMIE_CONTENUS={NOMS:ACADEMIE_NIVEAUX_NOMS,ARTICLES:ACADEMIE_ARTICLES,NIVEAUX_THEMES:ACADEMIE_NIVEAUX_THEMES,THEME_EXERCICES:ACADEMIE_THEME_EXERCICES,
  niveauExercice:acNiveauExercice,exerciceClasse:acExerciceClasse,niveauDeclare:acNiveauDeclare,
  niveauExerciceDeclare:()=>{const n=acNiveauDeclare();return n?acNiveauExercice(n):null;},
  themesFaibles:acThemesFaibles,seancesQuiz:acSeancesQuiz,pourExercices:()=>acPourExercices(acSeancesQuiz())};

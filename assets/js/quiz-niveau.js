@@ -209,6 +209,7 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   carte.hidden=true;
   const z=document.getElementById("qresult");z.hidden=false;z.textContent="";
   z.append(el("span","vtag "+P.cls,P.nom),el("p","score",fiabilite),el("p","",P.txt));
+  z.appendChild(el("p","qnote","Ce résultat estime la catégorie de tournoi qui te correspond. Ton niveau de 1 à 10 (grille FFT) se choisit à part, dans Mon académie : l'un n'est pas converti en l'autre."));
   r.notes.forEach(n=>z.appendChild(el("p","qnote",n)));
   if(r.priorites.length){
    z.appendChild(el("h4","qtitre","À travailler en priorité"));
@@ -225,6 +226,7 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   const btns=el("div","btns");
   const prog=el("a","btn primary","Voir mon programme");prog.href="espace.html#esp-bord";btns.appendChild(prog);
   const plan=el("a","btn ghost","Le plan 8 semaines");plan.href="entrainement.html";btns.appendChild(plan);
+  const acad=el("a","btn ghost","Choisir mon niveau de 1 à 10");acad.href="academie.html#niveaux";btns.appendChild(acad);
   if(r.palier>=1){const t=el("a","btn ghost","Trouver un tournoi");t.href="tournois.html";btns.appendChild(t);}
   const raq=el("a","btn ghost","Choisir ma raquette");raq.href="materiel.html#raquette";btns.appendChild(raq);
   const encore=el("button","btn ghost","Refaire le test");encore.type="button";btns.appendChild(encore);

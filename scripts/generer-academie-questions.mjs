@@ -44,10 +44,11 @@ function exercice(theme, min, max) {
 export function construire() {
   const classement = JSON.parse(lire('scripts/donnees/academie-classement.json'));
   const redigees = JSON.parse(lire('scripts/donnees/academie-questions-redigees.json')).questions;
-  const questions = [];
+  const questions = [], titres = {};
   const dossier = path.join(RACINE, 'assets/3d/scenarios');
   for (const f of fs.readdirSync(dossier).filter(f => f.endsWith('.json')).sort()) {
     const s = JSON.parse(fs.readFileSync(path.join(dossier, f), 'utf8'));
+    titres[s.id] = s.titre;
     (s.questions || []).forEach((q, i) => {
       const id = s.id + '-' + (i + 1), c = classement[id];
       if (!c) throw new Error('Question sans classement : ' + id + ' (scripts/donnees/academie-classement.json)');
@@ -68,6 +69,7 @@ export function construire() {
       exercice: exercice(r.theme, ...r.niveaux), scenario: r.scenario || (scenarios.has(THEMES[r.theme].scene) ? THEMES[r.theme].scene : null),
       prerequis: r.prerequis || [] });
   }
+  construire.titres = titres; // titres des scènes 3D (ACADEMIE_SCENES)
   return questions;
 }
 
@@ -78,6 +80,8 @@ function fichier(questions) {
    niveauMin / niveauMax : grille des niveaux de padel de la FFT (1 à 10) ; difficulte : 1 à 3 ; prerequis : questions à
    connaître avant (même scène) ; article, exercice (exercices-donnees.js), scenario (simulateur-3d-<id>.html). */
 const ACADEMIE_THEMES = ${JSON.stringify(th)};
+// Titres des scènes 3D (simulateur-3d-<id>.html)
+const ACADEMIE_SCENES = ${JSON.stringify(construire.titres || {})};
 const ACADEMIE_QUESTIONS = ${JSON.stringify(questions).replace(/\},\{"id"/g, '},\n{"id"')};
 `;
 }

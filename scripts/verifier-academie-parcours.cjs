@@ -57,7 +57,10 @@ async function horsNavigateur(){
  // Parcours pour les 10 niveaux
  for(let n=1;n<=10;n++){
   const prio=copie(P.priorites({niveau:n}));
-  assert.deepEqual(prio,[...C.NIVEAUX_THEMES[n]].slice(0,4));
+  // compétences du niveau d'abord, complétées par celles des niveaux voisins (n-1, n+1, n-2…) : toujours 4
+  const voisins=[n];for(let d=1;d<10;d++)voisins.push(n-d,n+d);
+  assert.deepEqual(prio,[...new Set(voisins.flatMap(k=>C.NIVEAUX_THEMES[k]||[]))].slice(0,4),'niveau '+n+' : priorités');
+  assert.equal(prio.length,4,'niveau '+n+' : 4 compétences, donc 3 priorités dans Ta semaine');
   const arts=copie(P.articles(n,prio));assert.ok(arts.length>=2&&arts.every(a=>a.niveaux[0]<=n&&n<=a.niveaux[1]),'niveau '+n+' : articles');
   const sc=copie(P.scenesRecommandees(Q,n,prio));assert.ok(sc.length>=1&&sc.every(x=>x.niveaux[0]<=n&&n<=x.niveaux[1]),'niveau '+n+' : scènes');
   const th=copie(E.themesPrioritaires(null,[],[],[],P.entreeExercices(n,['communication'],[])));

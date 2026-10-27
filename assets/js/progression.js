@@ -1,6 +1,8 @@
 /* TABLEAU DE BORD DE PROGRESSION (espace.html, bloc #esp-bord)
    Relie le test de niveau, les objectifs de jeu, le programme d'exercices, les matchs et l'entraînement :
-     - niveau estimé : dernier test (pa-quiz-dernier ou compte), avec sa date et sa méthode, jamais présenté comme un classement FFT ;
+     - mon niveau, en quatre lignes distinctes, sans aucune conversion de l'une à l'autre : niveau déclaré (pa-academie,
+       grille FFT 1 à 10), quiz de l'académie (pa-academie-quiz), test de niveau (pa-quiz-dernier ou compte : catégorie de
+       tournoi estimée, avec sa date et sa méthode) et classement FFT saisi (pa-classement-fft), le seul officiel ;
      - objectifs de jeu : OBJECTIFS_JEU (exercices-donnees.js), gardés par joueur-sync.js (pa-objectifs-jeu, compte si "progression") ;
      - programme de la semaine : PA_EXERCICES.programme (thèmes du test, des matchs et des objectifs ; nombre selon la fréquence de jeu) ;
      - derniers matchs : PA_JOURNAL ; historique : exercices faits (pa-exercices-faits) et semaines du plan validées (pa-weeks-v2).
@@ -37,18 +39,36 @@
  }
 
  function blocNiveau(quiz){
-  const b=el("div","bord-bloc bord-niveau");b.appendChild(el("h3","","Mon niveau estimé"));
-  if(!quiz){
-   b.appendChild(el("p","acc-muted","Pas encore de test : 14 questions pour connaître ton palier et tes 3 priorités."));
-   const a=el("a","btn primary","Passer le test de niveau");a.href="niveau.html";b.appendChild(a);return b;
-  }
-  const v2=Number.isInteger(quiz.palier)&&E.PALIERS[quiz.palier];
-  b.appendChild(el("p","bord-palier",v2?E.PALIERS[quiz.palier]:"Niveau "+quiz.niveau+" sur 4"));
-  const meta=el("p","acc-muted");
-  meta.textContent="Test de niveau du "+dateFr(quiz.date)+(quiz.source&&FIABILITE[quiz.source]?" · "+FIABILITE[quiz.source]:"")+".";
-  b.appendChild(meta);
-  b.appendChild(el("p","bord-avert","C'est une estimation de ton jeu, pas ton classement FFT : celui-ci vient uniquement de tes résultats en tournoi."));
-  const a=el("a","","Refaire le test");a.href="niveau.html";b.appendChild(a);
+  const b=el("div","bord-bloc bord-niveau");b.appendChild(el("h3","","Mon niveau"));
+  const dl=el("dl","bord-niveaux");
+  const ligne=(cls,titre,valeur,detail,lien)=>{
+   const d=el("div","bord-niv bord-niv-"+cls);d.appendChild(el("dt","",titre));
+   const dd=el("dd");if(valeur)dd.appendChild(valeur);
+   if(detail)dd.appendChild(el("span","acc-muted bord-niv-detail",detail));
+   if(lien){const a=el("a","",lien[0]);a.href=lien[1];dd.appendChild(a);}
+   d.appendChild(dd);dl.appendChild(d);
+  };
+  // 1. Niveau déclaré dans Mon académie (grille FFT 1 à 10)
+  const C=window.PA_ACADEMIE_CONTENUS,niv=C?C.niveauDeclare():null;
+  if(niv)ligne("declare","Niveau déclaré (grille FFT 1 à 10)",el("b","bord-niv-valeur",niv+" · "+((C.NOMS||{})[niv]||"")),null,["Changer","academie.html#niveaux"]);
+  else ligne("declare","Niveau déclaré (grille FFT 1 à 10)",null,"Pas encore choisi. ",["Choisir mon niveau de 1 à 10","academie.html#niveaux"]);
+  // 2. Quiz de l'académie
+  const seances=C?C.seancesQuiz():[],der=seances[seances.length-1];
+  if(der)ligne("quiz","Quiz de l'académie",el("b","bord-niv-valeur",der.reponses.filter(r=>r.juste).length+" sur "+der.reponses.length),
+   " au niveau "+der.niveau+", le "+dateFr(der.debut)+(seances.length>1?" ("+pluriel(seances.length,"quiz")+")":"")+". ",["Nouveau quiz","academie.html#quiz"]);
+  else ligne("quiz","Quiz de l'académie",null,"Aucun quiz pour l'instant. ",["Faire un quiz","academie.html#quiz"]);
+  // 3. Test de niveau : catégorie de tournoi estimée
+  if(quiz){
+   const v2=Number.isInteger(quiz.palier)&&E.PALIERS[quiz.palier];
+   ligne("test","Test de niveau (catégorie de tournoi estimée)",el("span","bord-palier",v2?E.PALIERS[quiz.palier]:"Niveau "+quiz.niveau+" sur 4"),
+    "Test du "+dateFr(quiz.date)+(quiz.source&&FIABILITE[quiz.source]?" · "+FIABILITE[quiz.source]:"")+". ",["Refaire le test","niveau.html"]);
+  }else ligne("test","Test de niveau (catégorie de tournoi estimée)",null,"Pas encore de test : 14 questions pour estimer ta catégorie de tournoi et tes 3 priorités. ",["Passer le test de niveau","niveau.html"]);
+  // 4. Classement FFT saisi dans Mon padel
+  const r=lire("pa-classement-fft",null);
+  if(r&&Number.isInteger(r.rang))ligne("fft","Classement FFT",el("b","bord-niv-valeur",r.rang.toLocaleString("fr-FR")+"e"),r.sexe?" ("+r.sexe+"). ":". ",["Modifier","#mon-padel"]);
+  else ligne("fft","Classement FFT",null,"Non renseigné. ",["Saisir mon classement","#mon-padel"]);
+  b.appendChild(dl);
+  b.appendChild(el("p","bord-avert","Seul le classement FFT est officiel : il vient de tes résultats en tournoi. Le niveau déclaré, les quiz et le test servent à personnaliser ton parcours ; aucun n'est converti en un autre."));
   return b;
  }
  function blocObjectifs(){

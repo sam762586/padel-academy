@@ -1470,3 +1470,20 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .ac-changer{margin-top:var(--s-3)}
 .ac-changer summary{cursor:pointer;font-weight:700}
 .ac-reprise{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3);margin:var(--s-3) 0 0}
+/* Ta semaine (Mon académie, Mon espace) et Mon niveau (tableau de bord) */
+.ac-semaine-carte{margin-top:var(--s-4);background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-4);scroll-margin-top:84px}
+.ac-semaine-carte.esp-carte{margin-top:0}
+.ac-semaine-titre{margin:0 0 var(--s-2)}
+.ac-semaine-niveau{margin:0 0 var(--s-3);font-weight:700}
+.ac-semaine-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.ac-semaine-liste>li{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr);gap:var(--s-2) var(--s-3);align-items:baseline;padding-top:var(--s-3);border-top:1px solid var(--line)}
+.ac-semaine-liste>li:first-child{border-top:0;padding-top:0}
+.ac-semaine-lib{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ac-semaine-prio{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.ac-semaine-liste details summary{cursor:pointer}
+@media (max-width:560px){.ac-semaine-liste>li{grid-template-columns:minmax(0,1fr);gap:4px}}
+.bord-niveaux{margin:0;display:grid;gap:var(--s-3)}
+.bord-niv dt{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.bord-niv dd{margin:2px 0 0}
+.bord-niv-valeur{font-size:1.15rem;margin-right:.3em}
+.bord-niv .bord-palier{font-size:1.6rem;margin-right:.3em}

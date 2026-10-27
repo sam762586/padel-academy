@@ -124,7 +124,7 @@ const serveur=http.createServer((req,res)=>{
   // Joueur connecté sans données
   ({ctx,page}=await ouvrir());
   assert.match(await page.textContent('#esp-bord .bord-niveau'),/Pas encore de test/);
-  assert.equal(await page.getAttribute('#esp-bord .bord-niveau a','href'),'niveau.html');
+  assert.equal(await page.getAttribute('#esp-bord .bord-niv-test a','href'),'niveau.html');assert.equal(await page.getAttribute('#esp-bord .bord-niv-declare a','href'),'academie.html#niveaux');
   assert.match(await page.textContent('#esp-bord .bord-programme'),/ton programme apparaîtra ici/);
   assert.match(await page.textContent('#esp-bord .bord-matchs'),/Aucun match/);
   ok('joueur connecté sans données : invitation au test, programme vide expliqué, aucun match');
@@ -160,7 +160,7 @@ const serveur=http.createServer((req,res)=>{
    localStorage.setItem('pa-score-historique',JSON.stringify([{cle:'match-progression-01',config:{nomA:'Nous',nomB:'Léo et Max',serveur:0,egalite:'decisif',dernierSet:'super'},points:[{g:0,m:'gagnant'},{g:1,m:'faute'}],fin:d,score:'6-4',vainqueur:0,interrompu:false}]));
   }}));
   const niveau=await page.textContent('.bord-niveau');
-  assert.match(niveau,/P100/);assert.match(niveau,/basé sur tes résultats en tournoi/);assert.match(niveau,/pas ton classement FFT/);
+  assert.match(niveau,/P100/);assert.match(niveau,/basé sur tes résultats en tournoi/);assert.match(niveau,/Seul le classement FFT est officiel/);
   assert.match(await page.textContent('.bord-programme'),/3 exercices cette semaine, parce que tu joues deux ou trois fois par semaine/);
   assert.equal(await page.locator('.bord-ex').count(),3);
   assert.match(await page.textContent('.bord-matchs'),/contre Léo et Max · 6-4 \(gagné\)/);

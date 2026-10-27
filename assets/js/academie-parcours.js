@@ -6,6 +6,8 @@
    Recommandations : articles (ACADEMIE_ARTICLES) et scènes 3D (classées par leurs questions) dont la plage de niveaux
    contient le niveau déclaré, triés par priorité ; exercices par le moteur commun de Mon espace (exercices.js), au niveau
    d'exercice du niveau déclaré ; défi de la semaine de Mon espace (defis.js), le même pour les deux pages.
+   « Ta semaine » (#ac-semaine, Mon académie et Mon espace) résume ce parcours : niveau, prochain quiz, 3 priorités,
+   1 exercice, 1 scène 3D et l'objectif de la semaine (le défi).
    Rien n'est masqué ailleurs sur le site. */
 const AP_CLE_PRIORITES="pa-academie-priorites";
 const AP_MAX_PRIORITES=3;
@@ -16,8 +18,14 @@ function apStats(seances,nb=3){
  const s={};(seances||[]).slice(-nb).forEach(x=>x.reponses.forEach(r=>{const t=s[r.theme]=s[r.theme]||{bonnes:0,total:0};t.total++;if(r.juste)t.bonnes++;}));
  return s;
 }
+// Compétences du niveau, puis, s'il en manque, celles des niveaux voisins (n-1, n+1, n-2, n+2…)
+function apThemesNiveau(niveau){
+ const l=[...(ACADEMIE_NIVEAUX_THEMES[niveau]||[])];
+ for(let d=1;d<10;d++)[niveau-d,niveau+d].forEach(n=>l.push(...(ACADEMIE_NIVEAUX_THEMES[n]||[])));
+ return l;
+}
 function apPriorites({niveau,faibles=[],choisis=[],max=4}){
- const l=[...choisis,...faibles.map(f=>f.theme),...(ACADEMIE_NIVEAUX_THEMES[niveau]||[])];
+ const l=[...choisis,...faibles.map(f=>f.theme),...apThemesNiveau(niveau)];
  return [...new Set(l)].filter(t=>ACADEMIE_THEMES[t]).slice(0,max);
 }
 // Compétences : thèmes prioritaires et leur état d'après les quiz
@@ -50,28 +58,90 @@ function apEntreeExercices(niveau,choisis,faibles){
   ...(ACADEMIE_NIVEAUX_THEMES[niveau]||[]).map(t=>({theme:ACADEMIE_THEME_EXERCICES[t],points:1,raison:"Compétence du niveau "+niveau+" : "+nom(t)}))].filter(x=>x.theme);
 }
 
+// Exercices recommandés par le moteur commun (exercices.js) : un par thème prioritaire, au niveau d'exercice du niveau déclaré
+function apExercices(E,niveau,choisis,faibles){
+ if(!E)return [];
+ const nivEx=acNiveauExercice(niveau),vus=new Set(),l=[];
+ E.themesPrioritaires(null,[],[],[],apEntreeExercices(niveau,choisis,faibles)).forEach(t=>{
+  const e=E.exercicesPour(t.theme,nivEx).find(x=>!vus.has(x.id));if(e){vus.add(e.id);l.push({e,raison:t.raisons[0]});}});
+ return l;
+}
+// « Ta semaine » : niveau, prochain quiz, 3 priorités, 1 exercice, 1 scène 3D, objectif de la semaine (défi de la semaine).
+// Exercice : le premier recommandé qui n'est pas le défi, de préférence pas encore fait. Rien de nouveau n'est calculé :
+// mêmes règles que le parcours ci-dessous et que le défi de Mon espace.
+function apSemaine({Q,E,D,niveau,seances=[],enCours=null,choisis=[],faits={},releves={},maintenant=new Date()}){
+ const faibles=acThemesFaibles(seances),stats=apStats(seances);
+ const priorites=apCompetences(apPriorites({niveau,faibles,choisis,max:3}),stats);
+ const lundi=D?D.lundi(maintenant):null,defi=D?D.defi(lundi,acNiveauExercice(niveau)):null;
+ const exos=apExercices(E,niveau,choisis,faibles).filter(x=>!defi||!defi.exercice||x.e.id!==defi.exercice.id);
+ const scene=Q?apScenesRecommandees(Q,niveau,priorites.map(p=>p.theme),1)[0]||null:null;
+ return {niveau,priorites,
+  quiz:enCours&&Array.isArray(enCours.reponses)?{enCours:true,question:enCours.reponses.length+1,total:enCours.questions.length,niveau:enCours.niveau}:{enCours:false,niveau},
+  exercice:exos.find(x=>!faits[x.e.id])||exos[0]||null,
+  scene:scene?scene.id:null,
+  objectif:defi&&defi.exercice?{semaine:defi.semaine,exercice:defi.exercice,releve:!!releves[defi.semaine]}:null};
+}
+
 /* ---------- Interface ---------- */
+const apEsc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+const apLireJ=(cle,def)=>{try{const v=JSON.parse(localStorage.getItem(cle)||"null");return v===null?def:v;}catch(e){return def;}};
+const apChoisis=()=>{const p=apLireJ(AP_CLE_PRIORITES,{});return (Array.isArray(p.themes)?p.themes:[]).filter(t=>typeof ACADEMIE_THEMES!=="undefined"&&ACADEMIE_THEMES[t]).slice(0,AP_MAX_PRIORITES);};
+const AP_ETATS={"a-travailler":"À travailler","en-cours":"En progrès","acquis":"Acquis","non-evalue":"Pas encore évalué"};
+
+// Carte « Ta semaine » (#ac-semaine) : en haut de Mon académie et de Mon espace
+function apSemaineDemarrer(){
+ const zone=document.getElementById("ac-semaine");
+ if(!zone)return;
+ const bloc=zone.closest("[data-semaine-bloc]")||zone,surAcademie=!!document.getElementById("ap");
+ const ici=surAcademie?"":"academie.html",lien=(h,t)=>`<a href="${ici}${h}">${t}</a>`;
+ function rendre(){
+  const C=window.PA_ACADEMIE_CONTENUS,niveau=C?C.niveauDeclare():null;
+  if(!niveau||typeof ACADEMIE_QUESTIONS==="undefined"){
+   // Mon académie affiche déjà le choix du niveau ; Mon espace invite à le choisir
+   if(surAcademie||!C){bloc.hidden=true;return;}
+   bloc.hidden=false;
+   zone.innerHTML=`<p class="ac-semaine-vide">Choisis ton niveau de 1 à 10 : ton prochain quiz, tes 3 priorités, un exercice, une scène 3D et ton objectif de la semaine s'afficheront ici.</p><p><a class="btn primary" href="academie.html#niveaux">Choisir mon niveau de 1 à 10</a></p>`;
+   return;
+  }
+  bloc.hidden=false;
+  const aq=apLireJ("pa-academie-quiz",{}),T=ACADEMIE_THEMES,noms=C.NOMS||{};
+  const s=apSemaine({Q:ACADEMIE_QUESTIONS,E:window.PA_EXERCICES,D:window.PA_DEFIS,niveau,seances:C.seancesQuiz(),enCours:aq&&aq.enCours,
+   choisis:apChoisis(),faits:apLireJ("pa-exercices-faits",{}),releves:apLireJ("pa-defis",{})});
+  const titreScene=s.scene?(typeof ACADEMIE_SCENES!=="undefined"&&ACADEMIE_SCENES[s.scene])||s.scene:null;
+  const quiz=s.quiz.enCours
+   ?`Quiz en cours${s.quiz.niveau!==niveau?" (niveau "+s.quiz.niveau+")":""} : question ${s.quiz.question} sur ${s.quiz.total}. ${lien("#quiz","Reprendre mon quiz")}`
+   :`10 questions : 6 au niveau ${niveau}, puis 4 adaptées à tes réponses. ${lien("#quiz","Lancer mon quiz")}`;
+  const ligne=(cls,lib,contenu)=>`<li class="ac-semaine-${cls}"><span class="ac-semaine-lib">${lib}</span><div>${contenu}</div></li>`;
+  const ex=s.exercice&&s.exercice.e;
+  zone.innerHTML=`<p class="ac-semaine-niveau"><span class="ac-moi-num">${niveau}</span> ${apEsc(noms[niveau]||"")} <span class="ap-tag">niveau déclaré, grille FFT 1 à 10</span>${surAcademie?"":` · ${lien("#niveaux","changer")}`}</p>
+  <ul class="ac-semaine-liste">
+   ${ligne("quiz","Prochain quiz",quiz)}
+   ${ligne("priorites","Mes 3 priorités",`<ol class="ac-semaine-prio">${s.priorites.map(p=>`<li><b>${apEsc(T[p.theme].nom)}</b> <span class="ap-etat ap-${p.etat}">${AP_ETATS[p.etat]}${p.total?` · ${p.bonnes}/${p.total}`:""}</span></li>`).join("")}</ol>`)}
+   ${ligne("exercice","Mon exercice",ex?`<details><summary><b>${apEsc(ex.titre)}</b> <span class="ap-tag">${apEsc(ex.duree)} · ${apEsc(ex.joueurs)}</span></summary><p>${apEsc(ex.consigne)}</p><p class="ex-reussite"><b>Objectif :</b> ${apEsc(ex.reussite)}</p><p class="note">${apEsc(s.exercice.raison)}</p></details>`:`<span class="note">Les exercices ne sont pas disponibles sur cet appareil.</span>`)}
+   ${ligne("scene","Ma scène 3D",titreScene?`<a href="simulateur-3d-${apEsc(s.scene)}.html">${apEsc(titreScene)}</a> · <a href="simulateur-3d-${apEsc(s.scene)}.html#mode-quiz">te tester</a>`:`<a href="simulateur-3d.html">Le simulateur 3D</a>`)}
+   ${ligne("objectif","Objectif de la semaine",s.objectif?`<b>${apEsc(s.objectif.exercice.titre)}</b> : ${apEsc(s.objectif.exercice.reussite)} ${s.objectif.releve?`<span class="ap-etat ap-acquis">Défi relevé</span>`:`<a href="${surAcademie?"#ac-defi":"#esp-bloc-defi"}">Mon défi de la semaine</a>`}`:`<span class="note">Pas de défi disponible sur cet appareil.</span>`)}
+  </ul>`;
+ }
+ ["pa-academie","pa-academie-quiz","pa-progression","pa-academie-priorites"].forEach(ev=>window.addEventListener(ev,rendre));
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)rendre();});
+ rendre();
+}
 function apDemarrer(){
  const zone=document.getElementById("ap");
  if(!zone)return;
  if(typeof ACADEMIE_QUESTIONS==="undefined"||typeof ACADEMIE_ARTICLES==="undefined"){zone.innerHTML=`<p class="msg msg-erreur">Ton parcours n'a pas pu se charger (connexion interrompue ?). Recharge la page.</p>`;return;}
  const Q=ACADEMIE_QUESTIONS,T=ACADEMIE_THEMES,E=window.PA_EXERCICES,C=window.PA_ACADEMIE_CONTENUS;
- const scenes=typeof QUIZ_TACTIQUE!=="undefined"?Object.fromEntries(QUIZ_TACTIQUE.map(q=>[q.scenario,q.titre])):{};
- const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
- const lireJ=(cle,def)=>{try{const v=JSON.parse(localStorage.getItem(cle)||"null");return v===null?def:v;}catch(e){return def;}};
- const choisis=()=>{const p=lireJ(AP_CLE_PRIORITES,{});return (Array.isArray(p.themes)?p.themes:[]).filter(t=>T[t]).slice(0,AP_MAX_PRIORITES);};
+ const scenes=typeof ACADEMIE_SCENES!=="undefined"?ACADEMIE_SCENES:{};
+ const esc=apEsc,lireJ=apLireJ,choisis=apChoisis,ETATS=AP_ETATS;
  const jour=d=>new Date(d).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"});
- const ETATS={"a-travailler":"À travailler","en-cours":"En progrès","acquis":"Acquis","non-evalue":"Pas encore évalué"};
  function rendre(){
   const niveau=C.niveauDeclare();
   if(!niveau){zone.innerHTML=`<p class="aq-vide">Choisis ton niveau : ton parcours (compétences, articles, exercices, scènes 3D, défis) se construira tout seul. <a href="#academie">Choisir mon niveau</a>.</p>`;return;}
   const seances=C.seancesQuiz(),faibles=C.themesFaibles(seances),ch=choisis(),stats=apStats(seances);
   const prio=apPriorites({niveau,faibles,choisis:ch}),comp=apCompetences(prio,stats);
-  const nivEx=C.niveauExercice(niveau),faits=lireJ("pa-exercices-faits",{});
+  const faits=lireJ("pa-exercices-faits",{});
   // Exercices : moteur commun (exercices.js)
-  let exos=[];
-  if(E){const th=E.themesPrioritaires(null,[],[],[],apEntreeExercices(niveau,ch,faibles));
-   const vus=new Set();th.forEach(t=>{const e=E.exercicesPour(t.theme,nivEx).find(x=>!vus.has(x.id));if(e){vus.add(e.id);exos.push({e,raison:t.raisons[0]});}});}
+  const exos=apExercices(E,niveau,ch,faibles);
   const articles=apArticles(niveau,prio),sc=apScenesRecommandees(Q,niveau,prio);
   const hist=lireJ("pa-academie",{}),changements=Array.isArray(hist.historique)?hist.historique.length:0;
   const releves=Object.keys(lireJ("pa-defis",{})).length,nbFaits=Object.keys(faits).length;
@@ -95,7 +165,7 @@ function apDemarrer(){
    const l=choisis().filter(t=>t!==i.value);
    if(i.checked){if(l.length>=AP_MAX_PRIORITES){i.checked=false;return;}l.push(i.value);}
    try{localStorage.setItem(AP_CLE_PRIORITES,JSON.stringify({themes:l}));}catch(e){}
-   rendre();const d=zone.querySelector(".ap-priorites");if(d)d.open=true;
+   rendre();window.dispatchEvent(new Event("pa-academie-priorites"));const d=zone.querySelector(".ap-priorites");if(d)d.open=true;
   }));
   zone.querySelectorAll(".ap-fait").forEach(b=>b.addEventListener("click",()=>{
    const f=lireJ("pa-exercices-faits",{});if(f[b.dataset.exo])delete f[b.dataset.exo];else f[b.dataset.exo]=new Date().toISOString();
@@ -108,5 +178,6 @@ function apDemarrer(){
  ["pa-academie","pa-academie-quiz","pa-progression"].forEach(ev=>window.addEventListener(ev,rendre));
  rendre();
 }
-window.PA_PARCOURS={stats:apStats,priorites:apPriorites,competences:apCompetences,articles:apArticles,scenes:apScenes,scenesRecommandees:apScenesRecommandees,entreeExercices:apEntreeExercices,CLE_PRIORITES:AP_CLE_PRIORITES};
+window.PA_PARCOURS={semaine:apSemaine,exercices:apExercices,stats:apStats,priorites:apPriorites,competences:apCompetences,articles:apArticles,scenes:apScenes,scenesRecommandees:apScenesRecommandees,entreeExercices:apEntreeExercices,CLE_PRIORITES:AP_CLE_PRIORITES};
 apDemarrer();
+apSemaineDemarrer();

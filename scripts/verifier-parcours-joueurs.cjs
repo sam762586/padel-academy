@@ -90,9 +90,13 @@ async function dansLeNavigateur(base){
  try{
   // 1. Nouvel utilisateur
   {const {ctx,page}=await ouvrir();
+   await page.goto(base+'/espace.html');
+   assert.match(await page.textContent('#ac-semaine'),/Choisis ton niveau de 1 à 10/,'Ta semaine : invitation à choisir son niveau');
+   assert.match(await page.textContent('.bord-niv-declare'),/Pas encore choisi/);
    await page.goto(base+'/index.html');
    await page.click('.ac-accueil a');await page.waitForURL(/academie\.html#niveaux$/);
    assert.equal(await page.textContent('.ac-moi-titre'),'Choisis ton niveau pour commencer');
+   assert.equal(await page.isVisible('[data-semaine-bloc]'),false,'Ta semaine masquée tant que le niveau n\u2019est pas choisi');
    await page.click('.ac-rapide-btn[data-choisir="2"]');
    const s=await quizComplet(page,i=>i%2===0);
    assert.equal(s.reponses.length,10);assert.match(await page.textContent('#aq-score'),/^Score : 5 sur 10$/);
@@ -111,7 +115,25 @@ async function dansLeNavigateur(base){
    await page.click(`.ac-rapide-btn[data-choisir="${n}"]`);
    await quizComplet(page);
    await verifierNiveau(page,n);
-   await page.goto(base+'/espace.html');
+   // Ta semaine : niveau, quiz, 3 priorités, 1 exercice, 1 scène du niveau, objectif = défi de la semaine
+   const sem=async()=>page.evaluate(()=>({vu:!!document.querySelector('[data-semaine-bloc]:not([hidden])'),niveau:document.querySelector('.ac-semaine-niveau .ac-moi-num').textContent,
+    prio:document.querySelectorAll('.ac-semaine-prio li').length,exo:!!document.querySelector('.ac-semaine-exercice details'),
+    scene:(document.querySelector('.ac-semaine-scene a')||{}).getAttribute?.('href'),objectif:document.querySelector('.ac-semaine-objectif b').textContent,
+    quiz:document.querySelector('.ac-semaine-quiz').textContent}));
+   for(const ou of ['academie','espace']){
+    if(ou==='espace')await page.goto(base+'/espace.html');
+    const s=await sem();
+    assert.ok(s.vu&&s.niveau===String(n)&&s.prio===3&&s.exo,ou+' : Ta semaine complète au niveau '+n+' '+JSON.stringify(s));
+    const id=s.scene.replace(/^(academie\.html)?simulateur-3d-|\.html$/g,'');
+    assert.ok(await page.evaluate(([id,n])=>{const x=PA_PARCOURS.scenes(ACADEMIE_QUESTIONS).find(y=>y.id===id);return x&&x.niveaux[0]<=n&&n<=x.niveaux[1];},[id,n]),ou+' : scène du niveau');
+    assert.equal(s.objectif,await page.evaluate(k=>PA_DEFIS.defi(PA_DEFIS.lundi(new Date()),k).exercice.titre,n<=3?1:n<=5?2:n<=7?3:4),ou+' : objectif = défi de la semaine');
+    assert.match(s.quiz,new RegExp('6 au niveau '+n));
+   }
+   // Tableau de bord : quatre lignes distinctes, aucune conversion
+   assert.match(await page.textContent('.bord-niv-declare'),new RegExp('^Niveau déclaré \\(grille FFT 1 à 10\\)'+n+' · '));
+   assert.match(await page.textContent('.bord-niv-quiz'),/sur 10/);
+   assert.match(await page.textContent('.bord-niv-test'),/catégorie de tournoi estimée/);
+   assert.match(await page.textContent('.bord-niv-fft'),/12\s500e/);
    assert.match(await page.textContent('#esp-exercices'),new RegExp('niveau déclaré \\('+n+' sur 10'),'Mon espace suit le niveau '+n);
    await planGenerique(page);
    await existantIntact(page,'niveau '+n);
