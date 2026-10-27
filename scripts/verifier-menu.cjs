@@ -32,10 +32,10 @@ function gabarit(){
  assert.match(G.nav('404.html','/'),/href="\/index\.html"/);
  // Pages de contenu absentes du menu : seulement les pages de service, et les pages rattachées à une entrée (SECTIONS)
  const hors=fs.readdirSync(racine).filter(n=>n.endsWith('.html')&&!G.PAGES_MENU.some(p=>p[0]===n));
- assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html','simulateur-3d.html']);
- // Simulateur 3D : rattaché à Tactique, le groupe « Apprendre » est marqué
+ assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
+ // Simulateur 3D : dans le groupe « Apprendre », marqué comme page en cours
  assert.match(G.nav('simulateur-3d.html'),/class="nav-titre active"[^>]*aria-controls="nav-apprendre"/);
- assert.match(G.nav('simulateur-3d.html'),/href="tactique\.html" class="active">Tactique/);
+ assert.match(G.nav('simulateur-3d.html'),/href="simulateur-3d\.html" class="active" aria-current="page">Simulateur 3D/);
  ok('gabarit : Accueil, Apprendre, S\'entraîner, Compétition, Mon espace + bouton raquette ; pages actives ; aucune page oubliée');
 }
 

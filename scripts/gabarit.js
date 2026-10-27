@@ -15,16 +15,15 @@ const AUTEUR = {
 const MENU = [
   ["index.html", "Accueil"],
   { id: "apprendre", nom: "Apprendre", liens: [["regles.html", "Règles"], ["technique.html", "Technique"], ["tactique.html", "Tactique"],
-    ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
+    ["simulateur-3d.html", "Simulateur 3D"], ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
   { id: "entrainer", nom: "S'entraîner", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
 ];
 const APPEL = ["materiel.html#raquette", "Choisir sa raquette"];
-// Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »,
-// simulateur 3D → « Tactique »
-const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html", "simulateur-3d.html": "tactique.html" };
+// Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »
+const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html" };
 // Toutes les pages du menu (contrôles, sitemap éventuel)
 const PAGES_MENU = MENU.flatMap(e => Array.isArray(e) ? [e] : e.liens);
 
