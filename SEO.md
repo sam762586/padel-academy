@@ -31,8 +31,10 @@ désigne l'adresse avec `.html`.
   à corriger au fil des refontes visuelles (changer le niveau change le style).
 - `tournois.html` : la liste nationale reste construite en JavaScript (fichier de 310 Ko) ; les pages départements
   et région × catégorie, en HTML, sont liées en bas de page.
-- Performances : mesures de labo seulement (LCP 1,2 à 2,1 s, CLS 0 sur téléphone, réseau non bridé). Les vraies
-  valeurs (75e percentile des visiteurs) viendront du rapport « Signaux Web essentiels » de Search Console.
+- Performances (lot 5A, 27/10/2026) : polices hébergées sur le site, préchargées, repli aux mêmes dimensions ; bandeaux
+  en 4 tailles ; place réservée pour la date des tournois. Labo, téléphone en 4G lente et processeur ×4 : avant, en
+  ligne, LCP 2,5 à 3,7 s et CLS 0,05 à 0,08 ; après, LCP 1,4 à 2,4 s et CLS 0 (`scripts/verifier-performance.cjs`,
+  10 pages). Les vraies valeurs (75e percentile des visiteurs) viendront de Search Console (Signaux Web essentiels).
 
 ## 2. Calendrier éditorial (novembre 2026 → janvier 2027)
 

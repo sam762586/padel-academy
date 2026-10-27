@@ -102,6 +102,17 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
 
 ## Phase 5 — SEO et performance (continu)
 Suivi dans SEO.md ; `verifier-seo.cjs` à chaque livraison ; mesures réelles via Search Console et PageSpeed.
+Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de tests (30) avant chaque publication.
+- [x] 5A. Performance (27/10/2026) : polices Big Shoulders Display et Manrope hébergées (`assets/fonts`, OFL), préchargées
+  dans les 1 067 pages et le générateur des pages tournois, repli aux mêmes dimensions (size-adjust) ; bandeaux en
+  640 / 960 / 1280 / 1600 px ; date des tournois avec sa place réservée. Labo (téléphone, 4G lente, CPU ×4) : LCP de
+  2,5–3,7 s à 1,4–2,4 s, CLS de 0,05–0,08 à 0. Test : `scripts/verifier-performance.cjs` (budget LCP < 2,5 s, CLS < 0,02).
+- [ ] Validation du 5A par Samuel.
+- [ ] 5B. SEO des nouveautés : titres et descriptions des pages Tactique et Simulateur (quiz, tableau, labo,
+  diagnostic), liens internes vers ces outils, règle « 3 pages liées » dans `verifier-seo.cjs`, sauts de titres.
+- [ ] 5C. Search Console (vérification du domaine par DNS, à faire avec Samuel) puis suivi mensuel dans SEO.md.
+- [ ] 5D. Contenus de novembre (SEO.md § 2) : débuter au padel, compter les points, le service ; règles vérifiées
+  FFT/FIP, relues par Samuel.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).

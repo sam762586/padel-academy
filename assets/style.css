@@ -5,6 +5,12 @@
    blanc froid #F4F7FA (texte). Sable et corail : niveaux, avertissements et erreurs.
    Les noms historiques sont gardés (--turf = couleur d'action, --sky = liens) pour ne pas réécrire tout le site.
    Contrastes contrôlés par scripts/verifier-design.cjs : texte ≥ 4,5:1 sur --bg, --bg-2 et les cartes. */
+/* POLICES : hébergées sur le site (assets/fonts, licence OFL, voir assets/fonts/LICENCES.md), préchargées dans chaque page.
+   Repli aux mêmes dimensions (size-adjust…) : le texte ne bouge pas quand la police arrive. */
+@font-face{font-family:"Big Shoulders Display";src:url(fonts/big-shoulders-display-latin.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap;unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:"Manrope";src:url(fonts/manrope-latin.woff2) format("woff2");font-weight:200 800;font-style:normal;font-display:swap;unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:"Big Shoulders repli";src:local("Arial Narrow"),local("ArialNarrow");size-adjust:101.79%;ascent-override:96.67%;descent-override:20.93%;line-gap-override:0%}
+@font-face{font-family:"Manrope repli";src:local("Arial"),local("ArialMT");size-adjust:102.93%;ascent-override:103.57%;descent-override:29.15%;line-gap-override:0%}
 :root{
   /* Couleurs de la marque */
   --navy:#101F35; --terrain:#1674A6; --energie:#C8F14B; --blanc:#F4F7FA;
@@ -19,7 +25,7 @@
   --sand:#ffb547; --coral:#ff6b57; --ok:var(--turf); --erreur:#ff8a7a;
   --accent:var(--turf); --accent-fg:#101F35; --focus:var(--sand);
   /* Typographie */
-  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --body:"Manrope","Segoe UI",Helvetica,Arial,sans-serif;
+  --display:"Big Shoulders Display","Big Shoulders repli","Arial Narrow",Impact,sans-serif; --body:"Manrope","Manrope repli","Segoe UI",Helvetica,Arial,sans-serif;
   --fs-xs:.72rem; --fs-s:.875rem; --fs-m:1rem; --fs-l:1.15rem; --fs-xl:1.5rem;
   /* Espacements (multiples de 4 px) */
   --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:88px;
@@ -1378,3 +1384,6 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .esp-filtres .btn{padding:12px 16px;font-size:.78rem}
 .esp-filtres .btn:disabled{opacity:.45;cursor:default;transform:none}
 .esp-tendance-texte{margin:var(--s-2) 0 0}
+
+/* Tournois : la date de mise à jour arrive avec les données ; deux lignes réservées pour que la page ne bouge pas */
+#tournois-maj{display:block;min-height:3.2em}

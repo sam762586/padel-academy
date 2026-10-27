@@ -144,8 +144,8 @@ ${noindex ? '<meta name="robots" content="noindex,follow">\n' : ""}<link rel="ca
 <meta property="og:image" content="${SITE}assets/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 ${jsonLd.map(o => `<script type="application/ld+json">${jsonDansHtml(o)}</script>`).join("\n")}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="preload" href="${pre}assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="${pre}assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${pre}assets/style.css">
 <link rel="manifest" href="${pre}manifest.webmanifest">
 <script src="${pre}assets/js/pwa.js" defer></script>

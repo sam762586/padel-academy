@@ -4,12 +4,12 @@
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Simulateur 3D (assets/3d/ : moteur, modèle, scénarios, environ 1,5 Mo) : jamais précaché, « network-first »
      à la demande ; la page simulateur-3d.html elle-même n'est pas dans le shell.
-   - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
+   - Tout ce qui vient d'un autre domaine (Supabase, IGN...) n'est JAMAIS intercepté ni mis en cache.
    - Style et scripts sont appelés avec « ?v=<empreinte> » (scripts/gabarit.js) : une nouvelle version a une autre adresse,
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v26-academie";
+const CACHE = "pa-v27-academie";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -18,7 +18,7 @@ const SHELL = [
   "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
   "premier-tournoi.html", "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "connexion.html", "score.html", "partenaires.html", "hors-ligne.html",
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
-  "assets/style.css",
+  "assets/style.css", "assets/fonts/manrope-latin.woff2", "assets/fonts/big-shoulders-display-latin.woff2",
   "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",
   "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/quiz-tactique-donnees.js", "assets/js/quiz-tactique.js", "assets/js/tableau-tactique.js", "assets/js/diagnostic-paire.js", "assets/js/defis.js", "assets/js/carnet-outils.js", "assets/js/plan.js", "assets/js/pwa.js",
   "assets/js/quiz-niveau.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
