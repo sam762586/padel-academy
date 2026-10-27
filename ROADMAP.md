@@ -93,7 +93,12 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   pour tous (cycle des 10 thèmes), exercice au niveau du dernier test ; « J'ai relevé le défi » (auto-évaluation),
   compté comme exercice fait ; série et 8 dernières semaines ; sur l'appareil. Tests : `scripts/verifier-defis.cjs`.
 - [x] Validation du 4E par Samuel (27/10/2026).
-- [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
+- [x] 4F. Carnet de match (27/10/2026), choix de Samuel : filtres type et partenaire (en plus de la période) et export CSV
+  des matchs filtrés ; tendance des points perdus sur les 5 et 10 derniers matchs comptés (motifs notés au compteur,
+  des comptes seulement) ; dans le diagnostic après match, scène 3D et « Te tester » pour chaque axe. Le bilan par
+  partenaire et par type existait déjà : gardé tel quel. Corrigé : barre vide sous chaque match du journal (bilan
+  fermé encore affiché). Tests : `scripts/verifier-carnet.cjs`.
+- [ ] Validation du 4F par Samuel, puis de la phase 4.
 
 ## Phase 5 — SEO et performance (continu)
 Suivi dans SEO.md ; `verifier-seo.cjs` à chaque livraison ; mesures réelles via Search Console et PageSpeed.

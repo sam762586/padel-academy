@@ -20,6 +20,10 @@ const DG_TACTIQUES=[["placement","Placement",["placement","couple"]],["communica
 const DG_FICHES={vitre:["technique.html#coups","Les sorties de vitre"],aerien:["tutos.html","Bandeja, víbora ou smash"],placement:["tactique.html#placement","Le placement phase par phase"],
  couple:["tutos.html","Bouger avec son partenaire"],montee:["tutos.html","Quand monter au filet"],regularite:["conseils.html#erreurs","Les erreurs à éviter"],
  transition:["technique.html#coups","Volée basse et chiquita"],communication:["tactique.html#placement","Jouer à deux"],service:["technique.html#coups","Le service"],compet:["competition.html","Jouer en compétition"]};
+// Scène 3D de chaque thème (simulateur-3d-<id>.html) : la voir, puis répondre à ses questions en mode quiz
+const DG_SCENES={vitre:["sortie-vitre-fond","La sortie de vitre de fond"],aerien:["bandeja-garder-filet","La bandeja pour garder le filet"],placement:["duel-filet","Le duel au filet"],
+ couple:["partenaire-lobe-cambio","Partenaire lobé : le cambio"],montee:["monter-apres-lob","Monter au filet après un lob"],regularite:["coup-droit-fond","Le coup droit de fond"],
+ transition:["volee-basse-transition","La volée basse de transition"],communication:["couverture-centre","Couvrir le centre à deux"],service:["servir-monter","Servir et prendre le filet"]};
 // Objectif de jeu proposé pour chaque thème (OBJECTIFS_JEU)
 const DG_OBJECTIF={vitre:"vitre",aerien:"bandeja",placement:"placement",couple:"placement",montee:"placement",regularite:"defense",transition:"volees",communication:"tournoi"};
 
@@ -140,6 +144,12 @@ function dgDifficultes(tous,maintenant){
    if(r.exercice){const p=el("p","dg-reco-ex");p.append(el("b","",r.exercice.titre)," · "+r.exercice.duree+" · "+r.exercice.joueurs);c.appendChild(p);c.appendChild(el("p","dg-reco-consigne",r.exercice.consigne));}
    const actions=el("div","dg-reco-actions");
    if(r.fiche){const a=el("a","","Revoir : "+r.fiche[1]);a.href=r.fiche[0];actions.appendChild(a);}
+   const sc=DG_SCENES[r.theme];
+   if(sc){
+    const v=el("a","dg-scene","Voir en 3D : "+sc[1]);v.href="simulateur-3d-"+sc[0]+".html";
+    const q=el("a","dg-scene","Te tester sur cette scène");q.href="simulateur-3d-"+sc[0]+".html#mode-quiz";
+    actions.append(v,q);
+   }
    if(r.objectif&&libelleObjectif(r.objectif)){
     const deja=objectifActif(r.objectif);
     const b=el("button","btn ghost dg-objectif",deja?"Dans mes objectifs : "+libelleObjectif(r.objectif).toLowerCase():"Ajouter à mes objectifs");

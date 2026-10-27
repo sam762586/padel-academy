@@ -1121,6 +1121,7 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 .dg-objectif{min-height:44px}
 .esp-bilan{min-height:40px;padding:6px 12px;font-size:.8rem;margin-left:auto}
 .esp-journal li.esp-bilan-panneau{display:block;padding:0 0 12px;border-top:0}
+.esp-journal li.esp-bilan-panneau[hidden]{display:none} /* bilan fermé : pas de barre vide sous le match */
 .esp-journal li:not(.esp-bilan-panneau){grid-template-columns:28px minmax(0,1fr) auto auto}
 /* Bilan dans le compteur : les puces gardent le style des choix (.opts), pas celui des étiquettes du formulaire du compteur */
 .sc-carte .dg-bloc .opts label{display:inline-block;font-size:.88rem;text-transform:none;letter-spacing:0;color:var(--muted);font-weight:600;margin:0;padding:9px 14px}
@@ -1370,3 +1371,10 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .df-pastille{width:14px;height:14px;border-radius:50%;border:1px solid var(--line-2);background:transparent}
 .df-pastille.ok{background:var(--turf);border-color:var(--turf)}
 .df-pastille.encours{outline:2px solid var(--sky);outline-offset:2px}
+
+/* CARNET DE MATCH (espace.html, Mes matchs) : filtres, export, tendance des points perdus */
+.esp-filtres{display:flex;flex-wrap:wrap;align-items:end;gap:var(--s-3);margin-bottom:var(--s-4)}
+.esp-filtres .champ{flex:1 1 160px}
+.esp-filtres .btn{padding:12px 16px;font-size:.78rem}
+.esp-filtres .btn:disabled{opacity:.45;cursor:default;transform:none}
+.esp-tendance-texte{margin:var(--s-2) 0 0}

@@ -223,9 +223,12 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
  function rendreMatchs(){
   const zoneS=$("esp-stats"),zoneJ=$("esp-journal");zoneS.textContent="";zoneJ.textContent="";
   if(!JN)return;
-  const tous=JN.liste(),jours=periode();
-  const depuis=jours?Date.now()-jours*86400000:-Infinity;
-  const liste=tous.filter(m=>Date.parse(m.fin)>=depuis);
+  const tous=JN.liste(),jours=periode(),C=window.PA_CARNET;
+  remplirFiltres(tous);
+  // Période, type de match et partenaire (carnet-outils.js)
+  const liste=C?C.filtrer(tous,{jours,type:$("esp-f-type").value,partenaire:$("esp-f-partenaire").value}):tous;
+  $("esp-export").disabled=!liste.length;
+  $("esp-export").textContent=liste.length?"Exporter en CSV ("+liste.length+" match"+(liste.length>1?"s":"")+")":"Exporter en CSV";
   const joues=liste.filter(m=>m.vainqueur===0||m.vainqueur===1),v=joues.filter(m=>m.vainqueur===0).length,d=joues.length-v;
   const comptes=liste.filter(m=>m.pointsTotal>0),pg=comptes.reduce((s,m)=>s+m.pointsGagnes,0),pt=comptes.reduce((s,m)=>s+m.pointsTotal,0);
   if(JN.etat().texte)zoneS.append(el("p","acc-msg acc-err",JN.etat().texte));
@@ -255,9 +258,10 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
     parType.forEach(([t,n,vt],i)=>{if(i)p.append(" · ");p.append(el("b","",JN.TYPES[t])," "+n+" match"+(n>1?"s":"")+", "+pourcent(vt,n)+" de victoires");});
     zoneS.appendChild(p);
    }
+   rendreTendance(zoneS,liste);
   }
   // Journal
-  if(!liste.length){if(tous.length)zoneJ.append(el("p","acc-muted","Aucun match sur cette période."));return;}
+  if(!liste.length){if(tous.length)zoneJ.append(el("p","acc-muted","Aucun match avec cette période et ces filtres."));return;}
   zoneJ.appendChild(el("h3","esp-sous-titre","Journal"));
   const ul=el("ul","esp-journal");
   liste.slice(0,nbJournal).forEach(m=>{
@@ -293,6 +297,42 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
   zoneJ.appendChild(ul);
   if(liste.length>nbJournal){const b=el("button","btn ghost","Afficher plus ("+(liste.length-nbJournal)+")");b.type="button";b.addEventListener("click",()=>{nbJournal+=20;rendreMatchs();});zoneJ.appendChild(b);}
  }
+ // Tendance des points perdus : motifs notés au compteur, sur les 5 et 10 derniers matchs comptés (des comptes, pas une estimation)
+ function rendreTendance(zone,liste){
+  const C=window.PA_CARNET;if(!C)return;
+  const t5=C.tendance(liste,5),t10=C.tendance(liste,10);
+  if(!t10.total)return;
+  zone.appendChild(el("h3","esp-sous-titre","Tes points perdus"));
+  const tbl=el("div","tbl esp-tbl-compact esp-tendance"),table=el("table"),tete=el("thead"),corps=el("tbody");
+  const col=(t,n)=>"Sur "+Math.min(t.matchs,n)+" match"+(Math.min(t.matchs,n)>1?"s":""); // les plus récents
+  const lt=tete.insertRow();["Motif",col(t5,5),col(t10,10)].forEach(t=>{const th=el("th","",t);th.scope="col";lt.appendChild(th);});
+  const part=(t,motif)=>{const x=t.motifs.find(m=>m.motif===motif);return x?Math.round(100*x.part)+" % ("+x.n+")":"–";};
+  t10.motifs.forEach(m=>{const tr=corps.insertRow();[C.PERDUS[m.motif],part(t5,m.motif),part(t10,m.motif)].forEach(v=>{tr.insertCell().textContent=v;});});
+  table.append(tete,corps);tbl.appendChild(table);zone.appendChild(tbl);
+  const premier=t10.motifs[0],expl=typeof MOTIF_EXPLICATION!=="undefined"?MOTIF_EXPLICATION[premier.motif]:"";
+  if(expl)zone.appendChild(el("p","esp-tendance-texte","Sur "+(t10.matchs>1?"tes "+t10.matchs+" derniers matchs comptés":"ton dernier match compté")+", "+Math.round(100*premier.part)+" % des points perdus "+expl+"."));
+  zone.appendChild(el("p","note","D'après les motifs notés au compteur : "+t10.total+" point"+(t10.total>1?"s":"")+" perdu"+(t10.total>1?"s":"")+" avec un motif. Les exercices recommandés en tiennent déjà compte."));
+ }
+ // Filtres : types de match (fixes) et partenaires présents dans le journal ; le choix en cours est gardé
+ function remplirFiltres(tous){
+  const ft=$("esp-f-type"),fp=$("esp-f-partenaire"),C=window.PA_CARNET;
+  if(ft.options.length===1)Object.entries(JN.TYPES).forEach(([k,v])=>ft.add(new Option(v,k)));
+  if(!C)return;
+  const choix=fp.value,noms=C.partenaires(tous),avecSans=tous.some(m=>!m.partenaire);
+  fp.length=1;
+  noms.forEach(n=>fp.add(new Option(n,n)));
+  if(avecSans)fp.add(new Option("Partenaire non précisé",C.SANS_PARTENAIRE));
+  fp.value=[...fp.options].some(o=>o.value===choix)?choix:"";
+ }
+ ["esp-f-type","esp-f-partenaire"].forEach(id=>$(id).addEventListener("change",()=>{nbJournal=10;rendreMatchs();}));
+ // Export CSV des matchs affichés (période et filtres en cours)
+ $("esp-export").addEventListener("click",()=>{
+  const C=window.PA_CARNET;if(!C||!JN)return;
+  const liste=C.filtrer(JN.liste(),{jours:periode(),type:$("esp-f-type").value,partenaire:$("esp-f-partenaire").value});
+  const a=el("a");a.href=URL.createObjectURL(new Blob([C.csv(liste,JN.TYPES)],{type:"text/csv;charset=utf-8"}));
+  a.download="padel-matchs-"+aujourdhui()+".csv";
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+ });
  document.querySelectorAll('input[name="esp-periode"]').forEach(i=>i.addEventListener("change",()=>{nbJournal=10;rendreMatchs();}));
  const formMatch=$("esp-form-match");
  formMatch.elements["esp-m-date"].max=aujourdhui();formMatch.elements["esp-m-date"].value=aujourdhui();
