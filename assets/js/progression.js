@@ -61,7 +61,7 @@
   if(quiz){
    const v2=Number.isInteger(quiz.palier)&&E.PALIERS[quiz.palier];
    ligne("test","Test de niveau (catégorie de tournoi estimée)",el("span","bord-palier",v2?E.PALIERS[quiz.palier]:"Niveau "+quiz.niveau+" sur 4"),
-    "Test du "+dateFr(quiz.date)+(quiz.source&&FIABILITE[quiz.source]?" · "+FIABILITE[quiz.source]:"")+". ",["Refaire le test","niveau.html"]);
+    "Test du "+dateFr(quiz.date)+(quiz.source&&FIABILITE[quiz.source]?" · "+FIABILITE[quiz.source]:"")+". ",["Refaire le test de niveau","niveau.html"]);
   }else ligne("test","Test de niveau (catégorie de tournoi estimée)",null,"Pas encore de test : 14 questions pour estimer ta catégorie de tournoi et tes 3 priorités. ",["Passer le test de niveau","niveau.html"]);
   // 4. Classement FFT saisi dans Mon padel
   const r=lire("pa-classement-fft",null);

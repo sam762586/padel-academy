@@ -203,7 +203,11 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   niveau). Valider dans Mon plan coche la case du plan générique : même stockage, même synchronisation.
 - [x] Validation du lot 4 par Samuel (27/10/2026).
 - [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
-- [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).
+- [x] Lot 5 (27/10/2026) : intitulés du test de niveau ramenés à « Test de niveau » / « Passer (Refaire) le test de
+  niveau » (accueil, compte, tableau de bord, 942 pages tournois relibellées sans régénération) ; .btn.petit unique à la
+  place de 7 réglages locaux ; un seul style de choix de réponse (test de niveau, quiz, mode quiz 3D) ; un seul style
+  de bouton-lien ; verifier-design.cjs refuse les réglages locaux et les libellés hors liste.
+- [ ] Validation du lot 5 par Samuel ; publication sur son accord.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).

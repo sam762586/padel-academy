@@ -17,7 +17,7 @@ const html=fs.readFileSync(path.join(racine,'index.html'),'utf8');
 // Liens que l'accueil doit toujours proposer (pages de contenu, outils, espace)
 const INDISPENSABLES=['regles.html','technique.html','tactique.html','tutos.html','conseils.html','niveau.html','entrainement.html','score.html','videos.html',
  'materiel.html','materiel.html#raquette','competition.html','bareme.html','tournois.html','partenaires.html','lexique.html','espace.html'];
-const PROFILS=[['debutant','Commencer à apprendre','regles.html'],['intermediaire','Améliorer mon jeu','niveau.html'],['competiteur','Préparer mes compétitions','tournois.html']];
+const PROFILS=[['debutant','Commencer à apprendre','regles.html'],['intermediaire','Passer le test de niveau','niveau.html'],['competiteur','Préparer mes compétitions','tournois.html']];
 
 const serveur=http.createServer((req,res)=>{
  const rel=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\//,'')||'index.html';

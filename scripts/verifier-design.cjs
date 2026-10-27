@@ -61,8 +61,30 @@ async function contexte(browser, viewport) {
   return ctx;
 }
 
+// Cohérence (lot 5) : composants définis une seule fois, intitulés du test de niveau et de Mon académie
+function coherence() {
+  const css = fs.readFileSync(path.join(racine, 'assets/style.css'), 'utf8'), css3d = fs.readFileSync(path.join(racine, 'assets/simulateur-3d.css'), 'utf8');
+  const regles = c => c.replace(/\/\*[\s\S]*?\*\//g, '').match(/[^{}]+\{[^{}]*\}/g).map(r => r.trim());
+  // Taille des boutons : seulement .btn (base), .btn.petit (règle commune) et le héros de l'accueil
+  const tailles = regles(css).filter(r => /\.btn\b[^{]*\{[^}]*(padding|font-size)/.test(r.split(':not(.btn)').join('')) && !/^\.btn\{/.test(r) && !r.startsWith('.btn.petit,') && !r.startsWith('.hero .btns .btn{'));
+  assert.deepEqual(tailles, [], 'taille de bouton réglée localement : utiliser .btn.petit');
+  // Choix de réponse et boutons-liens : une seule définition commune
+  for (const sel of ['.qopt', '.qt-reponse', '.p3d-quiz-choix button', '.lien-btn', '.esp-lien', '.ct-lien'])
+    assert.equal(regles(css + css3d).filter(r => !r.startsWith(':is(') && r.split('{')[0].split(',').map(x => x.trim()).includes(sel)).length, 1, sel + ' : une seule définition, commune');
+  // Intitulés : liens vers le test de niveau et vers Mon académie
+  const pages = fs.readdirSync(racine).filter(f => f.endsWith('.html'));
+  const scripts = fs.readdirSync(path.join(racine, 'assets/js')).filter(f => f.endsWith('.js')).map(f => 'assets/js/' + f);
+  const libelles = (cible, re) => pages.flatMap(f => [...fs.readFileSync(path.join(racine, f), 'utf8').matchAll(new RegExp('<a [^>]*href="' + cible + '"[^>]*>([^<]*)</a>', 'g'))].map(m => [f, m[1]]))
+    .concat(scripts.flatMap(f => [...fs.readFileSync(path.join(racine, f), 'utf8').matchAll(new RegExp('\\["([^"]+)","' + cible + '"\\]|el\\("a","[^"]*","([^"]+)"\\);[a-z]+\\.href="' + cible + '"', 'g'))].map(m => [f, m[1] || m[2]])))
+    .filter(([, l]) => !re.test(l));
+  assert.deepEqual(libelles('niveau\\.html', /^((passer|refaire) )?(le )?test de niveau( en 14 questions)?$/i), [], 'libellé du test de niveau');
+  assert.deepEqual(libelles('academie\\.html', /^(Mon académie|Choisir mon niveau de 1 à 10)$/), [], 'libellé de Mon académie');
+  ok('cohérence : taille des petits boutons, choix de réponse et boutons-liens définis une seule fois ; intitulés du test de niveau et de Mon académie');
+}
+
 (async () => {
   tokens();
+  coherence();
   await new Promise(r => serveur.listen(0, '127.0.0.1', r));
   const base = 'http://127.0.0.1:' + serveur.address().port;
   const browser = await chromium.launch({ channel: 'msedge' });
@@ -76,7 +98,7 @@ async function contexte(browser, viewport) {
     assert.equal((await page.textContent('h1')).replace(/\s+/g, ' ').trim(), 'Progresse au padel, point après point.');
     assert.equal((await page.textContent('.hero .lead')).trim(), 'Apprends les bons gestes, comprends les placements et développe ton jeu grâce à des exercices et outils interactifs.');
     const acces = await page.$$eval('.hero .btns .btn', l => l.map(a => [a.textContent.trim(), a.getAttribute('href'), Math.round(a.getBoundingClientRect().top)]));
-    assert.deepEqual(acces.map(a => a.slice(0, 2)), [['Commencer à apprendre', '#parcours'], ['Explorer le simulateur 3D', 'simulateur-3d.html'], ['Tester mon niveau', 'niveau.html']]);
+    assert.deepEqual(acces.map(a => a.slice(0, 2)), [['Commencer à apprendre', '#parcours'], ['Explorer le simulateur 3D', 'simulateur-3d.html'], ['Passer le test de niveau', 'niveau.html']]);
     assert.equal(new Set(acces.map(a => a[2])).size, 1, 'trois accès sur une ligne');
     assert.deepEqual(await page.$$eval('.profil-tag', l => l.map(p => p.textContent)), ['Débutant', 'Intermédiaire', 'Compétiteur']);
     await page.locator('.vitrine-3d').scrollIntoViewIfNeeded();
