@@ -8,6 +8,7 @@ Pages : index, technique, tactique, tutos, niveau, entrainement, videos, regles,
 - `assets/style.css` : tout le style. Tokens dans `:root` (palette "night session" : fond nuit, vert turf #35e27f, sable #ffb547, corail #ff5d4a). Fonts : Big Shoulders Display (titres) + Manrope (texte).
 - `assets/js/*.js` : un fichier par fonctionnalité. Les données (coups, raquettes, lexique, quiz, plan) sont DANS ces fichiers, en tête, sous forme de tableaux d'objets. Modifier le contenu = modifier ces tableaux.
 - Chaque page inclut uniquement les scripts dont elle a besoin (voir le bas de chaque .html).
+- Simulateur 3D (`simulateur-3d.html`, lié depuis Tactique) : modules ES dans `assets/js/p3d/` (physique, scénarios et gestes sans dépendance, testables sous Node ; terrain, caméras, joueurs et page avec three.js), three.js recopié dans `assets/3d/vendor/`, modèle CC0 dans `assets/3d/modeles/`, scénarios JSON dans `assets/3d/scenarios/`, style propre dans `assets/simulateur-3d.css`. Les modules sont versionnés par la carte d'import de la page (réécrite par `appliquer-gabarit.js`). Tout asset ajouté doit être inscrit avec sa licence dans `assets/3d/LICENCES-3D.md`. Tests : `node scripts/verifier-simulateur-3d.cjs`.
 
 ## Règles de travail
 - Français partout (contenu, commentaires, commits). Tutoiement dans le contenu.

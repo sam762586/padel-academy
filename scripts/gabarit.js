@@ -22,8 +22,9 @@ const MENU = [
   ["espace.html", "Mon espace"],
 ];
 const APPEL = ["materiel.html#raquette", "Choisir sa raquette"];
-// Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »
-const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html" };
+// Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »,
+// simulateur 3D → « Tactique »
+const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html", "simulateur-3d.html": "tactique.html" };
 // Toutes les pages du menu (contrôles, sitemap éventuel)
 const PAGES_MENU = MENU.flatMap(e => Array.isArray(e) ? [e] : e.liens);
 
@@ -33,7 +34,7 @@ function nav(actif, prefixe = "") {
   const lien = ([href, nom]) => `<li><a href="${prefixe}${href}"${href === actif ? ' class="active" aria-current="page"' : SECTIONS[actif] === href ? ' class="active"' : ""}${href === "espace.html" ? " data-espace" : ""}>${nom}</a></li>`;
   const entree = e => {
     if (Array.isArray(e)) return lien(e);
-    const dedans = e.liens.some(([href]) => href === actif);
+    const dedans = e.liens.some(([href]) => href === actif || href === SECTIONS[actif]);
     return `<li class="nav-groupe"><button type="button" class="nav-titre${dedans ? " active" : ""}" aria-expanded="false" aria-controls="nav-${e.id}">${e.nom}</button>`
       + `<ul class="nav-sous" id="nav-${e.id}">${e.liens.map(lien).join("")}</ul></li>`;
   };
@@ -57,7 +58,10 @@ function footer(prefixe = "") {
 /* Versions des fichiers : chaque lien vers assets/style.css ou assets/js/*.js reçoit « ?v=<empreinte du contenu> ».
    Une page publiée ne peut donc jamais être servie avec un ancien style ou un ancien script gardé en cache
    (service worker, navigateur) : quand le fichier change, son adresse change. Empreinte calculée sur le contenu
-   aux fins de ligne normalisées (identique sous Windows et sous Linux). assets/data/ n'est pas versionné (jamais mis en cache). */
+   aux fins de ligne normalisées (identique sous Windows et sous Linux). assets/data/ n'est pas versionné (jamais mis en cache).
+   Feuilles de style propres à une page (assets/<nom>.css) : versionnées de la même façon.
+   Modules ES (simulateur 3D) : la carte d'import de la page (<script type="importmap">) est réécrite par carteModules(),
+   chaque module y reçoit son « ?v=<empreinte> », y compris ceux qu'il importe lui-même (imports relatifs). */
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -71,7 +75,18 @@ function empreinte(relatif) {
   return empreintes[relatif];
 }
 function versionner(html) {
-  return html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:style\.css|js\/[\w-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
-    (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`);
+  return html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:[\w-]+\.css|js\/[\w-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
+    (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`)
+    .replace(/<script type="importmap">[\s\S]*?<\/script>/, () => `<script type="importmap">${carteModules()}</script>`);
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, PAGES_MENU, nav, footer, versionner, empreinte };
+// Carte d'import du simulateur 3D : Three.js (fichiers recopiés dans assets/3d/vendor) et modules assets/js/p3d/*.js
+function carteModules() {
+  const imports = {
+    three: "./assets/3d/vendor/three.module.min.js",
+    "three/addons": "./assets/3d/vendor/three-addons.min.js",
+  };
+  for (const f of fs.readdirSync(path.join(RACINE, "assets/js/p3d")).filter(n => n.endsWith(".js")).sort()) imports["./assets/js/p3d/" + f] = "./assets/js/p3d/" + f;
+  for (const cle of Object.keys(imports)) imports[cle] += "?v=" + empreinte(imports[cle].slice(2));
+  return JSON.stringify({ imports });
+}
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, PAGES_MENU, nav, footer, versionner, empreinte, carteModules };

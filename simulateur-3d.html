@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Simulateur 3D de padel : bandeja, lob et montée au filet</title>
+<meta name="description" content="Revois deux situations de padel en 3D : quatre joueurs, une balle aux trajectoires calculées, six caméras, lecture pas à pas. Bandeja pour garder le filet, montée après un lob.">
+<link rel="canonical" href="https://apprendre-padel.fr/simulateur-3d.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Apprendre Padel">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://apprendre-padel.fr/simulateur-3d.html">
+<meta property="og:title" content="Simulateur 3D de padel : bandeja, lob et montée au filet">
+<meta property="og:description" content="Revois deux situations de padel en 3D : quatre joueurs, une balle aux trajectoires calculées, six caméras, lecture pas à pas. Bandeja pour garder le filet, montée après un lob.">
+<meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Placement au padel", "item": "https://apprendre-padel.fr/tactique.html"}, {"@type": "ListItem", "position": 3, "name": "Simulateur 3D", "item": "https://apprendre-padel.fr/simulateur-3d.html"}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css?v=bb94aee7ea">
+<link rel="stylesheet" href="assets/simulateur-3d.css?v=751173be44">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/pwa.js?v=a63caa1792" defer></script>
+</head>
+<body>
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i></i>Apprendre <span>Padel</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <ul id="nav-menu"><li><a href="index.html">Accueil</a></li><li class="nav-groupe"><button type="button" class="nav-titre active" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="regles.html">Règles</a></li><li><a href="technique.html">Technique</a></li><li><a href="tactique.html" class="active">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="materiel.html">Matériel</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-entrainer">S'entraîner</button><ul class="nav-sous" id="nav-entrainer"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Plan d'entraînement</a></li><li><a href="score.html">Compteur de match</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-competition">Compétition</button><ul class="nav-sous" id="nav-competition"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html" data-espace>Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
+  </div>
+</nav>
+<section id="simulateur" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">Apprendre · Tactique</p><h1>Simulateur 3D</h1></div>
+      <p>Revois une situation de jeu sous tous les angles : quatre joueurs, une balle dont la trajectoire est calculée (gravité, freinage de l'air, rebonds au sol et sur les vitres), et une explication à chaque étape. Mets en pause, avance pas à pas, ralentis.</p>
+    </div>
+    <div class="phases p3d-choix" id="p3d-scenarios" role="group" aria-label="Scénario"></div>
+    <div class="p3d-scene" id="p3d-scene" tabindex="0" aria-label="Scène 3D du scénario. Espace : lecture ou pause ; flèches : étape précédente ou suivante." role="region">
+      <canvas id="p3d-canvas" aria-hidden="true"></canvas>
+      <div class="p3d-etiquettes" id="p3d-etiquettes" aria-hidden="true"></div>
+      <p class="p3d-geste" id="p3d-geste" hidden></p>
+      <p class="p3d-chargement" id="p3d-chargement">Chargement de la scène…</p>
+    </div>
+    <div class="p3d-sans-3d" id="p3d-sans-3d" hidden>
+      <h3>La 3D n'est pas disponible ici</h3>
+      <p id="p3d-sans-3d-raison">Ton navigateur n'affiche pas la 3D.</p>
+      <p>Les étapes du scénario restent lisibles ci-dessous, et le <a href="tactique.html#placement">simulateur de placement en 2D</a> fonctionne sur tous les appareils.</p>
+    </div>
+    <div class="p3d-commandes" role="group" aria-label="Lecture">
+      <button type="button" class="btn ghost" id="p3d-debut" aria-label="Recommencer">⏮</button>
+      <button type="button" class="btn ghost" id="p3d-prec" aria-label="Étape précédente">◀</button>
+      <button type="button" class="btn primary" id="p3d-lecture" aria-pressed="false">Lecture</button>
+      <button type="button" class="btn ghost" id="p3d-suiv" aria-label="Étape suivante">▶</button>
+      <input type="range" class="p3d-temps" id="p3d-temps" min="0" max="6" step="0.01" value="0" aria-label="Instant du scénario">
+      <span class="p3d-chrono" id="p3d-chrono" aria-hidden="true">0,0 s</span>
+      <label class="sr-only" for="p3d-vitesse">Vitesse</label>
+      <select id="p3d-vitesse" title="Vitesse de lecture"></select>
+    </div>
+    <div class="phases p3d-vues" id="p3d-vues" role="group" aria-label="Caméra"></div>
+    <p class="p3d-aide-libre" id="p3d-aide-libre"></p>
+    <div class="p3d-panneau">
+      <p class="p3d-etape-num" id="p3d-etape-num"></p>
+      <h2 id="p3d-etape-titre">Chargement…</h2>
+      <p class="p3d-etape-texte" id="p3d-etape-texte" aria-live="polite"></p>
+      <ol class="p3d-etapes" id="p3d-etapes" aria-label="Étapes du scénario"></ol>
+    </div>
+  </div>
+</section>
+<section id="comprendre">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow" id="p3d-niveau">Scénario</p><h2 id="p3d-titre-scenario">Le scénario</h2></div>
+      <p id="p3d-situation"></p>
+    </div>
+    <div class="p3d-fiche">
+      <div><h3>Ce qu'il faut retenir</h3><ul id="p3d-explication"></ul></div>
+      <div><h3>Les erreurs fréquentes</h3><ul id="p3d-erreurs"></ul></div>
+      <div><h3>En résumé</h3><p id="p3d-conclusion"></p></div>
+      <div><h3>L'exercice</h3><p id="p3d-exercice"></p><p class="note"><a id="p3d-lien" href="tutos.html">Voir les tutos</a></p></div>
+    </div>
+  </div>
+</section>
+<section id="limites" class="alt">
+  <div class="wrap">
+    <h2>Ce que montre (et ne montre pas) le simulateur</h2>
+    <ul class="p3d-limites">
+      <li>Terrain aux dimensions du règlement FIP : 20 m sur 10 m, filet de 0,88 m au centre et 0,92 m aux poteaux, vitres de 3 m au fond, grillage jusqu'à 4 m.</li>
+      <li>Balle : trajectoire calculée avec la gravité, le freinage de l'air et des rebonds moyens (sol réglé sur le rebond réglementaire de 1,40 m pour une chute de 2,54 m). L'effet (lift, slice) n'est pas simulé.</li>
+      <li>Gestes : <span id="p3d-gestes-intro">mouvements simplifiés, construits à la main (pas de capture de mouvement).</span></li>
+    </ul>
+    <ul class="p3d-limites" id="p3d-gestes"></ul>
+    <p class="note">Personnages : mannequin « Universal Animation Library » de Quaternius, domaine public (CC0). Moteur 3D : three.js (licence MIT). Aucune donnée n'est envoyée : tout est calculé sur ton appareil.</p>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div><b>Apprendre Padel</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par Samuel, joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie.</div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
+  </div>
+</footer>
+<script type="importmap">{"imports":{"three":"./assets/3d/vendor/three.module.min.js?v=2b1ab9125b","three/addons":"./assets/3d/vendor/three-addons.min.js?v=0f36c4f86c","./assets/js/p3d/cameras.js":"./assets/js/p3d/cameras.js?v=3878cf03eb","./assets/js/p3d/constantes.js":"./assets/js/p3d/constantes.js?v=88c9b69884","./assets/js/p3d/gestes.js":"./assets/js/p3d/gestes.js?v=a3d88a48f3","./assets/js/p3d/joueurs.js":"./assets/js/p3d/joueurs.js?v=a5d15a7d28","./assets/js/p3d/physique.js":"./assets/js/p3d/physique.js?v=db6978a2b7","./assets/js/p3d/scenarios.js":"./assets/js/p3d/scenarios.js?v=a94c681b95","./assets/js/p3d/simulateur.js":"./assets/js/p3d/simulateur.js?v=fb6bc74214","./assets/js/p3d/terrain.js":"./assets/js/p3d/terrain.js?v=3816879063"}}</script>
+<script type="module">import "./assets/js/p3d/simulateur.js";</script>
+<script nomodule>document.getElementById("p3d-sans-3d").hidden=false;document.getElementById("p3d-scene").hidden=true;</script>
+<script src="assets/js/nav.js?v=6ec1140ce4"></script>
+<script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

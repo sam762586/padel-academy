@@ -2,6 +2,8 @@
    - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation, servi en « stale-while-revalidate ».
    - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
+   - Simulateur 3D (assets/3d/ : moteur, modèle, scénarios, environ 1,5 Mo) : jamais précaché, « network-first »
+     à la demande ; la page simulateur-3d.html elle-même n'est pas dans le shell.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN, Google Fonts...) n'est JAMAIS intercepté ni mis en cache.
    - Style et scripts sont appelés avec « ?v=<empreinte> » (scripts/gabarit.js) : une nouvelle version a une autre adresse,
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
@@ -112,7 +114,7 @@ self.addEventListener("fetch", event => {
   if (requete.method !== "GET" || requete.headers.has("range")) return;
   const url = new URL(requete.url);
   if (url.origin !== self.location.origin) return; // autre domaine : on ne touche à rien
-  if (estDonnee(url.pathname)) {
+  if (estDonnee(url.pathname) || url.pathname.includes("/assets/3d/")) {
     event.respondWith(reseauDabord(requete));
     return;
   }
