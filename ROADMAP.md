@@ -145,7 +145,13 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   víbora) reprises de phrases du site, en brouillon. Validées posables : 1:6 2:12 3:20 4:40 5:40 6:39 7:33 8:15 9:13 10:13.
   Test : `scripts/verifier-academie-questions.cjs`.
 - [x] Relecture de Samuel (27/10/2026) : les 20 questions rédigées validées, classement des 55 questions accepté.
-- [ ] Phase 3 : quiz adaptatif (référence N, consolidation N−1, découverte N+1, bornes 1 et 10, non-répétition, reprise).
+- [x] Phase 3 (27/10/2026) : quiz adaptatif dans Mon académie (`academie.html#quiz`) : 6 questions de référence au
+  niveau N, puis 4 en découverte N+1 (5 bonnes sur 6 ou plus), consolidation N−1 (3 ou moins) ou au niveau N ; bornes 1
+  et 10 ; thèmes variés, prérequis respectés, pas de question des 2 dernières séances tant que la banque le permet ;
+  une question à la fois, schéma 2D pour les questions de scène, progression, reprise après interruption ; bilan
+  (score, réussite par thème, erreurs expliquées, points forts, à renforcer, 3 recommandations avec exercice, article et
+  scène 3D, « Refaire un quiz ») ; niveau déclaré jamais modifié. Test : `scripts/verifier-academie-quiz.cjs`.
+- [ ] Validation de la phase 3 par Samuel.
 - [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
   Mon espace.
 - [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).

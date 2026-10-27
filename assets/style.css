@@ -1412,3 +1412,28 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .ac-choisir{justify-content:center}
 .ac-carte.choisi .ac-choisir{background:var(--turf);color:var(--accent-fg);border-color:var(--turf)}
 @media (max-width:720px){.ac-moi{padding:var(--s-4)}.ac-carte{padding:var(--s-4) var(--s-3)}}
+
+/* MON ACADÉMIE · Quiz adaptatif (academie-quiz.js) : réutilise les réponses et le schéma du quiz tactique (.qt-*) */
+.aq{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5);scroll-margin-top:84px}
+.aq-vide{margin:0}
+.aq-actions{display:flex;flex-wrap:wrap;gap:var(--s-3);margin:var(--s-4) 0 0}
+.aq-question{display:grid;gap:var(--s-4)}
+.aq-avec-schema{grid-template-columns:minmax(0,240px) minmax(0,1fr);align-items:start}
+.aq-avec-schema .aq-tete{grid-column:1/-1}
+.aq-scene .qt-schema{max-width:240px}
+.aq-avancement{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);margin:0 0 var(--s-2);font-size:var(--fs-s);color:var(--muted)}
+.aq-type{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--line-2)}
+.aq-decouverte{color:var(--turf);border-color:rgba(var(--turf-rgb),.45)}
+.aq-consolidation{color:var(--sand);border-color:rgba(255,181,71,.45)}
+.aq-barre{height:6px;border-radius:999px;background:var(--glass-2);overflow:hidden}
+.aq-barre span{display:block;height:100%;background:var(--turf);transition:width var(--t)}
+.aq-texte h3{margin:0 0 var(--s-4);font-size:var(--fs-l);line-height:1.35;outline:none}
+.aq-bilan h3{font-size:var(--fs-xl);margin:0 0 var(--s-3);outline:none}
+.aq-bilan h4{margin:var(--s-5) 0 var(--s-2)}
+.aq-erreurs{display:grid;gap:var(--s-3);padding-left:1.2em}
+.aq-erreurs p{margin:0 0 var(--s-1)}
+.aq-recos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:var(--s-3)}
+.aq-reco{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-4)}
+.aq-reco h4{margin:0 0 var(--s-2)}
+.aq-reco p{margin:0 0 var(--s-2);font-size:var(--fs-s)}
+@media (max-width:720px){.aq{padding:var(--s-4)}.aq-avec-schema{grid-template-columns:1fr}.aq-scene .qt-schema{max-width:200px}}
