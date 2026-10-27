@@ -63,7 +63,7 @@ Search Console.
   « du coup » et « de la scène » distingués.
   Images : `scripts/generer-affiches-3d.cjs` (captures de la vraie scène, 23 × environ 31 Ko). three.js et le modèle ne sont
   téléchargés qu'au clic (image, Lecture, Quiz, Trajectoire, Placements) ; lien direct vers le quiz : démarrage immédiat.
-- [ ] Validation du 3D par Samuel, puis de la phase 3.
+- [x] Validation du 3D et de la phase 3 par Samuel (27/10/2026).
 Limite gardée : pas d'effet de balle (slice, lift), affichée sur la page.
 
 ## Phase 4 — Outils interactifs (ordre proposé)
