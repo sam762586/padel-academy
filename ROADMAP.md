@@ -161,7 +161,7 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
 - [x] Phase 5 (27/10/2026) : choix du niveau en un toucher dès l'arrivée (10 boutons, puis « Changer de niveau »),
   sommaire de la page, reprise d'un quiz interrompu proposée en haut, niveau changé pendant un quiz signalé, messages si
   le stockage est bloqué ou si les questions ne se chargent pas. Test : `scripts/verifier-academie-ux.cjs`.
-- [ ] Validation de la phase 5 par Samuel.
+- [x] Validation de la phase 5 par Samuel (27/10/2026).
 - [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
 
 ## Phase 6 — Stabilisation
