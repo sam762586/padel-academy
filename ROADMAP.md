@@ -82,7 +82,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   simulateur sans 3D ; point de frappe, cible (rebond ou passage), temps de vol ; vues de dessus et de côté ; vitesse,
   marge au-dessus du filet, hauteur maximale, rebond, suite (vitre, grillage, sortie), faute reconnue ; 6 préréglages
   copiés des scénarios ; limites affichées. Tests : `scripts/verifier-labo-trajectoires.cjs`.
-- [ ] Validation du 4C par Samuel.
+- [x] Validation du 4C par Samuel (27/10/2026).
 - [ ] 4D. Diagnostic de paire (`tactique.html#construire`) : règles fixes, jamais présenté comme un avis professionnel.
 - [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
 - [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
