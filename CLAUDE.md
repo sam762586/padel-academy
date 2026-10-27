@@ -19,6 +19,8 @@ Pages : index, technique, tactique, tutos, niveau, entrainement, videos, regles,
 - Responsive obligatoire (tester à 400 px). Gouttière 16 px minimum.
 - Pas d'images externes ni de iframes YouTube dans le dépôt : liens sortants uniquement, sauf si des photos sont ajoutées dans `assets/img/`.
 - Contenu padel : vérifier les règles contre le règlement FFT/FIP avant de modifier `regles.html`. Prix des raquettes : indicatifs, à dater.
+- Contenu construit en JavaScript (fiches de coups, lexique, barème, plan 8 semaines) : il est aussi écrit dans le HTML pour les moteurs de recherche, entre `<!-- prerendu:id -->` et `<!-- /prerendu:id -->`. Après toute modification de ces données, lancer `node scripts/prerendre-contenu.js` (ne pas modifier ces blocs à la main).
+- SEO : `node scripts/verifier-seo.cjs` vérifie titles et descriptions uniques (≤ 160 caractères), canoniques, liens internes, sitemap, noindex des pages privées, données structurées et contenu pré-rendu à jour. Pas de FAQPage (Google ne l'affiche plus pour ce type de site).
 - Avant de livrer : ouvrir chaque page, vérifier la console (0 erreur), tester le sélecteur de raquette et le quiz.
 
 ## Prochaines étapes envisagées
