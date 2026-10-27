@@ -115,7 +115,7 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   diagnostic, labo), sommaire des outils en tête de ces pages, liens vers les outils depuis tutos, technique et
   entraînement, « À voir aussi » sur 4 pages peu reliées ; plan des titres corrigé sur 13 modèles de page (intertitres
   invisibles) ; `verifier-seo.cjs` : titres sans saut et 3 pages liées au moins (1 060 pages).
-- [ ] Validation du 5B par Samuel.
+- [x] Validation du 5B par Samuel (27/10/2026).
 - [ ] 5C. Search Console (vérification du domaine par DNS, à faire avec Samuel) puis suivi mensuel dans SEO.md.
 - [ ] 5D. Contenus de novembre (SEO.md § 2) : débuter au padel, compter les points, le service ; règles vérifiées
   FFT/FIP, relues par Samuel.
