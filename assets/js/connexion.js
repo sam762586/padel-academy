@@ -33,6 +33,7 @@
   if(brut.includes("password")&&brut.includes("least")) return "Le mot de passe doit faire au moins 8 caractères.";
   if(brut.includes("rate limit")||brut.includes("security purposes")||brut.includes("too many")) return "Trop de tentatives. Patiente quelques minutes avant de réessayer.";
   if(brut.includes("failed to fetch")||brut.includes("network")) return "Connexion impossible : vérifie ton réseau puis réessaie.";
+  if(brut.includes("error sending")||brut.includes("sending email")||brut.includes("smtp")) return "L'e-mail n'a pas pu partir (souci technique de notre côté, pas de ta faute). Réessaie dans quelques minutes, ou utilise « Continuer avec Google ».";
   if(brut.includes("invalid")&&brut.includes("email")) return "Cette adresse e-mail n'est pas valide.";
   if(brut.includes("same password")||brut.includes("different from the old")) return "Choisis un mot de passe différent de l'ancien.";
   return defaut||"Une erreur est survenue. Réessaie dans un instant.";
