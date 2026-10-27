@@ -195,7 +195,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   8 semaines, celles des 3 priorités en tête (Semaine match toujours dernière), un exercice par semaine au niveau
   d'exercice (la 2e semaine « aérien » reçoit celui d'un niveau voisin, signalé : un seul exercice par thème et par
   niveau). Valider dans Mon plan coche la case du plan générique : même stockage, même synchronisation.
-- [ ] Validation du lot 4 par Samuel.
+- [x] Validation du lot 4 par Samuel (27/10/2026).
 - [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
 - [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).
 
