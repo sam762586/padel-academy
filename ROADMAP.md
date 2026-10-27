@@ -89,7 +89,10 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   une aide, pas un avis de professionnel ; réponses gardées sur l'appareil. Tests : `scripts/verifier-diagnostic-paire.cjs`
   (toutes les combinaisons de réponses).
 - [x] Validation du 4D par Samuel (27/10/2026).
-- [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
+- [x] 4E. Défi de la semaine (27/10/2026) : `espace.html#esp-bloc-defi`, après le tableau de bord ; un thème par semaine ISO
+  pour tous (cycle des 10 thèmes), exercice au niveau du dernier test ; « J'ai relevé le défi » (auto-évaluation),
+  compté comme exercice fait ; série et 8 dernières semaines ; sur l'appareil. Tests : `scripts/verifier-defis.cjs`.
+- [ ] Validation du 4E par Samuel.
 - [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
 
 ## Phase 5 — SEO et performance (continu)

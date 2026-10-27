@@ -1357,3 +1357,16 @@ section:has(.erreurs-liste){counter-reset:erreur}
   .dp{padding:var(--s-4)}
   .dp-joueurs,.dp-paire{grid-template-columns:1fr}
 }
+
+/* DÉFI DE LA SEMAINE (espace.html#esp-bloc-defi, defis.js) : carte comme les exercices recommandés, série en pastilles */
+.df-tete{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--s-2);margin:0 0 var(--s-3)}
+.df-theme{font-size:var(--fs-xs);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--turf)}
+.df-echeance{font-size:var(--fs-s);color:var(--muted)}
+.df-carte{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-4)}
+.df-carte h3{font-size:var(--fs-l);margin:0}
+.df-suivi{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3);margin-top:var(--s-4)}
+.df-serie{margin:0;font-weight:700}
+.df-semaines{display:flex;gap:6px;list-style:none;margin:0;padding:0}
+.df-pastille{width:14px;height:14px;border-radius:50%;border:1px solid var(--line-2);background:transparent}
+.df-pastille.ok{background:var(--turf);border-color:var(--turf)}
+.df-pastille.encours{outline:2px solid var(--sky);outline-offset:2px}
