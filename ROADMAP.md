@@ -174,8 +174,11 @@ Constats vérifiés : accueil en « 6 paliers » à côté du 1 à 10 (vrai) ; m
 pour le test de niveau ; plan 8 semaines commun à tous (vrai) ; Mon espace en 8 blocs, académie secondaire (vrai) ;
 quiz reliés aux contenus seulement au bilan (vrai en partie) ; banque déséquilibrée (niveaux 8–10, difficulté 3).
 Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un lot à la fois.
-- [ ] Lot 0 : test des parcours complets (nouvel utilisateur, niveaux 2 / 5 / 8, connecté, non connecté, retour après
-  plusieurs jours, conservation des données).
+- [x] Lot 0 (27/10/2026) : `scripts/verifier-parcours-joueurs.cjs` fige le comportement actuel : nouvel utilisateur,
+  niveaux 2 / 5 / 8, connecté (Mon académie ne charge pas Supabase : aucune écriture en base), non connecté (Mon espace →
+  connexion, académie sans compte), retour après 11 jours (tout conservé, nouveau défi, quiz sans répétition), données
+  existantes jamais modifiées. À relancer à chaque lot.
+- [ ] Validation du lot 0 par Samuel.
 - [ ] Lot 1 : le 1 à 10 comme référence (accueil, tableau de bord : niveau déclaré / quiz / classement FFT, fin du test).
 - [ ] Lot 2 : « Ta semaine » en tête de Mon académie et de Mon espace (niveau, quiz, 3 priorités, 1 exercice, 1 scène, objectif).
 - [ ] Lot 3a : contenu recommandé après chaque erreur (quiz de l'académie, quiz tactique, mode quiz 3D).
