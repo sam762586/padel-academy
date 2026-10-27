@@ -190,7 +190,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
 - [x] Lot 3a (27/10/2026) : « Pour revoir ce point » après chaque erreur (quiz de l'académie, quiz tactique, mode quiz
   3D) : section d'article du thème couvrant les niveaux de la question, exercice, scène 3D ; calculé par
   generer-academie-questions.mjs (champ revoir, assets/3d/revoir.json chargé à la première erreur dans le simulateur).
-- [ ] Validation du lot 3a par Samuel.
+- [x] Validation du lot 3a par Samuel (27/10/2026).
 - [ ] Lot 4 : « Mon plan » personnalisé, plan générique et progression préservés.
 - [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
 - [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).
