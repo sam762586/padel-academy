@@ -32,14 +32,46 @@ export const GESTES = Object.freeze({
     phases: ['Raquette haute devant soi, petite préparation', 'Contact devant le corps, poignet ferme', 'Accompagnement court vers la cible'],
     tronc: [0, -25, -5, 5, 0], avant: [20, 25, 55, 60, 20], cote: [20, 45, 35, 30, 20], coude: [60, 70, 25, 25, 55], poignet: [45, 45, 25, 25, 45], genoux: [15, 20, 25, 15, 10],
   },
-  coup_droit: { nom: 'Coup droit', statut: 'a_venir' },
-  revers: { nom: 'Revers', statut: 'a_venir' },
-  volee_revers: { nom: 'Volée de revers', statut: 'a_venir' },
-  vibora: { nom: 'Víbora', statut: 'a_venir' },
-  smash: { nom: 'Smash', statut: 'a_venir' },
-  defense_double_vitre: { nom: 'Défense après double vitre', statut: 'a_venir' },
-  service: { nom: 'Service', statut: 'a_venir' },
-  retour: { nom: 'Retour de service', statut: 'a_venir' },
+  coup_droit: {
+    nom: 'Coup droit', statut: 'simplifie',
+    phases: ['Épaules tournées, raquette en arrière à hauteur de hanche', 'Contact devant la jambe avant, genoux fléchis', 'Accompagnement vers l\'avant et en travers, vers la cible'],
+    tronc: [0, -60, -10, 35, 0], avant: [15, -20, 45, 80, 20], cote: [15, 60, 50, -30, 15], coude: [40, 40, 15, 75, 50], poignet: [45, 30, 10, 30, 45], genoux: [10, 30, 25, 15, 10],
+  },
+  revers: {
+    nom: 'Revers', statut: 'simplifie',
+    phases: ['Épaules tournées vers la gauche, raquette en arrière côté revers', 'Contact devant le corps, bras presque tendu', 'Accompagnement vers l\'avant, les épaules s\'ouvrent'],
+    tronc: [0, 70, 15, -25, 0], avant: [15, 15, 45, 70, 20], cote: [15, -60, -40, 30, 15], coude: [40, 70, 15, 35, 50], poignet: [45, 30, 10, 30, 45], genoux: [10, 30, 25, 15, 10],
+  },
+  volee_revers: {
+    nom: 'Volée de revers', statut: 'simplifie',
+    phases: ['Raquette haute côté revers, épaules légèrement tournées', 'Contact devant le corps, poignet ferme', 'Accompagnement court vers la cible'],
+    tronc: [0, 45, 10, 0, 0], avant: [20, 35, 55, 60, 20], cote: [20, -35, -30, -20, 20], coude: [60, 80, 25, 25, 55], poignet: [45, 45, 25, 25, 45], genoux: [15, 20, 25, 15, 10],
+  },
+  vibora: {
+    nom: 'Víbora', statut: 'simplifie',
+    phases: ['Profil, raquette armée derrière l\'épaule, plus bas que pour la bandeja', 'Contact sur le côté droit, à hauteur d\'épaule, en coupant la balle', 'Accompagnement en travers vers la gauche, le bras traverse le corps'],
+    tronc: [0, -75, -20, 25, 0], avant: [15, 85, 120, 50, 20], cote: [15, 75, 60, -15, 15], coude: [40, 115, 10, 25, 50], poignet: [45, 55, 0, 30, 45], genoux: [10, 15, 10, 10, 10],
+  },
+  smash: {
+    nom: 'Smash', statut: 'simplifie',
+    phases: ['Profil, raquette tombée derrière la tête, coude haut', 'Contact au plus haut, devant la tête, bras tendu', 'Accompagnement vers le bas et vers la gauche, les épaules ont tourné'],
+    tronc: [0, -80, 0, 40, 0], avant: [15, 120, 165, 35, 20], cote: [15, 60, 15, -35, 15], coude: [40, 130, 5, 25, 50], poignet: [45, 70, 0, 15, 45], genoux: [10, 25, 5, 15, 10],
+  },
+  defense_double_vitre: {
+    nom: 'Défense après double vitre', statut: 'simplifie',
+    phases: ['Suivre la balle dans l\'angle, très bas sur les jambes', 'Contact tard, en remontant sous la balle', 'Accompagnement vers le haut : lob ou balle lente au centre'],
+    tronc: [0, -60, -15, 25, 0], avant: [15, -20, 15, 105, 20], cote: [15, 35, 35, 30, 15], coude: [40, 30, 15, 40, 50], poignet: [45, 15, 0, 25, 45], genoux: [15, 45, 40, 15, 10],
+  },
+  service: {
+    nom: 'Service', statut: 'simplifie',
+    phases: ['De profil, laisser rebondir la balle, raquette en arrière', 'Contact sous la taille, devant le pied avant', 'Accompagnement vers la cible, dans la diagonale'],
+    tronc: [0, -50, -10, 30, 0], avant: [15, -25, 30, 60, 20], cote: [15, 45, 35, 0, 15], coude: [40, 25, 10, 30, 50], poignet: [45, 20, 5, 20, 45], genoux: [10, 25, 20, 10, 10],
+  },
+  retour: {
+    nom: 'Retour de service', statut: 'simplifie',
+    phases: ['Petite préparation, épaules tournées', 'Contact devant, genoux fléchis', 'Accompagnement vers l\'avant pour viser les pieds ou le lob'],
+    tronc: [0, -45, -5, 25, 0], avant: [20, 5, 45, 75, 20], cote: [20, 55, 40, -10, 20], coude: [55, 45, 15, 60, 55], poignet: [45, 30, 10, 35, 45], genoux: [15, 35, 25, 15, 10],
+  },
 });
 
 // Garde (position d'attente) : raquette devant la poitrine
