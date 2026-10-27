@@ -92,7 +92,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
 - [x] 4E. Défi de la semaine (27/10/2026) : `espace.html#esp-bloc-defi`, après le tableau de bord ; un thème par semaine ISO
   pour tous (cycle des 10 thèmes), exercice au niveau du dernier test ; « J'ai relevé le défi » (auto-évaluation),
   compté comme exercice fait ; série et 8 dernières semaines ; sur l'appareil. Tests : `scripts/verifier-defis.cjs`.
-- [ ] Validation du 4E par Samuel.
+- [x] Validation du 4E par Samuel (27/10/2026).
 - [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
 
 ## Phase 5 — SEO et performance (continu)
