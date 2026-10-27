@@ -1,8 +1,8 @@
 /* Vérification de l'accueil orienté profils (index.html) :
-   1) structure : promesse, « Découvrir mon parcours » → #parcours, 3 profils avec leur action principale et leurs étapes,
+   1) structure : promesse, « Commencer à apprendre » → #parcours, 3 profils avec leur action principale et leurs étapes,
       outils gratuits, progression, contenus, auteur ; titres h1 unique / h2 de section ; description à jour ;
    2) liens : chaque lien interne mène à une page existante (ancre comprise) ; aucun lien important ne disparaît ;
-   3) navigateur : actions au clavier, ancre « Découvrir mon parcours », mobile 390 et 320 px sans débordement,
+   3) navigateur : actions au clavier, ancre « Commencer à apprendre », mobile 390 et 320 px sans débordement,
       ordinateur 1366 px, bloc tournois toujours présent, aucune erreur console.
    Lancer depuis la racine du site : node scripts/verifier-profils.cjs */
 const assert=require('node:assert/strict');
@@ -30,7 +30,7 @@ const serveur=http.createServer((req,res)=>{
 (async()=>{
  // 1. Structure
  assert.equal((html.match(/<h1\b/g)||[]).length,1);
- assert.match(html,/<a class="btn primary" href="#parcours">Découvrir mon parcours<\/a>/);
+ assert.match(html,/<a class="btn primary" href="#parcours">Commencer à apprendre<\/a>/);
  assert.match(html,/<meta name="description" content="Apprendre le padel gratuitement[^"]*parcours[^"]*">/);
  for(const id of ['parcours-titre','pdt-titre','outils-titre','progression-titre','contenus-titre','auteur-titre'])assert.match(html,new RegExp('<h2 id="'+id+'"'),id);
  PROFILS.forEach(([cle,appel,cible])=>{
@@ -63,10 +63,10 @@ const serveur=http.createServer((req,res)=>{
   return {ctx,page};
  };
  try{
-  // 3. Clavier : depuis le haut, Tab atteint « Découvrir mon parcours », Entrée amène aux profils
+  // 3. Clavier : depuis le haut, Tab atteint « Commencer à apprendre », Entrée amène aux profils
   let {ctx,page}=await ouvrir({width:1366,height:900},false);
   let n=0;
-  while(await page.evaluate(()=>document.activeElement.textContent.trim())!=='Découvrir mon parcours'&&n++<40)await page.keyboard.press('Tab');
+  while(await page.evaluate(()=>document.activeElement.textContent.trim())!=='Commencer à apprendre'&&n++<40)await page.keyboard.press('Tab');
   assert.ok(n<40,'bouton atteint au clavier');
   await page.keyboard.press('Enter');
   await page.waitForFunction(()=>location.hash==='#parcours');
@@ -83,7 +83,7 @@ const serveur=http.createServer((req,res)=>{
    assert.ok(page.url().endsWith('/'+cible),cle+' → '+page.url());
    await page.goBack();
   }
-  ok('clavier : « Découvrir mon parcours » amène aux profils ; chaque action de profil s\'ouvre au clavier sur la bonne page');
+  ok('clavier : « Commencer à apprendre » amène aux profils ; chaque action de profil s\'ouvre au clavier sur la bonne page');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),1366);
   assert.equal(await page.locator('.profils .profil').count(),3);
   const colonnes=await page.evaluate(()=>getComputedStyle(document.querySelector('.profils')).gridTemplateColumns.split(' ').length);
@@ -97,10 +97,11 @@ const serveur=http.createServer((req,res)=>{
    assert.equal(await page.locator('.home-grid .card p').first().isVisible(),false);
    assert.ok(await page.locator('#pres-de-chez-toi').isVisible());
    const hauteur=await page.evaluate(()=>document.documentElement.scrollHeight);
-   if(largeur===390)assert.ok(hauteur<8191,'page plus courte qu\'avant la refonte ('+hauteur+' px)');
+   // Accueil v3 : la vitrine du simulateur 3D ajoute une section (environ 600 px sur mobile)
+   if(largeur===390)assert.ok(hauteur<9000,'accueil sans rallongement imprévu ('+hauteur+' px)');
    await ctx.close();
   }
-  ok('mobile 390 et 320 px : aucun débordement, cartes compactes, bloc tournois présent, page plus courte qu\'avant');
+  ok('mobile 390 et 320 px : aucun débordement, cartes compactes, bloc tournois présent, hauteur maîtrisée');
   assert.deepEqual(erreurs,[]);
   ok('aucune erreur console');
   console.log('TOTAL '+nb+' contrôles réussis.');

@@ -66,8 +66,8 @@ function pairPositions(){
 }
 function drawPair(){
  const p=pairPositions();
- document.getElementById("pair-us").innerHTML=p.us.map(u=>`<circle cx="${u[0]}" cy="${u[1]}" r="13" fill="#35e27f" stroke="#06110b" stroke-width="2" style="transition:all .35s ease"/><text x="${u[0]}" y="${u[1]-18}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Manrope,sans-serif" style="transition:all .35s ease">${u[2]}</text>`).join("");
- document.getElementById("pair-opp").innerHTML=p.them.map(o=>`<circle cx="${o[0]}" cy="${o[1]}" r="13" fill="#fff" stroke="#06110b" stroke-width="2" style="transition:all .35s ease"/>`).join("");
+ document.getElementById("pair-us").innerHTML=p.us.map(u=>`<circle cx="${u[0]}" cy="${u[1]}" r="13" fill="#C8F14B" stroke="#101F35" stroke-width="2" style="transition:all .35s ease"/><text x="${u[0]}" y="${u[1]-18}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Manrope,sans-serif" style="transition:all .35s ease">${u[2]}</text>`).join("");
+ document.getElementById("pair-opp").innerHTML=p.them.map(o=>`<circle cx="${o[0]}" cy="${o[1]}" r="13" fill="#fff" stroke="#101F35" stroke-width="2" style="transition:all .35s ease"/>`).join("");
  const r=document.getElementById("rope");r.setAttribute("x1",p.us[0][0]);r.setAttribute("y1",p.us[0][1]);r.setAttribute("x2",p.us[1][0]);r.setAttribute("y2",p.us[1][1]);
  const b=document.getElementById("pair-ball");b.setAttribute("cx",ball.x);b.setAttribute("cy",ball.y);
  const dist=Math.hypot(p.us[0][0]-p.us[1][0],p.us[0][1]-p.us[1][1]);

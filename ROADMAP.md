@@ -1,6 +1,71 @@
-# Feuille de route v2 — apprendre-padel.fr (issue de ANALYSE-STRATEGIE.md)
+# Feuille de route v3 — apprendre-padel.fr (mission « Apprendre Padel V3 », 27/10/2026)
 
-## Mode d'emploi pour Claude Code
+Objectif : faire d'apprendre-padel.fr une plateforme francophone de référence pour apprendre et progresser au padel :
+premium, rapide, responsive, riche en contenus, différenciée par son simulateur 3D, gratuite, sans API d'IA payante
+ni service payant.
+
+## Règles de la v3 (en plus de CLAUDE.md)
+- Une phase à la fois : plan détaillé → accord de Samuel → développement → tests → présentation → commits locaux →
+  validation avant la phase suivante. **Aucun push ni déploiement sans autorisation explicite.**
+- Ne pas reconstruire ce qui fonctionne ; préserver pages, URLs, comptes et données ; garder le simulateur 2D ;
+  ne pas remplacer le simulateur 3D sans justification ; pas de coach IA, pas d'API payante, pas d'abonnement.
+- Licences vérifiées pour tout modèle, image, icône, animation. Aucune règle, statistique, mesure ou résultat de test
+  inventé. Pas de FAQPage (voir SEO.md).
+- Chaque fonctionnalité marche sur mobile (390 et 320 px) et a ses tests.
+- Une page existante améliorée plutôt qu'une nouvelle page ; pas de suppression de page sans redirection
+  (GitHub Pages : pas de 301, seulement une page de renvoi).
+
+## Phase 0 — Audit ✅ 27/10/2026
+Inventaire, risques et ordre des phases présentés et validés. Points ouverts : synchronisation des comptes désactivée
+(`PA_SUPABASE.activees = []`, à confirmer avec Samuel avant toute activation) ; performances réelles à lire dans
+Search Console.
+
+## Phase 1 — Design system et accueil (branche `feature/apprendre-padel-v3`)
+- [x] Palette de la marque en tokens (`assets/style.css`, en-tête) : bleu nuit #101F35, bleu terrain #1674A6,
+  vert énergie #C8F14B, blanc froid #F4F7FA ; contrastes AA contrôlés par `scripts/verifier-design.cjs`.
+- [x] Échelles (espacements, tailles de texte, rayons) et composants communs : focus clavier, boutons (désactivé,
+  chargement), champs (aide, erreur), messages, indicateur de chargement, icônes.
+- [x] Menu : Accueil · Apprendre · S'entraîner · Tactique 3D · Compétition · Mon espace (+ bouton raquette).
+- [x] Accueil : « Progresse au padel, point après point. », trois accès (apprendre, simulateur 3D, niveau),
+  parcours Débutant / Intermédiaire / Compétiteur, vitrine du simulateur 3D.
+- [x] Icônes, image de partage, couleur du navigateur et manifeste aux nouvelles couleurs ; cache hors ligne pa-v20.
+- [ ] Validation de Samuel.
+
+## Phase 2 — Académie pédagogique (à planifier après validation de la phase 1)
+- Fiches de coups en 11 parties (titre, niveau, objectif, explication, animation, étapes, erreurs, corrections,
+  exercice, lien 3D, contenus associés), générées par `scripts/generer-pages-3d.js` sur les URLs existantes.
+- Enrichir avant de créer : règles (score, point décisif, service, cas litigieux — vérifiés au règlement FFT/FIP
+  en vigueur), conseils (10 → 20 erreurs), tactique, tutos, lexique.
+- Nouvelles pages seulement si aucune page ne répond : premier tournoi (ex-M5), jouer contre un gaucher, partenaire
+  de niveau différent, analyser ses matchs.
+- Parcours relié : article → exercice → simulateur → quiz → suivi.
+
+## Phase 3 — Simulateur 3D v2
+Qualité économique / équilibrée / élevée ; boutons trajectoires et placements ; erreurs, conseil et exercice sur
+les 6 scénarios prioritaires (défense de lob, bandeja, montée au filet, sortie de vitre, centre, défense-attaque) ;
+matériaux et éclairage ; couleurs d'équipe alignées sur la palette. Gestes toujours marqués « simplifiés ».
+Limite connue : pas d'effet de balle (par 3, rulo).
+
+## Phase 4 — Outils interactifs (ordre proposé)
+Quiz tactique hors 3D (réutilise les questions des scénarios) → tableau tactique (export image, sauvegarde locale)
+→ laboratoire des trajectoires (limites physiques affichées) → diagnostic de paire (règles déterministes, jamais
+présenté comme un avis professionnel) → défis hebdomadaires → carnet de match (existe : compteur, journal,
+diagnostic ; à améliorer seulement).
+
+## Phase 5 — SEO et performance (continu)
+Suivi dans SEO.md ; `verifier-seo.cjs` à chaque livraison ; mesures réelles via Search Console et PageSpeed.
+
+## Phase 6 — Stabilisation
+Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
+
+---
+
+## Archive : feuille de route v2 (26/10/2026)
+Conservée pour mémoire. Remplacée par la v3 sur ces points : **C3** (pages `bandeja.html`, `vibora.html`…) devient
+l'enrichissement des fiches 3D déjà indexées ; **C6** (suppression de videos.html et conseils.html) est abandonné ;
+les **FAQ en FAQPage** du lot C sont abandonnées ; **V1** (badges, couleurs) est couvert par la phase 1.
+
+### Mode d'emploi pour Claude Code
 - Lis d'abord CLAUDE.md puis ANALYSE-STRATEGIE.md (le « pourquoi » de chaque tâche est dedans).
 - Traite les tâches **dans l'ordre**, une à la fois. Pour chaque tâche : code → test (navigateur headless : 0 erreur console, 390 px sans débordement, interactions cliquées) → **un commit par tâche** (message en français, préfixé par le numéro de tâche) → coche la case ici avec la date et le hash.
 - **Ne pousse jamais** (`git push` interdit) : Samuel publie lui-même.
@@ -10,14 +75,14 @@
 - Identité visuelle : garde les tokens de assets/style.css (thème nuit, Big Shoulders Display + Manrope). Les évolutions visuelles sont décrites dans le lot V, pas ailleurs.
 - Toute nouvelle page générée sort d'un script (jamais à la main) et est ajoutée au sitemap par ce script.
 
-## Décisions prises par Samuel (26/10/2026)
+### Décisions prises par Samuel (26/10/2026)
 1. **Nom** : le site s'appelle désormais **« Apprendre Padel »** (= le domaine). Auteur visible : **Samuel**, joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie (Rouen). Pas de numéro de licence, pas de club nommé tant qu'il ne l'a pas confirmé. Photo : BLOQUÉ jusqu'à réception.
 2. **Tournois** : une page par tournoi pour **toute la France**, en deux temps : Normandie + Île-de-France d'abord (validation du rendu), puis tout.
 3. **Communauté** : « J'y vais », partenaires, et **avis après tournoi** limités à 3 questions structurées + un texte court filtré (pas de nom de personne, pas de coordonnées, pas d'insulte). Modération par les règles existantes (3 signalements = masqué, admin).
 
 ---
 
-## Lot T — Le hub tournois (jours 1-30)
+### Lot T — Le hub tournois (jours 1-30)
 
 - [x] **T1. Script de génération `scripts/generer-pages.js`** (Node, sans dépendance). Lit `assets/data/tournois.json` + `assets/data/fiches/*.json` + `assets/js/bareme.js` et écrit : ✅ 26/10/2026, commit d5f989e (avec T2).
   - `tournoi/<id>.html` : une page par tournoi (voir T2 pour le contenu).
@@ -49,7 +114,7 @@
 
 - [x] **T8. Vérifier les cuts 2026/2027** : `@agent-expert-padel` compare les cuts affichés (P100 Top 3 000 / P250 Top 800 messieurs) au règlement FFT 2026/2027 (Chapitre I ou II, saison depuis le 1er septembre 2026 ; Padel Magazine annonce Top 2 000 / Top 500). Corrige compte.html, bareme.html et les fiches ; cite la source dans le Journal. ✅ 26/10/2026, commit 5fd5163 : valeurs relevées sur les fiches Ten'Up (champ « cut » de milliers d'épreuves).
 
-## Lot M — Marque et confiance (jours 1-30, en parallèle de T)
+### Lot M — Marque et confiance (jours 1-30, en parallèle de T)
 
 - [x] **M1. Renommage « Apprendre Padel »** : `<title>`, logo texte de la nav (« Apprendre <span>Padel</span> »), footer, manifest PWA, og:site_name, mentions légales, README, CLAUDE.md. Garde « Padel Academy » nulle part, sauf une ligne dans mentions-legales.html (« anciennement Padel Academy »). ✅ 26/10/2026 (étape 4 : gabarit commun scripts/gabarit.js).
 - [x] **M2. Bloc auteur** sur l'accueil et en pied de chaque page de contenu : « Écrit par Samuel, joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie. » Emplacement photo prévu (BLOQUÉ : photo). Données structurées `Person` reliées au `WebSite`. ✅ 26/10/2026 : bloc sur l'accueil (initiale « S » à la place de la photo, BLOQUÉ : photo), auteur dans le pied de chaque page, Person relié au WebSite.
@@ -57,7 +122,7 @@
 - [ ] **M4. Convertisseur de niveau** `niveau-padel.html` : niveau Playtomic (1-7, auto-déclaré) ↔ niveau Ten'Up ↔ catégorie P (P25-P500) ↔ classement FFT approximatif, basé sur le test de niveau existant + une table de correspondance assumée comme indicative. H1 « Niveau padel 3, 4, 5 : ça veut dire quoi ? ». FAQ.
 - [ ] **M5. Hub « Ton premier tournoi »** `premier-tournoi.html` : P25 c'est quoi, le cut, la licence (où, prix), s'inscrire sur Ten'Up pas à pas (captures d'écran du vrai parcours), quoi apporter, comment se passe une journée, les points, lien vers la liste des P25 du département. FAQ. Lié depuis chaque fiche P25.
 
-## Lot C — Contenu qui répond à une recherche (jours 31-60)
+### Lot C — Contenu qui répond à une recherche (jours 31-60)
 
 Règle : une requête = une page = un H1 formulé comme la question, 700-900 mots, FAQ en `FAQPage`, 3 liens internes minimum, ajout au sitemap. Les pages thématiques existantes deviennent des sommaires qui renvoient vers ces pages.
 
@@ -70,7 +135,7 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 - [ ] **C7. Fiches clubs** générées : `club/<slug>.html` à partir des clubs présents dans tournois.json (nom, ville, tournois à venir et passés, avis agrégés, lien Ten'Up), enrichies avec data.gouv.fr « Équipements sportifs » (nombre de terrains, intérieur/extérieur) si le jeu de données est exploitable sans effort démesuré. Normandie d'abord.
 - [ ] **C8. Partenaires par ville** : `partenaire/<ville>.html` pour les 20 plus grandes villes (annonces filtrées + formulaire), H1 « Trouver un partenaire de padel à Lyon ».
 
-## Lot V — Visuel signature (jours 31-90, en parallèle)
+### Lot V — Visuel signature (jours 31-90, en parallèle)
 
 - [ ] **V1. Système de badges de catégorie** (couleurs de T2) + le terrain vu de dessus comme icône système (favicon, badges, fonds de section), le jaune de la balle réservé aux actions (bouton principal, élément sélectionné), le vert gardé pour la marque et le terrain. Audit de contraste AA après changement.
 - [ ] **V2. Silhouettes de gestes** : pour chaque coup de C3, 4 vignettes SVG (préparation, armé, frappe, accompagnement), silhouette blanche trait épais, raquette verte, balle jaune, légende d'un mot ; version « erreur » barrée pour les 3 erreurs. Un seul fichier `assets/js/silhouettes.js` qui dessine à partir de données (pas 32 fichiers SVG à la main).
@@ -78,17 +143,17 @@ Règle : une requête = une page = un H1 formulé comme la question, 700-900 mot
 - [ ] **V4. Carte de résultat à partager** (test de niveau, convertisseur, simulateur, compteur de match) : image 1080×1920 générée en canvas aux couleurs du site, Web Share API sinon téléchargement.
 - [ ] **V5. Photos** — BLOQUÉ : photos de Samuel dans `assets/img/gestes/` (WebP, `loading="lazy"`, alt descriptif, étalonnage sombre cohérent).
 
-## Lot R — Revenir chaque semaine (jours 61-90)
+### Lot R — Revenir chaque semaine (jours 61-90)
 
 - [ ] **R1. Alertes e-mail hebdomadaires** : table `alertes` (zone département ou ville + rayon, catégories, sexe), UI dans compte.html, Edge Function `alertes-hebdo` (lundi 7 h) qui envoie les nouveaux tournois et les inscriptions qui ouvrent, via Resend. BLOQUÉ : compte Resend + clé + domaine d'envoi (documente la mise en route dans supabase/LISEZMOI.md).
 - [ ] **R2. Carnet du joueur** : compte.html relie le compteur de match (historique, courbe, « ton point faible du mois »), les résultats saisis (simulateur), les favoris et les présences ; « ton prochain objectif » calculé (points manquants pour le palier suivant).
 - [ ] **R3. Widget « prochains tournois du club »** : `widget.html?club=<slug>` intégrable en iframe + page `clubs.html` qui l'explique aux clubs (avec le code à copier). Pas de PDF.
 - [ ] **R4. Passe SEO finale** : sitemap complet, maillage interne (chaque page → 3 pages liées), données structurées validées, titres et descriptions uniques, relecture `@agent-relecteur` de tout le site.
 
-## Abandonné (voir ANALYSE-STRATEGIE.md § 6)
+### Abandonné (voir ANALYSE-STRATEGIE.md § 6)
 - Thème clair, kit club PDF, newsletter séparée (remplacée par R1), plan d'entraînement comme « produit » (reste une page), guide clubs Normandie écrit à la main (remplacé par C7 généré).
 
-## Déjà fait (feuille de route v1)
+### Déjà fait (feuille de route v1)
 - [x] A1. Compteur de match (`score.html`) — 26/10/2026, commit 172b3c0. SQL exécuté le 26/10 (table `matchs`).
 - [x] A2. Tableau de bord « Mon padel » — 26/10/2026, commit c05699f. Cuts à vérifier : voir T8.
 - [x] Audit technique, SEO de base, mentions légales, GoatCounter, mobile, domaine apprendre-padel.fr.
@@ -131,3 +196,8 @@ Sur ordinateur, ce sont des menus déroulants (au clic et au survol ; Échap et 
 
 ### 27/10/2026 — Coach IA abandonné (décision de Samuel)
 L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, commit 51f5b07) a été annulée avant publication par un commit de retour en arrière ; elle reste dans l'historique git si l'idée revient. Seule la correction « test en 14 questions » des pages tournois est conservée.
+
+### 27/10/2026 — v3, phase 1 : design system et accueil
+**Fait** : palette de la marque en tokens (bleu nuit, bleu terrain, vert énergie, blanc froid), échelles et composants communs, menu avec « Tactique 3D », accueil « Progresse au padel, point après point. » avec vitrine du simulateur 3D (capture du simulateur), icônes et image de partage refaites, cache pa-v20. Corrigé au passage : débordements à 320 px (grilles, titres longs, page 404). Test : scripts/verifier-design.cjs (5) ; verifier-menu et verifier-profils mis à jour. Commit local, non poussé.
+**Choix pris** : site sombre conservé ; le bleu terrain sert aux surfaces (trop sombre pour du texte sur le fond, 3,2:1), les liens prennent une version éclaircie (#5CB2E3) ; « Choisir sa raquette » s'affiche « Raquette » entre 861 et 1 180 px pour garder le menu sur une ligne ; couleurs du simulateur 3D inchangées jusqu'à la phase 3.
+**À confirmer** : SQL Supabase exécuté ? (`activees` est vide en ligne).

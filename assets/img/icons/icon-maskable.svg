@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Version maskable : fond plein cadre, balle dans la zone de sécurité (80 %) -->
-  <rect width="512" height="512" fill="#070b14"/>
-  <circle cx="256" cy="256" r="112" fill="#35e27f"/>
-  <path d="M154 206c50 18 78 52 78 100M358 306c-52-15-80-48-80-96" fill="none" stroke="#06110b" stroke-width="12" stroke-linecap="round"/>
+  <rect width="512" height="512" fill="#101F35"/>
+  <circle cx="256" cy="256" r="112" fill="#C8F14B"/>
+  <path d="M154 206c50 18 78 52 78 100M358 306c-52-15-80-48-80-96" fill="none" stroke="#101F35" stroke-width="12" stroke-linecap="round"/>
 </svg>

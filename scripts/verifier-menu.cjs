@@ -1,5 +1,5 @@
 /* Vérification du menu et de l'identité (scripts/gabarit.js, assets/js/nav.js) :
-   1) gabarit : 5 entrées (Accueil, Apprendre, S'entraîner, Compétition, Mon espace) + bouton raquette, chaque page du menu
+   1) gabarit : 6 entrées (Accueil, Apprendre, S'entraîner, Tactique 3D, Compétition, Mon espace) + bouton raquette, chaque page du menu
       existe, page et groupe actifs marqués, aucune page de contenu oubliée ;
    2) ordinateur (900, 1024, 1280 px) : menu sur une ligne, groupes au clic, un seul ouvert, Échap (focus rendu), clic ailleurs,
       parcours complet au clavier ;
@@ -22,8 +22,8 @@ function gabarit(){
  G.PAGES_MENU.forEach(([href])=>assert.ok(fs.existsSync(path.join(racine,href)),href));
  assert.equal(new Set(G.PAGES_MENU.map(p=>p[0])).size,G.PAGES_MENU.length);
  const entrees=G.MENU.map(e=>Array.isArray(e)?e[1]:e.nom);
- assert.deepEqual(entrees,['Accueil','Apprendre','S\'entraîner','Compétition','Mon espace']);
- assert.deepEqual(G.APPEL,['materiel.html#raquette','Choisir sa raquette']);
+ assert.deepEqual(entrees,['Accueil','Apprendre','S\'entraîner','Tactique 3D','Compétition','Mon espace']);
+ assert.deepEqual(G.APPEL,['materiel.html#raquette','Choisir sa raquette','Raquette']);
  const html=G.nav('bareme.html');
  assert.equal((html.match(/aria-current="page"/g)||[]).length,1);
  assert.match(html,/class="nav-titre active"[^>]*aria-controls="nav-competition"/);
@@ -32,13 +32,13 @@ function gabarit(){
  assert.match(G.nav('404.html','/'),/href="\/index\.html"/);
  // Pages de contenu absentes du menu : seulement les pages de service, et les pages rattachées à une entrée (SECTIONS)
  const hors=fs.readdirSync(racine).filter(n=>n.endsWith('.html')&&!G.PAGES_MENU.some(p=>p[0]===n)&&!/^simulateur-3d-/.test(n));
- // Pages de scénario du simulateur 3D : rattachées à « Simulateur 3D » (groupe Apprendre marqué)
- assert.match(G.nav('simulateur-3d-vibora.html'),/href="simulateur-3d\.html" class="active">Simulateur 3D/);
+ // Pages de scénario du simulateur 3D : rattachées à l'entrée « Tactique 3D », aucun groupe marqué
+ assert.match(G.nav('simulateur-3d-vibora.html'),/href="simulateur-3d\.html" class="active">Tactique 3D/);
+ assert.equal((G.nav('simulateur-3d-vibora.html').match(/nav-titre active/g)||[]).length,0);
  assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
- // Simulateur 3D : dans le groupe « Apprendre », marqué comme page en cours
- assert.match(G.nav('simulateur-3d.html'),/class="nav-titre active"[^>]*aria-controls="nav-apprendre"/);
- assert.match(G.nav('simulateur-3d.html'),/href="simulateur-3d\.html" class="active" aria-current="page">Simulateur 3D/);
- ok('gabarit : Accueil, Apprendre, S\'entraîner, Compétition, Mon espace + bouton raquette ; pages actives ; aucune page oubliée');
+ // Simulateur 3D : entrée principale « Tactique 3D », marquée comme page en cours
+ assert.match(G.nav('simulateur-3d.html'),/href="simulateur-3d\.html" class="active" aria-current="page">Tactique 3D/);
+ ok('gabarit : Accueil, Apprendre, S\'entraîner, Tactique 3D, Compétition, Mon espace + bouton raquette ; pages actives ; aucune page oubliée');
 }
 
 const serveur=http.createServer((req,res)=>{
@@ -119,7 +119,7 @@ async function contexte(browser,options,sansNav){
   assert.equal(await page.getAttribute('.nav-toggle','aria-label'),'Fermer le menu');
   assert.equal(await page.locator('.nav-titre',{hasText:'Compétition'}).getAttribute('aria-expanded'),'true');
   assert.equal(await page.locator('#nav-apprendre').isVisible(),false);
-  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('nav-menu')).backgroundColor),'rgb(7, 11, 20)');
+  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('nav-menu')).backgroundColor),'rgb(16, 31, 53)');
   await page.locator('.nav-titre',{hasText:'Apprendre'}).click();
   assert.equal(await page.locator('#nav-apprendre').isVisible(),true);
   assert.equal(await page.locator('#nav-competition').isVisible(),false);

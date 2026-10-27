@@ -9,7 +9,7 @@ function drawPhase(k){
  const p=PH[k];
  document.getElementById("zone").innerHTML=`<rect x="${p.zone[0]}" y="${p.zone[1]}" width="${p.zone[2]}" height="${p.zone[3]}" fill="rgba(255,255,255,.3)" rx="4"/>`;
  let s="";
- p.you.forEach((y,i)=>{s+=`<circle cx="${y[0]}" cy="${y[1]}" r="13" fill="#35e27f" stroke="#06110b" stroke-width="2"/><text x="${y[0]}" y="${y[1]-18}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Barlow,sans-serif">${y[2]}</text>`;});
+ p.you.forEach((y,i)=>{s+=`<circle cx="${y[0]}" cy="${y[1]}" r="13" fill="#C8F14B" stroke="#101F35" stroke-width="2"/><text x="${y[0]}" y="${y[1]-18}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Barlow,sans-serif">${y[2]}</text>`;});
  p.opp.forEach(o=>{s+=`<circle cx="${o[0]}" cy="${o[1]}" r="13" fill="#fff" stroke="#15202b" stroke-width="2"/>`;});
  s+=`<circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="6" fill="#f5f04a" stroke="#15202b" stroke-width="1.5"/>`;
  document.getElementById("players").innerHTML=s;

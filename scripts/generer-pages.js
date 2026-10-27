@@ -134,7 +134,7 @@ function page({ chemin, titre, description, h1, corps, jsonLd = [], noindex = fa
 ${noindex ? '<meta name="robots" content="noindex,follow">\n' : ""}<link rel="canonical" href="${url}">
 <link rel="icon" type="image/png" href="${pre}favicon.png">
 <link rel="apple-touch-icon" href="${pre}apple-touch-icon.png">
-<meta name="theme-color" content="#070b14">
+<meta name="theme-color" content="#101F35">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${echapper(NOM_SITE)}">
 <meta property="og:locale" content="fr_FR">

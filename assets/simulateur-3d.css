@@ -25,10 +25,10 @@
 .p3d-scene canvas{display:block;width:100%;height:100%}
 .p3d-chargement{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:700;letter-spacing:.04em}
 .p3d-etiquettes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.p3d-etiquette{position:absolute;left:0;top:0;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(7,11,20,.78);border:1px solid var(--line-2);white-space:nowrap;will-change:transform}
+.p3d-etiquette{position:absolute;left:0;top:0;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(var(--bg-rgb),.78);border:1px solid var(--line-2);white-space:nowrap;will-change:transform}
 .p3d-etiquette.eq-A{color:var(--turf)}
 .p3d-etiquette.eq-B{color:var(--coral)}
-.p3d-geste{position:absolute;left:12px;top:12px;max-width:calc(100% - 24px);font-size:.78rem;font-weight:800;padding:6px 12px;border-radius:999px;background:rgba(7,11,20,.85);border:1px solid var(--sand);color:var(--sand)}
+.p3d-geste{position:absolute;left:12px;top:12px;max-width:calc(100% - 24px);font-size:.78rem;font-weight:800;padding:6px 12px;border-radius:999px;background:rgba(var(--bg-rgb),.85);border:1px solid var(--sand);color:var(--sand)}
 .p3d-geste[hidden]{display:none}
 .p3d-commandes{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
 .p3d-commandes .btn{padding:10px 16px;font-size:.8rem}

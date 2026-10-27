@@ -15,15 +15,17 @@ const AUTEUR = {
 const MENU = [
   ["index.html", "Accueil"],
   { id: "apprendre", nom: "Apprendre", liens: [["regles.html", "Règles"], ["technique.html", "Technique"], ["tactique.html", "Tactique"],
-    ["simulateur-3d.html", "Simulateur 3D"], ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
+    ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
   { id: "entrainer", nom: "S'entraîner", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
+  ["simulateur-3d.html", "Tactique 3D"],
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
 ];
-const APPEL = ["materiel.html#raquette", "Choisir sa raquette"];
+// Bouton d'appel : [page, libellé, libellé court affiché quand la place manque sur ordinateur (le libellé complet reste lu)]
+const APPEL = ["materiel.html#raquette", "Choisir sa raquette", "Raquette"];
 // Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »
-// et les pages de scénario du simulateur 3D (simulateur-3d-<id>.html, générées par generer-pages-3d.js) → « Simulateur 3D »
+// et les pages de scénario du simulateur 3D (simulateur-3d-<id>.html, générées par generer-pages-3d.js) → « Tactique 3D »
 const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html" };
 const section = actif => SECTIONS[actif] || (/^simulateur-3d-[a-z0-9-]+\.html$/.test(actif) ? "simulateur-3d.html" : undefined);
 // Toutes les pages du menu (contrôles, sitemap éventuel)
@@ -43,7 +45,7 @@ function nav(actif, prefixe = "") {
   <div class="wrap">
     <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><i></i>Apprendre <span>Padel</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
-    <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}">${APPEL[1]}</a></li></ul>
+    <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}"><span class="cta-long">${APPEL[1]}</span><span class="cta-court" aria-hidden="true">${APPEL[2]}</span></a></li></ul>
   </div>
 </nav>`;
 }
