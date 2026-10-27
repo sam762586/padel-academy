@@ -139,8 +139,12 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   affiché à part ; « Mon académie » dans le menu S'entraîner (« Mon niveau » devient « Test de niveau »), accès depuis
   l'accueil. Test : `scripts/verifier-academie.cjs`.
 - [x] Validation de la phase 1 par Samuel (27/10/2026).
-- [ ] Phase 2 : banque de questions (55 questions existantes reclassées 1–10 et par thème ; nouvelles questions en
-  « brouillon » jusqu'à relecture de Samuel).
+- [x] Phase 2 (27/10/2026) : banque de 75 questions (`assets/js/academie-questions.js`, générée) : les 55 questions des
+  scénarios classées par thème (11), niveaux 1–10, difficulté, prérequis (question précédente de la même scène),
+  article, exercice et scène 3D ; 20 questions rédigées (règles, communication, placement, défense, construction, lob,
+  víbora) reprises de phrases du site, en brouillon. Validées posables : 1:6 2:12 3:20 4:40 5:40 6:39 7:33 8:15 9:13 10:13.
+  Test : `scripts/verifier-academie-questions.cjs`.
+- [ ] Relecture de Samuel : les 20 brouillons et le classement des 55 questions.
 - [ ] Phase 3 : quiz adaptatif (référence N, consolidation N−1, découverte N+1, bornes 1 et 10, non-répétition, reprise).
 - [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
   Mon espace.
