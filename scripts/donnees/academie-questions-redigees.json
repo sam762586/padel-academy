@@ -1,105 +1,405 @@
 {
-  "_note": "Questions rédigées pour Mon académie (thèmes et niveaux sans question de scénario). Chacune reprend une phrase déjà publiée sur le site (champ source) : aucune règle ni chiffre nouveau. statut « brouillon » tant que Samuel ne les a pas relues ; seules les questions « validee » sont posées.",
+  "_note": "Questions rédigées pour Mon académie (thèmes et niveaux sans question de scénario). Chacune reprend une phrase déjà publiée sur le site (champ source) : aucune règle ni chiffre nouveau. Relues et validées par Samuel le 27/10/2026 (statut « validee ») ; une nouvelle question reste « brouillon » jusqu'à sa relecture.",
   "questions": [
-    { "id": "regles-service-hauteur", "statut": "brouillon", "source": "regles.html#service", "theme": "regles", "niveaux": [1, 3], "difficulte": 1,
+    {
+      "id": "regles-service-hauteur",
+      "statut": "validee",
+      "source": "regles.html#service",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        3
+      ],
+      "difficulte": 1,
       "situation": "Tu sers pour la première fois en match.",
       "question": "À quelle hauteur dois-tu frapper la balle au service ?",
-      "choix": ["À hauteur de taille ou en dessous", "Au-dessus de l'épaule, comme au tennis", "À la hauteur que tu veux"],
-      "bonne": 0, "explication": "Le service se joue à la cuillère : un rebond dans ton carré, puis la balle frappée à hauteur de taille ou en dessous, avec au moins un pied au sol." },
-    { "id": "regles-service-grille", "statut": "brouillon", "source": "regles.html#service", "theme": "regles", "niveaux": [1, 4], "difficulte": 2,
+      "choix": [
+        "À hauteur de taille ou en dessous",
+        "Au-dessus de l'épaule, comme au tennis",
+        "À la hauteur que tu veux"
+      ],
+      "bonne": 0,
+      "explication": "Le service se joue à la cuillère : un rebond dans ton carré, puis la balle frappée à hauteur de taille ou en dessous, avec au moins un pied au sol."
+    },
+    {
+      "id": "regles-service-grille",
+      "statut": "validee",
+      "source": "regles.html#service",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 2,
       "situation": "Ton service rebondit dans le carré du relanceur, puis touche la grille avant le second rebond.",
       "question": "Le service est-il bon ?",
-      "choix": ["Non, c'est une faute", "Oui, la balle a rebondi dans le bon carré", "On rejoue le service"],
-      "bonne": 0, "explication": "Au service, si la balle touche la grille après son rebond et avant le second rebond, c'est une faute." },
-    { "id": "regles-deux-fautes", "statut": "brouillon", "source": "regles.html#service", "theme": "regles", "niveaux": [1, 3], "difficulte": 1,
+      "choix": [
+        "Non, c'est une faute",
+        "Oui, la balle a rebondi dans le bon carré",
+        "On rejoue le service"
+      ],
+      "bonne": 0,
+      "explication": "Au service, si la balle touche la grille après son rebond et avant le second rebond, c'est une faute."
+    },
+    {
+      "id": "regles-deux-fautes",
+      "statut": "validee",
+      "source": "regles.html#service",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        3
+      ],
+      "difficulte": 1,
       "situation": "Ton premier service est faute.",
       "question": "Et si le second service est faute aussi ?",
-      "choix": ["Le point est perdu", "Tu as droit à un troisième service", "Ton partenaire sert à ta place"],
-      "bonne": 0, "explication": "Deux fautes de suite au service : le point est perdu." },
-    { "id": "regles-relanceur-touche", "statut": "brouillon", "source": "regles.html#service", "theme": "regles", "niveaux": [2, 5], "difficulte": 2,
+      "choix": [
+        "Le point est perdu",
+        "Tu as droit à un troisième service",
+        "Ton partenaire sert à ta place"
+      ],
+      "bonne": 0,
+      "explication": "Deux fautes de suite au service : le point est perdu."
+    },
+    {
+      "id": "regles-relanceur-touche",
+      "statut": "validee",
+      "source": "regles.html#service",
+      "theme": "regles",
+      "niveaux": [
+        2,
+        5
+      ],
+      "difficulte": 2,
       "situation": "Tu relances. Le service adverse te touche avant d'avoir rebondi.",
       "question": "À qui est le point ?",
-      "choix": ["Au serveur", "À toi, le service est faute", "On rejoue le point"],
-      "bonne": 0, "explication": "Le relanceur laisse rebondir la balle dans son carré. S'il est touché par la balle avant le rebond, le point est au serveur." },
-    { "id": "regles-vitre-avant-sol", "statut": "brouillon", "source": "regles.html#regles", "theme": "regles", "niveaux": [1, 4], "difficulte": 1,
+      "choix": [
+        "Au serveur",
+        "À toi, le service est faute",
+        "On rejoue le point"
+      ],
+      "bonne": 0,
+      "explication": "Le relanceur laisse rebondir la balle dans son carré. S'il est touché par la balle avant le rebond, le point est au serveur."
+    },
+    {
+      "id": "regles-vitre-avant-sol",
+      "statut": "validee",
+      "source": "regles.html#regles",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 1,
       "situation": "La frappe adverse touche directement ta vitre du fond, sans rebondir au sol dans ton camp.",
       "question": "Que se passe-t-il ?",
-      "choix": ["Le point est pour ton équipe", "Tu dois jouer la balle après la vitre", "Le point est rejoué"],
-      "bonne": 0, "explication": "La balle ne doit jamais toucher une vitre ou la grille adverse avant le sol : l'adversaire perd le point." },
-    { "id": "regles-vitre-apres-rebond", "statut": "brouillon", "source": "regles.html#regles", "theme": "regles", "niveaux": [1, 4], "difficulte": 1,
+      "choix": [
+        "Le point est pour ton équipe",
+        "Tu dois jouer la balle après la vitre",
+        "Le point est rejoué"
+      ],
+      "bonne": 0,
+      "explication": "La balle ne doit jamais toucher une vitre ou la grille adverse avant le sol : l'adversaire perd le point."
+    },
+    {
+      "id": "regles-vitre-apres-rebond",
+      "statut": "validee",
+      "source": "regles.html#regles",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 1,
       "situation": "La balle rebondit dans ton camp, puis touche ta vitre du fond.",
       "question": "Peux-tu encore la jouer ?",
-      "choix": ["Oui, tant qu'elle n'a pas touché le sol une seconde fois", "Non, le point est perdu", "Seulement en volée"],
-      "bonne": 0, "explication": "Après un rebond au sol dans ton camp, la balle peut toucher tes vitres : tu peux encore la jouer. Le rebond sur la vitre ne compte pas comme un rebond au sol." },
-    { "id": "regles-propre-vitre", "statut": "brouillon", "source": "regles.html#regles", "theme": "regles", "niveaux": [3, 6], "difficulte": 2,
+      "choix": [
+        "Oui, tant qu'elle n'a pas touché le sol une seconde fois",
+        "Non, le point est perdu",
+        "Seulement en volée"
+      ],
+      "bonne": 0,
+      "explication": "Après un rebond au sol dans ton camp, la balle peut toucher tes vitres : tu peux encore la jouer. Le rebond sur la vitre ne compte pas comme un rebond au sol."
+    },
+    {
+      "id": "regles-propre-vitre",
+      "statut": "validee",
+      "source": "regles.html#regles",
+      "theme": "regles",
+      "niveaux": [
+        3,
+        6
+      ],
+      "difficulte": 2,
       "situation": "La balle t'a passé : tu ne peux plus la renvoyer directement par-dessus le filet.",
       "question": "As-tu le droit de la frapper contre ta propre vitre pour la renvoyer ?",
-      "choix": ["Oui, si elle passe ensuite le filet", "Non, c'est toujours une faute", "Seulement au service"],
-      "bonne": 0, "explication": "Tu peux frapper la balle contre ta propre vitre pour la renvoyer par-dessus le filet." },
-    { "id": "regles-point-decisif", "statut": "brouillon", "source": "regles.html#points", "theme": "regles", "niveaux": [1, 5], "difficulte": 1,
+      "choix": [
+        "Oui, si elle passe ensuite le filet",
+        "Non, c'est toujours une faute",
+        "Seulement au service"
+      ],
+      "bonne": 0,
+      "explication": "Tu peux frapper la balle contre ta propre vitre pour la renvoyer par-dessus le filet."
+    },
+    {
+      "id": "regles-point-decisif",
+      "statut": "validee",
+      "source": "regles.html#points",
+      "theme": "regles",
+      "niveaux": [
+        1,
+        5
+      ],
+      "difficulte": 1,
       "situation": "40-40 dans un match joué au point décisif.",
       "question": "Comment se termine le jeu ?",
-      "choix": ["Un seul point décide du jeu", "Il faut deux points d'affilée", "On joue un jeu décisif"],
-      "bonne": 0, "explication": "Selon le format, à 40-40 on joue avec avantages ou un seul point décide du jeu. Le format est annoncé avant le match." },
-    { "id": "regles-jeu-decisif", "statut": "brouillon", "source": "regles.html#points", "theme": "regles", "niveaux": [2, 6], "difficulte": 2,
+      "choix": [
+        "Un seul point décide du jeu",
+        "Il faut deux points d'affilée",
+        "On joue un jeu décisif"
+      ],
+      "bonne": 0,
+      "explication": "Selon le format, à 40-40 on joue avec avantages ou un seul point décide du jeu. Le format est annoncé avant le match."
+    },
+    {
+      "id": "regles-jeu-decisif",
+      "statut": "validee",
+      "source": "regles.html#points",
+      "theme": "regles",
+      "niveaux": [
+        2,
+        6
+      ],
+      "difficulte": 2,
       "situation": "6-6 dans le set : vous jouez un jeu décisif.",
       "question": "Comment se gagne-t-il ?",
-      "choix": ["À 7 points, avec 2 points d'écart", "À 10 points, avec 2 points d'écart", "Au premier à 7 points, même à 7-6"],
-      "bonne": 0, "explication": "On compte 1, 2, 3… Le jeu décisif se gagne à 7 points avec 2 points d'écart (8-6, 9-7… si besoin)." },
-    { "id": "communication-centre", "statut": "brouillon", "source": "tactique.html#communication", "theme": "communication", "niveaux": [1, 4], "difficulte": 1,
+      "choix": [
+        "À 7 points, avec 2 points d'écart",
+        "À 10 points, avec 2 points d'écart",
+        "Au premier à 7 points, même à 7-6"
+      ],
+      "bonne": 0,
+      "explication": "On compte 1, 2, 3… Le jeu décisif se gagne à 7 points avec 2 points d'écart (8-6, 9-7… si besoin)."
+    },
+    {
+      "id": "communication-centre",
+      "statut": "validee",
+      "source": "tactique.html#communication",
+      "theme": "communication",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 1,
       "situation": "Une balle arrive au centre, entre ton partenaire et toi.",
       "question": "Que faites-vous avant le rebond ?",
-      "choix": ["L'un de vous annonce « moi » ou « toi »", "Chacun la joue s'il peut", "Vous la laissez passer"],
-      "bonne": 0, "explication": "Sans annonce, deux raquettes vont sur la même balle, ou aucune. « Moi » / « Toi » : qui joue la balle du centre, annoncé tôt, avant le rebond." },
-    { "id": "communication-laisse", "statut": "brouillon", "source": "tactique.html#communication", "theme": "communication", "niveaux": [2, 5], "difficulte": 1,
+      "choix": [
+        "L'un de vous annonce « moi » ou « toi »",
+        "Chacun la joue s'il peut",
+        "Vous la laissez passer"
+      ],
+      "bonne": 0,
+      "explication": "Sans annonce, deux raquettes vont sur la même balle, ou aucune. « Moi » / « Toi » : qui joue la balle du centre, annoncé tôt, avant le rebond."
+    },
+    {
+      "id": "communication-laisse",
+      "statut": "validee",
+      "source": "tactique.html#communication",
+      "theme": "communication",
+      "niveaux": [
+        2,
+        5
+      ],
+      "difficulte": 1,
       "situation": "Tu vois que la balle que ton partenaire va jouer sera plus facile après la vitre.",
       "question": "Que lui dis-tu ?",
-      "choix": ["« Laisse »", "« Moi »", "Rien, il verra bien"],
-      "bonne": 0, "explication": "« Laisse » : ne la joue pas, elle sort ou elle sera plus facile après la vitre." },
-    { "id": "communication-apres-faute", "statut": "brouillon", "source": "tactique.html#communication", "theme": "communication", "niveaux": [3, 7], "difficulte": 2,
+      "choix": [
+        "« Laisse »",
+        "« Moi »",
+        "Rien, il verra bien"
+      ],
+      "bonne": 0,
+      "explication": "« Laisse » : ne la joue pas, elle sort ou elle sera plus facile après la vitre."
+    },
+    {
+      "id": "communication-apres-faute",
+      "statut": "validee",
+      "source": "tactique.html#communication",
+      "theme": "communication",
+      "niveaux": [
+        3,
+        7
+      ],
+      "difficulte": 2,
       "situation": "Ton partenaire vient de faire une faute directe.",
       "question": "Que lui dis-tu ?",
-      "choix": ["Une phrase pour la suite, par exemple « on rejoue haut »", "Ce qu'il aurait dû jouer", "Rien jusqu'à la fin du jeu"],
-      "bonne": 0, "explication": "Après une faute : une phrase pour la suite, pas sur la faute (« on rejoue haut », « prochain point au centre »)." },
-    { "id": "communication-entre-points", "statut": "brouillon", "source": "tactique.html#communication", "theme": "communication", "niveaux": [4, 8], "difficulte": 2,
+      "choix": [
+        "Une phrase pour la suite, par exemple « on rejoue haut »",
+        "Ce qu'il aurait dû jouer",
+        "Rien jusqu'à la fin du jeu"
+      ],
+      "bonne": 0,
+      "explication": "Après une faute : une phrase pour la suite, pas sur la faute (« on rejoue haut », « prochain point au centre »)."
+    },
+    {
+      "id": "communication-entre-points",
+      "statut": "validee",
+      "source": "tactique.html#communication",
+      "theme": "communication",
+      "niveaux": [
+        4,
+        8
+      ],
+      "difficulte": 2,
       "situation": "Tu vas servir, entre deux points.",
       "question": "Que dis-tu à ton partenaire ?",
-      "choix": ["Ta zone de service et le plan, en une phrase", "Le score", "Rien : il faut rester concentré"],
-      "bonne": 0, "explication": "Entre les points, le serveur annonce sa zone de service et le plan : « au T, on monte », « sur le revers du joueur de gauche ». Une phrase suffit." },
-    { "id": "placement-filet-distance", "statut": "brouillon", "source": "conseils.html#erreurs", "theme": "placement", "niveaux": [1, 4], "difficulte": 1,
+      "choix": [
+        "Ta zone de service et le plan, en une phrase",
+        "Le score",
+        "Rien : il faut rester concentré"
+      ],
+      "bonne": 0,
+      "explication": "Entre les points, le serveur annonce sa zone de service et le plan : « au T, on monte », « sur le revers du joueur de gauche ». Une phrase suffit."
+    },
+    {
+      "id": "placement-filet-distance",
+      "statut": "validee",
+      "source": "conseils.html#erreurs",
+      "theme": "placement",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 1,
       "situation": "Ton partenaire et toi êtes montés au filet.",
       "question": "À quelle distance du filet te places-tu ?",
-      "choix": ["Environ 2 à 2,5 m", "Collé au filet", "Sur la ligne de service"],
-      "bonne": 0, "explication": "Entre la ligne de service et environ 3 m du filet, la balle arrive dans tes pieds. Au filet, place-toi à 2 à 2,5 m." },
-    { "id": "placement-defense-vitre", "statut": "brouillon", "source": "conseils.html#erreurs", "theme": "defense", "niveaux": [1, 4], "difficulte": 1,
+      "choix": [
+        "Environ 2 à 2,5 m",
+        "Collé au filet",
+        "Sur la ligne de service"
+      ],
+      "bonne": 0,
+      "explication": "Entre la ligne de service et environ 3 m du filet, la balle arrive dans tes pieds. Au filet, place-toi à 2 à 2,5 m."
+    },
+    {
+      "id": "placement-defense-vitre",
+      "statut": "validee",
+      "source": "conseils.html#erreurs",
+      "theme": "defense",
+      "niveaux": [
+        1,
+        4
+      ],
+      "difficulte": 1,
       "situation": "Les adversaires attaquent depuis le filet, tu défends au fond.",
       "question": "Où te places-tu par rapport à ta vitre du fond ?",
-      "choix": ["À environ 1 à 1,5 m de la vitre", "Collé à la vitre", "Au milieu de ta moitié de terrain"],
-      "bonne": 0, "explication": "Trop près de la vitre, la balle qui rebondit dessus te tombe dessus : tu n'as plus la place de la frapper. En défense, reste à environ 1 à 1,5 m de la vitre." },
-    { "id": "placement-monter-seul", "statut": "brouillon", "source": "conseils.html#erreurs", "theme": "placement", "niveaux": [2, 5], "difficulte": 1,
+      "choix": [
+        "À environ 1 à 1,5 m de la vitre",
+        "Collé à la vitre",
+        "Au milieu de ta moitié de terrain"
+      ],
+      "bonne": 0,
+      "explication": "Trop près de la vitre, la balle qui rebondit dessus te tombe dessus : tu n'as plus la place de la frapper. En défense, reste à environ 1 à 1,5 m de la vitre."
+    },
+    {
+      "id": "placement-monter-seul",
+      "statut": "validee",
+      "source": "conseils.html#erreurs",
+      "theme": "placement",
+      "niveaux": [
+        2,
+        5
+      ],
+      "difficulte": 1,
       "situation": "Tu montes au filet pendant que ton partenaire reste au fond.",
       "question": "Quel est le risque ?",
-      "choix": ["La diagonale entre vous deux est vide", "Aucun : un au filet, un au fond couvre tout le terrain", "Le partenaire au fond ne voit plus la balle"],
-      "bonne": 0, "explication": "Si un joueur est au filet et l'autre au fond, la diagonale entre les deux est vide : l'adversaire n'a qu'à jouer dedans. On monte à deux et on recule à deux." },
-    { "id": "construction-fautes", "statut": "brouillon", "source": "tactique.html#construire", "theme": "construction", "niveaux": [2, 6], "difficulte": 1,
+      "choix": [
+        "La diagonale entre vous deux est vide",
+        "Aucun : un au filet, un au fond couvre tout le terrain",
+        "Le partenaire au fond ne voit plus la balle"
+      ],
+      "bonne": 0,
+      "explication": "Si un joueur est au filet et l'autre au fond, la diagonale entre les deux est vide : l'adversaire n'a qu'à jouer dedans. On monte à deux et on recule à deux."
+    },
+    {
+      "id": "construction-fautes",
+      "statut": "validee",
+      "source": "tactique.html#construire",
+      "theme": "construction",
+      "niveaux": [
+        2,
+        6
+      ],
+      "difficulte": 1,
       "situation": "Les deux paires ont le même niveau.",
       "question": "Quelle paire gagne le plus souvent ?",
-      "choix": ["Celle qui fait le moins de fautes directes", "Celle qui frappe le plus fort", "Celle qui joue le plus de smashs"],
-      "bonne": 0, "explication": "Sinon, joue une balle de plus : à niveau égal, la paire qui fait le moins de fautes directes gagne souvent." },
-    { "id": "construction-accelerer", "statut": "brouillon", "source": "tactique.html#construire", "theme": "construction", "niveaux": [3, 7], "difficulte": 2,
+      "choix": [
+        "Celle qui fait le moins de fautes directes",
+        "Celle qui frappe le plus fort",
+        "Celle qui joue le plus de smashs"
+      ],
+      "bonne": 0,
+      "explication": "Sinon, joue une balle de plus : à niveau égal, la paire qui fait le moins de fautes directes gagne souvent."
+    },
+    {
+      "id": "construction-accelerer",
+      "statut": "validee",
+      "source": "tactique.html#construire",
+      "theme": "construction",
+      "niveaux": [
+        3,
+        7
+      ],
+      "difficulte": 2,
       "situation": "Tu construis le point au filet, sans prendre de risque.",
       "question": "Sur quelle balle accélères-tu ?",
-      "choix": ["Une balle haute et courte, près du filet", "La première balle qui arrive au filet", "Une balle basse dans tes pieds"],
-      "bonne": 0, "explication": "Sur une balle haute et courte, près du filet : smash ou volée appuyée. Quand un adversaire est hors de sa place : vise l'espace qu'il a laissé." },
-    { "id": "lob-profondeur", "statut": "brouillon", "source": "conseils.html#erreurs", "theme": "lob", "niveaux": [2, 5], "difficulte": 1,
+      "choix": [
+        "Une balle haute et courte, près du filet",
+        "La première balle qui arrive au filet",
+        "Une balle basse dans tes pieds"
+      ],
+      "bonne": 0,
+      "explication": "Sur une balle haute et courte, près du filet : smash ou volée appuyée. Quand un adversaire est hors de sa place : vise l'espace qu'il a laissé."
+    },
+    {
+      "id": "lob-profondeur",
+      "statut": "validee",
+      "source": "conseils.html#erreurs",
+      "theme": "lob",
+      "niveaux": [
+        2,
+        5
+      ],
+      "difficulte": 1,
       "situation": "Les deux adversaires sont au filet : tu veux les faire reculer.",
       "question": "Où vises-tu ton lob ?",
-      "choix": ["Haut, environ un mètre avant la vitre du fond adverse", "Juste au-dessus de la raquette du volleyeur", "Sur la ligne de service adverse"],
-      "bonne": 0, "explication": "Un lob qui ne dépasse pas la raquette adverse levée devient un smash facile. Vise plus haut que tu ne le penses, environ un mètre avant la vitre du fond adverse." },
-    { "id": "vibora-trop-plate", "statut": "brouillon", "source": "simulateur-3d-vibora.html#comprendre", "theme": "vibora", "niveaux": [6, 9], "difficulte": 2,
+      "choix": [
+        "Haut, environ un mètre avant la vitre du fond adverse",
+        "Juste au-dessus de la raquette du volleyeur",
+        "Sur la ligne de service adverse"
+      ],
+      "bonne": 0,
+      "explication": "Un lob qui ne dépasse pas la raquette adverse levée devient un smash facile. Vise plus haut que tu ne le penses, environ un mètre avant la vitre du fond adverse."
+    },
+    {
+      "id": "vibora-trop-plate",
+      "statut": "validee",
+      "source": "simulateur-3d-vibora.html#comprendre",
+      "theme": "vibora",
+      "niveaux": [
+        6,
+        9
+      ],
+      "difficulte": 2,
       "situation": "Ta víbora part plate et fort, sans couper la balle.",
       "question": "Que risque-t-il de se passer ?",
-      "choix": ["La vitre renvoie la balle à l'adversaire", "La balle meurt dans le coin vitre-grille", "La balle sort par 3"],
-      "bonne": 0, "explication": "Víbora trop plate : la vitre renvoie la balle. La víbora se joue en coupant le côté de la balle pour qu'elle meure dans le coin vitre-grille." }
+      "choix": [
+        "La vitre renvoie la balle à l'adversaire",
+        "La balle meurt dans le coin vitre-grille",
+        "La balle sort par 3"
+      ],
+      "bonne": 0,
+      "explication": "Víbora trop plate : la vitre renvoie la balle. La víbora se joue en coupant le côté de la balle pour qu'elle meure dans le coin vitre-grille."
+    }
   ]
 }

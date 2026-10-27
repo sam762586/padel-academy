@@ -144,7 +144,7 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   article, exercice et scène 3D ; 20 questions rédigées (règles, communication, placement, défense, construction, lob,
   víbora) reprises de phrases du site, en brouillon. Validées posables : 1:6 2:12 3:20 4:40 5:40 6:39 7:33 8:15 9:13 10:13.
   Test : `scripts/verifier-academie-questions.cjs`.
-- [ ] Relecture de Samuel : les 20 brouillons et le classement des 55 questions.
+- [x] Relecture de Samuel (27/10/2026) : les 20 questions rédigées validées, classement des 55 questions accepté.
 - [ ] Phase 3 : quiz adaptatif (référence N, consolidation N−1, découverte N+1, bornes 1 et 10, non-répétition, reprise).
 - [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
   Mon espace.
