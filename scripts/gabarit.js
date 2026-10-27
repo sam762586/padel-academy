@@ -23,17 +23,19 @@ const MENU = [
 ];
 const APPEL = ["materiel.html#raquette", "Choisir sa raquette"];
 // Pages hors menu rattachées à une entrée (marquée comme section en cours) : connexion et compte → « Mon espace »
+// et les pages de scénario du simulateur 3D (simulateur-3d-<id>.html, générées par generer-pages-3d.js) → « Simulateur 3D »
 const SECTIONS = { "connexion.html": "espace.html", "compte.html": "espace.html" };
+const section = actif => SECTIONS[actif] || (/^simulateur-3d-[a-z0-9-]+\.html$/.test(actif) ? "simulateur-3d.html" : undefined);
 // Toutes les pages du menu (contrôles, sitemap éventuel)
 const PAGES_MENU = MENU.flatMap(e => Array.isArray(e) ? [e] : e.liens);
 
 // prefixe : "" (racine), "../" (sous-dossier) ou "/" (404.html, servie à n'importe quelle adresse)
 function nav(actif, prefixe = "") {
   // « Mon espace » porte data-espace : nav.js le fait pointer vers connexion.html?suite=espace.html si le visiteur n'est pas connecté
-  const lien = ([href, nom]) => `<li><a href="${prefixe}${href}"${href === actif ? ' class="active" aria-current="page"' : SECTIONS[actif] === href ? ' class="active"' : ""}${href === "espace.html" ? " data-espace" : ""}>${nom}</a></li>`;
+  const lien = ([href, nom]) => `<li><a href="${prefixe}${href}"${href === actif ? ' class="active" aria-current="page"' : section(actif) === href ? ' class="active"' : ""}${href === "espace.html" ? " data-espace" : ""}>${nom}</a></li>`;
   const entree = e => {
     if (Array.isArray(e)) return lien(e);
-    const dedans = e.liens.some(([href]) => href === actif || href === SECTIONS[actif]);
+    const dedans = e.liens.some(([href]) => href === actif || href === section(actif));
     return `<li class="nav-groupe"><button type="button" class="nav-titre${dedans ? " active" : ""}" aria-expanded="false" aria-controls="nav-${e.id}">${e.nom}</button>`
       + `<ul class="nav-sous" id="nav-${e.id}">${e.liens.map(lien).join("")}</ul></li>`;
   };
@@ -88,4 +90,4 @@ function carteModules() {
   for (const cle of Object.keys(imports)) imports[cle] += "?v=" + empreinte(imports[cle].slice(2));
   return JSON.stringify({ imports });
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, PAGES_MENU, nav, footer, versionner, empreinte, carteModules };
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, empreinte, carteModules };

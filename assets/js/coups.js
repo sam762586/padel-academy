@@ -37,6 +37,6 @@ function cardCoup(c){
  <p>${c.q}</p>
  <div class="meta"><span>Quand</span><b>${c.quand}</b><span>Cible</span><b>${c.cible}</b></div>
  <details class="coup"><summary>Erreurs à éviter</summary><ul>${c.err.map(e=>`<li>${e}</li>`).join("")}</ul></details>
- ${c.p3d?`<a class="coup-3d" href="simulateur-3d.html#${c.p3d}">Voir en 3D <span aria-hidden="true">→</span></a>`:""}</article>`;
+ ${c.p3d?`<a class="coup-3d" href="simulateur-3d-${c.p3d}.html">Voir en 3D <span aria-hidden="true">→</span></a>`:""}</article>`;
 }
 for(const k of Object.keys(COUPS)){document.getElementById("coups-"+k).innerHTML=COUPS[k].map(cardCoup).join("");}

@@ -31,6 +31,10 @@ const SCENARIOS = [
   { id: 'retour-lob', nom: 'Retourner en lob', groupe: 'Service et retour' },
 ];
 const DEFAUT = 'bandeja-garder-filet'; // scénario ouvert sans lien direct
+// Page d'un scénario (simulateur-3d-<id>.html, générée par scripts/generer-pages-3d.js) : elle s'ouvre sur ce scénario,
+// et choisir un autre scénario mène à sa page. Sur simulateur-3d.html, le scénario suit l'ancre (#id).
+const PAGE_SCENARIO = document.getElementById('simulateur')?.dataset.scenario || null;
+const adressePage = id => 'simulateur-3d-' + id + '.html';
 const GROUPES = ['Fond de court et défense', 'Transition et coups spéciaux', 'Filet et attaque', 'Service et retour'];
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
@@ -44,6 +48,11 @@ window.P3D = { etat, quiz, aller: t => aller(t) }; // utilisé par les tests (sc
 function texte(el, valeur) { el.textContent = valeur; }
 function liste(el, elements) { el.replaceChildren(...elements.map(x => { const li = document.createElement('li'); li.textContent = x; return li; })); }
 
+// Libellé du lien de fin de fiche selon la page visée
+function texteLien(href) {
+  const page = href.split('#')[0];
+  return { 'technique.html': 'Voir la fiche du coup', 'tutos.html': 'Voir les tutos', 'regles.html': 'Voir les règles', 'tactique.html': 'Voir le placement' }[page] || 'En savoir plus';
+}
 function afficherScenario(s) {
   texte($('p3d-titre-scenario'), s.titre);
   texte($('p3d-niveau'), s.niveau);
@@ -53,7 +62,7 @@ function afficherScenario(s) {
   texte($('p3d-conclusion'), s.conclusion);
   texte($('p3d-exercice'), s.exercice);
   const lien = $('p3d-lien');
-  lien.hidden = !s.lien; if (s.lien) lien.href = s.lien;
+  lien.hidden = !s.lien; if (s.lien) { lien.href = s.lien; texte(lien, texteLien(s.lien)); }
   // Gestes du scénario et leur statut
   const vus = [...new Set(s.frappes.map(f => f.geste))];
   liste($('p3d-gestes'), vus.map(g => GESTES[g].nom + ' : ' + (GESTES[g].statut === 'simplifie' ? 'geste simplifié' : 'geste à venir (position d\'attente)')));
@@ -199,7 +208,10 @@ function brancherCommandes() {
   $('p3d-debut').addEventListener('click', () => { aller(0); pause(); if (etat.mode === 'quiz') reinitialiserQuiz(); });
   $('p3d-mode').querySelectorAll('button').forEach(b => b.addEventListener('click', () => choisirMode(b.dataset.mode)));
   $('p3d-quiz-suite').addEventListener('click', suiteQuiz);
-  $('p3d-scenarios').addEventListener('change', ev => choisirScenario(ev.target.value).catch(erreurScenario));
+  $('p3d-scenarios').addEventListener('change', ev => {
+    if (PAGE_SCENARIO) location.href = adressePage(ev.target.value);
+    else choisirScenario(ev.target.value).catch(erreurScenario);
+  });
   $('p3d-prec').addEventListener('click', () => {
     pause();
     const i = etapeCourante(etat.t), e = etat.scenario.etapes;
@@ -238,7 +250,7 @@ async function choisirScenario(id) {
   reinitialiserQuiz();
   majInterface();
   if (scene3d) scene3d.nouveauScenario(s);
-  try { history.replaceState(null, '', '#' + id); } catch (e) { /* adresse inchangée */ }
+  if (!PAGE_SCENARIO) try { history.replaceState(null, '', '#' + id); } catch (e) { /* adresse inchangée */ }
 }
 
 /* ---------- 3D ---------- */
@@ -421,10 +433,10 @@ async function demarrer() {
   }));
   brancherCommandes();
   const demande = location.hash.slice(1);
-  const premier = SCENARIOS.some(x => x.id === demande) ? demande : DEFAUT;
+  const premier = SCENARIOS.some(x => x.id === PAGE_SCENARIO) ? PAGE_SCENARIO : SCENARIOS.some(x => x.id === demande) ? demande : DEFAUT;
   await choisirScenario(premier).catch(erreurScenario);
   // Lien vers un autre scénario sur la même page (ou retour arrière) : l'ancre change sans recharger
-  addEventListener('hashchange', () => {
+  if (!PAGE_SCENARIO) addEventListener('hashchange', () => {
     const id = location.hash.slice(1);
     if (SCENARIOS.some(x => x.id === id) && id !== etat.scenario?.id) choisirScenario(id).catch(erreurScenario);
   });

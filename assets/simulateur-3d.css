@@ -56,6 +56,12 @@
 .p3d-fiche li + li{margin-top:6px}
 .p3d-fiche p{color:var(--muted)}
 .p3d-limites{color:var(--muted);max-width:52em}
+.p3d-deroule{max-width:52em;padding-left:1.4em;color:var(--muted)}
+.p3d-deroule li+li{margin-top:8px}
+.p3d-deroule b{color:var(--fg)}
+.p3d-tous ul{list-style:none;padding:0}
+.p3d-tous li+li{margin-top:6px}
+.p3d-tous a{color:var(--turf);font-weight:700}
 .p3d-limites li + li{margin-top:6px}
 @media (max-width:640px){
   .p3d-scene{aspect-ratio:4/5;max-height:70vh}

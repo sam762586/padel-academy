@@ -31,7 +31,9 @@ function gabarit(){
  assert.match(G.nav('index.html'),/href="index\.html" class="active" aria-current="page">Accueil/);
  assert.match(G.nav('404.html','/'),/href="\/index\.html"/);
  // Pages de contenu absentes du menu : seulement les pages de service, et les pages rattachées à une entrée (SECTIONS)
- const hors=fs.readdirSync(racine).filter(n=>n.endsWith('.html')&&!G.PAGES_MENU.some(p=>p[0]===n));
+ const hors=fs.readdirSync(racine).filter(n=>n.endsWith('.html')&&!G.PAGES_MENU.some(p=>p[0]===n)&&!/^simulateur-3d-/.test(n));
+ // Pages de scénario du simulateur 3D : rattachées à « Simulateur 3D » (groupe Apprendre marqué)
+ assert.match(G.nav('simulateur-3d-vibora.html'),/href="simulateur-3d\.html" class="active">Simulateur 3D/);
  assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
  // Simulateur 3D : dans le groupe « Apprendre », marqué comme page en cours
  assert.match(G.nav('simulateur-3d.html'),/class="nav-titre active"[^>]*aria-controls="nav-apprendre"/);

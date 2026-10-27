@@ -151,6 +151,25 @@ async function horsNavigateur(){
  assert.match(sw,/\/assets\/3d\//);
  assert.match(fs.readFileSync(path.join(racine,'tactique.html'),'utf8'),/href="simulateur-3d\.html"/);
  ok('page : modules versionnés par la carte d\'import, gabarit à jour, 3D hors précache, lien depuis Tactique');
+
+ // Une page par scénario : adresse, titre et description propres, textes du scénario dans le HTML, sitemap
+ const sitemap=fs.readFileSync(path.join(racine,'sitemap.xml'),'utf8'),principale=fs.readFileSync(path.join(racine,'simulateur-3d.html'),'utf8');
+ const titres=new Set(),descriptions=new Set();
+ const decoder=t=>t.replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+ for(const id of SCENARIOS){
+  const f='simulateur-3d-'+id+'.html',h=fs.readFileSync(path.join(racine,f),'utf8'),s=lireScenario(id);
+  assert.ok(h.includes('data-scenario="'+id+'"'),f+' : scénario de la page');
+  assert.ok(h.includes('<link rel="canonical" href="https://apprendre-padel.fr/'+f+'">'),f+' : adresse canonique');
+  const titre=h.match(/<title>([^<]*)<\/title>/)[1],desc=h.match(/<meta name="description" content="([^"]*)">/)[1];
+  assert.ok(!titres.has(titre)&&!descriptions.has(desc),f+' : titre et description uniques');titres.add(titre);descriptions.add(desc);
+  assert.ok(decoder(desc).length<=160,f+' : description trop longue');
+  const texte=decoder(h);
+  [s.explication[0],s.erreurs[0],s.exercice,s.etapes[s.etapes.length-1].texte].forEach(x=>assert.ok(texte.includes(x),f+' : texte absent du HTML : '+x.slice(0,40)));
+  assert.ok(sitemap.includes('<loc>https://apprendre-padel.fr/'+f+'</loc>'),f+' : absente du sitemap');
+  assert.ok(principale.includes('href="'+f+'"'),f+' : absente de la liste de la page principale');
+ }
+ assert.deepEqual(fs.readdirSync(racine).filter(n=>/^simulateur-3d-.+\.html$/.test(n)&&!SCENARIOS.includes(n.slice(14,-5))),[],'pages de scénarios disparus');
+ ok('une page par scénario ('+SCENARIOS.length+') : adresse, titre et description uniques, textes dans le HTML, sitemap, liste sur la page principale');
 }
 
 /* ---- 2. Dans le navigateur ---- */
@@ -313,16 +332,23 @@ async function dansLeNavigateur(base){
   assert.ok(liens.length>=20,'cartes de coups');
   liens.forEach(l=>{
    assert.ok(l.href,l.coup+' : bouton « Voir en 3D »');
-   const id=l.href.split('#')[1];
+   const id=(l.href.match(/^simulateur-3d-([a-z0-9-]+)\.html$/)||[])[1];
    assert.ok(SCENARIOS.includes(id),l.coup+' : scénario '+id+' introuvable');
   });
-  await page.click('#coups .card a.coup-3d[href$="#vibora"]');
+  await page.click('#coups .card a.coup-3d[href="simulateur-3d-vibora.html"]');
   await pret(page);
+  assert.match(page.url(),/simulateur-3d-vibora\.html$/);
   assert.equal(await page.evaluate(()=>P3D.etat.scenario.id),'vibora');
   assert.equal(await page.inputValue('#p3d-scenarios'),'vibora');
+  // Sur une page de scénario, choisir un autre scénario mène à sa page
+  await Promise.all([page.waitForURL(/simulateur-3d-gancho\.html$/),page.selectOption('#p3d-scenarios','gancho')]);
+  await pret(page);
+  assert.equal(await page.evaluate(()=>P3D.etat.scenario.id),'gancho');
+  // Sur la page principale, l'ancre de l'adresse choisit le scénario
+  await page.goto(base+'/simulateur-3d.html#amorti');await pret(page);
   await page.evaluate(()=>{location.hash='gancho';});
   await page.waitForFunction(()=>P3D.etat.scenario.id==='gancho');
-  ok('page Technique : les '+liens.length+' coups ont leur bouton « Voir en 3D », qui ouvre le bon scénario ; l’ancre de l’adresse change le scénario');
+  ok('page Technique : les '+liens.length+' coups ouvrent la page de leur scénario ; autre scénario = autre page ; ancre suivie sur la page principale');
   await ctx.close();
 
   // Sans WebGL : message, lien vers le 2D, étapes lisibles
