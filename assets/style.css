@@ -1259,3 +1259,49 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .etapes-guide h3{margin-bottom:var(--s-2)}
 .bloc h2{margin-bottom:var(--s-3)}
 .wrap>h2+.grille-blocs,.wrap>h2+.tbl,.wrap>h2+.schemas,.wrap>h2+.cas,.wrap>h2+.etapes-guide{margin-top:var(--s-5)}
+
+/* QUIZ TACTIQUE (tactique.html#quiz, quiz-tactique.js) : schéma 2D vu de dessus, question, correction */
+.qt{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5);scroll-margin-top:84px}
+.qt-consigne{color:var(--muted);margin:0 0 var(--s-4)}
+.qt-nb{opacity:.7;font-weight:600}
+.qt-record{color:var(--muted);font-size:var(--fs-s);min-height:1.4em}
+.qt-question{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:var(--s-5);align-items:start}
+.qt-scene{margin:0}
+.qt-schema{display:block;width:100%;max-width:260px;height:auto;margin:0 auto}
+.qt-sol{fill:rgba(var(--terrain-rgb),.55)}
+.qt-cadre{fill:none;stroke:var(--line-2);stroke-width:.12}
+.qt-ligne{fill:none;stroke:rgba(255,255,255,.55);stroke-width:.06}
+.qt-filet{stroke:var(--fg);stroke-width:.14}
+.qt-trace{fill:none;stroke:var(--sand);stroke-width:.08;stroke-dasharray:.25 .2}
+.qt-joueur text{font:700 .62px var(--body);fill:var(--fg);text-anchor:middle}
+.qt-nous circle{fill:var(--turf);stroke:var(--navy);stroke-width:.08}
+.qt-eux circle{fill:var(--coral);stroke:var(--navy);stroke-width:.08}
+.qt-balle circle{fill:var(--sand);stroke:var(--navy);stroke-width:.05}
+.qt-ombre{fill:rgba(0,0,0,.35)}
+.qt-balle text{font:700 .55px var(--body);fill:var(--sand)}
+.qt-legende{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-3);justify-content:center;font-size:var(--fs-xs);color:var(--muted);margin:var(--s-2) 0 0}
+.qt-legende span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.qt-l-nous::before{background:var(--turf)}.qt-l-eux::before{background:var(--coral)}.qt-l-balle::before{background:var(--sand)}
+.qt-avancement{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);font-size:var(--fs-s);color:var(--muted);margin:0 0 var(--s-3)}
+.qt-scenario{color:var(--muted);font-size:var(--fs-s);margin:0 0 var(--s-3)}
+.qt-scenario b{color:var(--fg)}
+.qt-texte h3{margin:0 0 var(--s-4);font-size:var(--fs-l);line-height:1.35}
+.qt-choix{display:grid;gap:var(--s-2)}
+.qt-reponse{text-align:left;font:600 var(--fs-m)/1.4 var(--body);color:var(--fg);background:var(--glass-2);border:1px solid var(--line-2);border-radius:var(--r-s);padding:var(--s-3) var(--s-4);cursor:pointer;transition:border-color var(--t),background var(--t)}
+.qt-reponse:hover:not(:disabled){border-color:var(--turf)}
+.qt-reponse:disabled{cursor:default}
+.qt-reponse.bonne{border-color:var(--turf);background:rgba(var(--turf-rgb),.14)}
+.qt-reponse.fausse{border-color:var(--erreur);background:rgba(255,138,122,.12)}
+.qt-reponse.bonne::after{content:" ✓";color:var(--turf)}
+.qt-reponse.fausse::after{content:" ✗";color:var(--erreur)}
+.qt-correction:empty{display:none}
+.qt-correction{margin-top:var(--s-4)}
+.qt-actions{display:flex;flex-wrap:wrap;gap:var(--s-3);margin:var(--s-4) 0 0}
+.qt-fin h3{font-size:var(--fs-xl);margin:0 0 var(--s-3)}
+.qt-revoir{display:grid;gap:var(--s-2);padding-left:1.2em}
+.qt-revoir li{display:flex;flex-wrap:wrap;gap:var(--s-2);align-items:center}
+@media (max-width:720px){
+  .qt{padding:var(--s-4)}
+  .qt-question{grid-template-columns:1fr}
+  .qt-schema{max-width:220px}
+}

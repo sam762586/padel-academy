@@ -66,11 +66,19 @@ Search Console.
 - [x] Validation du 3D et de la phase 3 par Samuel (27/10/2026).
 Limite gardée : pas d'effet de balle (slice, lift), affichée sur la page.
 
-## Phase 4 — Outils interactifs (ordre proposé)
-Quiz tactique hors 3D (réutilise les questions des scénarios) → tableau tactique (export image, sauvegarde locale)
-→ laboratoire des trajectoires (limites physiques affichées) → diagnostic de paire (règles déterministes, jamais
-présenté comme un avis professionnel) → défis hebdomadaires → carnet de match (existe : compteur, journal,
-diagnostic ; à améliorer seulement).
+## Phase 4 — Outils interactifs
+Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suivant ; aucune nouvelle page.
+- [x] 4A. Quiz tactique sans 3D (27/10/2026) : `tactique.html#quiz`, les 55 questions des scénarios 3D, scène figée
+  dessinée en 2D (positions calculées par le moteur, `scripts/generer-quiz-tactique.mjs`), séries de 10 par niveau,
+  réponses mélangées, correction, lien vers la scène en 3D, scénarios à revoir, meilleur score sur l'appareil ;
+  lien depuis l'espace joueur. Tests : `scripts/verifier-quiz-tactique.cjs`.
+- [ ] Validation du 4A par Samuel.
+- [ ] 4B. Tableau tactique (`tactique.html`, à partir du schéma 2D) : joueurs et balle déplaçables, flèches, export PNG,
+  sauvegarde sur l'appareil.
+- [ ] 4C. Labo des trajectoires (page Simulateur 3D) : curseurs, vues de profil et de dessus, limites affichées.
+- [ ] 4D. Diagnostic de paire (`tactique.html#construire`) : règles fixes, jamais présenté comme un avis professionnel.
+- [ ] 4E. Défis hebdomadaires (espace joueur), tirés des exercices existants.
+- [ ] 4F. Carnet de match : petites améliorations, à lister avec Samuel.
 
 ## Phase 5 — SEO et performance (continu)
 Suivi dans SEO.md ; `verifier-seo.cjs` à chaque livraison ; mesures réelles via Search Console et PageSpeed.
