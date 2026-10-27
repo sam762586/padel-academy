@@ -90,6 +90,8 @@ section.alt{background:var(--bg-2)}
 details.coup summary{cursor:pointer;font-weight:700;font-size:.8rem;color:var(--coral);list-style:none;text-transform:uppercase;letter-spacing:.1em}
 details.coup summary::before{content:"+ "}
 details.coup[open] summary::before{content:"– "}
+.coup-3d{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px;border:1px solid var(--line-2);border-radius:999px;color:var(--turf);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;position:relative;z-index:1}
+.coup-3d:hover,.coup-3d:focus-visible{border-color:var(--turf);background:rgba(53,226,127,.08)}
 details.coup ul{margin:8px 0 0;padding-left:18px;font-size:.9rem;color:var(--muted)}
 .subhead{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:800;font-size:1.5rem;color:#fff;margin:44px 0 16px;display:flex;align-items:center;gap:14px}
 .subhead::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
