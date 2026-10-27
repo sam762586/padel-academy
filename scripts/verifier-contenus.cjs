@@ -73,8 +73,12 @@ ok(`articles (${Object.keys(ARTICLES).join(', ')}) : sections, exemple ou exerci
   const erreurs = [...s.matchAll(/<li class="bloc">([\s\S]*?)<\/li>/g)].map(m => m[1]);
   assert.equal(erreurs.length, 20, '20 erreurs');
   erreurs.forEach(e => { assert.match(e, /<h3[^>]*>[^<]+<\/h3>/); assert.match(e, /<p class="correction"><b>Correction/, 'correction : ' + texte(e).slice(0, 40)); });
-  assert.match(h, /<h1>Les 20 erreurs/);
-  ok('conseils : 20 erreurs en 4 familles, chacune avec son explication et sa correction');
+  assert.match(h, /<h1>Débuter au padel : les 20 erreurs à corriger<\/h1>/); // titre aligné sur la recherche « débuter au padel » (SEO.md)
+  // Avant les erreurs : club, matériel, règles du premier match, chacun relié à la page qui détaille
+  const debut = h.slice(h.indexOf('id="bien-commencer"'), h.indexOf('Placement et déplacements'));
+  ['Trouver un club et une première séance', 'Le matériel minimal', 'Les règles du premier match'].forEach(t => assert.match(debut, new RegExp('<h3>' + t + '</h3>')));
+  ['niveau.html', 'materiel.html#raquette', 'regles.html', 'simulateur-3d-servir-monter.html'].forEach(l => assert.ok(debut.includes('href="' + l + '"'), 'lien ' + l));
+  ok('conseils : avant le premier match (club, matériel, règles) puis 20 erreurs en 4 familles, chacune avec son explication et sa correction');
 }
 
 // Technique (vitres) et lexique

@@ -47,9 +47,9 @@ Toute règle sportive est vérifiée dans le règlement FFT/FIP en vigueur avant
 
 | Mois | Sujet | Intention | Public | Page | Mot-clé indicatif | Priorité |
 |---|---|---|---|---|---|---|
-| Nov. | Débuter au padel | Savoir par où commencer | Débutant | **Enrichir** conseils.html | débuter au padel | P1 |
-| Nov. | Compter les points | Comprendre le score, le point décisif | Débutant | **Enrichir** regles.html | comment compter les points au padel | P1 |
-| Nov. | Le service | Servir sans faute | Débutant | **Enrichir** regles.html (+ lien 3D service) | service padel règle | P1 |
+| Nov. | Débuter au padel | Savoir par où commencer | Débutant | **Enrichi le 27/10** : conseils.html (club, matériel, règles, 20 erreurs) | débuter au padel | P1 |
+| Nov. | Compter les points | Comprendre le score, le point décisif | Débutant | **Déjà couvert** : regles.html#points (vérifié le 27/10) | comment compter les points au padel | P1 |
+| Nov. | Le service | Servir sans faute | Débutant | **Déjà couvert** : regles.html#service, lien 3D (vérifié le 27/10) | service padel règle | P1 |
 | Déc. | Ton premier tournoi | S'inscrire et jouer un P25 | Débutant → compétiteur | **Nouvelle** premier-tournoi.html (ROADMAP M5) | premier tournoi padel P25 | P1 |
 | Déc. | Défendre un lob | Que faire quand on est lobé | Intermédiaire | **Enrichir** tutos.html | défendre un lob padel | P2 |
 | Déc. | Parler avec son partenaire | Les annonces en match | Tous | **Enrichir** tactique.html | communication padel partenaire | P2 |

@@ -120,8 +120,11 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   enregistrement contrôlé sur 8.8.8.8, 1.1.1.1 et ns103.ovh.net), sitemap envoyé.
 - [ ] Suivi mensuel : tableau de SEO.md § 4 à remplir le 1er du mois (première ligne : 1er décembre 2026, données de
   novembre) ; relire alors les vrais LCP / CLS (point ouvert Tactique et Tournois).
-- [ ] 5D. Contenus de novembre (SEO.md § 2) : débuter au padel, compter les points, le service ; règles vérifiées
-  FFT/FIP, relues par Samuel.
+- [x] 5D. Contenus de novembre (27/10/2026) : « compter les points » et « le service » étaient déjà couverts par
+  regles.html (rien à ajouter) ; conseils.html enrichi d'« Avant ton premier match » (trouver un club, matériel minimal,
+  règles du premier match), uniquement à partir des règles déjà vérifiées de regles.html et des conseils de
+  materiel.html, H1 « Débuter au padel : les 20 erreurs à corriger ».
+- [ ] Relecture et validation du 5D par Samuel, avant publication.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
