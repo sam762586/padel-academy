@@ -1,7 +1,7 @@
 /* DÉFI DE LA SEMAINE (espace.html#esp-bloc-defi)
    Un thème par semaine (lundi → dimanche, semaine ISO), le même pour tout le monde : les 10 thèmes des exercices tournent
    dans un ordre fixe, soit un cycle de 10 semaines. Dans ce thème, l'exercice du niveau du joueur (dernier test de niveau,
-   pa-quiz-dernier ; niveau 2 sans test), pris dans exercices-donnees.js : consigne, durée, objectif mesurable.
+   niveau déclaré dans Mon académie, sinon pa-quiz-dernier ; niveau 2 sans test), pris dans exercices-donnees.js : consigne, durée, objectif mesurable.
    « J'ai relevé le défi » : auto-évaluation, gardée sur l'appareil (pa-defis : { "2026-W44": { id, date, fait } }) ;
    l'exercice compte aussi comme fait (pa-exercices-faits) s'il ne l'était pas déjà, et seulement dans ce cas il est
    retiré si on décoche. Série : semaines d'affilée relevées (la semaine en cours ne la casse pas tant qu'elle dure). */
@@ -32,6 +32,8 @@ function dfSerie(releves,lundi){
  return n;
 }
 function dfNiveau(){
+ const declare=window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.niveauExerciceDeclare():null;
+ if(declare)return declare; // niveau déclaré dans Mon académie
  try{const q=JSON.parse(localStorage.getItem("pa-quiz-dernier")||"null");if(q&&Number.isInteger(q.niveau)&&q.niveau>=1&&q.niveau<=4)return q.niveau;}catch(e){}
  return 2;
 }
@@ -39,12 +41,18 @@ function dfLire(cle){try{const v=JSON.parse(localStorage.getItem(cle)||"{}");ret
 function dfEcrire(cle,v){try{localStorage.setItem(cle,JSON.stringify(v));}catch(e){/* stockage indisponible */}}
 
 function dfDemarrer(){
- const zone=document.getElementById("esp-defi");
- if(!zone||typeof EXERCICES==="undefined")return;
+ // Mon espace (#esp-defi) ou Mon académie (#ac-defi, redessinée par academie-parcours.js) : même défi, même stockage.
+ // La zone est retrouvée à chaque affichage ; PA_DEFIS_RENDRE permet à l'académie de redemander l'affichage.
+ const trouver=()=>document.getElementById("esp-defi")||document.getElementById("ac-defi");
+ // pages sans défi : rien à faire (le parcours de l'académie, #ap, crée sa zone #ac-defi plus tard)
+ if(typeof EXERCICES==="undefined"||(!trouver()&&!document.getElementById("ap")))return;
  const libelles=window.PA_EXERCICES&&window.PA_EXERCICES.LIBELLES||{};
  const cleFaits=window.PA_EXERCICES&&window.PA_EXERCICES.CLE_FAITS||"pa-exercices-faits";
  const el=(b,c,t)=>{const e=document.createElement(b);if(c)e.className=c;if(t!==undefined)e.textContent=t;return e;};
+ let zone=null;
  function rendre(){
+  zone=trouver();
+  if(!zone)return;
   const maintenant=new Date(),lundi=dfLundi(maintenant),d=dfDefi(lundi,dfNiveau()),releves=dfLire(DF_CLE);
   const releve=releves[d.semaine],e=d.exercice;
   zone.textContent="";
@@ -90,6 +98,7 @@ function dfDemarrer(){
   zone.append(tete,art,suivi);
  }
  window.addEventListener("pa-progression",rendre);
+ window.PA_DEFIS_RENDRE=rendre;
  rendre();
 }
 window.PA_DEFIS={lundi:dfLundi,semaine:dfSemaine,defi:dfDefi,serie:dfSerie,THEMES:DF_THEMES,CLE:DF_CLE};

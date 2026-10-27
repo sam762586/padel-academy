@@ -5,7 +5,8 @@
      - des 10 derniers matchs comptés au compteur : motifs des points perdus (MOTIF_VERS_THEME, exercices-donnees.js).
      - des objectifs de jeu choisis dans l'espace (pa-objectifs-jeu, OBJECTIFS_JEU) ;
      - des difficultés notées dans les bilans après match des 30 derniers jours (diagnostic.js) ;
-   Puis propose 2 exercices par thème, adaptés au niveau du test. « Je l'ai fait » est gardé sur l'appareil.
+     - des thèmes manqués aux quiz de Mon académie (academie-contenus.js, si la page le charge) ;
+   Puis propose 2 exercices par thème, adaptés au niveau déclaré dans Mon académie s'il existe, sinon au niveau du test. « Je l'ai fait » est gardé sur l'appareil.
    exProgramme : le programme de la semaine (nombre d'exercices selon la fréquence de jeu déclarée au test, exercices
    faits ces 6 derniers jours mis de côté), utilisé par le tableau de bord (progression.js).
    Dépend de exercices-donnees.js (EXERCICES, MOTIF_VERS_THEME, MOTIF_EXPLICATION, OBJECTIFS_JEU), journal.js (PA_JOURNAL)
@@ -24,7 +25,8 @@ const exPluriel=(n,mot)=>n+" "+mot+(n>1?"s":"");
 // Moteur pur (testable) : renvoie [{theme, score, raisons:[texte]}] triés, au plus 3.
 // objectifs : identifiants d'objectifs de jeu (OBJECTIFS_JEU) ; difficultes : [{theme, raison}] des bilans après match
 // (diagnostic.js) ; à score égal, l'ordre des priorités du test est gardé.
-function exThemesPrioritaires(quiz,matchs,objectifs,difficultes){
+// academie : [{theme, points, raison}] (thèmes d'exercices tirés des quiz de Mon académie, academie-contenus.js)
+function exThemesPrioritaires(quiz,matchs,objectifs,difficultes,academie){
  const ordreTest={};
  const scores={};
  const ajouter=(theme,points,raison)=>{if(!EX_LIBELLES_THEMES[theme])return;const s=scores[theme]=scores[theme]||{theme,score:0,raisons:[]};s.score+=points;s.raisons.push(raison);};
@@ -51,6 +53,7 @@ function exThemesPrioritaires(quiz,matchs,objectifs,difficultes){
   if(o)o.themes.forEach((th,i)=>ajouter(th,i===0?3:2,"Ton objectif : "+o.libelle.toLowerCase()));
  });
  (difficultes||[]).forEach(d=>{if(d&&typeof d.raison==="string")ajouter(d.theme,1,d.raison);});
+ (academie||[]).forEach(a=>{if(a&&typeof a.raison==="string"&&Number.isFinite(a.points))ajouter(a.theme,a.points,a.raison);});
  const rang=th=>th in ordreTest?ordreTest[th]:99;
  return Object.values(scores).sort((a,b)=>b.score-a.score||rang(a.theme)-rang(b.theme)||a.theme.localeCompare(b.theme)).slice(0,3);
 }
@@ -111,9 +114,11 @@ window.PA_EXERCICES={themesPrioritaires:exThemesPrioritaires,exercicesPour:exExe
  function rendre(){
   zone.textContent="";
   const quiz=dernierQuiz(),matchs=window.PA_JOURNAL?window.PA_JOURNAL.liste():[];
-  const niveau=quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2;
-  const themes=exThemesPrioritaires(quiz,matchs,window.PA_EXERCICES.objectifsJeu(),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[]);
+  const declare=window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.niveauDeclare():null;
+  const niveau=declare?window.PA_ACADEMIE_CONTENUS.niveauExercice(declare):quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2;
+  const themes=exThemesPrioritaires(quiz,matchs,window.PA_EXERCICES.objectifsJeu(),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[],window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.pourExercices():[]);
   const base=el("p","acc-muted");
+  if(declare){const l=el("a","","Mon académie");l.href="academie.html";base.append("Niveau d'exercice tiré de ton niveau déclaré ("+declare+" sur 10, ",l,"). ");}
   base.append(quiz?"Basé sur ton test de niveau du "+new Date(quiz.date).toLocaleDateString("fr-FR")+(EX_PALIERS[quiz.palier]?" (palier "+EX_PALIERS[quiz.palier]+")":" (niveau "+niveau+" sur 4)"):"Pas encore de test de niveau",
    (n=>n?" et sur "+n+" match"+(n>1?"s":"")+" compté"+(n>1?"s":"")+" au compteur.":", sans match compté au compteur.")(matchs.filter(m=>m.pointsTotal>0).slice(0,EX_NB_MATCHS).length));
   zone.appendChild(base);

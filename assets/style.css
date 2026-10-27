@@ -1437,3 +1437,24 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .aq-reco h4{margin:0 0 var(--s-2)}
 .aq-reco p{margin:0 0 var(--s-2);font-size:var(--fs-s)}
 @media (max-width:720px){.aq{padding:var(--s-4)}.aq-avec-schema{grid-template-columns:1fr}.aq-scene .qt-schema{max-width:200px}}
+
+/* MON ACADÉMIE · Parcours (academie-parcours.js) : six blocs de recommandations */
+.ap-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:var(--s-4)}
+.ap-bloc{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-4);min-width:0}
+.ap-bloc h3{margin:0 0 var(--s-3);font-size:var(--fs-l)}
+.ap-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.ap-liste li{line-height:1.45}
+.ap-tag{color:var(--muted);font-size:var(--fs-xs)}
+.ap-etat{font-size:var(--fs-xs);font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line-2);white-space:nowrap}
+.ap-a-travailler{color:var(--coral);border-color:rgba(255,107,87,.45)}
+.ap-en-cours{color:var(--sand);border-color:rgba(255,181,71,.45)}
+.ap-acquis{color:var(--turf);border-color:rgba(var(--turf-rgb),.45)}
+.ap-non-evalue{color:var(--muted)}
+.ap-competences .ap-liste li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s-2)}
+.ap-priorites{margin-top:var(--s-3)}
+.ap-priorites summary{cursor:pointer;font-weight:700}
+.ap-choix{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-2);margin-top:var(--s-2);font-size:var(--fs-s)}
+.ap-exos details summary{cursor:pointer}
+.ap-exos details p{font-size:var(--fs-s);margin:var(--s-2) 0}
+.ap-fait{padding:8px 14px;font-size:.74rem}
+.ap-defi .df-carte{padding:var(--s-3)}

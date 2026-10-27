@@ -170,6 +170,7 @@ function aqDemarrer(){
   const fini=s.reponses.length===s.questions.length;
   if(fini){e.enCours=null;e.seances=e.seances.concat([s]).slice(-AQ_CONFIG.maxSeances);}else e.enCours=s;
   ecrire(e);
+  if(fini)window.dispatchEvent(new Event("pa-academie-quiz")); // parcours : compétences et recommandations à jour
   const juste=k===q.bonne;
   zone.querySelector("#aq-correction").innerHTML=`<p class="msg ${juste?"msg-ok":"msg-erreur"}"><b>${juste?"Bonne réponse.":"Pas tout à fait."}</b> ${esc(q.explication)}</p>
    <p class="qt-actions"><button type="button" class="btn primary" id="aq-suite">${fini?"Voir mon bilan":"Question suivante"}</button>${q.scenario?`<a class="btn ghost" href="simulateur-3d-${q.scenario}.html">Voir la scène en 3D</a>`:""}</p>`;

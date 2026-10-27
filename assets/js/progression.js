@@ -67,7 +67,8 @@
  function blocProgramme(quiz,themes){
   const b=el("div","bord-bloc bord-programme");b.appendChild(el("h3","","Mon programme de la semaine"));
   const freq=quiz&&quiz.reperes&&Number.isInteger(quiz.reperes.frequence)?quiz.reperes.frequence:null;
-  const niveau=quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2;
+  const declare=window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.niveauExerciceDeclare():null;
+  const niveau=declare||(quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2);
   if(!themes.length){
    b.appendChild(el("p","acc-muted","Passe le test de niveau, choisis un objectif ou compte un match : ton programme apparaîtra ici."));
    return b;
@@ -131,7 +132,7 @@
  function rendre(){
   const quiz=E.dernierQuiz?E.dernierQuiz():null;
   const matchs=window.PA_JOURNAL?window.PA_JOURNAL.liste():[];
-  const themes=E.themesPrioritaires(quiz,matchs,objectifsActifs().map(o=>o.objectif),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[]);
+  const themes=E.themesPrioritaires(quiz,matchs,objectifsActifs().map(o=>o.objectif),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[],window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.pourExercices():[]);
   zone.textContent="";
   zone.append(blocNiveau(quiz),blocObjectifs(),blocProgramme(quiz,themes),blocMatchs(),blocHistorique());
   // Le focus reste sur la puce qu'on vient de basculer

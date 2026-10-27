@@ -152,8 +152,12 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   (score, réussite par thème, erreurs expliquées, points forts, à renforcer, 3 recommandations avec exercice, article et
   scène 3D, « Refaire un quiz ») ; niveau déclaré jamais modifié. Test : `scripts/verifier-academie-quiz.cjs`.
 - [x] Validation de la phase 3 par Samuel (27/10/2026).
-- [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
-  Mon espace.
+- [x] Phase 4 (27/10/2026) : classement des contenus (`academie-contenus.js` : 24 sections d'articles, 30 exercices
+  classés par règle, scènes 3D par leurs questions) ; parcours dans Mon académie (compétences à travailler, priorités
+  choisies (3), articles, exercices, scènes 3D, défi de la semaine, historique) ; moteur d'exercices commun avec Mon
+  espace (thèmes faibles des quiz en entrée), niveau d'exercice et défi tirés du niveau déclaré dans les deux pages ;
+  lien de Mon espace vers l'académie. Test : `scripts/verifier-academie-parcours.cjs`.
+- [ ] Validation de la phase 4 par Samuel (dont le tableau de classement des contenus).
 - [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).
 - [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
 
