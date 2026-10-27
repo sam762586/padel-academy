@@ -1,0 +1,54 @@
+{
+  "id": "gancho",
+  "titre": "Le gancho",
+  "niveau": "Avancé",
+  "duree": 6.74,
+  "situation": "Tu es au filet. L'adversaire 1 lobe très haut et profond : trop haut pour une bandeja.",
+  "explication": [
+    "Le gancho est un smash « crochet », joué très haut, au-dessus de la tête, sur un lob qu'on ne peut pas jouer en bandeja.",
+    "On ne cherche pas la vitesse : balle lente et profonde, pour garder le filet.",
+    "Après le gancho, on revient au filet."
+  ],
+  "erreurs": [
+    "Vouloir mettre de la vitesse.",
+    "Perdre l'équilibre vers l'arrière.",
+    "Laisser passer le lob et perdre le filet."
+  ],
+  "conclusion": "Lob très haut et profond : gancho lent et profond, puis retour au filet.",
+  "exercice": "Sur le terrain : un partenaire lobe très haut. Gancho profond au centre, puis retour au filet. 3 séries de 8.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [0.4, -1.8, -3.1], [2.1, -1.25, -6.5], [3.6, -1.7, -3.4], [6.74, -1.6, -2.9]],
+    "A2": [[0, 1.9, -2.8], [2.1, 1.9, -3.8], [3.6, 1.9, -3], [5.34, 1.9, -3], [6.74, 1.8, -2.9]],
+    "B1": [[0, 1.8, 8.2], [1.5, 1.6, 5], [3.2, 1, 7.6], [4.04, 0.17, 8.97], [5.4, 1.3, 7.6], [6.74, 1.6, 7.8]],
+    "B2": [[0, -2, 8.3], [1.5, -1.9, 5], [3.2, -1.9, 7.4], [6.74, -3, 7.8]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "lob", "cible": [-1.6, 3.05, -6.2], "vol": 2.1, "depart": [2.3, 0.9, 8.2] },
+    { "t": 2.1, "joueur": "A1", "geste": "gancho", "cible": [0.2, 0.033, 7.6], "vol": 1.4 },
+    { "t": 4.04, "joueur": "B1", "geste": "sortie_vitre", "cible": [1.4, 1, -3], "vol": 1.3 },
+    { "t": 5.34, "joueur": "A2", "geste": "volee_cd", "cible": [-3.6, 0.033, 5.5], "vol": 0.6 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob très haut", "texte": "L'adversaire 1 lobe très haut au-dessus de toi." },
+    { "t": 0.4, "titre": "Reculer de profil", "texte": "Tu recules de profil, raquette armée haute derrière la tête." },
+    { "t": 2.1, "titre": "Le gancho", "texte": "Contact au-dessus de la tête, bras tendu : balle lente, profonde, au centre." },
+    { "t": 2.5, "titre": "Retour au filet", "texte": "Tu remontes pendant que la balle file vers la vitre du fond." },
+    { "t": 4.04, "titre": "Défense adverse", "texte": "L'adversaire 1 remet la balle après la vitre, sans vitesse." },
+    { "t": 5.34, "titre": "La volée", "texte": "Ton partenaire conclut d'une volée croisée courte." }
+  ],
+  "questions": [
+    { "t": 0.9, "question": "Le lob est très haut et profond : trop haut pour une bandeja. Que joues-tu ?",
+      "choix": ["Un gancho lent et profond", "Un smash à plat, le plus fort possible", "Une volée"],
+      "bonne": 0, "explication": "Sur un lob très haut, le gancho se joue au-dessus de la tête, lent et profond, pour garder le filet." },
+    { "t": 2.4, "question": "Ton gancho est parti. Et toi ?",
+      "choix": ["Je recule au fond", "Je reviens au filet", "Je reste où j'ai frappé"],
+      "bonne": 1, "explication": "Comme la bandeja, le gancho sert à garder le filet : on y revient tout de suite." }
+  ]
+}

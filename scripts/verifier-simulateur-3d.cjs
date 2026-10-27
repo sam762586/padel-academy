@@ -15,7 +15,8 @@ let nb=0;
 function ok(nom){nb++;console.log('OK '+nom);}
 const module3d=f=>import(pathToFileURL(path.join(racine,'assets/js/p3d',f)).href);
 const lireScenario=id=>JSON.parse(fs.readFileSync(path.join(racine,'assets/3d/scenarios',id+'.json'),'utf8'));
-const SCENARIOS=['bandeja-garder-filet','monter-apres-lob','servir-monter','smash-lob-court','defendre-double-vitre','retour-lob','chiquita','duel-filet'];
+// Tous les scénarios du dossier (chaque fichier doit être proposé par la page)
+const SCENARIOS=fs.readdirSync(path.join(racine,'assets/3d/scenarios')).filter(f=>f.endsWith('.json')).map(f=>f.slice(0,-5)).sort((a,b)=>a==='bandeja-garder-filet'?-1:b==='bandeja-garder-filet'?1:a.localeCompare(b));
 
 /* ---- 1. Sans navigateur ---- */
 async function horsNavigateur(){
@@ -63,7 +64,9 @@ async function horsNavigateur(){
   const c=calculer(s);
   assert.deepEqual(ecartsHorsPortee(c),[],id+' : balle hors de portée d\'un frappeur');
   c.ecarts.forEach(e=>assert.ok(e.horizontale<1.2,id+' frappe '+e.frappe));
-  assert.ok(!c.evenements.some(e=>e.type==='dehors'),id+' : balle sortie');
+  // Une balle ne sort du terrain (par 3, par 4) qu'après la dernière frappe : c'est le point gagnant, jamais un raté
+  const derniere=s.frappes[s.frappes.length-1].t;
+  assert.ok(!c.evenements.some(e=>e.type==='dehors'&&e.t<derniere),id+' : balle sortie avant la dernière frappe');
   // Chaque frappe passe le filet sans le toucher, et part du côté du frappeur
   c.frappes.forEach((f,i)=>{
    const camp=f.joueur[0]==='A'?-1:1;
@@ -127,7 +130,7 @@ async function horsNavigateur(){
  assert.deepEqual(angles('coup_magique',0),angles(null,0),'geste inconnu : position d\'attente');
  const utilises=new Set(SCENARIOS.flatMap(id=>lireScenario(id).frappes.map(f=>f.geste)));
  assert.deepEqual([...utilises].sort(),Object.keys(GESTES).sort(),'chaque geste est montré dans au moins un scénario');
- ok('gestes : les 12 coups construits (statut « simplifié »), chacun montré dans un scénario');
+ ok('gestes : les '+Object.keys(GESTES).length+' coups construits (statut « simplifié »), chacun montré dans un scénario');
 
  const licences=fs.readFileSync(path.join(racine,'assets/3d/LICENCES-3D.md'),'utf8');
  for(const dossier of ['assets/3d/vendor','assets/3d/modeles'])
@@ -300,6 +303,26 @@ async function dansLeNavigateur(base){
   fs.mkdirSync(path.join(racine,'scripts/captures'),{recursive:true});
   await page.screenshot({path:path.join(racine,'scripts/captures/simulateur-3d-mobile.png')});
   ok('390 px : scène lisible, aucune barre de défilement horizontale, lien direct vers un scénario');
+  await ctx.close();
+
+  // Page Technique : chaque coup a son bouton « Voir en 3D », qui ouvre le bon scénario
+  ctx=await contexte(browser,{viewport:{width:1280,height:900}});
+  page=await ctx.newPage();suivre(page,erreurs);
+  await page.goto(base+'/technique.html');
+  const liens=await page.$$eval('#coups .card',cartes=>cartes.map(c=>({coup:c.querySelector('h3').textContent,href:c.querySelector('a.coup-3d')?.getAttribute('href')})));
+  assert.ok(liens.length>=20,'cartes de coups');
+  liens.forEach(l=>{
+   assert.ok(l.href,l.coup+' : bouton « Voir en 3D »');
+   const id=l.href.split('#')[1];
+   assert.ok(SCENARIOS.includes(id),l.coup+' : scénario '+id+' introuvable');
+  });
+  await page.click('#coups .card a.coup-3d[href$="#vibora"]');
+  await pret(page);
+  assert.equal(await page.evaluate(()=>P3D.etat.scenario.id),'vibora');
+  assert.equal(await page.inputValue('#p3d-scenarios'),'vibora');
+  await page.evaluate(()=>{location.hash='gancho';});
+  await page.waitForFunction(()=>P3D.etat.scenario.id==='gancho');
+  ok('page Technique : les '+liens.length+' coups ont leur bouton « Voir en 3D », qui ouvre le bon scénario ; l’ancre de l’adresse change le scénario');
   await ctx.close();
 
   // Sans WebGL : message, lien vers le 2D, étapes lisibles

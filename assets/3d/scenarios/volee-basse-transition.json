@@ -1,0 +1,52 @@
+{
+  "id": "volee-basse-transition",
+  "titre": "La volée basse de transition",
+  "niveau": "Intermédiaire",
+  "duree": 5.2,
+  "situation": "Tu viens de lober et tu montes au filet avec ton partenaire. L'adversaire 1 répond par une balle basse dans tes pieds.",
+  "explication": [
+    "Pendant la montée, la balle arrive souvent dans les pieds, avant le filet.",
+    "Volée courte, raquette ouverte : on ne cherche pas le point, on remet la balle longue et au centre.",
+    "Après la volée basse, on continue d'avancer : il ne faut pas s'arrêter au milieu du terrain."
+  ],
+  "erreurs": [
+    "Vouloir gagner le point sur une balle basse.",
+    "S'arrêter au milieu du terrain, dans la « zone de la mort ».",
+    "Frapper la volée basse : elle part dans le filet."
+  ],
+  "conclusion": "Balle basse pendant la montée : volée courte, longue au centre, et on continue de monter.",
+  "exercice": "Sur le terrain : pars du fond, monte ; un partenaire envoie une balle dans tes pieds à mi-terrain. Volée basse longue au centre, puis finis la montée. 3 séries de 8.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8], [0.6, -2.2, -7.6], [3.6, -0.9, -5], [5.2, -1.4, -3.4]],
+    "A2": [[0, 2.4, -8.2], [0.6, 2.3, -7.8], [3.6, 1.9, -4.8], [5.2, 1.8, -3.2]],
+    "B1": [[0, 1.6, 2.9], [1.2, 1.9, 5], [2.5, 1.98, 8.42], [3.8, 1.8, 7.6], [5.2, 1.8, 7.2]],
+    "B2": [[0, -1.9, 2.9], [1.2, -2, 5], [2.5, -2.1, 7.4], [5.2, -1.6, 7.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "A1", "geste": "lob", "cible": [1.6, 0.033, 8.6], "vol": 1.9, "depart": [-2.8, 0.9, -8] },
+    { "t": 2.5, "joueur": "B1", "geste": "sortie_vitre", "cible": [-1.4, 0.35, -5], "vol": 1.1 },
+    { "t": 3.6, "joueur": "A1", "geste": "volee_basse", "cible": [0.3, 0.033, 7.8], "vol": 1.3 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob", "texte": "Tu lobes par-dessus les adversaires." },
+    { "t": 0.6, "titre": "On monte", "texte": "Ton partenaire et toi montez vers le filet." },
+    { "t": 2.5, "titre": "La balle basse", "texte": "L'adversaire 1 répond par une balle basse, dans tes pieds." },
+    { "t": 3.6, "titre": "La volée basse", "texte": "Très bas sur les jambes, raquette ouverte : tu remets la balle longue, au centre." },
+    { "t": 4.0, "titre": "On continue", "texte": "Tu ne t'arrêtes pas : tu finis ta montée jusqu'au filet." }
+  ],
+  "questions": [
+    { "t": 1.2, "question": "Ton lob est passé. Que faites-vous ?",
+      "choix": ["On reste au fond", "Seul mon partenaire monte", "On monte"],
+      "bonne": 2, "explication": "Le lob profond fait reculer les adversaires : on monte à deux." },
+    { "t": 3.1, "question": "Pendant ta montée, la balle arrive dans tes pieds. Que joues-tu ?",
+      "choix": ["Une volée fort dans l'angle", "Une volée courte, longue au centre, et je continue de monter", "Je m'arrête et je la laisse rebondir"],
+      "bonne": 1, "explication": "Sur une balle basse, on ne cherche pas le point : volée longue au centre, puis on finit la montée sans s'arrêter." }
+  ]
+}

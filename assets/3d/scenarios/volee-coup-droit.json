@@ -1,0 +1,53 @@
+{
+  "id": "volee-coup-droit",
+  "titre": "La volée de coup droit",
+  "niveau": "Débutant",
+  "duree": 5.08,
+  "situation": "Ton partenaire et toi êtes au filet. Les adversaires, au fond, jouent une balle à hauteur de hanche vers ton coup droit.",
+  "explication": [
+    "La volée est un blocage, pas une frappe : raquette ouverte, geste court de haut en bas, poids vers l'avant.",
+    "On place la balle : pieds adverses, ou coin vitre-grille, pour qu'elle rebondisse avant la vitre.",
+    "Quand la balle revient lente, on conclut dans l'angle."
+  ],
+  "erreurs": [
+    "Faire un grand geste : la balle part n'importe où.",
+    "Frapper à plat : la balle sort ou revient vite après la vitre.",
+    "Volleyer avec le poids sur les talons."
+  ],
+  "conclusion": "Volée de coup droit : bloquer, placer profond ou dans le coin, puis conclure sur la balle lente.",
+  "exercice": "Sur le terrain : au filet, un partenaire au fond te joue des balles à hauteur de hanche. 10 volées profondes, puis 10 dans le coin vitre-grille.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [0.9, -1.8, -2.8], [5.08, -1.6, -2.8]],
+    "A2": [[0, 1.9, -2.8], [2.6, 1.9, -2.9], [3.68, 1.9, -2.9], [5.08, 1.8, -2.8]],
+    "B1": [[0, 1.8, 8.3], [1.2, 2.4, 8.3], [2.38, 4.01, 8.31], [3.4, 3, 8.2], [5.08, 1.5, 8]],
+    "B2": [[0, -2, 8.3], [3, -2, 8.3], [5.08, -2.9, 7.8]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "coup_droit", "cible": [-2.3, 1, -2.8], "vol": 0.9, "depart": [2.3, 0.8, 8.3] },
+    { "t": 0.9, "joueur": "A1", "geste": "volee_cd", "cible": [3.2, 0.033, 7.6], "vol": 0.9 },
+    { "t": 2.38, "joueur": "B1", "geste": "sortie_vitre", "cible": [1.4, 1, -2.9], "vol": 1.3 },
+    { "t": 3.68, "joueur": "A2", "geste": "volee_cd", "cible": [-3.6, 0.033, 5.5], "vol": 0.6 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La balle adverse", "texte": "L'adversaire 1 joue depuis le fond, à hauteur de hanche, vers ton coup droit." },
+    { "t": 0.9, "titre": "La volée", "texte": "Geste court, raquette ouverte : tu places la balle profond dans le coin, vers la vitre." },
+    { "t": 1.8, "titre": "Le coin", "texte": "La balle rebondit, touche la vitre du fond puis la vitre latérale : difficile à jouer." },
+    { "t": 2.38, "titre": "Défense lente", "texte": "L'adversaire 1 remet la balle comme il peut, lente." },
+    { "t": 3.68, "titre": "La volée qui conclut", "texte": "Ton partenaire volée croisé court, vers la vitre latérale." }
+  ],
+  "questions": [
+    { "t": 0.3, "question": "La balle arrive à hauteur de hanche sur ton coup droit, au filet. Quel geste ?",
+      "choix": ["Un blocage court, raquette ouverte", "Je la laisse passer", "Un grand geste, à plat"],
+      "bonne": 0, "explication": "La volée est un blocage : geste court, raquette ouverte, poids vers l'avant. On place, on ne frappe pas." },
+    { "t": 3.1, "question": "La défense adverse revient lente vers ton partenaire. Où vise-t-il ?",
+      "choix": ["Volée croisée courte, vers la vitre latérale", "Au centre, sur l'adversaire", "En lob"],
+      "bonne": 0, "explication": "Les adversaires sont au fond : la volée croisée courte meurt dans l'angle avant qu'ils n'arrivent." }
+  ]
+}

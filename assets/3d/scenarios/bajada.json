@@ -1,0 +1,51 @@
+{
+  "id": "bajada",
+  "titre": "La bajada",
+  "niveau": "Avancé",
+  "duree": 4.4,
+  "situation": "Ton partenaire et toi tenez le filet. L'adversaire 1 lobe trop long : la balle va toucher ta vitre du fond et ressortir haut.",
+  "explication": [
+    "Un lob trop long touche la vitre du fond et ressort haut : c'est une balle d'attaque.",
+    "On laisse taper la vitre, on se place derrière la balle, et on la frappe en descendant, fort, à hauteur d'épaule.",
+    "Après la bajada, on remonte au filet : la balle attaquante donne le temps de reprendre la place."
+  ],
+  "erreurs": [
+    "Frapper trop tôt, avant que la balle ne redescende.",
+    "Rester au fond après la bajada.",
+    "Se coller à la vitre : la balle ressort au-dessus de toi."
+  ],
+  "conclusion": "Lob trop long : vitre, balle qui ressort haute, bajada en descendant, et on remonte.",
+  "exercice": "Sur le terrain : un partenaire lobe long dans ta vitre. Laisse taper, frappe la balle qui redescend, croisé vers la grille, puis monte. 3 séries de 8.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [0.4, -1.8, -3], [2, -2.4, -7.6], [2.8, -2.15, -8.45], [4.4, -1.9, -5]],
+    "A2": [[0, 1.9, -2.8], [1.2, 1.8, -4.5], [2.8, 1.6, -5.5], [4.4, 1.8, -3.8]],
+    "B1": [[0, 1.8, 8.3], [1.5, 1.6, 6], [3, 1.7, 5.5], [4.4, 2.6, 7.4]],
+    "B2": [[0, -2, 8.3], [1.5, -1.9, 6], [4.4, -1.6, 6.5]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "lob", "cible": [-1.8, 0.033, -8.4], "vol": 2.1, "depart": [2.3, 0.9, 8.3] },
+    { "t": 2.8, "joueur": "A1", "geste": "bajada", "cible": [3.5, 0.033, 6], "vol": 0.8 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob trop long", "texte": "L'adversaire 1 lobe : la balle passe au-dessus de toi, vers ta vitre du fond." },
+    { "t": 0.4, "titre": "Reculer", "texte": "Tu recules, de profil, en suivant la balle." },
+    { "t": 2.39, "titre": "La vitre", "texte": "La balle touche la vitre et ressort haute." },
+    { "t": 2.8, "titre": "La bajada", "texte": "Tu frappes la balle en descendant, fort, croisé vers la grille adverse." },
+    { "t": 3.2, "titre": "On remonte", "texte": "Tu avances pour reprendre le filet avec ton partenaire." }
+  ],
+  "questions": [
+    { "t": 1.0, "question": "Le lob adverse est trop long : il va toucher ta vitre et ressortir haut. Que fais-tu ?",
+      "choix": ["Je recule et je le laisse taper la vitre", "Je smashe tout de suite", "Je laisse le point"],
+      "bonne": 0, "explication": "Un lob trop long devient une balle d'attaque après la vitre : on recule, on laisse taper, on se place derrière la balle." },
+    { "t": 2.35, "question": "La balle touche la vitre et va ressortir haute. Que joues-tu ?",
+      "choix": ["Un amorti", "Une bajada : je frappe en descendant, fort, puis je remonte", "Un lob"],
+      "bonne": 1, "explication": "La balle qui ressort haute se frappe en descendant, fort, en avançant : c'est la bajada, et on reprend le filet." }
+  ]
+}

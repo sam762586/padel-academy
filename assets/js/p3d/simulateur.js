@@ -6,17 +6,31 @@ import { valider, calculer, positionJoueur, positionBalle, frappeProche } from '
 import { GESTES } from './gestes.js';
 import { BALLE } from './constantes.js';
 
-// Classés comme sur la page Technique (les coups y renvoient par simulateur-3d.html#id)
+// Classés comme sur la page Technique, dans le même ordre (chaque coup y renvoie par simulateur-3d.html#id)
 const SCENARIOS = [
-  { id: 'bandeja-garder-filet', nom: 'Bandeja : garder le filet', groupe: 'Filet et attaque' },
-  { id: 'monter-apres-lob', nom: 'Monter après un lob', groupe: 'Fond de court et défense' },
-  { id: 'servir-monter', nom: 'Servir et monter', groupe: 'Service et retour' },
-  { id: 'smash-lob-court', nom: 'Smash sur lob court', groupe: 'Filet et attaque' },
+  { id: 'coup-droit-fond', nom: 'Coup droit de fond', groupe: 'Fond de court et défense' },
+  { id: 'revers-fond', nom: 'Revers de fond', groupe: 'Fond de court et défense' },
+  { id: 'monter-apres-lob', nom: 'Lob : monter après un lob', groupe: 'Fond de court et défense' },
+  { id: 'sortie-vitre-fond', nom: 'Sortie de vitre de fond', groupe: 'Fond de court et défense' },
+  { id: 'sortie-vitre-laterale', nom: 'Sortie de vitre latérale', groupe: 'Fond de court et défense' },
   { id: 'defendre-double-vitre', nom: 'Défendre la double vitre', groupe: 'Fond de court et défense' },
-  { id: 'retour-lob', nom: 'Retourner en lob', groupe: 'Service et retour' },
-  { id: 'chiquita', nom: 'La chiquita', groupe: 'Transition et coups spéciaux' },
+  { id: 'contre-pied', nom: 'Contre-pied : jouer sur le corps', groupe: 'Fond de court et défense' },
+  { id: 'chiquita', nom: 'Chiquita', groupe: 'Transition et coups spéciaux' },
+  { id: 'volee-basse-transition', nom: 'Volée basse de transition', groupe: 'Transition et coups spéciaux' },
+  { id: 'bajada', nom: 'Bajada', groupe: 'Transition et coups spéciaux' },
+  { id: 'amorti', nom: 'Amorti (dejada)', groupe: 'Transition et coups spéciaux' },
+  { id: 'volee-coup-droit', nom: 'Volée de coup droit', groupe: 'Filet et attaque' },
+  { id: 'volee-revers', nom: 'Volée de revers', groupe: 'Filet et attaque' },
   { id: 'duel-filet', nom: 'Duel au filet', groupe: 'Filet et attaque' },
+  { id: 'bandeja-garder-filet', nom: 'Bandeja : garder le filet', groupe: 'Filet et attaque' },
+  { id: 'vibora', nom: 'Víbora', groupe: 'Filet et attaque' },
+  { id: 'smash-lob-court', nom: 'Smash sur lob court', groupe: 'Filet et attaque' },
+  { id: 'smash-par-3', nom: 'Smash par 3 (et rulo)', groupe: 'Filet et attaque' },
+  { id: 'gancho', nom: 'Gancho', groupe: 'Filet et attaque' },
+  { id: 'servir-monter', nom: 'Servir et monter', groupe: 'Service et retour' },
+  { id: 'retour-lob', nom: 'Retourner en lob', groupe: 'Service et retour' },
 ];
+const DEFAUT = 'bandeja-garder-filet'; // scénario ouvert sans lien direct
 const GROUPES = ['Fond de court et défense', 'Transition et coups spéciaux', 'Filet et attaque', 'Service et retour'];
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
@@ -351,6 +365,9 @@ async function demarrer3d() {
     tPrecedent = t;
     const b = positionBalle(c, t);
     balle.position.set(b[0], b[1], b[2]);
+    // Balle sortie du terrain (smash par 3 ou par 4) : elle disparaît, comme hors de l'enceinte
+    const sortie = c.evenements.find(e => e.type === 'dehors');
+    balle.visible = ombre.visible = !(sortie && t > sortie.t);
     ombre.position.set(b[0], 0.006, b[2]);
     ombre.material.opacity = Math.max(0.08, 0.4 - b[1] * 0.08);
     // Traînée de la frappe en cours
@@ -404,8 +421,13 @@ async function demarrer() {
   }));
   brancherCommandes();
   const demande = location.hash.slice(1);
-  const premier = SCENARIOS.some(x => x.id === demande) ? demande : SCENARIOS[0].id;
+  const premier = SCENARIOS.some(x => x.id === demande) ? demande : DEFAUT;
   await choisirScenario(premier).catch(erreurScenario);
+  // Lien vers un autre scénario sur la même page (ou retour arrière) : l'ancre change sans recharger
+  addEventListener('hashchange', () => {
+    const id = location.hash.slice(1);
+    if (SCENARIOS.some(x => x.id === id) && id !== etat.scenario?.id) choisirScenario(id).catch(erreurScenario);
+  });
   if (!webglDisponible()) { sans3d('Ton navigateur ou ton appareil n\'affiche pas la 3D (WebGL indisponible).'); return; }
   try {
     scene3d = await demarrer3d();

@@ -72,6 +72,26 @@ export const GESTES = Object.freeze({
     phases: ['Petite préparation, épaules tournées', 'Contact devant, genoux fléchis', 'Accompagnement vers l\'avant pour viser les pieds ou le lob'],
     tronc: [0, -45, -5, 25, 0], avant: [20, 5, 45, 75, 20], cote: [20, 55, 40, -10, 20], coude: [55, 45, 15, 60, 55], poignet: [45, 30, 10, 35, 45], genoux: [15, 35, 25, 15, 10],
   },
+  gancho: {
+    nom: 'Gancho', statut: 'simplifie',
+    phases: ['Lob très haut et profond : profil, raquette armée haute derrière la tête', 'Contact au-dessus de la tête, bras tendu, la raquette « crochète » la balle', 'Le bras repasse au-dessus de la tête, balle lente et profonde'],
+    tronc: [0, -50, -20, 10, 0], avant: [15, 120, 175, 120, 20], cote: [15, 40, -5, -40, 15], coude: [40, 120, 10, 60, 50], poignet: [45, 60, 10, 30, 45], genoux: [10, 20, 5, 10, 10],
+  },
+  bajada: {
+    nom: 'Bajada', statut: 'simplifie',
+    phases: ['La balle ressort haute de la vitre : épaules tournées, raquette armée haute', 'Contact à hauteur d\'épaule, en descendant sur la balle', 'Accompagnement vers l\'avant et vers le bas, on continue d\'avancer'],
+    tronc: [0, -70, -15, 30, 0], avant: [15, 70, 100, 60, 20], cote: [15, 80, 50, -30, 15], coude: [40, 100, 15, 40, 50], poignet: [45, 50, 10, 30, 45], genoux: [10, 20, 15, 10, 10],
+  },
+  amorti: {
+    nom: 'Amorti', statut: 'simplifie',
+    phases: ['Raquette devant soi, tamis ouvert, aucune préparation', 'Contact souple : on absorbe la vitesse de la balle', 'Presque pas d\'accompagnement, la balle tombe juste derrière le filet'],
+    tronc: [0, -15, -5, 0, 0], avant: [20, 40, 55, 50, 20], cote: [20, 40, 35, 35, 20], coude: [60, 70, 35, 35, 55], poignet: [45, 55, 40, 45, 45], genoux: [15, 20, 25, 20, 10],
+  },
+  volee_basse: {
+    nom: 'Volée basse', statut: 'simplifie',
+    phases: ['Très bas sur les jambes, raquette ouverte devant soi', 'Contact sous le niveau du filet, sans frapper', 'Court accompagnement vers le haut et la profondeur, on continue de monter'],
+    tronc: [0, -20, -5, 5, 0], avant: [20, 5, 15, 30, 20], cote: [20, 40, 35, 30, 20], coude: [60, 45, 25, 30, 55], poignet: [45, 40, 30, 35, 45], genoux: [15, 40, 50, 30, 10],
+  },
 });
 
 // Garde (position d'attente) : raquette devant la poitrine

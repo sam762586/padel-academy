@@ -1,0 +1,52 @@
+{
+  "id": "contre-pied",
+  "titre": "Le contre-pied : jouer sur le corps",
+  "niveau": "Intermédiaire",
+  "duree": 5.47,
+  "situation": "Les adversaires sont bien placés au filet et ne laissent aucun angle. La balle arrive à ton partenaire, au fond.",
+  "explication": [
+    "Quand les volleyeurs couvrent les angles, on vise le corps : la hanche côté revers ou les pieds.",
+    "Sur le corps, le volleyeur doit se décaler pour jouer : sa volée est gênée et part sans précision.",
+    "La balle qui revient molle se rejoue dans les pieds de l'autre volleyeur."
+  ],
+  "erreurs": [
+    "Jouer trop haut : volée facile.",
+    "Jouer trop fort : la vitre renvoie la balle aux adversaires.",
+    "Viser l'angle alors qu'il est couvert."
+  ],
+  "conclusion": "Volleyeurs bien placés : on ne cherche pas l'angle, on joue sur le corps et dans les pieds.",
+  "exercice": "Sur le terrain : un partenaire au filet, toi au fond. 10 balles à sa hanche côté revers, 10 dans ses pieds.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8.2], [2.5, -2.3, -8.2], [4.07, -1.65, -8.15], [5.47, -2.2, -7.6]],
+    "A2": [[0, 2.4, -8.2], [1.3, 4.04, -8.51], [2.6, 2.5, -8.2], [5.47, 2.4, -8]],
+    "B1": [[0, 1.6, 2.9], [1.6, 1.6, 2.9], [2.25, 1.6, 2.9], [5.47, 1.5, 2.9]],
+    "B2": [[0, -1.9, 2.7], [1, -1.9, 2.9], [3.6, -1.9, 2.9], [5.47, -1.8, 3]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "volee_cd", "cible": [2.3, 0.033, -5.7], "vol": 0.9, "depart": [-1.4, 1, 2.7] },
+    { "t": 1.3, "joueur": "A2", "geste": "coup_droit", "cible": [1.1, 0.9, 2.9], "vol": 0.95 },
+    { "t": 2.25, "joueur": "B1", "geste": "volee_revers", "cible": [-1.4, 0.033, -5.6], "vol": 1.3 },
+    { "t": 4.07, "joueur": "A1", "geste": "coup_droit", "cible": [-1.4, 0.35, 3], "vol": 1 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Les volleyeurs en place", "texte": "L'adversaire 2 volée vers ton partenaire ; les deux adversaires couvrent bien les angles." },
+    { "t": 1.3, "titre": "Sur le corps", "texte": "Ton partenaire vise la hanche de l'adversaire 1, côté revers." },
+    { "t": 2.25, "titre": "Volée gênée", "texte": "L'adversaire 1 doit se décaler : sa volée de revers part sans précision." },
+    { "t": 4.07, "titre": "Dans les pieds", "texte": "Tu rejoues la balle molle dans les pieds de l'adversaire 2." }
+  ],
+  "questions": [
+    { "t": 0.6, "question": "Les volleyeurs couvrent bien les angles. Où vises-tu ?",
+      "choix": ["Très fort au centre", "Dans l'angle quand même", "Sur le corps : la hanche côté revers"],
+      "bonne": 2, "explication": "Quand les angles sont fermés, on joue sur le corps : le volleyeur doit se décaler et sa volée est gênée." },
+    { "t": 3.4, "question": "La volée gênée revient molle. Où la rejoues-tu ?",
+      "choix": ["En lob", "Haut, au centre", "Dans les pieds de l'autre volleyeur"],
+      "bonne": 2, "explication": "On continue de gêner : dans les pieds, le volleyeur doit encore jouer vers le haut." }
+  ]
+}

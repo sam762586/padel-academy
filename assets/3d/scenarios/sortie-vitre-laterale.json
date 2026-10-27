@@ -1,0 +1,53 @@
+{
+  "id": "sortie-vitre-laterale",
+  "titre": "La sortie de vitre latérale",
+  "niveau": "Intermédiaire",
+  "duree": 6.36,
+  "situation": "Les adversaires tiennent le filet. L'adversaire 1 volée croisé : la balle va toucher ta vitre latérale.",
+  "explication": [
+    "La balle touche la vitre de côté et revient vers le centre : il faut se décaler vers le centre et l'attendre.",
+    "C'est une balle plus facile qu'il n'y paraît : elle vient vers toi, il suffit de ne pas se coller à la vitre.",
+    "La réponse : croisé ou au centre, bas, pour gêner les volleyeurs."
+  ],
+  "erreurs": [
+    "Se placer trop près de la vitre : la balle te rentre dans le corps.",
+    "Anticiper trop tôt : la balle change de direction sur la vitre.",
+    "Vouloir frapper fort : on joue placé."
+  ],
+  "conclusion": "Se décaler vers le centre, attendre que la balle revienne de la vitre, jouer bas au centre.",
+  "exercice": "Sur le terrain : un partenaire envoie des balles croisées dans ta vitre latérale. Place-toi vers le centre, attends, renvoie au centre. 3 séries de 10.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8.2], [0.9, -2, -8.6], [1.67, -2.04, -8.91], [3, -2.3, -8], [6.36, -2, -6.4]],
+    "A2": [[0, 2.4, -8.2], [3, 2.3, -8.2], [4.56, 1.87, -9.05], [6.36, 2.1, -6.4]],
+    "B1": [[0, 1.6, 2.7], [1.2, 1.4, 2.9], [2.77, 1.1, 3], [4.2, 1.5, 3], [6.36, 1.4, 5.6]],
+    "B2": [[0, -1.9, 2.9], [4.6, -1.9, 3], [6.36, -1.8, 5.8]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "volee_cd", "cible": [-3.9, 0.033, -5.6], "vol": 0.8, "depart": [2.1, 1, 2.7] },
+    { "t": 1.67, "joueur": "A1", "geste": "coup_droit", "cible": [0.6, 0.4, 3], "vol": 1.1 },
+    { "t": 2.77, "joueur": "B1", "geste": "volee_revers", "cible": [1.2, 0.033, -6.4], "vol": 1.3 },
+    { "t": 4.56, "joueur": "A2", "geste": "lob", "cible": [-1.8, 0.033, 8.6], "vol": 1.9 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La balle croisée", "texte": "L'adversaire 1 volée croisé : rebond, puis vitre latérale." },
+    { "t": 0.8, "titre": "Vers le centre", "texte": "Tu ne cours pas vers la vitre : tu te décales vers le centre, la balle va revenir vers toi." },
+    { "t": 1.67, "titre": "Le coup droit", "texte": "La balle est revenue de la vitre : coup droit bas, au centre, vers les pieds de l'adversaire 1." },
+    { "t": 2.77, "titre": "Volée vers le haut", "texte": "L'adversaire 1 remonte la balle, sans vitesse." },
+    { "t": 4.56, "titre": "Le lob", "texte": "Ton partenaire lobe par-dessus l'adversaire 2 : vous pouvez monter." }
+  ],
+  "questions": [
+    { "t": 0.5, "question": "La balle croisée va toucher ta vitre latérale. Où te places-tu ?",
+      "choix": ["Contre la vitre latérale", "Vers le centre, la balle va revenir vers moi", "Au filet"],
+      "bonne": 1, "explication": "La balle touche la vitre de côté et revient vers le centre : on se décale vers le centre et on l'attend." },
+    { "t": 2.2, "question": "Ton coup droit au centre oblige l'adversaire à volleyer vers le haut. Quelle balle attends-tu ?",
+      "choix": ["Une balle très rapide", "Une balle lente, à lober", "Un smash"],
+      "bonne": 1, "explication": "Une volée jouée vers le haut revient lente : ton partenaire pourra lober et vous monterez." }
+  ]
+}

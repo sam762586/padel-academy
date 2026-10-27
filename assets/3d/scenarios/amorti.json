@@ -1,0 +1,49 @@
+{
+  "id": "amorti",
+  "titre": "L'amorti (dejada)",
+  "niveau": "Avancé",
+  "duree": 3.6,
+  "situation": "Tu es au filet. Les deux adversaires sont loin derrière, contre leur vitre du fond, et te renvoient une balle facile.",
+  "explication": [
+    "L'amorti est une volée qui tombe juste derrière le filet : il se joue quand les adversaires sont loin, au fond.",
+    "Contact souple : on absorbe la vitesse de la balle, tamis ouvert, presque sans accompagnement.",
+    "Rare mais dévastateur : trop utilisé, il devient prévisible."
+  ],
+  "erreurs": [
+    "Amorti trop long : balle facile pour l'adversaire qui arrive.",
+    "Amorti joué quand l'adversaire est près du filet.",
+    "Amorti à chaque point : il devient prévisible."
+  ],
+  "conclusion": "Adversaires au fond, balle facile au filet : amorti juste derrière le filet, côté vitre.",
+  "exercice": "Sur le terrain : au filet, un partenaire au fond te renvoie des balles lentes. Amorti qui rebondit deux fois avant la ligne de service. 3 séries de 10.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [1.4, -1.8, -2.8], [3.6, -1.8, -2.9]],
+    "A2": [[0, 1.9, -2.8], [3.6, 1.7, -2.8]],
+    "B1": [[0, 1.8, 8.3], [3.6, 1, 7]],
+    "B2": [[0, -2.1, 8.6], [1.6, -2.2, 8.2], [3.6, -3.2, 4.5]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "sortie_vitre", "cible": [-2.3, 1.1, -2.8], "vol": 1.4, "depart": [-1.6, 1, 8.6] },
+    { "t": 1.4, "joueur": "A1", "geste": "amorti", "cible": [-3.2, 0.033, 1.6], "vol": 0.7 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Adversaires au fond", "texte": "L'adversaire 2 joue depuis le fond, contre sa vitre : balle lente vers toi." },
+    { "t": 1.4, "titre": "L'amorti", "texte": "Tamis ouvert, contact souple : la balle tombe juste derrière le filet, côté vitre." },
+    { "t": 2.1, "titre": "Trop loin", "texte": "L'adversaire 2 se précipite, mais il part de trop loin : la balle rebondit deux fois." }
+  ],
+  "questions": [
+    { "t": 0.6, "question": "Les deux adversaires sont loin, contre leur vitre. La balle arrive lente vers toi. Quel coup ?",
+      "choix": ["Un amorti juste derrière le filet", "Une volée profonde vers la vitre", "Un lob"],
+      "bonne": 0, "explication": "Adversaires au fond, balle facile au filet : l'amorti qui tombe juste derrière le filet est imparable." },
+    { "t": 1.8, "question": "Ton amorti est parti. Pourquoi l'adversaire ne l'aura pas ?",
+      "choix": ["Il n'a pas le droit de la jouer", "Il part de trop loin", "La balle sort du terrain"],
+      "bonne": 1, "explication": "L'amorti marche parce que les adversaires sont au fond : la balle rebondit deux fois avant qu'ils arrivent." }
+  ]
+}

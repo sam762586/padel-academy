@@ -1,0 +1,54 @@
+{
+  "id": "coup-droit-fond",
+  "titre": "Le coup droit de fond",
+  "niveau": "Débutant",
+  "duree": 5.74,
+  "situation": "Les adversaires tiennent le filet ; ton partenaire et toi êtes au fond. L'adversaire 2 volée vers ton coup droit.",
+  "explication": [
+    "Le coup droit de fond se joue après le rebond, à hauteur de hanche, avec un geste compact : on place, on ne frappe pas fort.",
+    "Contre deux volleyeurs, la bonne cible est basse : dans les pieds, pour qu'ils jouent vers le haut.",
+    "Quand la balle revient molle, le lob par-dessus les volleyeurs permet de monter à votre tour."
+  ],
+  "erreurs": [
+    "Prendre trop d'élan : le geste arrive en retard et la balle part haute.",
+    "Frapper fort au lieu de placer : un volleyeur bien placé renvoie la vitesse.",
+    "Jouer haut au milieu : c'est une volée facile."
+  ],
+  "conclusion": "Coup droit compact, balle basse dans les pieds, puis lob quand la volée revient faible.",
+  "exercice": "Sur le terrain : un partenaire au filet te renvoie la balle. Coup droit après rebond, viser ses pieds 10 fois de suite sans faute, puis 5 lobs.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8.2], [1.3, -2.51, -8.4], [2.6, -2.4, -8], [4.14, -1.89, -8.53], [5.74, -2, -6.5]],
+    "A2": [[0, 2.4, -8.2], [4.3, 2.4, -8], [5.74, 2.2, -6.3]],
+    "B1": [[0, 1.6, 2.9], [1.6, 1.7, 2.9], [2.35, 1.6, 3], [3.2, 1.6, 2.9], [4.5, 1.6, 3.2], [5.74, 1.4, 5.5]],
+    "B2": [[0, -1.9, 2.7], [1, -1.9, 2.9], [4.5, -1.9, 3.1], [5.74, -1.8, 5.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "volee_cd", "cible": [-2.6, 0.033, -5.6], "vol": 0.9, "depart": [-1.4, 1, 2.7] },
+    { "t": 1.3, "joueur": "A1", "geste": "coup_droit", "cible": [2.1, 0.45, 3], "vol": 1.05 },
+    { "t": 2.35, "joueur": "B1", "geste": "volee_basse", "cible": [-1.4, 0.033, -6], "vol": 1.3 },
+    { "t": 4.14, "joueur": "A1", "geste": "lob", "cible": [-1.8, 0.033, 8.6], "vol": 1.9 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La volée adverse", "texte": "L'adversaire 2 volée vers ton côté coup droit : la balle rebondit au milieu de ton camp." },
+    { "t": 0.9, "titre": "Se placer", "texte": "Tu laisses rebondir et tu te places à côté de la balle, épaules tournées, raquette déjà prête." },
+    { "t": 1.3, "titre": "Le coup droit", "texte": "Geste compact, contact devant toi à hauteur de hanche : balle basse vers les pieds de l'adversaire 1." },
+    { "t": 2.35, "titre": "Volée vers le haut", "texte": "Balle dans les pieds : l'adversaire 1 ne peut que la remonter, sans vitesse." },
+    { "t": 4.14, "titre": "Le lob", "texte": "La balle revient molle : tu lobes par-dessus l'adversaire 2." },
+    { "t": 4.6, "titre": "On monte", "texte": "Le lob passe : ton partenaire et toi montez au filet." }
+  ],
+  "questions": [
+    { "t": 0.7, "question": "Deux volleyeurs au filet, la balle arrive sur ton coup droit. Où la joues-tu ?",
+      "choix": ["Fort, au milieu, à hauteur de poitrine", "Basse, dans les pieds d'un volleyeur", "Dans l'angle, le long de la vitre"],
+      "bonne": 1, "explication": "Contre deux volleyeurs, la balle basse dans les pieds les oblige à jouer vers le haut. Fort au milieu, c'est une volée facile." },
+    { "t": 3.6, "question": "La volée adverse revient molle vers toi. Quelle suite ?",
+      "choix": ["Une frappe fort sur le volleyeur", "Un lob par-dessus les volleyeurs, puis on monte", "Encore une balle basse"],
+      "bonne": 1, "explication": "La balle molle te laisse le temps : le lob fait reculer les volleyeurs et vous donne le filet." }
+  ]
+}

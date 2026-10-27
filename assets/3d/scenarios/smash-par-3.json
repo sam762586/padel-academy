@@ -1,0 +1,50 @@
+{
+  "id": "smash-par-3",
+  "titre": "Le smash par 3 (et le rulo)",
+  "niveau": "Avancé",
+  "duree": 3.1,
+  "situation": "Tu es au filet. L'adversaire 2 lobe court, du côté croisé : c'est une balle pour le smash qui sort du terrain.",
+  "explication": [
+    "Le smash par 3 est croisé, avec angle : la balle rebondit, touche la vitre latérale et sort par-dessus la grille latérale.",
+    "Le rulo (smash lifté) cherche le même but avec un effet qui fait sauter la balle haut sur la vitre.",
+    "Limite du simulateur : la balle est calculée sans effet, elle montre le chemin jusqu'en haut de la vitre latérale ; la sortie elle-même dépend de l'effet et de la puissance, que le simulateur ne calcule pas."
+  ],
+  "erreurs": [
+    "Pas assez d'angle : la balle reste dans le terrain.",
+    "Smasher par 3 depuis trop loin du filet.",
+    "Risque de faute dans la grille : il faut de la marge."
+  ],
+  "conclusion": "Lob court côté croisé : smash croisé, avec angle, vers la vitre latérale.",
+  "exercice": "Sur le terrain : un partenaire lobe court côté croisé. Smash croisé qui touche la vitre latérale le plus haut possible. 3 séries de 8.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [0.3, -1.8, -3], [1.5, -0.95, -4.3], [3.1, -1.6, -3]],
+    "A2": [[0, 1.9, -2.8], [3.1, 1.8, -2.8]],
+    "B1": [[0, 1.8, 8.3], [1.9, 2.2, 7.8], [3.1, 3.4, 8.2]],
+    "B2": [[0, -2, 8.2], [3.1, -1.8, 8]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "lob", "cible": [-1.3, 2.9, -4], "vol": 1.5, "depart": [-1.5, 0.9, 8.2] },
+    { "t": 1.5, "joueur": "A1", "geste": "smash", "cible": [1.5, 0.033, 1.75], "vol": 0.22 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob court croisé", "texte": "L'adversaire 2 lobe court, de ton côté croisé." },
+    { "t": 0.4, "titre": "Se placer", "texte": "Tu recules de deux pas, de profil, sous la balle." },
+    { "t": 1.5, "titre": "Le smash croisé", "texte": "Contact au plus haut, fort et en angle, vers la vitre latérale." },
+    { "t": 1.75, "titre": "La vitre latérale", "texte": "La balle rebondit et monte jusqu'en haut de la vitre latérale. Avec l'effet et la puissance d'un vrai par 3, elle passerait par-dessus la grille." }
+  ],
+  "questions": [
+    { "t": 0.6, "question": "Le lob adverse est court, de ton côté croisé. Quel smash ?",
+      "choix": ["Une bandeja lente", "Un smash croisé, avec angle, vers la vitre latérale", "Un smash au centre"],
+      "bonne": 1, "explication": "Lob court côté croisé : le smash par 3 cherche l'angle vers la vitre latérale, pour faire sortir la balle par-dessus la grille." },
+    { "t": 1.9, "question": "Que faut-il pour que la balle sorte vraiment du terrain ?",
+      "choix": ["Frapper doucement", "Viser la grille directement", "De l'angle, de la puissance et de l'effet"],
+      "bonne": 2, "explication": "Il faut de l'angle et de la puissance (et de l'effet pour le rulo). Viser la grille directement, c'est la faute." }
+  ]
+}
