@@ -13,3 +13,5 @@ window.PA_SUPABASE = { url: "https://bvhfizdfgccrkhdfqzkf.supabase.co", anonKey:
 //   "journal"     : migrations 2026-10-26-journal-01 à 03 (journal de matchs : partenaire, type, matchs saisis après coup)
 //   "communaute"  : migrations 2026-10-26-t4-*.sql (« J'y vais », annonces et avis sur les fiches tournois)
 window.PA_SUPABASE.activees = [];
+// Bouton « Continuer avec Google » (connexion.html) : fournisseur Google configuré dans Supabase le 27/10/2026.
+window.PA_SUPABASE.google = true;
