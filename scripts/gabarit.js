@@ -13,10 +13,11 @@ const AUTEUR = {
 // Menu : groupes (menu déroulant sur ordinateur, accordéon sur mobile) et liens directs, dans l'ordre d'affichage.
 // Un lien direct = [page, libellé] ; un groupe = { id, nom, liens: [[page, libellé], ...] }. Le bouton d'appel ferme la marche.
 const MENU = [
-  { id: "apprendre", nom: "Apprendre", liens: [["technique.html", "Technique"], ["tactique.html", "Tactique"], ["tutos.html", "Tutos"],
-    ["regles.html", "Règles"], ["conseils.html", "Conseils"], ["materiel.html", "Matériel"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"]] },
-  { id: "progresser", nom: "Progresser", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Entraînement"], ["score.html", "Compteur"]] },
-  { id: "tournois", nom: "Tournois", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
+  ["index.html", "Accueil"],
+  { id: "apprendre", nom: "Apprendre", liens: [["regles.html", "Règles"], ["technique.html", "Technique"], ["tactique.html", "Tactique"],
+    ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
+  { id: "entrainer", nom: "S'entraîner", liens: [["niveau.html", "Mon niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
+  { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
 ];

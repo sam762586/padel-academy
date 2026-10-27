@@ -1,4 +1,4 @@
-# Padel Academy : apprendre-padel.fr
+# Apprendre Padel : apprendre-padel.fr
 User-agent: *
 Allow: /
 # Outils et configuration, sans intérêt pour les moteurs

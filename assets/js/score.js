@@ -329,7 +329,7 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
   zone.textContent="";
   if(!compte||!compte.actif||typeof compte.saveMatch!=="function")return;
   await compte.ready;
-  if(!compte.user){zone.textContent="Connecte-toi depuis « Mon compte » pour garder tes matchs sur tous tes appareils.";return;}
+  if(!compte.user){const a=document.createElement("a");a.href="compte.html";a.textContent="Connecte-toi";zone.append(a," pour garder tes matchs sur tous tes appareils (tu les retrouves dans Mon espace).");return;}
   zone.textContent="Enregistrement dans ton compte…";
   const reponse=await compte.saveMatch(match);
   if(matchFini!==match)return; // un autre match a commencé entre-temps

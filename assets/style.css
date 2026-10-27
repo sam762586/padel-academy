@@ -177,7 +177,7 @@ td.n{font-variant-numeric:tabular-nums;text-align:right}
 footer{border-top:1px solid var(--line);padding-block:40px;font-size:.88rem;color:var(--dim)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer b{color:#fff;font-family:var(--display);font-size:1.2rem;text-transform:uppercase;letter-spacing:.03em}
-footer a{color:var(--turf)}
+footer a{color:var(--turf);display:inline-block;padding-block:3px;min-height:24px}
 
 @media (max-width:860px){
   .hero .wrap,.court-wrap,.sel-grid,.sec-head{grid-template-columns:1fr}
@@ -344,9 +344,9 @@ a.card.link:hover h4{color:var(--turf)}
 .nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 @media (max-width:860px){
   .nav .wrap{flex-wrap:nowrap;min-height:60px}
-  .nav-toggle{display:flex}
-  .nav #nav-menu{display:none;position:absolute;left:0;right:0;top:100%;max-height:calc(100vh - 60px - env(safe-area-inset-top,0px));margin:0;padding:12px max(16px,env(safe-area-inset-left,0px)) 24px max(16px,env(safe-area-inset-right,0px));background:rgba(7,11,20,.97);border-bottom:1px solid var(--line);grid-template-columns:1fr;gap:4px;overflow-y:auto;z-index:20;width:auto;box-shadow:0 30px 60px rgba(0,0,0,.6)}
-  .nav #nav-menu.open{display:grid}
+  .nav-js .nav-toggle{display:flex}
+  .nav-js .nav #nav-menu{display:none;position:absolute;left:0;right:0;top:100%;max-height:calc(100vh - 60px - env(safe-area-inset-top,0px));margin:0;padding:12px max(16px,env(safe-area-inset-left,0px)) 24px max(16px,env(safe-area-inset-right,0px));background:rgba(7,11,20,.97);border-bottom:1px solid var(--line);grid-template-columns:1fr;gap:4px;overflow-y:auto;z-index:20;width:auto;box-shadow:0 30px 60px rgba(0,0,0,.6)}
+  .nav-js .nav #nav-menu.open{display:grid}
   .nav li:has(a.cta){grid-column:1 / -1}
   .nav li a{font-size:1.05rem;padding:13px 14px;border-radius:12px;color:#fff}
   .nav li a.active{background:var(--glass-2)}
@@ -916,10 +916,10 @@ details.geste summary{color:var(--turf)}
   .nav #nav-menu>li>a{font-size:1.05rem;padding:13px 14px}
   .nav-titre{width:100%;justify-content:space-between;font-size:1.05rem;padding:13px 14px;border-radius:12px;color:#fff;min-height:48px}
   .nav-sous{position:static;min-width:0;padding:2px 0 8px 12px;border:0;border-radius:0;background:none;box-shadow:none}
-  .nav-groupe.ouvert .nav-sous{grid-template-columns:1fr 1fr;gap:2px 8px}
+  .nav-groupe.ouvert .nav-sous{grid-template-columns:1fr;gap:2px}
   #nav-tournois.nav-sous{grid-template-columns:1fr}
   /* Panneau opaque : le flou de la barre ne s'applique pas au panneau, qui laissait voir la page dessous */
-  .nav #nav-menu{background:#070b14}
+  .nav #nav-menu,.nav-js .nav #nav-menu{background:#070b14}
   .nav-sous a{font-size:1rem;padding:11px 14px;color:var(--muted)}
   .nav-sous a.active{color:#fff}
 }
@@ -951,3 +951,18 @@ details.geste summary{color:var(--turf)}
 .tetat-erreur p{margin:0;color:var(--muted)}
 .tetat-erreur b{color:var(--fg)}
 .tetat-erreur .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+/* Sans JavaScript (nav.js absent ou bloqué) : le menu reste utilisable. Mobile : liens affichés sous l'en-tête,
+   groupes dépliés ; ordinateur : groupe ouvert au survol ou au clavier (focus). nav.js ajoute .nav-js à <html>. */
+@media (max-width:860px){
+  html:not(.nav-js) .nav .wrap{flex-wrap:wrap}
+  html:not(.nav-js) .nav #nav-menu{display:grid;grid-template-columns:1fr;width:100%;gap:2px;padding-bottom:10px}
+  html:not(.nav-js) .nav-sous{display:grid;grid-template-columns:1fr}
+  html:not(.nav-js) .nav-titre::after{display:none}
+}
+html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
+/* Zones qui défilent (tableaux) : atteignables au clavier (nav.js ajoute tabindex) */
+.tbl:focus-visible,.acc-scroll:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+/* Compteur : liste « Type de match » au même style que les champs (.sc-noms input) */
+.sc-noms select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.sc-noms select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
