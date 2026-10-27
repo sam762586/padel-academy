@@ -178,7 +178,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   niveaux 2 / 5 / 8, connecté (Mon académie ne charge pas Supabase : aucune écriture en base), non connecté (Mon espace →
   connexion, académie sans compte), retour après 11 jours (tout conservé, nouveau défi, quiz sans répétition), données
   existantes jamais modifiées. À relancer à chaque lot.
-- [ ] Validation du lot 0 par Samuel.
+- [x] Validation du lot 0 par Samuel (27/10/2026).
 - [ ] Lot 1 : le 1 à 10 comme référence (accueil, tableau de bord : niveau déclaré / quiz / classement FFT, fin du test).
 - [ ] Lot 2 : « Ta semaine » en tête de Mon académie et de Mon espace (niveau, quiz, 3 priorités, 1 exercice, 1 scène, objectif).
 - [ ] Lot 3a : contenu recommandé après chaque erreur (quiz de l'académie, quiz tactique, mode quiz 3D).
