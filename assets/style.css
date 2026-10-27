@@ -1458,3 +1458,15 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .ap-exos details p{font-size:var(--fs-s);margin:var(--s-2) 0}
 .ap-fait{padding:8px 14px;font-size:.74rem}
 .ap-defi .df-carte{padding:var(--s-3)}
+
+/* MON ACADÉMIE · phase 5 : choix rapide du niveau, reprise, sommaire */
+.ac-sommaire{margin:0 0 var(--s-4)}
+.ac-rapide{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr));gap:var(--s-2);margin-top:var(--s-3)}
+.ac-rapide-btn{display:flex;align-items:center;gap:var(--s-2);text-align:left;font:600 var(--fs-s)/1.3 var(--body);color:var(--fg);background:var(--glass-2);border:1px solid var(--line-2);border-radius:var(--r-s);padding:10px 12px;min-height:44px;cursor:pointer}
+.ac-rapide-btn b{display:inline-grid;place-items:center;min-width:1.8em;height:1.8em;border-radius:50%;background:var(--bg-3)}
+.ac-rapide-btn:hover{border-color:var(--turf)}
+.ac-rapide-btn[aria-pressed="true"]{border-color:var(--turf);background:rgba(var(--turf-rgb),.14)}
+.ac-rapide-btn[aria-pressed="true"] b{background:var(--turf);color:var(--accent-fg)}
+.ac-changer{margin-top:var(--s-3)}
+.ac-changer summary{cursor:pointer;font-weight:700}
+.ac-reprise{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3);margin:var(--s-3) 0 0}

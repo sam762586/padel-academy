@@ -88,7 +88,7 @@ async function dansLeNavigateur(base){
    await page.clock.setFixedTime(new Date('2026-10-29T10:00:00'));
    await page.goto(base+'/academie.html');
    assert.match(await page.textContent('#ap'),/Choisis ton niveau : ton parcours/);
-   await page.click('[data-choisir="5"]');
+   await page.click('.ac-carte [data-choisir="5"]');
    assert.equal(await page.locator('#ap .ap-bloc').count(),6,'six blocs');
    assert.match(await page.textContent('.ap-competences'),/Pas encore évalué/);
    // Quiz terminé avec la víbora manquée : compétence à travailler, en tête
@@ -119,7 +119,7 @@ async function dansLeNavigateur(base){
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,largeur+' px : pas de débordement');
    // Mon espace suit le niveau déclaré et les thèmes faibles des quiz
    if(largeur===1280){
-    await page.click('[data-choisir="8"]');
+    await page.click('.ac-carte [data-choisir="8"]');
     await page.goto(base+'/espace.html');
     assert.match(await page.textContent('#esp-exercices'),/niveau déclaré \(8 sur 10/);
     assert.match(await page.textContent('#esp-exercices'),/Quiz de l'académie/);

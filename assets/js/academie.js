@@ -25,6 +25,8 @@ function acChoisir(etat,niveau,date=new Date().toISOString()){
  return {version:1,niveau,historique:etat.historique.concat([{niveau,date}]).slice(-AC_MAX_HISTORIQUE)};
 }
 function acEcrire(etat){try{localStorage.setItem(AC_CLE,JSON.stringify(etat));return true;}catch(e){return false;}}
+// Le navigateur permet-il d'enregistrer ? (navigation privée stricte, stockage bloqué ou plein)
+function acStockageDisponible(){try{localStorage.setItem("pa-test","1");localStorage.removeItem("pa-test");return true;}catch(e){return false;}}
 
 function acDemarrer(){
  const zone=document.getElementById("ac-moi");
@@ -33,9 +35,17 @@ function acDemarrer(){
  const nomDe=n=>{const c=cartes.find(x=>Number(x.dataset.niveau)===n);return c?c.querySelector(".ac-nom").textContent:"";};
  const el=(b,c,t)=>{const e=document.createElement(b);if(c)e.className=c;if(t!==undefined)e.textContent=t;return e;};
  const jour=d=>new Date(d).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"});
+ // Choix rapide des 10 niveaux (un toucher) : mêmes boutons data-choisir que les cartes
+ function choixRapide(etat){
+  const g=el("div","ac-rapide");g.setAttribute("role","group");g.setAttribute("aria-label","Choisir mon niveau");
+  cartes.forEach(c=>{const n=Number(c.dataset.niveau),b=el("button","ac-rapide-btn");b.type="button";b.dataset.choisir=String(n);
+   b.setAttribute("aria-pressed",String(n===etat.niveau));b.append(el("b","",String(n)),el("span",""," "+nomDe(n)));g.append(b);});
+  return g;
+ }
  function rendre(){
   const etat=acLire();
   zone.textContent="";
+  if(!acStockageDisponible())zone.append(el("p","msg msg-alerte","Ton navigateur ne permet pas d'enregistrer sur cet appareil (navigation privée ou stockage bloqué) : ton niveau et tes quiz ne seront pas gardés après la fermeture de la page."));
   if(etat.niveau){
    const h=el("h2","ac-moi-titre");h.append("Ton niveau déclaré : ",el("span","ac-moi-num",String(etat.niveau)),el("span","ac-moi-nom"," · "+nomDe(etat.niveau)));
    zone.append(h);
@@ -43,6 +53,7 @@ function acDemarrer(){
    const p=el("p","ac-moi-info");p.append((dernier?"Choisi le "+jour(dernier.date)+". ":"")+"Tu peux le changer à tout moment : ");
    const a=el("a","","revoir les niveaux");a.href="#niveaux";p.append(a,".");
    zone.append(p);
+   const ch=el("details","ac-changer");ch.append(el("summary","","Changer de niveau"),choixRapide(etat));zone.append(ch);
    if(etat.historique.length>1){
     const d=el("details","ac-historique");d.append(el("summary","","Historique de ton niveau ("+etat.historique.length+" choix)"));
     const ul=el("ul");etat.historique.slice().reverse().slice(0,10).forEach(x=>ul.append(el("li","",jour(x.date)+" : niveau "+x.niveau+" · "+nomDe(x.niveau))));
@@ -50,8 +61,17 @@ function acDemarrer(){
    }
   }else{
    zone.append(el("h2","ac-moi-titre","Choisis ton niveau pour commencer"));
-   const p=el("p","ac-moi-info");p.append("Ça prend quelques secondes : ");const a=el("a","","voir les 10 niveaux");a.href="#niveaux";p.append(a,".");
-   zone.append(p);
+   const p=el("p","ac-moi-info");p.append("Un toucher suffit. Pour lire les critères de chaque niveau : ");const a=el("a","","les 10 niveaux en détail");a.href="#niveaux";p.append(a,".");
+   zone.append(p,choixRapide(etat));
+  }
+  // Quiz interrompu : la reprise est proposée dès le haut de la page
+  let quiz=null;try{quiz=JSON.parse(localStorage.getItem("pa-academie-quiz")||"null");}catch(e){}
+  const enCours=quiz&&quiz.enCours&&Array.isArray(quiz.enCours.questions)&&Array.isArray(quiz.enCours.reponses)&&quiz.enCours.reponses.length<quiz.enCours.questions.length?quiz.enCours:null;
+  if(etat.niveau&&enCours){
+   const p=el("p","ac-reprise");p.append("Tu as un quiz en cours (question "+(enCours.reponses.length+1)+"). ");
+   const b=el("button","btn primary","Reprendre mon quiz");b.type="button";b.id="ac-reprendre";
+   b.addEventListener("click",()=>window.dispatchEvent(new Event("pa-academie-reprendre")));
+   p.append(b);zone.append(p);
   }
   // Ancien test de niveau : autre échelle, affiché à part, jamais converti
   let test=null;try{test=JSON.parse(localStorage.getItem("pa-quiz-dernier")||"null");}catch(e){}
@@ -68,15 +88,18 @@ function acDemarrer(){
    b.textContent=choisi?"Mon niveau ✓":"C'est mon niveau";
   });
  }
- document.querySelectorAll(".ac-choisir").forEach(b=>b.addEventListener("click",()=>{
+ // Cartes et choix rapide : un seul gestionnaire (les boutons du choix rapide sont recréés à chaque affichage)
+ document.addEventListener("click",ev=>{
+  const b=ev.target.closest("[data-choisir]");if(!b)return;
   const etat=acChoisir(acLire(),Number(b.dataset.choisir));
   if(!acEcrire(etat)){zone.prepend(el("p","msg msg-erreur","Impossible d'enregistrer sur cet appareil (stockage désactivé ou plein)."));return;}
   rendre();
   window.dispatchEvent(new CustomEvent("pa-academie",{detail:{niveau:etat.niveau}})); // pour les blocs des phases suivantes
   zone.scrollIntoView({block:"start"});
   const t=zone.querySelector(".ac-moi-titre");if(t){t.tabIndex=-1;t.focus({preventScroll:true});}
- }));
+ });
+ window.addEventListener("pa-academie-quiz",rendre);
  rendre();
 }
-window.PA_ACADEMIE={CLE:AC_CLE,lire:acLire,choisir:acChoisir,normaliser:acNormaliser,niveauValide:acNiveauValide};
+window.PA_ACADEMIE={stockageDisponible:acStockageDisponible,CLE:AC_CLE,lire:acLire,choisir:acChoisir,normaliser:acNormaliser,niveauValide:acNiveauValide};
 acDemarrer();

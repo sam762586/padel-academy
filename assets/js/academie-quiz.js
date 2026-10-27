@@ -110,7 +110,8 @@ function aqNormaliser(e,Q){
 /* ---------- Interface ---------- */
 function aqDemarrer(){
  const zone=document.getElementById("aq");
- if(!zone||typeof ACADEMIE_QUESTIONS==="undefined")return;
+ if(!zone)return;
+ if(typeof ACADEMIE_QUESTIONS==="undefined"){zone.innerHTML=`<p class="msg msg-erreur">Les questions n'ont pas pu se charger (connexion interrompue ?). Recharge la page pour faire ton quiz.</p>`;return;}
  const Q=ACADEMIE_QUESTIONS,T=ACADEMIE_THEMES;
  const EX=typeof EXERCICES!=="undefined"?EXERCICES:[];
  const scenes=typeof QUIZ_TACTIQUE!=="undefined"?QUIZ_TACTIQUE:[];
@@ -123,13 +124,14 @@ function aqDemarrer(){
 
  function accueil(){
   const n=niveau(),e=lire();
-  if(!n){zone.innerHTML=`<p class="aq-vide">Choisis d'abord ton niveau : ton quiz sera construit pour lui. <a href="#niveaux">Voir les 10 niveaux</a>.</p>`;return;}
+  if(!n){zone.innerHTML=`<p class="aq-vide">Choisis d'abord ton niveau : ton quiz sera construit pour lui. <a href="#academie">Choisir mon niveau</a>.</p>`;return;}
   const der=e.seances[e.seances.length-1];
   let html="";
   if(e.enCours){
-   const s=e.enCours;
+   const s=e.enCours,autre=s.niveau!==n;
    html=`<p>Tu as un quiz en cours (niveau ${s.niveau}) : question ${s.reponses.length+1} sur ${s.questions.length}${s.adaptee?"":" au moins"}.</p>
-    <p class="aq-actions"><button type="button" class="btn primary" id="aq-reprendre">Reprendre mon quiz</button><button type="button" class="btn ghost" id="aq-nouveau">Recommencer</button></p>`;
+    ${autre?`<p class="msg msg-alerte">Ce quiz a commencé au niveau ${s.niveau} ; ton niveau déclaré est maintenant le ${n}.</p>`:""}
+    <p class="aq-actions"><button type="button" class="btn primary" id="aq-reprendre">Reprendre mon quiz</button><button type="button" class="btn ghost" id="aq-nouveau">${autre?"Nouveau quiz au niveau "+n:"Recommencer"}</button></p>`;
   }else{
    html=`<p>${AQ_CONFIG.reference+AQ_CONFIG.adaptation} questions, une à la fois, sur les situations de jeu de ton niveau (${n}). Selon tes réponses, les dernières questions te font découvrir le niveau du dessus ou revoir celui du dessous. Ton niveau déclaré ne change pas.</p>
     <p class="aq-actions"><button type="button" class="btn primary" id="aq-nouveau">${der?"Refaire un quiz":"Commencer mon quiz"}</button></p>`;
@@ -169,10 +171,11 @@ function aqDemarrer(){
   zone.querySelectorAll(".qt-reponse").forEach(b=>{const v=Number(b.dataset.k);b.disabled=true;if(v===q.bonne)b.classList.add("bonne");else if(v===k)b.classList.add("fausse");if(v===k)b.setAttribute("aria-pressed","true");});
   const fini=s.reponses.length===s.questions.length;
   if(fini){e.enCours=null;e.seances=e.seances.concat([s]).slice(-AQ_CONFIG.maxSeances);}else e.enCours=s;
-  ecrire(e);
+  const garde=ecrire(e);
   if(fini)window.dispatchEvent(new Event("pa-academie-quiz")); // parcours : compétences et recommandations à jour
   const juste=k===q.bonne;
   zone.querySelector("#aq-correction").innerHTML=`<p class="msg ${juste?"msg-ok":"msg-erreur"}"><b>${juste?"Bonne réponse.":"Pas tout à fait."}</b> ${esc(q.explication)}</p>
+   ${garde?"":`<p class="msg msg-alerte">Ta réponse n'a pas pu être enregistrée sur cet appareil : si tu fermes la page, le quiz ne reprendra pas ici.</p>`}
    <p class="qt-actions"><button type="button" class="btn primary" id="aq-suite">${fini?"Voir mon bilan":"Question suivante"}</button>${q.scenario?`<a class="btn ghost" href="simulateur-3d-${q.scenario}.html">Voir la scène en 3D</a>`:""}</p>`;
   zone.querySelector("#aq-suite").addEventListener("click",()=>fini?bilan(s):question());
   focus("#aq-suite");
@@ -200,7 +203,10 @@ function aqDemarrer(){
   });
   focus("#aq-score");
  }
- window.addEventListener("pa-academie",()=>{if(!lire().enCours)accueil();});
+ // Niveau changé : on garde la question affichée d'un quiz en cours, sinon on revient à l'accueil du quiz
+ window.addEventListener("pa-academie",()=>{if(!zone.querySelector(".aq-question")||!lire().enCours)accueil();});
+ // « Reprendre mon quiz » en haut de la page
+ window.addEventListener("pa-academie-reprendre",()=>{zone.scrollIntoView({block:"start"});question();});
  accueil();
 }
 window.PA_ACADEMIE_QUIZ={CONFIG:AQ_CONFIG,CLE:AQ_CLE,tirer:aqTirer,nouvelle:aqNouvelle,repondre:aqRepondre,adaptation:aqAdaptation,bilan:aqBilan,memoire:aqMemoire,normaliser:aqNormaliser};

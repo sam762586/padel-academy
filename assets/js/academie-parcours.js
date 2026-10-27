@@ -53,7 +53,8 @@ function apEntreeExercices(niveau,choisis,faibles){
 /* ---------- Interface ---------- */
 function apDemarrer(){
  const zone=document.getElementById("ap");
- if(!zone||typeof ACADEMIE_QUESTIONS==="undefined"||typeof ACADEMIE_ARTICLES==="undefined")return;
+ if(!zone)return;
+ if(typeof ACADEMIE_QUESTIONS==="undefined"||typeof ACADEMIE_ARTICLES==="undefined"){zone.innerHTML=`<p class="msg msg-erreur">Ton parcours n'a pas pu se charger (connexion interrompue ?). Recharge la page.</p>`;return;}
  const Q=ACADEMIE_QUESTIONS,T=ACADEMIE_THEMES,E=window.PA_EXERCICES,C=window.PA_ACADEMIE_CONTENUS;
  const scenes=typeof QUIZ_TACTIQUE!=="undefined"?Object.fromEntries(QUIZ_TACTIQUE.map(q=>[q.scenario,q.titre])):{};
  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
@@ -63,7 +64,7 @@ function apDemarrer(){
  const ETATS={"a-travailler":"À travailler","en-cours":"En progrès","acquis":"Acquis","non-evalue":"Pas encore évalué"};
  function rendre(){
   const niveau=C.niveauDeclare();
-  if(!niveau){zone.innerHTML=`<p class="aq-vide">Choisis ton niveau : ton parcours (compétences, articles, exercices, scènes 3D, défis) se construira tout seul. <a href="#niveaux">Voir les 10 niveaux</a>.</p>`;return;}
+  if(!niveau){zone.innerHTML=`<p class="aq-vide">Choisis ton niveau : ton parcours (compétences, articles, exercices, scènes 3D, défis) se construira tout seul. <a href="#academie">Choisir mon niveau</a>.</p>`;return;}
   const seances=C.seancesQuiz(),faibles=C.themesFaibles(seances),ch=choisis(),stats=apStats(seances);
   const prio=apPriorites({niveau,faibles,choisis:ch}),comp=apCompetences(prio,stats);
   const nivEx=C.niveauExercice(niveau),faits=lireJ("pa-exercices-faits",{});

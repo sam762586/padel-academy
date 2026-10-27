@@ -158,7 +158,10 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   espace (thèmes faibles des quiz en entrée), niveau d'exercice et défi tirés du niveau déclaré dans les deux pages ;
   lien de Mon espace vers l'académie. Test : `scripts/verifier-academie-parcours.cjs`.
 - [x] Validation de la phase 4 par Samuel (27/10/2026), tableau de classement compris.
-- [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).
+- [x] Phase 5 (27/10/2026) : choix du niveau en un toucher dès l'arrivée (10 boutons, puis « Changer de niveau »),
+  sommaire de la page, reprise d'un quiz interrompu proposée en haut, niveau changé pendant un quiz signalé, messages si
+  le stockage est bloqué ou si les questions ne se chargent pas. Test : `scripts/verifier-academie-ux.cjs`.
+- [ ] Validation de la phase 5 par Samuel.
 - [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
 
 ## Phase 6 — Stabilisation

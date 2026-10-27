@@ -94,14 +94,14 @@ async function dansLeNavigateur(base){
    assert.match(await page.textContent('.ac-ancien'),/catégorie de tournoi P100\. C'est une autre échelle que les niveaux 1 à 10/);
    // Choix, changement, bornes
    for(const n of [5,1,10]){
-    await page.click(`[data-choisir="${n}"]`);
-    assert.equal(await page.getAttribute(`[data-choisir="${n}"]`,'aria-pressed'),'true');
+    await page.click(`.ac-carte [data-choisir="${n}"]`);
+    assert.equal(await page.getAttribute(`.ac-carte [data-choisir="${n}"]`,'aria-pressed'),'true');
     assert.equal(await page.locator('.ac-carte.choisi').count(),1);
     assert.equal(await page.textContent('.ac-moi-num'),String(n));
     assert.equal(await page.evaluate(()=>document.activeElement.classList.contains('ac-moi-titre')),true,'focus sur le niveau choisi');
    }
    assert.match(await page.textContent('.ac-moi-titre'),/Ton niveau déclaré : 10 · Élite/);
-   await page.click('[data-choisir="10"]'); // même niveau : pas de nouvelle entrée
+   await page.click('.ac-carte [data-choisir="10"]'); // même niveau : pas de nouvelle entrée
    const etat=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-academie')));
    assert.deepEqual(etat.historique.map(h=>h.niveau),[5,1,10]);
    assert.equal(etat.niveau,10);

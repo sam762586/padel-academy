@@ -108,7 +108,7 @@ async function dansLeNavigateur(base){
    page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
    await page.goto(base+'/academie.html');
    assert.match(await page.textContent('#aq'),/Choisis d'abord ton niveau/,'sans niveau : invitation');
-   await page.click('[data-choisir="5"]');
+   await page.click('.ac-carte [data-choisir="5"]');
    assert.match(await page.textContent('#aq'),/10 questions, une à la fois/);
    await page.click('#aq-nouveau');
    for(let i=0;i<3;i++){assert.match(await page.textContent('.aq-avancement'),new RegExp('^Question '+(i+1)+' sur 10'));await repondre(page,true);}
@@ -135,7 +135,7 @@ async function dansLeNavigateur(base){
    assert.ok((await enCours(page)).questions.every(x=>!vues.has(x.id)),'pas de répétition');
    // Niveau 1, tout faux : pas de consolidation sous le niveau 1
    await page.evaluate(()=>localStorage.removeItem('pa-academie-quiz'));
-   await page.click('[data-choisir="1"]');await page.click('#aq-nouveau');
+   await page.click('.ac-carte [data-choisir="1"]');await page.click('#aq-nouveau');
    for(let i=0;i<10;i++)await repondre(page,false);
    const s1=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-academie-quiz')).seances[0]);
    assert.ok(s1.questions.every(x=>x.type==='reference'&&x.cible===1),'niveau 1 : pas de consolidation');
