@@ -97,13 +97,13 @@ const serveur=http.createServer((req,res)=>{
   stats=await page.textContent('#esp-stats');
   assert.match(stats,/3\s*matchs/);assert.match(stats,/2 – 1/);
   assert.match(await page.textContent('#esp-stats tbody'),/Hugo/);
-  assert.equal(await page.locator('#esp-journal li').count(),3);
+  assert.equal(await page.locator('#esp-journal li:not(.esp-bilan-panneau)').count(),3);
   ok('statistiques : période, victoires/défaites, % par partenaire et par type');
   // Résumé « Mon padel » : pas de % de points pour un match saisi après coup
   assert.match(await page.textContent('#mp-matchs'),/–/);
   // Suppression
-  await page.locator('#esp-journal li').first().locator('button.x').click();
-  assert.equal(await page.locator('#esp-journal li').count(),2);
+  await page.locator('#esp-journal li:not(.esp-bilan-panneau)').first().locator('button.x').click();
+  assert.equal(await page.locator('#esp-journal li:not(.esp-bilan-panneau)').count(),2);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   ok('suppression d\'un match ; résumé sans % de points inventé ; 390 px sans débordement');
   // 2. Compteur : partenaire et type
@@ -134,19 +134,19 @@ const serveur=http.createServer((req,res)=>{
   ({ctx,page}=await nouveau({sdk:FAUX,config:CONFIG_ACTIVE,etat,local}));
   await page.waitForFunction(()=>window.__base.appels.includes('+local-nouveau-01'));
   await page.click('#esp-bloc-matchs label.tchip:has(input[value="tout"])');
-  await page.waitForFunction(()=>document.querySelectorAll('#esp-journal li').length===3);
+  await page.waitForFunction(()=>document.querySelectorAll('#esp-journal li:not(.esp-bilan-panneau)').length===3);
   const appels=await page.evaluate(()=>window.__base.appels);
   assert.deepEqual(appels,['+local-nouveau-01'],'l\'ancien match n\'est pas recopié');
   assert.match(await page.textContent('#esp-journal'),/Avec Zoé/);
   ok('connecté : match de l\'appareil copié une fois, ancien match reconnu, match d\'un autre appareil affiché');
   // Suppression d'un match du compte
-  const iZoe=await page.locator('#esp-journal li').evaluateAll(l=>l.findIndex(x=>/Zoé/.test(x.textContent)));
-  await page.locator('#esp-journal li').nth(iZoe).locator('button.x').click();
+  const iZoe=await page.locator('#esp-journal li:not(.esp-bilan-panneau)').evaluateAll(l=>l.findIndex(x=>/Zoé/.test(x.textContent)));
+  await page.locator('#esp-journal li:not(.esp-bilan-panneau)').nth(iZoe).locator('button.x').click();
   await page.waitForFunction(()=>window.__base.appels.includes('-autre-appareil-01'));
   ok('suppression d\'un match du compte depuis le journal');
   // Hors connexion : suppression mise en attente, envoyée au retour
   await page.evaluate(()=>{window.__base.panne=true;window.__garder&&0;sessionStorage.setItem('base',JSON.stringify(window.__base));});
-  await page.locator('#esp-journal li').first().locator('button.x').click();
+  await page.locator('#esp-journal li:not(.esp-bilan-panneau)').first().locator('button.x').click();
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-journal-suppressions')).length),1);
   await page.evaluate(()=>{const b=JSON.parse(sessionStorage.getItem('base'));b.panne=false;sessionStorage.setItem('base',JSON.stringify(b));});
   await page.reload();

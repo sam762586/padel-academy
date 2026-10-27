@@ -174,6 +174,8 @@
  // Matchs du compteur (score.html) : match = { config, points, fin, interrompu, score, vainqueur }
  // Journal de l'espace joueur (migrations 2026-10-26-journal-*) : identifiant, partenaire, type, saisie manuelle
  const journalActif=()=>((window.PA_SUPABASE||{}).activees||[]).includes("journal");
+ // Bilan après match dans la ligne du match (SQL 2026-10-27-diagnostic-01) : avec "journal" et "diagnostic"
+ const diagnosticActif=()=>journalActif()&&((window.PA_SUPABASE||{}).activees||[]).includes("diagnostic");
  compte.saveMatch=async function(match){
   if(!compte.user) return nonConnecte();
   const moteur=window.PA_SCORE;
@@ -191,6 +193,7 @@
    let requete;
    if(journalActif()&&typeof match.cle==="string"&&/^[0-9A-Za-z-]{8,40}$/.test(match.cle)){
     Object.assign(ligne,{cle:match.cle,partenaire:match.partenaire||null,type_match:match.type||null,saisie:manuel?"manuelle":"compteur"});
+    if(diagnosticActif()&&window.PA_DIAGNOSTIC){const d=window.PA_DIAGNOSTIC.lire(match.cle);if(d)ligne.diagnostic=d;}
     // Déjà dans le compte (même identifiant) : rien à faire
     requete=client.from("matchs").upsert(ligne,{onConflict:"user_id,cle",ignoreDuplicates:true});
    }else requete=client.from("matchs").insert(ligne);
@@ -206,12 +209,24 @@
  compte.loadMatches=async function(limite=20){
   if(!compte.user) return nonConnecte();
   try{
-   const colonnes="id,joue_le,nom_a,nom_b,format,points,score,vainqueur,interrompu"+(journalActif()?",cle,partenaire,type_match,saisie":"");
+   const colonnes="id,joue_le,nom_a,nom_b,format,points,score,vainqueur,interrompu"+(journalActif()?",cle,partenaire,type_match,saisie":"")+(diagnosticActif()?",diagnostic":"");
    const {data,error}=await client.from("matchs").select(colonnes)
     .eq("user_id",compte.user.id).order("joue_le",{ascending:false}).limit(Math.min(Math.max(1,limite|0),500));
    if(error) return echec(error,"Impossible de charger tes matchs.");
    return {ok:true,matchs:data||[]};
   }catch(e){ return echec(e,"Impossible de charger tes matchs."); }
+ };
+
+ // Bilan après match : écrit (ou efface avec null) le bilan dans la ligne du match ; sans effet si le match n'est pas encore
+ // dans le compte (le bilan part avec lui à sa copie, voir saveMatch)
+ compte.saveDiagnostic=async function(cle,diagnostic){
+  if(!compte.user) return nonConnecte();
+  if(!diagnosticActif()||typeof cle!=="string"||!/^[0-9A-Za-z-]{8,40}$/.test(cle)) return {ok:false,message:"Bilan non enregistré dans le compte."};
+  try{
+   const {error}=await client.from("matchs").update({diagnostic:diagnostic||null}).eq("user_id",compte.user.id).eq("cle",cle);
+   if(error) return echec(error,"Impossible d'enregistrer le bilan dans ton compte. Il reste sur cet appareil.");
+   return {ok:true};
+  }catch(e){ return echec(e,"Impossible d'enregistrer le bilan dans ton compte. Il reste sur cet appareil."); }
  };
 
  // Favoris tournois (favoris.js) : identifiants Ten'Up

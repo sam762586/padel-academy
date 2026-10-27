@@ -87,6 +87,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 5. `2026-10-26-espace-01` à `-06`, puis ajoute `"espace"` à `PA_SUPABASE.activees`.
 6. `2026-10-26-journal-01` à `-03` (après `20261026_matchs.sql`, déjà exécuté), puis ajoute `"journal"` à `PA_SUPABASE.activees`.
 7. `2026-10-27-progression-01` et `-02` (après les migrations espace), puis ajoute `"progression"` à `PA_SUPABASE.activees`.
+8. `2026-10-27-diagnostic-01` et `-02` (après les migrations journal), puis ajoute `"diagnostic"` à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
@@ -103,3 +104,7 @@ Le compte sert d'archive : effacer l'historique du compteur sur un téléphone n
 # Progression (tableau de bord de l'espace joueur)
 
 `2026-10-27-progression-01` crée la table `objectifs_jeu` (objectifs de jeu choisis dans l'espace : défense, sorties de vitre, volées, bandeja, placement, fautes directes, préparer un tournoi), avec RLS : chaque joueur ne lit et ne modifie que ses lignes. `-02` ajoute la limite de 300 lignes (fonction commune `espace_limite_lignes`). À exécuter après les migrations espace (avec `"espace"` dans `activees`), puis ajoute `"progression"`. Avant ça, les objectifs de jeu, le programme de la semaine et le tableau de bord fonctionnent sur l'appareil.
+
+# Diagnostic après match (bilan)
+
+`2026-10-27-diagnostic-01` ajoute la colonne `diagnostic` (objet JSON limité) à la table `matchs` : le bilan reste attaché à son match, sans second journal. `-02` ajoute la règle qui manquait pour modifier une ligne de `matchs` : chaque joueur peut modifier ses propres matchs, et uniquement la colonne `diagnostic` (le score et les points restent figés). À exécuter après les migrations journal, puis ajoute `"diagnostic"` (avec `"journal"`). Avant ça, les bilans sont gardés sur l'appareil.

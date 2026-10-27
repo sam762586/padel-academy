@@ -1067,3 +1067,36 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 
 /* Espace joueur : masqué le temps de vérifier la session (espace.js) */
 .esp-attente #espace{visibility:hidden}
+
+/* Diagnostic après match (diagnostic.js) : compteur et journal de l'espace */
+.dg-bloc{margin-top:16px;display:grid;gap:12px}
+.dg-bloc:empty{display:none}
+.dg-question{margin:0;font-family:var(--display);font-size:1.5rem;text-transform:uppercase;color:var(--fg)}
+.dg-form{display:grid;gap:14px;padding:16px;border:1px solid var(--line-2);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.dg-intro{margin:0;color:var(--muted)}
+.dg-groupe{border:0;margin:0;padding:0;display:grid;gap:8px}
+.dg-groupe legend{font-weight:800;font-size:.9rem;margin-bottom:6px;color:var(--fg)}
+.dg-champ{display:grid;gap:6px}
+.dg-champ label{font-weight:800;font-size:.9rem}
+.dg-champ textarea{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:var(--r-s);border:1px solid var(--line-2);background:rgba(0,0,0,.3);color:var(--fg);font:inherit;resize:vertical}
+.dg-champ textarea:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.dg-bloc .btns,.dg-form .btns,.dg-reco-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dg-resume{display:grid;gap:4px;color:var(--muted)}
+.dg-resume p{margin:0}
+.dg-recos{display:grid;gap:10px}
+.dg-recos-titre{margin:4px 0 0;font-size:1.1rem;text-transform:uppercase}
+.dg-avert{margin:0;font-size:.85rem;color:var(--muted);border-left:3px solid var(--sand);padding-left:10px}
+.dg-reco{display:grid;gap:6px;padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.dg-reco p{margin:0}
+.dg-reco-titre{font-weight:800;color:var(--turf)}
+.dg-reco-pourquoi,.dg-reco-consigne{color:var(--muted);font-size:.92rem}
+.dg-reco-actions a{color:var(--turf);font-weight:700;padding-block:6px}
+.dg-objectif{min-height:44px}
+.esp-bilan{min-height:40px;padding:6px 12px;font-size:.8rem;margin-left:auto}
+.esp-journal li.esp-bilan-panneau{display:block;padding:0 0 12px;border-top:0}
+.esp-journal li:not(.esp-bilan-panneau){grid-template-columns:28px minmax(0,1fr) auto auto}
+/* Bilan dans le compteur : les puces gardent le style des choix (.opts), pas celui des étiquettes du formulaire du compteur */
+.sc-carte .dg-bloc .opts label{display:inline-block;font-size:.88rem;text-transform:none;letter-spacing:0;color:var(--muted);font-weight:600;margin:0;padding:9px 14px}
+.sc-carte .dg-bloc .opts label:has(input:checked){color:var(--accent-fg);font-weight:800}
+.sc-carte .dg-champ label{font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--fg);font-weight:800}
+.sc-carte .dg-groupe legend{font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--fg)}

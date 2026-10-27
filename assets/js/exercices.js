@@ -4,6 +4,7 @@
        décrit est au palier du joueur ou en dessous, les plus bas d'abord ; ancien test : réponses à 0 ou 1 point sur 3 ;
      - des 10 derniers matchs comptés au compteur : motifs des points perdus (MOTIF_VERS_THEME, exercices-donnees.js).
      - des objectifs de jeu choisis dans l'espace (pa-objectifs-jeu, OBJECTIFS_JEU) ;
+     - des difficultés notées dans les bilans après match des 30 derniers jours (diagnostic.js) ;
    Puis propose 2 exercices par thème, adaptés au niveau du test. « Je l'ai fait » est gardé sur l'appareil.
    exProgramme : le programme de la semaine (nombre d'exercices selon la fréquence de jeu déclarée au test, exercices
    faits ces 6 derniers jours mis de côté), utilisé par le tableau de bord (progression.js).
@@ -21,8 +22,9 @@ const EX_REPOS_JOURS=6;     // un exercice fait depuis moins de 6 jours laisse l
 const exPluriel=(n,mot)=>n+" "+mot+(n>1?"s":"");
 
 // Moteur pur (testable) : renvoie [{theme, score, raisons:[texte]}] triés, au plus 3.
-// objectifs : identifiants d'objectifs de jeu (OBJECTIFS_JEU) ; à score égal, l'ordre des priorités du test est gardé.
-function exThemesPrioritaires(quiz,matchs,objectifs){
+// objectifs : identifiants d'objectifs de jeu (OBJECTIFS_JEU) ; difficultes : [{theme, raison}] des bilans après match
+// (diagnostic.js) ; à score égal, l'ordre des priorités du test est gardé.
+function exThemesPrioritaires(quiz,matchs,objectifs,difficultes){
  const ordreTest={};
  const scores={};
  const ajouter=(theme,points,raison)=>{if(!EX_LIBELLES_THEMES[theme])return;const s=scores[theme]=scores[theme]||{theme,score:0,raisons:[]};s.score+=points;s.raisons.push(raison);};
@@ -48,6 +50,7 @@ function exThemesPrioritaires(quiz,matchs,objectifs){
   const o=defs.find(x=>x.id===id);
   if(o)o.themes.forEach((th,i)=>ajouter(th,i===0?3:2,"Ton objectif : "+o.libelle.toLowerCase()));
  });
+ (difficultes||[]).forEach(d=>{if(d&&typeof d.raison==="string")ajouter(d.theme,1,d.raison);});
  const rang=th=>th in ordreTest?ordreTest[th]:99;
  return Object.values(scores).sort((a,b)=>b.score-a.score||rang(a.theme)-rang(b.theme)||a.theme.localeCompare(b.theme)).slice(0,3);
 }
@@ -109,7 +112,7 @@ window.PA_EXERCICES={themesPrioritaires:exThemesPrioritaires,exercicesPour:exExe
   zone.textContent="";
   const quiz=dernierQuiz(),matchs=window.PA_JOURNAL?window.PA_JOURNAL.liste():[];
   const niveau=quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2;
-  const themes=exThemesPrioritaires(quiz,matchs,window.PA_EXERCICES.objectifsJeu());
+  const themes=exThemesPrioritaires(quiz,matchs,window.PA_EXERCICES.objectifsJeu(),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[]);
   const base=el("p","acc-muted");
   base.append(quiz?"Basé sur ton test de niveau du "+new Date(quiz.date).toLocaleDateString("fr-FR")+(EX_PALIERS[quiz.palier]?" (palier "+EX_PALIERS[quiz.palier]+")":" (niveau "+niveau+" sur 4)"):"Pas encore de test de niveau",
    (n=>n?" et sur "+n+" match"+(n>1?"s":"")+" compté"+(n>1?"s":"")+" au compteur.":", sans match compté au compteur.")(matchs.filter(m=>m.pointsTotal>0).slice(0,EX_NB_MATCHS).length));

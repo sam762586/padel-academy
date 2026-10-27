@@ -131,7 +131,7 @@
  function rendre(){
   const quiz=E.dernierQuiz?E.dernierQuiz():null;
   const matchs=window.PA_JOURNAL?window.PA_JOURNAL.liste():[];
-  const themes=E.themesPrioritaires(quiz,matchs,objectifsActifs().map(o=>o.objectif));
+  const themes=E.themesPrioritaires(quiz,matchs,objectifsActifs().map(o=>o.objectif),window.PA_DIAGNOSTIC?window.PA_DIAGNOSTIC.difficultes():[]);
   zone.textContent="";
   zone.append(blocNiveau(quiz),blocObjectifs(),blocProgramme(quiz,themes),blocMatchs(),blocHistorique());
   // Le focus reste sur la puce qu'on vient de basculer

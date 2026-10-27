@@ -269,6 +269,20 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
     el("span","",(m.partenaire?"Avec "+m.partenaire:"Partenaire non précisé")+" contre "+m.adversaires),
     el("span","mp-match-score",(m.score||"Score non saisi")+(m.interrompu?" (arrêté)":"")));
    li.append(badge,texte);
+   // Bilan du match (diagnostic.js) : ouvert sous la ligne, sans quitter le journal
+   if(window.PA_DIAGNOSTIC){
+    const D=window.PA_DIAGNOSTIC;
+    const bilan=el("button","btn ghost esp-bilan",D.existe(m.cle)?"Bilan ✓":"Bilan");bilan.type="button";
+    bilan.setAttribute("aria-expanded","false");
+    bilan.setAttribute("aria-label",(D.existe(m.cle)?"Voir le bilan":"Faire le bilan")+" du match du "+new Date(m.fin).toLocaleDateString("fr-FR"));
+    const panneau=el("li","dg-bloc esp-bilan-panneau");panneau.hidden=true;
+    bilan.addEventListener("click",()=>{
+     const ouvrir=panneau.hidden;panneau.hidden=!ouvrir;bilan.setAttribute("aria-expanded",String(ouvrir));
+     if(ouvrir)D.bloc(panneau,m.cle,{invitation:false,direct:true});
+    });
+    li.appendChild(bilan);
+    queueMicrotask(()=>li.after(panneau));
+   }
    // Suppression partout ; un match déjà dans le compte ne peut l'être qu'avec le journal activé
    if(!m.dansCompte||JN.actif()){
     const b=el("button","x","✕");b.type="button";b.setAttribute("aria-label","Supprimer le match du "+new Date(m.fin).toLocaleDateString("fr-FR"));

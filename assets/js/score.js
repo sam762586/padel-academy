@@ -269,11 +269,14 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
   supprimer(SC_CLE_EN_COURS);
   matchFini=match;
   rendreRecap(match,$("sc-recap"));
+  proposerBilan(match);
   afficherEcran(ecranFin);
   rendreHistorique();
   enregistrerCompte(match);
   $("sc-fin-titre").focus();
  }
+ // Bilan facultatif du match (diagnostic.js, chargé après ce fichier) : rattaché au match par sa clé
+ function proposerBilan(m){const z=$("sc-diagnostic");if(z&&window.PA_DIAGNOSTIC)window.PA_DIAGNOSTIC.bloc(z,window.PA_DIAGNOSTIC.cleMatch(m));else if(z)z.textContent="";}
  // Récapitulatif : vainqueur, score, % de points, motifs en barres, plus longue série
  function rendreRecap(match,zone){
   const c=match.config,e=calculer(c,match.points),noms=[c.nomA,c.nomB];
@@ -304,7 +307,9 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
    const hm=document.createElement("h3");hm.textContent=`Points gagnés par ${noms[i]}`;bloc.appendChild(hm);
    if(!nbAvecMotif){const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun motif renseigné.";bloc.appendChild(p);}
    const max=Math.max(1,...Object.values(motifs));
-   SC_MOTIFS.filter(m=>motifs[m.id]).sort((x,y)=>motifs[y.id]-motifs[x.id]).forEach(m=>bloc.appendChild(barre(m.label,motifs[m.id],max,String(motifs[m.id]),i)));
+   // Faute directe et double faute sont commises par l'autre paire : on le dit
+   const libelle=m=>m.id==="faute"?"Faute directe de "+noms[1-i]:m.id==="double"?"Double faute de "+noms[1-i]:m.label;
+   SC_MOTIFS.filter(m=>motifs[m.id]).sort((x,y)=>motifs[y.id]-motifs[x.id]).forEach(m=>bloc.appendChild(barre(libelle(m),motifs[m.id],max,String(motifs[m.id]),i)));
    zone.appendChild(bloc);
   });
   const serie=document.createElement("p");serie.className="sc-serie";
@@ -361,7 +366,7 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
  $("sc-historique").addEventListener("click",e=>{
   const b=e.target.closest("button.sc-histo");if(!b)return;
   const m=lireHistorique()[Number(b.dataset.i)];if(!m)return;
-  matchFini=m;rendreRecap(m,$("sc-recap"));$("sc-compte").textContent="";
+  matchFini=m;rendreRecap(m,$("sc-recap"));$("sc-compte").textContent="";proposerBilan(m);
   afficherEcran(ecranFin);$("sc-fin-titre").focus();
  });
  $("sc-effacer").addEventListener("click",()=>{$("sc-effacer-confirmation").hidden=false;$("sc-effacer-oui").focus();});

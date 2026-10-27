@@ -44,7 +44,8 @@ const JN_CLE_VALIDE=/^[0-9A-Za-z-]{8,40}$/;
  function depuisCompte(l){
   const pts=Array.isArray(l.points)?l.points:[];
   return {cle:l.cle||l.id,fin:l.joue_le,partenaire:l.partenaire||null,adversaires:l.nom_b,score:l.score||"",vainqueur:l.vainqueur===0||l.vainqueur===1?l.vainqueur:null,
-   interrompu:!!l.interrompu,type:JN_TYPES[l.type_match]?l.type_match:null,saisie:l.saisie||"compteur",pointsGagnes:pts.filter(p=>p&&p.g===0).length,pointsTotal:pts.length,motifsPerdus:motifsPerdus(pts),origine:null};
+   interrompu:!!l.interrompu,type:JN_TYPES[l.type_match]?l.type_match:null,saisie:l.saisie||"compteur",pointsGagnes:pts.filter(p=>p&&p.g===0).length,pointsTotal:pts.length,motifsPerdus:motifsPerdus(pts),
+   diagnostic:l.diagnostic&&typeof l.diagnostic==="object"?l.diagnostic:null,origine:null}; // diagnostic : bilan après match (diagnostic.js)
  }
  const valideAppareil=m=>m&&S.configValide(m.config)&&S.pointsValides(m.points)&&!Number.isNaN(Date.parse(m.fin));
  function locaux(){
