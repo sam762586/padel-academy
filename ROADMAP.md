@@ -166,8 +166,8 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   `academie_quiz`, RLS chacun ses lignes, aucune modification, 300 lignes au plus, cascade), vérifiées sur Postgres en
   mémoire (`scripts/verifier-academie-sql.mjs`, pglite installé hors package.json) ; synchronisation côté site à écrire
   plus tard ; Mon académie dans le test de performance ; quiz au clavier seul ; 38 suites de tests.
-- [ ] Validation de la phase 6 par Samuel ; puis, sur son accord seulement : publication du site, et plus tard
-  application des migrations et synchronisation.
+- [x] Validation de la phase 6 par Samuel et accord de publication (27/10/2026) : académie publiée.
+- [ ] Plus tard, sur accord de Samuel : synchronisation côté site, puis application des migrations academie-01 à 03.
 
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
