@@ -131,19 +131,21 @@ async function horsNavigateur(){
  const utilises=new Set(SCENARIOS.flatMap(id=>lireScenario(id).frappes.map(f=>f.geste)));
  assert.deepEqual([...utilises].sort(),Object.keys(GESTES).sort(),'chaque geste est montré dans au moins un scénario');
  ok('gestes : les '+Object.keys(GESTES).length+' coups construits (statut « simplifié »), chacun montré dans un scénario');
- // Gestes v2 (buste et bras gauche) : toutes les valeurs ou aucune ; prototype 3A : coup droit et bandeja seulement
+ // Gestes v2 (buste et bras gauche) : toutes les valeurs ou aucune ; 3A : coup droit et bandeja ; 3B groupe 1 : revers, volées, lob, víbora, smash, défense après double vitre
  for(const [id,g] of Object.entries(GESTES)){
   const n=V2.filter(k=>g[k]).length;
   assert.ok(n===0||n===V2.length,id+' : valeurs v2 incomplètes');
   V2.filter(k=>g[k]).forEach(k=>assert.equal(g[k].length,INSTANTS.length,id+' '+k));
  }
- assert.deepEqual(Object.keys(GESTES).filter(id=>GESTES[id].penche).sort(),['bandeja','coup_droit']);
+ assert.deepEqual(Object.keys(GESTES).filter(id=>GESTES[id].penche).sort(),['bandeja','coup_droit','defense_double_vitre','lob','revers','smash','vibora','volee_cd','volee_revers']);
+ assert.ok(angles('smash',-0.4).gAvant>120,'smash : la main gauche pointe la balle à l’armé');
+ assert.ok(angles('revers',0).gAvant<0,'revers : la main gauche part en arrière au contact');
  assert.ok(angles('bandeja',0).gAvant>90,'bandeja : la main gauche pointe la balle au contact');
  assert.ok(angles('coup_droit',-0.4).penche>0,'coup droit : buste penché vers la balle à la préparation');
  const srcJoueurs=fs.readFileSync(path.join(racine,'assets/js/p3d/joueurs.js'),'utf8');
  assert.match(srcJoueurs,/COULEURS = \{ A: 0xc8f14b, B: 0xff6b57 \}/,'couleurs d\'équipe du site');
  assert.match(srcJoueurs,/j\.repos\.forEach\(\(\[o, q\]\) => o\.quaternion\.copy\(q\)\)/,'vertèbres remises au repos à chaque image');
- ok('gestes v2 : coup droit et bandeja (buste, bras gauche), valeurs complètes ; couleurs d\'équipe du site ; colonne remise au repos à chaque image');
+ ok('gestes v2 : coup droit, bandeja et groupe 1 du 3B (buste, bras gauche), valeurs complètes ; couleurs d\'équipe du site ; colonne remise au repos à chaque image');
  // Conseil (facultatif) : affiché sur la page des scénarios qui en ont un, bloc masqué sinon
  for(const id of SCENARIOS){
   const s=lireScenario(id),h=fs.readFileSync(path.join(racine,'simulateur-3d-'+id+'.html'),'utf8');
