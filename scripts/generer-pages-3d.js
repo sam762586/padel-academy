@@ -80,7 +80,7 @@ function ficheCoup(cartes, s, id) {
     ${plusieurs ? "" : "<h2>La fiche du coup</h2>\n    "}${cartes.map(c => ficheUnCoup(c, s, plusieurs)).join("\n    ")}
     <div class="fiche-grille">
       <div class="fiche-bloc"><h3>Revoir en 3D</h3>
-        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li></ul></div>
+        <ul class="fiche-liens"><li><a href="#simulateur">Revoir la scène pas à pas</a></li><li><a href="#mode-quiz">Te tester en mode quiz</a></li><li><a href="#deroule">Lire le déroulé complet</a></li><li><a href="espace.html">Suivre ta progression dans ton espace joueur</a></li></ul></div>
       <div class="fiche-bloc"><h3>Contenus associés</h3>
         <ul class="fiche-liens">${voisins.map(c => `<li><a href="${page(c.p3d)}">${html(nbsp(c.n))}</a></li>`).join("")}<li><a href="technique.html#${ANCRES[famille]}">${html(FAMILLES[famille])} : tous les coups</a></li>${lienScene}</ul></div>
     </div>

@@ -1245,3 +1245,17 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .liens-fleche a{display:inline-block;padding-block:6px;color:var(--fg);font-weight:700}
 .liens-fleche a::after{content:" →";color:var(--turf)}
 .liens-fleche a:hover{color:var(--turf)}
+/* « Et maintenant ? » en fin d'article : s'exercer, voir en 3D, se tester, suivre sa progression */
+.suite{list-style:none;margin:var(--s-5) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:var(--s-3);counter-reset:suite}
+.suite li{counter-increment:suite;min-width:0}
+.suite a{display:grid;align-content:start;gap:var(--s-2);height:100%;padding:var(--s-5);border:1px solid var(--line-2);border-radius:var(--r);background:var(--glass);text-decoration:none;color:var(--muted);transition:border-color var(--t),background var(--t)}
+.suite a::before{content:counter(suite);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--turf);color:var(--accent-fg);font-weight:800}
+.suite b{color:var(--fg);font-family:var(--display);font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em}
+.suite a:hover,.suite a:focus-visible{border-color:var(--turf);background:var(--glass-2)}
+/* Étapes numérotées d'un guide (premier-tournoi.html) et espacements des titres de section */
+.etapes-guide{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:var(--s-3);counter-reset:etape-guide}
+.etapes-guide li{counter-increment:etape-guide}
+.etapes-guide li::before{content:counter(etape-guide);display:grid;place-items:center;width:32px;height:32px;margin-bottom:var(--s-3);border-radius:50%;background:rgba(var(--turf-rgb),.16);color:var(--turf);font-weight:800}
+.etapes-guide h3{margin-bottom:var(--s-2)}
+.bloc h2{margin-bottom:var(--s-3)}
+.wrap>h2+.grille-blocs,.wrap>h2+.tbl,.wrap>h2+.schemas,.wrap>h2+.cas,.wrap>h2+.etapes-guide{margin-top:var(--s-5)}

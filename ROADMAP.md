@@ -31,14 +31,19 @@ Search Console.
 - [x] Icônes, image de partage, couleur du navigateur et manifeste aux nouvelles couleurs ; cache hors ligne pa-v20.
 - [x] Validation de Samuel (27/10/2026).
 
-## Phase 2 — Académie pédagogique (à planifier après validation de la phase 1)
-- Fiches de coups en 11 parties (titre, niveau, objectif, explication, animation, étapes, erreurs, corrections,
-  exercice, lien 3D, contenus associés), générées par `scripts/generer-pages-3d.js` sur les URLs existantes.
-- Enrichir avant de créer : règles (score, point décisif, service, cas litigieux — vérifiés au règlement FFT/FIP
-  en vigueur), conseils (10 → 20 erreurs), tactique, tutos, lexique.
-- Nouvelles pages seulement si aucune page ne répond : premier tournoi (ex-M5), jouer contre un gaucher, partenaire
-  de niveau différent, analyser ses matchs.
-- Parcours relié : article → exercice → simulateur → quiz → suivi.
+## Phase 2 — Académie pédagogique (branche `feature/apprendre-padel-v3`)
+- [x] 2A. Fiches de coups en 11 parties, générées par `scripts/generer-pages-3d.js` (publié le 27/10/2026, 42cc5e1f).
+- [x] 2B. Débutant : règles (comptage, service, 12 cas litigieux, vérifiés sur le règlement FIP du 28/11/2025),
+  20 erreurs du débutant, section vitres (Technique), lexique relié aux fiches.
+- [x] 2C. Intermédiaire : schémas tactiques, construire le point, partenaire de niveau différent (Tactique) ;
+  face à un lob, défendre contre deux volleyeurs (Tutos).
+- [x] 2D. Compétiteur : `premier-tournoi.html` (seule page créée), s'adapter à l'adversaire (gaucher compris),
+  score et moments importants, communication (Tactique), analyser ses matchs (Compteur), préparation physique.
+- [x] 2E. Parcours relié : « Et maintenant ? » en fin d'article (exercice → 3D → quiz → suivi), fiches reliées à
+  l'espace joueur, parcours de l'accueil mis à jour. Test : `scripts/verifier-contenus.cjs`.
+- [ ] Relecture de Samuel (passages d'expérience : partenaire de niveau différent, moments importants,
+  communication ; gestes techniques des fiches). BLOQUÉ : captures du parcours Ten'Up (compte de Samuel).
+- [ ] Validation de Samuel.
 
 ## Phase 3 — Simulateur 3D v2
 Qualité économique / équilibrée / élevée ; boutons trajectoires et placements ; erreurs, conseil et exercice sur
@@ -201,3 +206,8 @@ L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, co
 **Fait** : palette de la marque en tokens (bleu nuit, bleu terrain, vert énergie, blanc froid), échelles et composants communs, menu avec « Tactique 3D », accueil « Progresse au padel, point après point. » avec vitrine du simulateur 3D (capture du simulateur), icônes et image de partage refaites, cache pa-v20. Corrigé au passage : débordements à 320 px (grilles, titres longs, page 404). Test : scripts/verifier-design.cjs (5) ; verifier-menu et verifier-profils mis à jour. Commit local, non poussé.
 **Choix pris** : site sombre conservé ; le bleu terrain sert aux surfaces (trop sombre pour du texte sur le fond, 3,2:1), les liens prennent une version éclaircie (#5CB2E3) ; « Choisir sa raquette » s'affiche « Raquette » entre 861 et 1 180 px pour garder le menu sur une ligne ; couleurs du simulateur 3D inchangées jusqu'à la phase 3.
 **À confirmer** : SQL Supabase exécuté ? (`activees` est vide en ligne).
+
+### 27/10/2026 — v3, phase 2 : académie pédagogique
+**Fait** : lots 2A à 2E (voir la phase 2 ci-dessus). Sources des règles : règlement FIP (révision du 28/11/2025) ; formats et temps de repos des tournois FFT d'après le résumé du Guide de la compétition 2026 publié par Padel Magazine (le guide officiel n'était pas accessible en ligne). Corrigé au passage : numéros de règles FIP cités, « point décisif systématique » (page Compétition), prix de cours non sourcé retiré, « P25 → P3000 ».
+**Choix pris** : une seule page créée (premier-tournoi.html, au menu Compétition) ; gaucher, partenaire de niveau différent et analyse de match traités en sections de pages existantes ; chaque encadré « Exercice » cite un exercice réel de l'espace joueur, mot pour mot ; cache pa-v21.
+**À relire par Samuel** : les passages d'expérience listés dans la phase 2.

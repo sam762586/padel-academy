@@ -107,6 +107,26 @@ ok(`articles (${Object.keys(ARTICLES).join(', ')}) : sections, exemple ou exerci
   ok('tactique : 4 schémas accessibles (description, deux paires), construire le point, partenaire de niveau différent ; tutos : face au lob (5 situations reliées aux fiches), défendre contre deux volleyeurs');
 }
 
+// Parcours relié : chaque article finit par « Et maintenant ? » (s'exercer → voir en 3D → se tester → suivre) ;
+// chaque fiche de coup mène aussi à l'espace joueur
+{
+  for (const f of Object.keys(ARTICLES)) {
+    const s = section(lire(f), 'et-maintenant');
+    const liens = [...s.matchAll(/<a href="([^"]+)"/g)].map(m => m[1]);
+    assert.equal(liens.length, 4, f + ' : 4 étapes');
+    assert.equal(liens[0], 'espace.html#esp-bloc-exercices', f + ' : s\'exercer');
+    assert.match(liens[1], /^simulateur-3d-[a-z0-9-]+\.html$/, f + ' : voir en 3D');
+    assert.ok(fs.existsSync(path.join(racine, liens[1])), f + ' : scène absente ' + liens[1]);
+    assert.equal(liens[2], liens[1] + '#mode-quiz', f + ' : quiz de la même scène');
+    assert.equal(liens[3], 'espace.html', f + ' : suivi');
+    const h = lire(f);
+    assert.equal(h.indexOf('</section>', h.indexOf('<section id="et-maintenant"')), h.lastIndexOf('</section>', h.indexOf('<footer>')), f + ' : « Et maintenant ? » en dernier');
+  }
+  const fiches = fs.readdirSync(racine).filter(n => /^simulateur-3d-.+\.html$/.test(n)).filter(n => lire(n).includes('<section id="fiche-coup"'));
+  fiches.forEach(n => assert.ok(section(lire(n), 'fiche-coup').includes('href="espace.html"'), n + ' : lien vers l\'espace joueur'));
+  ok(`parcours relié : ${Object.keys(ARTICLES).length} articles finissent par s'exercer → 3D → quiz → suivi ; ${fiches.length} fiches mènent à l'espace joueur`);
+}
+
 // Parcours compétiteur
 {
   const h = lire('tactique.html'), adv = texte(section(h, 'adversaire'));
