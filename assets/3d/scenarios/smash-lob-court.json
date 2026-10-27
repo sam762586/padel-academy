@@ -1,0 +1,47 @@
+{
+  "id": "smash-lob-court",
+  "titre": "Le smash sur un lob court",
+  "niveau": "Intermédiaire",
+  "duree": 5.0,
+  "situation": "Ton partenaire et toi tenez le filet. L'adversaire 1, en défense au fond, lève un lob trop court : il retombera devant ta ligne de service.",
+  "explication": [
+    "Un lob court est une balle d'attaque : tu peux la frapper sans reculer de plus de deux pas, épaules de profil.",
+    "Le smash à plat vise le centre, entre les deux adversaires : la balle rebondit près de la vitre du fond et ressort trop vite pour eux.",
+    "Juste après le smash, tu reviens au filet : la défense adverse sera une balle molle, à finir à la volée."
+  ],
+  "erreurs": [
+    "Smasher à plat un lob profond : de loin, la balle revient facile après la vitre. Sur un lob profond, joue la bandeja.",
+    "Smasher sans s'être placé : le bras est en retard et la balle finit dans le filet.",
+    "Rester planté après le smash au lieu de remonter : la balle de défense passe à tes pieds."
+  ],
+  "conclusion": "Lob court : smash. Lob profond : bandeja. Après le smash, on remonte toujours au filet.",
+  "exercice": "Sur le terrain : un partenaire alterne lobs courts et lobs profonds depuis le fond. Smash sur les courts, bandeja sur les profonds, puis retour au filet. 3 séries de 10.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.8, -2.8], [0.3, -1.8, -2.9], [1.55, -0.8, -4.6], [2.3, -1.2, -3.8], [3.3, -1.6, -2.8], [5.0, -1.6, -2.8]],
+    "A2": [[0, 1.9, -2.8], [1.0, 1.8, -3.1], [2.4, 1.9, -2.9], [3.6, 1.9, -2.75], [5.0, 1.7, -2.8]],
+    "B1": [[0, 1.7, 8.6], [0.5, 1.7, 8.4], [1.6, 1.5, 7.6], [2.0, 1.2, 8.3], [2.3, 1.1, 8.5], [3.0, 1.4, 8.0], [5.0, 1.4, 7.8]],
+    "B2": [[0, -2.0, 8.4], [2.4, -2.1, 8.6], [5.0, -2.2, 8.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "lob", "depart": [2.2, 0.9, 8.6], "cible": [-1.2, 2.7, -4.6], "vol": 1.55 },
+    { "t": 1.55, "joueur": "A1", "geste": "smash", "cible": [0.6, 0.033, 6.2], "vol": 0.42 },
+    { "t": 2.3, "joueur": "B1", "geste": "sortie_vitre", "cible": [2.4, 1.1, -2.75], "vol": 1.3 },
+    { "t": 3.6, "joueur": "A2", "geste": "volee_revers", "cible": [-3.6, 0.033, 6.3], "vol": 0.6 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le lob trop court", "texte": "L'adversaire 1 défend du fond, mais son lob manque de longueur : il retombera devant ta ligne de service." },
+    { "t": 0.4, "titre": "Se placer de profil", "texte": "Tu recules de deux pas, épaule gauche vers le filet, raquette armée derrière la tête." },
+    { "t": 1.55, "titre": "Le smash", "texte": "Contact au plus haut, devant toi. Tu frappes fort vers le centre, entre les deux adversaires." },
+    { "t": 1.98, "titre": "Rebond et vitre", "texte": "La balle rebondit près de la vitre du fond et ressort vite : les adversaires n'ont pas le temps de se placer." },
+    { "t": 2.3, "titre": "Défense en urgence", "texte": "L'adversaire 1 remet la balle comme il peut, sans vitesse ni angle." },
+    { "t": 2.6, "titre": "Retour au filet", "texte": "Pendant ce temps, tu remontes au filet : ton partenaire et toi êtes de nouveau en ligne." },
+    { "t": 3.6, "titre": "La volée finale", "texte": "Ton partenaire conclut d'une volée de revers croisée, dans le coin opposé." }
+  ]
+}

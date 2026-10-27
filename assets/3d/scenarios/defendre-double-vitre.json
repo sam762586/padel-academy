@@ -1,0 +1,50 @@
+{
+  "id": "defendre-double-vitre",
+  "titre": "Défendre la double vitre",
+  "niveau": "Intermédiaire",
+  "duree": 8.8,
+  "situation": "Les adversaires tiennent le filet. L'adversaire 2 volée dans ton coin : la balle va toucher la vitre du fond puis la vitre latérale.",
+  "explication": [
+    "Dans le coin, on ne court pas vers la balle : on la laisse toucher les deux vitres et on la suit, genoux pliés.",
+    "La défense ne cherche pas le point : une balle lente et basse au centre oblige les volleyeurs à jouer vers le haut.",
+    "Patience : chaque balle basse au centre amène une volée plus faible, jusqu'à la balle à accélérer."
+  ],
+  "erreurs": [
+    "Frapper la balle avant qu'elle ne sorte des vitres : on joue serré, sans élan.",
+    "Défendre fort : une balle rapide revient encore plus vite des volleyeurs.",
+    "Viser les côtés en défense : on ouvre les angles aux adversaires."
+  ],
+  "conclusion": "En défense : laisser travailler les vitres, jouer bas et au centre, attendre la balle faible pour accélérer.",
+  "exercice": "Sur le terrain : un partenaire au filet volée dans ton coin. Laisse toucher les deux vitres, puis renvoie une balle lente au centre, à ses pieds. 3 séries de 10.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8.2], [0.4, -2.6, -8.3], [1.25, -4.17, -8.1], [2.4, -2.6, -8.0], [5.0, -2.4, -7.6], [6.55, -1.95, -8.3], [8.8, -2.2, -7.6]],
+    "A2": [[0, 2.4, -8.2], [2.9, 2.5, -7.6], [3.95, 2.8, -8.4], [5.0, 2.4, -7.8], [8.8, 2.3, -7.6]],
+    "B1": [[0, 1.5, 2.9], [1.6, 1.4, 2.9], [2.85, 0.7, 2.9], [7.4, 1.4, 3.0], [8.8, 0.9, 4.6]],
+    "B2": [[0, -1.8, 3.0], [3.9, -1.7, 3.0], [4.95, -1.8, 3.1], [7.4, -1.8, 3.0], [8.8, -1.2, 4.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B2", "geste": "volee_cd", "depart": [-1.3, 1.0, 2.7], "cible": [-3.6, 0.033, -7.6], "vol": 0.75 },
+    { "t": 1.25, "joueur": "A1", "geste": "defense_double_vitre", "cible": [0.2, 0.55, 2.9], "vol": 1.6 },
+    { "t": 2.85, "joueur": "B1", "geste": "volee_revers", "cible": [2.7, 0.033, -6.2], "vol": 0.85 },
+    { "t": 3.95, "joueur": "A2", "geste": "revers", "cible": [-1.3, 0.45, 3.1], "vol": 1.0 },
+    { "t": 4.95, "joueur": "B2", "geste": "volee_cd", "cible": [-2.2, 0.033, -6.0], "vol": 1.2 },
+    { "t": 6.55, "joueur": "A1", "geste": "coup_droit", "cible": [0.0, 0.033, 6.5], "vol": 0.85 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La volée dans le coin", "texte": "L'adversaire 2 volée vers ton coin : rebond, vitre du fond, puis vitre latérale." },
+    { "t": 0.75, "titre": "Laisser travailler les vitres", "texte": "Tu ne te précipites pas : tu recules dans le coin et tu attends que la balle sorte des deux vitres." },
+    { "t": 1.25, "titre": "La défense", "texte": "Genoux très pliés, tu remontes sous la balle : balle lente et basse, au centre du terrain adverse." },
+    { "t": 2.85, "titre": "Volée vers le haut", "texte": "Balle basse au centre : l'adversaire 1 doit volleyer vers le haut, sans puissance." },
+    { "t": 3.95, "titre": "Le revers au centre", "texte": "Ton partenaire rejoue au centre, aux pieds de l'adversaire 2." },
+    { "t": 4.95, "titre": "La volée faible", "texte": "Gêné, l'adversaire 2 ne peut remettre qu'une balle molle et courte." },
+    { "t": 6.55, "titre": "L'accélération", "texte": "C'est la balle attendue : coup droit à plat par le centre, entre les deux adversaires." },
+    { "t": 7.4, "titre": "Le point", "texte": "La balle passe entre eux et rebondit près de la vitre du fond : les adversaires sont pris." }
+  ]
+}

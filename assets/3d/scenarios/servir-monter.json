@@ -1,0 +1,49 @@
+{
+  "id": "servir-monter",
+  "titre": "Servir et prendre le filet",
+  "niveau": "Débutant",
+  "duree": 7.2,
+  "situation": "Tu sers. Ton partenaire t'attend au filet ; en face, l'adversaire 1 retourne et l'adversaire 2 est au filet.",
+  "explication": [
+    "Au padel, le serveur a l'avantage s'il rejoint vite son partenaire au filet : servir, c'est d'abord monter.",
+    "Le service se joue à la cuillère : balle lâchée, un rebond, frappe sous la taille, dans le carré en diagonale.",
+    "Le retour vise tes pieds pendant ta montée : une première volée profonde et au centre vaut mieux qu'une volée risquée."
+  ],
+  "erreurs": [
+    "Servir fort et rester au fond : ton partenaire se retrouve seul au filet.",
+    "Vouloir gagner le point sur la première volée : à mi-terrain, on joue profond et lent.",
+    "Frapper le service au-dessus de la taille : c'est une faute."
+  ],
+  "conclusion": "Service placé, montée immédiate, première volée profonde : en trois coups, vous tenez le filet à deux.",
+  "exercice": "Sur le terrain : sers, monte, et joue ta première volée vers le centre du fond adverse. Le relanceur vise tes pieds. 3 séries de 8 services de chaque côté.",
+  "lien": "regles.html",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -1.4, -7.6], [0.3, -1.4, -7.5], [2.5, -1.4, -4.6], [4.0, -1.4, -3.0], [7.2, -1.4, -3.0]],
+    "A2": [[0, 2.0, -3.0], [2.5, 1.9, -3.0], [4.3, 2.0, -3.2], [5.5, 2.3, -4.4], [6.5, 2.0, -3.2], [7.2, 2.0, -3.0]],
+    "B1": [[0, 2.6, 8.6], [1.5, 2.45, 8.0], [2.6, 1.4, 8.3], [4.0, 0.55, 8.9], [5.5, 1.4, 5.0], [7.2, 1.6, 4.0]],
+    "B2": [[0, -2.0, 3.0], [2.6, -2.2, 3.6], [4.0, -2.0, 4.2], [5.5, -2.0, 3.2], [6.4, -2.9, 4.5], [7.2, -3.3, 5.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "A1", "geste": "service", "depart": [-1.9, 0.7, -7.4], "cible": [2.2, 0.033, 5.6], "vol": 1.2 },
+    { "t": 1.5, "joueur": "B1", "geste": "retour", "cible": [-0.9, 0.45, -4.6], "vol": 1.0 },
+    { "t": 2.5, "joueur": "A1", "geste": "volee_revers", "cible": [0.6, 0.033, 7.4], "vol": 1.05 },
+    { "t": 4.0, "joueur": "B1", "geste": "lob", "cible": [1.9, 2.5, -4.4], "vol": 1.5 },
+    { "t": 5.5, "joueur": "A2", "geste": "vibora", "cible": [-3.8, 0.033, 6.8], "vol": 0.7 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le service", "texte": "Derrière la ligne de service, tu laisses rebondir la balle et tu la frappes sous la taille, en diagonale." },
+    { "t": 0.3, "titre": "Monter tout de suite", "texte": "Dès la frappe, tu avances vers le filet : chaque pas compte avant le retour." },
+    { "t": 1.5, "titre": "Le retour", "texte": "L'adversaire 1 retourne bas, vers tes pieds, pour te gêner pendant ta montée." },
+    { "t": 2.5, "titre": "La première volée", "texte": "Volée de revers de contrôle : profonde, au centre, sans chercher l'angle." },
+    { "t": 3.55, "titre": "Vers la vitre du fond", "texte": "La balle file vers la vitre : l'adversaire 1 doit la jouer après la vitre, loin du filet." },
+    { "t": 4.0, "titre": "Le lob adverse", "texte": "Sa seule solution : un lob au-dessus de ton partenaire." },
+    { "t": 5.5, "titre": "La víbora", "texte": "Ton partenaire recule de deux pas et coupe la balle sur le côté : víbora croisée, vers la vitre latérale." },
+    { "t": 6.2, "titre": "Double vitre", "texte": "La balle touche la vitre latérale puis celle du fond : très difficile à défendre." }
+  ]
+}

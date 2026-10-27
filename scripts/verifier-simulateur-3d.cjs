@@ -15,7 +15,7 @@ let nb=0;
 function ok(nom){nb++;console.log('OK '+nom);}
 const module3d=f=>import(pathToFileURL(path.join(racine,'assets/js/p3d',f)).href);
 const lireScenario=id=>JSON.parse(fs.readFileSync(path.join(racine,'assets/3d/scenarios',id+'.json'),'utf8'));
-const SCENARIOS=['bandeja-garder-filet','monter-apres-lob'];
+const SCENARIOS=['bandeja-garder-filet','monter-apres-lob','servir-monter','smash-lob-court','defendre-double-vitre'];
 
 /* ---- 1. Sans navigateur ---- */
 async function horsNavigateur(){
@@ -84,7 +84,7 @@ async function horsNavigateur(){
    }
   }
  }
- ok('deux scénarios valides et synchronisés : balle à portée de chaque frappeur, filet franchi, joueurs à vitesse humaine');
+ ok(SCENARIOS.length+' scénarios valides et synchronisés : balle à portée de chaque frappeur, filet franchi, joueurs à vitesse humaine');
 
  const base=lireScenario(SCENARIOS[0]);
  const essai=modif=>{const s=JSON.parse(JSON.stringify(base));modif(s);return valider(s);};
@@ -103,16 +103,17 @@ async function horsNavigateur(){
  ok('validation stricte : champ inconnu, lien externe, geste inconnu, nombres invalides, positions incohérentes refusés');
 
  for(const [id,g] of Object.entries(GESTES)){
-  assert.ok(['simplifie','a_venir'].includes(g.statut),id);
-  if(g.statut==='simplifie'){
-   ['tronc','avant','cote','coude','poignet','genoux'].forEach(k=>assert.equal(g[k].length,INSTANTS.length,id+' '+k));
-   for(let p=-1;p<=1;p+=0.05)Object.values(angles(id,p)).forEach(x=>assert.ok(Number.isFinite(x)));
-  }
+  assert.equal(g.statut,'simplifie',id);
+  assert.equal(g.phases.length,3,id+' : trois phases expliquées');
+  ['tronc','avant','cote','coude','poignet','genoux'].forEach(k=>assert.equal(g[k].length,INSTANTS.length,id+' '+k));
+  for(let p=-1;p<=1;p+=0.05)Object.values(angles(id,p)).forEach(x=>assert.ok(Number.isFinite(x)));
+  // Au contact, le bras n'est pas en position d'attente
+  assert.notDeepEqual(angles(id,0),angles(null,0),id+' : contact différent de la garde');
  }
- assert.deepEqual(angles('smash',0),angles(null,0),'geste à venir : position d\'attente');
+ assert.deepEqual(angles('coup_magique',0),angles(null,0),'geste inconnu : position d\'attente');
  const utilises=new Set(SCENARIOS.flatMap(id=>lireScenario(id).frappes.map(f=>f.geste)));
- utilises.forEach(g=>assert.equal(GESTES[g].statut,'simplifie',g));
- ok('gestes : statut honnête (simplifié ou à venir), ceux des scénarios sont construits');
+ assert.deepEqual([...utilises].sort(),Object.keys(GESTES).sort(),'chaque geste est montré dans au moins un scénario');
+ ok('gestes : les 12 coups construits (statut « simplifié »), chacun montré dans un scénario');
 
  const licences=fs.readFileSync(path.join(racine,'assets/3d/LICENCES-3D.md'),'utf8');
  for(const dossier of ['assets/3d/vendor','assets/3d/modeles'])
@@ -168,7 +169,7 @@ async function dansLeNavigateur(base){
   assert.equal(await page.evaluate(()=>P3D.etat.modele),true,'modèle 3D chargé');
   assert.equal(await page.isHidden('#p3d-chargement'),true);
   assert.equal(await page.isHidden('#p3d-sans-3d'),true);
-  assert.equal(await page.locator('#p3d-scenarios button').count(),2);
+  assert.equal(await page.locator('#p3d-scenarios button').count(),SCENARIOS.length);
   assert.equal(await page.locator('#p3d-etiquettes .p3d-etiquette').count(),4);
   assert.match(await page.textContent('#p3d-titre-scenario'),/bandeja/i);
   assert.equal(await page.locator('#p3d-explication li').count(),3);
@@ -227,6 +228,19 @@ async function dansLeNavigateur(base){
   await page.evaluate(()=>P3D.aller(1.3));
   assert.match(await page.textContent('#p3d-geste'),/Partenaire · Sortie de vitre \(geste simplifié\)/);
   ok('changement de scénario : textes, joueurs, adresse (#monter-apres-lob), geste en cours affiché avec son statut');
+  // Chaque scénario se charge et affiche, à chaque frappe, le joueur et le geste joués
+  for(const id of SCENARIOS){
+   await page.click(`#p3d-scenarios button[data-id="${id}"]`);
+   await page.waitForFunction(id=>P3D.etat.scenario.id===id,id);
+   for(const f of await page.evaluate(()=>P3D.etat.scenario.frappes)){
+    await page.evaluate(t=>P3D.aller(t),f.t);
+    const n=await page.evaluate(()=>P3D.etat.images);
+    await page.waitForFunction(n=>P3D.etat.images>n,n);
+    const nom=await page.evaluate(f=>P3D.etat.scenario.joueurs.find(j=>j.id===f.joueur).nom,f);
+    assert.ok((await page.textContent('#p3d-geste')).startsWith(nom+' · '),id+' t='+f.t);
+   }
+  }
+  ok('les '+SCENARIOS.length+' scénarios se jouent : à chaque frappe, joueur et geste affichés');
   await ctx.close();
 
   // Téléphone : 390 px, pas de débordement, lien direct vers un scénario

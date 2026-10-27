@@ -9,6 +9,9 @@ import { BALLE } from './constantes.js';
 const SCENARIOS = [
   { id: 'bandeja-garder-filet', nom: 'Bandeja : garder le filet' },
   { id: 'monter-apres-lob', nom: 'Monter après un lob' },
+  { id: 'servir-monter', nom: 'Servir et monter' },
+  { id: 'smash-lob-court', nom: 'Smash sur lob court' },
+  { id: 'defendre-double-vitre', nom: 'Défendre la double vitre' },
 ];
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
