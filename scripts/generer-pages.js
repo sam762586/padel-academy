@@ -12,7 +12,8 @@
      node scripts/generer-pages.js --departements 76,27
      node scripts/generer-pages.js --tout              toute la France
    Sortie déterministe : une page ne change que si ses données changent (pas d'horodatage dans le HTML),
-   pour que le commit hebdomadaire reste petit. La date « lastmod » du sitemap ne bouge que si la page change.
+   pour que le commit hebdomadaire reste petit. La date « lastmod » du sitemap ne bouge que si le contenu de la page change
+   (pas pour le menu, le pied de page ou les numéros de version des fichiers : ce ne sont pas des modifications pour les moteurs).
    Tournois terminés : page gardée 60 jours avec un bandeau « Terminé », puis noindex et renvoi vers le
    département ; supprimée au bout d'un an. Les tournois sortis de tournois.json sont gardés dans
    scripts/cache/tournois-archive.json. */
@@ -296,12 +297,16 @@ function ecrire(chemin, html, { indexer = true } = {}) {
   const f = path.join(RACINE, chemin);
   const h = crypto.createHash("sha1").update(html).digest("hex").slice(0, 16);
   const avant = empreintes[chemin];
+  // Empreinte du contenu : entre la navigation et le pied de page, sans les numéros de version
+  const hc = crypto.createHash("sha1").update((html.split("</nav>")[1] || html).split("<footer")[0].replace(/\?v=[0-9a-f]+/g, "")).digest("hex").slice(0, 16);
   if (!avant || avant.h !== h || !fs.existsSync(f)) {
     fs.mkdirSync(path.dirname(f), { recursive: true });
     fs.writeFileSync(f, html);
-    empreintes[chemin] = { h, lastmod: aujourdhui };
+    // Ancienne empreinte sans « hc » : on garde la date connue (la page existait déjà)
+    const contenuChange = !avant || (avant.hc ? avant.hc !== hc : !avant.lastmod);
+    empreintes[chemin] = { h, hc, lastmod: contenuChange ? aujourdhui : avant.lastmod };
     nbEcrites++;
-  } else nbInchangees++;
+  } else { if (!avant.hc) avant.hc = hc; nbInchangees++; }
   empreintes[chemin].indexer = indexer;
   ecrites.add(chemin);
 }
@@ -312,6 +317,13 @@ function carteTournoiHtml(t, pre) {
 <a href="${pre}tournoi/${t.id}.html"><span class="cat-badge ${classeCat(t.categorie)}">${echapper(t.categorie || "?")}</span><span class="gen-item-texte"><b>${echapper(t.nom)}</b><span>${echapper(casse(t.club))} · ${echapper(casse(t.ville))}</span></span><span class="gen-item-date">${echapper(periode(t.date_debut, t.date_fin))}</span></a></li>`;
 }
 
+// Titre de base d'une fiche (catégorie, ville, dates) ; si plusieurs tournois le partagent (même club, même jour),
+// le nom du tournoi est ajouté pour que chaque page ait un titre et une description uniques
+const titreBase = t => `Tournoi de padel ${t.categorie ? t.categorie + " " : ""}à ${casse(t.ville)} (${t.dep}) · ${periodeCourte(t.date_debut, t.date_fin).replace(/^(le|les|du) /, "")}`;
+// (et, si deux tournois ont aussi le même nom, leur numéro Ten'Up)
+const nbTitres = {}, nbNoms = {};
+const cleNom = t => titreBase(t) + "|" + casse(t.nom);
+for (const { t } of tous) { nbTitres[titreBase(t)] = (nbTitres[titreBase(t)] || 0) + 1; nbNoms[cleNom(t)] = (nbNoms[cleNom(t)] || 0) + 1; }
 for (const { t, fiche } of tous) {
   const chemin = `tournoi/${t.id}.html`, pre = "../";
   const fin = t.date_fin || t.date_debut;
@@ -323,8 +335,12 @@ for (const { t, fiche } of tous) {
   const epreuves = fiche && Array.isArray(fiche.epreuves) ? fiche.epreuves : [];
   const tableaux = epreuves.map(e => e && e.tableau).filter(v => typeof v === "number" && v > 0);
   const nbPaires = tableaux.length ? Math.max(...tableaux) : null;
-  const titre = `Tournoi de padel ${t.categorie ? t.categorie + " " : ""}à ${ville} (${t.dep}) · ${periodeCourte(t.date_debut, t.date_fin).replace(/^(le|les|du) /, "")}`;
-  const description = `Tournoi de padel ${t.categorie || ""} à ${ville} ${periodeCourte(t.date_debut, t.date_fin)} : points selon le nombre de paires, épreuves, inscription sur Ten'Up et partenaires.`.replace(/\s+/g, " ");
+  const homonyme = nbTitres[titreBase(t)] > 1, numero = nbNoms[cleNom(t)] > 1 ? ` (Ten'Up n° ${t.id})` : "";
+  const titre = homonyme ? `${casse(t.nom)}${numero} · ${t.categorie || "Tournoi"} à ${ville} · ${periodeCourte(t.date_debut, t.date_fin).replace(/^(le|les|du) /, "")}` : titreBase(t);
+  // Description de 160 caractères au plus : fin de phrase raccourcie pour les noms de ville ou de tournoi longs
+  const debutDesc = `${homonyme ? casse(t.nom) + numero + " : tournoi" : "Tournoi"} de padel ${t.categorie || ""} à ${ville} ${periodeCourte(t.date_debut, t.date_fin)}`.replace(/\s+/g, " ");
+  const description = [" : points selon le nombre de paires, épreuves, inscription sur Ten'Up et partenaires.", " : points, épreuves, inscription sur Ten'Up et partenaires.", " : points, épreuves et inscription."]
+    .map(fin => debutDesc + fin).find(d => d.length <= 160) || debutDesc.slice(0, 159) + "…";
   const lienTenup = `https://tenup.fft.fr/tournoi/${t.id}`;
   const adresse = fiche && fiche.adresse ? String(fiche.adresse) : `${club}, ${ville}`;
   const itineraire = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(fiche && fiche.adresse ? fiche.adresse : `${t.club} ${t.cp || ""} ${t.ville}`);
@@ -479,6 +495,23 @@ const centres = Object.fromEntries(Object.keys(sommes).sort().map(d => [d, [+(so
 const nomsDeps = Object.fromEntries([...DEPARTEMENTS.entries()]);
 const pagesJs = `/* Généré par scripts/generer-pages.js : départements qui ont leurs pages tournoi/<id>.html et tournois/<dep>.html,\n   noms et centres approximatifs des départements (moyenne des lieux de tournoi). */\nwindow.PA_PAGES_TOURNOIS={departements:${JSON.stringify(depsPublies)},noms:${JSON.stringify(nomsDeps)},centres:${JSON.stringify(centres)}};\n`;
 fs.writeFileSync(path.join(RACINE, "assets/data/pages-tournois.js"), pagesJs);
+
+/* ---------- tournois.html : liens en HTML vers les pages départements et région × catégorie ----------
+   La liste interactive de tournois.html est construite en JavaScript ; ces liens restent lisibles sans lui (et par les moteurs). */
+{
+  const regions = REGIONS.filter(r => r.deps.every(d => publies.includes(d)));
+  const lienCat = (r, c) => `tournois/${r.slug}/${c.toLowerCase()}.html`;
+  const bloc = `<!-- liens-tournois:debut -->
+    <h2>Tournois par département</h2>
+    <ul class="gen-liens gen-liens-ligne">${depsPublies.map(d => `<li><a href="tournois/${d}.html">${echapper(nomDep(d))} (${d})</a></li>`).join("")}</ul>
+${regions.map(r => `    <h2>Tournois ${echapper(r.prep)} ${echapper(r.nom)} par catégorie</h2>
+    <ul class="gen-liens gen-liens-ligne">${CATEGORIES_REGION.filter(c => empreintes[lienCat(r, c)] && empreintes[lienCat(r, c)].indexer).map(c => `<li><a href="${lienCat(r, c)}">${c}</a></li>`).join("")}</ul>`).join("\n")}
+    <!-- liens-tournois:fin -->`;
+  const fichier = path.join(RACINE, "tournois.html");
+  const avant = fs.readFileSync(fichier, "utf8");
+  const apres = avant.replace(/<!-- liens-tournois:debut -->[\s\S]*?<!-- liens-tournois:fin -->/, () => bloc);
+  if (apres !== avant) fs.writeFileSync(fichier, apres);
+}
 
 /* ---------- Sitemap ---------- */
 const sitemapActuel = fs.existsSync(path.join(RACINE, "sitemap.xml")) ? fs.readFileSync(path.join(RACINE, "sitemap.xml"), "utf8") : "";
