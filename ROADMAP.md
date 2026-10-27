@@ -72,7 +72,7 @@ Plan validé par Samuel (27/10/2026) : un lot à la fois, validé avant le suiva
   dessinée en 2D (positions calculées par le moteur, `scripts/generer-quiz-tactique.mjs`), séries de 10 par niveau,
   réponses mélangées, correction, lien vers la scène en 3D, scénarios à revoir, meilleur score sur l'appareil ;
   lien depuis l'espace joueur. Tests : `scripts/verifier-quiz-tactique.cjs`.
-- [ ] Validation du 4A par Samuel.
+- [x] Validation du 4A par Samuel (27/10/2026).
 - [ ] 4B. Tableau tactique (`tactique.html`, à partir du schéma 2D) : joueurs et balle déplaçables, flèches, export PNG,
   sauvegarde sur l'appareil.
 - [ ] 4C. Labo des trajectoires (page Simulateur 3D) : curseurs, vues de profil et de dessus, limites affichées.
