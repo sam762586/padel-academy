@@ -175,6 +175,7 @@ function aqDemarrer(){
   if(fini)window.dispatchEvent(new Event("pa-academie-quiz")); // parcours : compétences et recommandations à jour
   const juste=k===q.bonne;
   zone.querySelector("#aq-correction").innerHTML=`<p class="msg ${juste?"msg-ok":"msg-erreur"}"><b>${juste?"Bonne réponse.":"Pas tout à fait."}</b> ${esc(q.explication)}</p>
+   ${!juste&&typeof qtRevoir==="function"?qtRevoir({article:q.revoir&&q.revoir.article,exercice:q.exercice,scene:q.scenario,titreScene:typeof ACADEMIE_SCENES!=="undefined"?ACADEMIE_SCENES[q.scenario]:null}):""}
    ${garde?"":`<p class="msg msg-alerte">Ta réponse n'a pas pu être enregistrée sur cet appareil : si tu fermes la page, le quiz ne reprendra pas ici.</p>`}
    <p class="qt-actions"><button type="button" class="btn primary" id="aq-suite">${fini?"Voir mon bilan":"Question suivante"}</button>${q.scenario?`<a class="btn ghost" href="simulateur-3d-${q.scenario}.html">Voir la scène en 3D</a>`:""}</p>`;
   zone.querySelector("#aq-suite").addEventListener("click",()=>fini?bilan(s):question());

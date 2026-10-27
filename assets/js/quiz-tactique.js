@@ -3,7 +3,8 @@
    dessus et de derrière toi (ton équipe en bas, ta droite à droite). Données : assets/js/quiz-tactique-donnees.js,
    générées depuis les scénarios par scripts/generer-quiz-tactique.mjs (positions calculées par le moteur du simulateur).
    Séries de 10 questions (ou moins si le niveau en a moins), tirées au hasard ; réponses mélangées à chaque affichage.
-   Après chaque réponse : correction, explication et lien vers la scène en 3D (mode quiz). À la fin : score et
+   Après chaque réponse : correction, explication et lien vers la scène en 3D (mode quiz) ; après une erreur, « Pour
+   revoir ce point » : article, exercice et scène 3D de la question (qtRevoir, partagé avec Mon académie). À la fin : score et
    scénarios à revoir. Meilleur score par niveau gardé sur l'appareil (pa-quiz-tactique). */
 const QT_NIVEAUX=["Tous","Débutant","Intermédiaire","Avancé"];
 const QT_SERIE=10;
@@ -21,6 +22,15 @@ function qtMelanger(q,alea=Math.random){
  return {choix:ordre.map(i=>q.choix[i]),bonne:ordre.indexOf(q.bonne)};
 }
 const qtEchapper=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+// « Pour revoir ce point » après une erreur : article, exercice (EXERCICES si la page les charge) et scène 3D
+function qtRevoir({article,exercice,scene,titreScene}){
+ const e=typeof exercice==="string"?(typeof EXERCICES!=="undefined"?EXERCICES.find(x=>x.id===exercice):null):exercice;
+ const l=[];
+ if(article)l.push(`<li><span class="qt-revoir-lib">Article</span> <a href="${qtEchapper(article.url)}">${qtEchapper(article.titre)}</a></li>`);
+ if(e)l.push(`<li><span class="qt-revoir-lib">Exercice</span> <details><summary><b>${qtEchapper(e.titre)}</b> <span class="ap-tag">${qtEchapper(e.duree)} · ${qtEchapper(e.joueurs)}</span></summary><p>${qtEchapper(e.consigne)}</p><p class="ex-reussite"><b>Objectif :</b> ${qtEchapper(e.reussite)}</p></details></li>`);
+ if(scene)l.push(`<li><span class="qt-revoir-lib">Scène 3D</span> <a href="simulateur-3d-${qtEchapper(scene)}.html#mode-quiz">${qtEchapper(titreScene||scene)}</a></li>`);
+ return l.length?`<div class="qt-revoir"><p class="qt-revoir-titre">Pour revoir ce point</p><ul>${l.join("")}</ul></div>`:"";
+}
 const qtMetres=v=>v.toFixed(1).replace(".",",")+" m";
 
 // Description en mots (lecteurs d'écran) : où sont les joueurs et la balle, vus de derrière toi
@@ -119,6 +129,7 @@ function qtDemarrer(){
   });
   const der=etat.i===etat.serie.length-1;
   zone.querySelector("#qt-correction").innerHTML=`<p class="msg ${juste?"msg-ok":"msg-erreur"}"><b>${juste?"Bonne réponse.":"Pas tout à fait."}</b> ${qtEchapper(q.explication)}</p>
+   ${!juste&&q.revoir?qtRevoir({...q.revoir,scene:q.scenario,titreScene:q.titre}):""}
    <p class="qt-actions"><button type="button" class="btn primary" id="qt-suite">${der?"Voir mon score":"Question suivante"}</button>
    <a class="btn ghost" href="simulateur-3d-${q.scenario}.html#mode-quiz">Voir la scène en 3D</a></p>`;
   zone.querySelector("#qt-suite").addEventListener("click",()=>{if(der)fin();else{etat.i++;question();}});

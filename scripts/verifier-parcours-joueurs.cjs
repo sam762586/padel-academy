@@ -63,7 +63,13 @@ async function dansLeNavigateur(base){
   for(let i=0;i<10;i++){
    const bonne=await page.evaluate(()=>{const e=JSON.parse(localStorage.getItem('pa-academie-quiz')).enCours;const q=ACADEMIE_QUESTIONS.find(x=>x.id===e.questions[e.reponses.length].id);return q.choix[q.bonne];});
    const t=await page.locator('.qt-reponse').allTextContents();
-   await page.locator('.qt-reponse').nth(strategie(i)?t.indexOf(bonne):t.findIndex(x=>x!==bonne)).click();await page.click('#aq-suite');
+   await page.locator('.qt-reponse').nth(strategie(i)?t.indexOf(bonne):t.findIndex(x=>x!==bonne)).click();
+   // Après une erreur : article, exercice et scène 3D de la question ; rien après une bonne réponse
+   const rv=await page.evaluate(()=>{const z=document.querySelector('#aq-correction .qt-revoir');return z&&{liens:[...z.querySelectorAll('a')].map(a=>a.getAttribute('href')),exo:(z.querySelector('summary b')||{}).textContent};});
+   if(strategie(i))assert.equal(rv,null);
+   else{const q=await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('pa-academie-quiz'));const e=s.enCours||s.seances[s.seances.length-1];const x=ACADEMIE_QUESTIONS.find(y=>y.id===e.reponses[e.reponses.length-1].id);return {article:x.revoir.article.url,scene:x.scenario,exo:EXERCICES.find(y=>y.id===x.exercice).titre};});
+    assert.equal(rv.liens[0],q.article);assert.equal(rv.exo,q.exo);if(q.scene)assert.equal(rv.liens[rv.liens.length-1],'simulateur-3d-'+q.scene+'.html#mode-quiz');}
+   await page.click('#aq-suite');
   }
   return page.evaluate(()=>JSON.parse(localStorage.getItem('pa-academie-quiz')).seances.slice(-1)[0]);
  }

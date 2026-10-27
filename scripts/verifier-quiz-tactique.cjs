@@ -104,7 +104,14 @@ async function dansLeNavigateur(base,Q){
     assert.equal(await page.textContent('.qt-reponse.bonne'),q.choix[q.bonne]);
     const msg=await page.textContent('#qt-correction .msg');
     assert.ok(msg.startsWith(i===0?'Bonne réponse.':'Pas tout à fait.')&&msg.includes(q.explication),'correction et explication');
-    assert.equal(await page.getAttribute('#qt-correction a','href'),'simulateur-3d-'+q.scenario+'.html#mode-quiz');
+    assert.equal(await page.getAttribute('#qt-correction .qt-actions a','href'),'simulateur-3d-'+q.scenario+'.html#mode-quiz');
+    // Après une erreur seulement : article, exercice et scène de la question
+    if(i===0)assert.equal(await page.locator('#qt-correction .qt-revoir').count(),0,'pas de « Pour revoir » sur une bonne réponse');
+    else{
+     assert.equal(await page.getAttribute('.qt-revoir li:nth-child(1) a','href'),q.revoir.article.url);
+     assert.equal(await page.textContent('.qt-revoir li:nth-child(2) summary b'),await page.evaluate(id=>EXERCICES.find(e=>e.id===id).titre,q.revoir.exercice));
+     assert.equal(await page.getAttribute('.qt-revoir li:nth-child(3) a','href'),'simulateur-3d-'+q.scenario+'.html#mode-quiz');
+    }
     if(i===0)assert.equal(await debordement(),false,largeur+' px : question sans débordement');
     await page.click('#qt-suite');
    }

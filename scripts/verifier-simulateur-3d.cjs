@@ -379,10 +379,16 @@ async function dansLeNavigateur(base){
   assert.match(await page.getAttribute(`#p3d-quiz-choix button[data-k="${fausse}"]`,'class'),/fausse/);
   assert.match(await page.getAttribute(`#p3d-quiz-choix button[data-k="${qs[0].bonne}"]`,'class'),/bonne/);
   assert.match(await page.textContent('#p3d-quiz-explication'),/^Pas tout à fait/);
+  // Après une erreur : « Pour revoir ce point » (article et exercice de la question, assets/3d/revoir.json)
+  await page.waitForSelector('#p3d-quiz-revoir:not([hidden])');
+  const rv=JSON.parse(fs.readFileSync(path.join(racine,'assets/3d/revoir.json'),'utf8'))['smash-lob-court-1'];
+  assert.equal(await page.getAttribute('#p3d-quiz-revoir a','href'),rv.article.url);
+  assert.equal(await page.textContent('#p3d-quiz-revoir summary b'),rv.exercice.titre);
   await page.click('#p3d-quiz-suite');
   await page.waitForFunction(()=>P3D.quiz.enCours===1,null,{timeout:20000});
   await page.click(`#p3d-quiz-choix button[data-k="${qs[1].bonne}"]`);
   assert.match(await page.textContent('#p3d-quiz-explication'),/^Bonne réponse/);
+  assert.equal(await page.isHidden('#p3d-quiz-revoir'),true,'pas de « Pour revoir » sur une bonne réponse');
   await page.click('#p3d-quiz-suite');
   await page.waitForFunction(()=>P3D.etat.t>=P3D.etat.scenario.duree,null,{timeout:20000});
   assert.match(await page.textContent('#p3d-quiz-question'),/Score : 1 sur 2/);

@@ -6,6 +6,10 @@
        phrase publiée sur le site (champ source) ; statut « brouillon » tant que Samuel ne les a pas relues.
    Pour chaque question : article (page du thème ou source), exercice de l'espace joueur du thème au niveau correspondant,
    scène 3D (celle de la question, ou celle du thème). Seules les questions « validee » sont posées par le quiz.
+   « À revoir » après une erreur (lot 3a) : revoir.article = la section d'article (ACADEMIE_ARTICLES) du thème de la
+   question qui couvre ses niveaux (celle de la source si elle en est une), plus l'exercice et la scène ci-dessus. Les
+   questions des scènes ont aussi leur « à revoir » dans assets/3d/revoir.json (mode quiz du simulateur, chargé à la
+   première erreur) avec l'exercice complet, la page 3D ne chargeant pas les exercices.
    Lancer depuis la racine du site : node scripts/generer-academie-questions.mjs [--verifier] [--relecture <fichier.html>] */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 const RACINE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const lire = f => fs.readFileSync(path.join(RACINE, f), 'utf8');
 const SORTIE = path.join(RACINE, 'assets/js/academie-questions.js');
+const SORTIE_3D = path.join(RACINE, 'assets/3d/revoir.json');
 
 // Thèmes demandés par Samuel : page de référence, thème d'exercices de l'espace joueur, scène 3D par défaut
 export const THEMES = {
@@ -34,6 +39,19 @@ export const THEMES = {
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext(lire('assets/js/exercices-donnees.js') + ';this.EX=EXERCICES;', ctx);
 const EXERCICES = ctx.EX;
+const ctxC = { window: {} }; vm.createContext(ctxC);
+vm.runInContext(lire('assets/js/academie-contenus.js') + ';this.AR=ACADEMIE_ARTICLES;', ctxC);
+const ARTICLES = ctxC.AR;
+// Section d'article à revoir : thème de la question, niveaux qui se recoupent ; la source si c'en est une, puis le thème
+// principal de l'article, puis la difficulté la plus proche, puis l'ordre de la liste
+export function articleARevoir(q) {
+  const l = ARTICLES.filter(a => a.themes.includes(q.theme)), recoupe = a => a.niveaux[0] <= q.niveauMax && q.niveauMin <= a.niveaux[1];
+  const cand = l.filter(recoupe).length ? l.filter(recoupe) : l;
+  const rang = a => [a.url === q.article || a.url === q.source ? 0 : 1, a.themes.indexOf(q.theme), Math.abs(a.difficulte - q.difficulte), ARTICLES.indexOf(a)];
+  const a = cand.slice().sort((x, y) => { const r = rang(x), s = rang(y); for (let i = 0; i < r.length; i++) if (r[i] !== s[i]) return r[i] - s[i]; return 0; })[0];
+  if (!a) throw new Error('Aucun article pour le thème ' + q.theme + ' (' + q.id + ')');
+  return { titre: a.titre, url: a.url };
+}
 // Niveau d'exercice (1 à 4) correspondant au milieu de la plage de la question (grille 1 à 10) : correspondance de contenus
 const niveauExercice = (min, max) => { const m = (min + max) / 2; return m <= 3 ? 1 : m <= 5 ? 2 : m <= 7 ? 3 : 4; };
 function exercice(theme, min, max) {
@@ -70,7 +88,15 @@ export function construire() {
       prerequis: r.prerequis || [] });
   }
   construire.titres = titres; // titres des scènes 3D (ACADEMIE_SCENES)
+  questions.forEach(q => { q.revoir = { article: articleARevoir(q) }; });
   return questions;
+}
+
+// « À revoir » du mode quiz du simulateur : questions des scènes, exercice complet
+export function revoir3d(questions) {
+  const ex = Object.fromEntries(EXERCICES.map(e => [e.id, e]));
+  return Object.fromEntries(questions.filter(q => q.origine === 'scenario').map(q => { const e = ex[q.exercice];
+    return [q.id, { article: q.revoir.article, exercice: { titre: e.titre, duree: e.duree, joueurs: e.joueurs, consigne: e.consigne, reussite: e.reussite } }]; }));
 }
 
 function fichier(questions) {
@@ -111,14 +137,16 @@ function relecture(questions) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const questions = construire(), contenu = fichier(questions);
+  const questions = construire(), contenu = fichier(questions), contenu3d = JSON.stringify(revoir3d(questions)) + '\n';
   const i = process.argv.indexOf('--relecture');
   if (i > 0) fs.writeFileSync(process.argv[i + 1], relecture(questions));
   if (process.argv.includes('--verifier')) {
     if ((fs.existsSync(SORTIE) ? fs.readFileSync(SORTIE, 'utf8') : '') !== contenu) { console.error('academie-questions.js n\'est pas à jour : lancer node scripts/generer-academie-questions.mjs'); process.exit(1); }
+    if ((fs.existsSync(SORTIE_3D) ? fs.readFileSync(SORTIE_3D, 'utf8') : '') !== contenu3d) { console.error('assets/3d/revoir.json n\'est pas à jour : lancer node scripts/generer-academie-questions.mjs'); process.exit(1); }
     console.log('Banque de questions à jour : ' + questions.length + ' questions.');
   } else {
     fs.writeFileSync(SORTIE, contenu);
+    fs.writeFileSync(SORTIE_3D, contenu3d);
     const cov = couverture(questions);
     console.log('Banque : ' + questions.length + ' questions (' + questions.filter(q => q.statut === 'validee').length + ' validées) ; validées par niveau : ' + cov.map(c => c.niveau + ':' + c.validees).join(' '));
   }

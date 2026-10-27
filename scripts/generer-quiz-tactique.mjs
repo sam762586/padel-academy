@@ -15,6 +15,9 @@ const { valider, calculer, positionJoueur, positionBalle } = await module3d('sce
 const DOSSIER = path.join(RACINE, 'assets/3d/scenarios');
 const SORTIE = path.join(RACINE, 'assets/js/quiz-tactique-donnees.js');
 const r = v => Math.round(v * 100) / 100;
+// « À revoir » après une erreur : celui de la banque de Mon académie (mêmes identifiants), exercice compris
+const { construire } = await import(pathToFileURL(path.join(RACINE, 'scripts/generer-academie-questions.mjs')).href);
+const banque = Object.fromEntries(construire().map(q => [q.id, q]));
 
 const questions = [];
 for (const f of fs.readdirSync(DOSSIER).filter(f => f.endsWith('.json')).sort()) {
@@ -36,6 +39,7 @@ for (const f of fs.readdirSync(DOSSIER).filter(f => f.endsWith('.json')).sort())
       id: s.id + '-' + (i + 1), scenario: s.id, titre: s.titre, niveau: s.niveau, situation: s.situation,
       question: q.question, choix: q.choix, bonne: q.bonne, explication: q.explication,
       joueurs, balle: [r(b[0]), r(b[1]), r(b[2])], trace,
+      revoir: { article: banque[s.id + '-' + (i + 1)].revoir.article, exercice: banque[s.id + '-' + (i + 1)].exercice },
     });
   });
 }
@@ -43,6 +47,7 @@ for (const f of fs.readdirSync(DOSSIER).filter(f => f.endsWith('.json')).sort())
 const contenu = `/* QUIZ TACTIQUE · Données (fichier généré par scripts/generer-quiz-tactique.mjs : ne pas modifier à la main)
    Les ${questions.length} questions des scénarios 3D, scène figée à l'instant de la question.
    joueurs : [id, nom, x, z] ; balle : [x, hauteur, z] ; trace : [x, z] sur la demi-seconde précédente.
+   revoir : article et exercice (exercices-donnees.js) à revoir après une erreur, ceux de la banque de Mon académie.
    Repère du simulateur, en mètres : x de -5 à 5 (la droite de ton équipe vers -x), z de -10 (ton fond) à 10. */
 const QUIZ_TACTIQUE = ${JSON.stringify(questions).replace(/\},\{"id"/g, '},\n{"id"')};
 `;

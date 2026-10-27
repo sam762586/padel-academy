@@ -187,7 +187,10 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   complétées par les compétences des niveaux voisins quand le niveau en a moins de 4 (niveaux 1, 2, 3, 8, 9, 10).
 - [x] Validation des lots 1 et 2 par Samuel (27/10/2026).
 - [ ] Lot 3b : intégrer les 120 questions de Samuel (scripts/donnees/academie-questions-samuel.md, reçues le 27/10/2026).
-- [ ] Lot 3a : contenu recommandé après chaque erreur (quiz de l'académie, quiz tactique, mode quiz 3D).
+- [x] Lot 3a (27/10/2026) : « Pour revoir ce point » après chaque erreur (quiz de l'académie, quiz tactique, mode quiz
+  3D) : section d'article du thème couvrant les niveaux de la question, exercice, scène 3D ; calculé par
+  generer-academie-questions.mjs (champ revoir, assets/3d/revoir.json chargé à la première erreur dans le simulateur).
+- [ ] Validation du lot 3a par Samuel.
 - [ ] Lot 4 : « Mon plan » personnalisé, plan générique et progression préservés.
 - [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
 - [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).

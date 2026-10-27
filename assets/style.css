@@ -1487,3 +1487,12 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .bord-niv dd{margin:2px 0 0}
 .bord-niv-valeur{font-size:1.15rem;margin-right:.3em}
 .bord-niv .bord-palier{font-size:1.6rem;margin-right:.3em}
+/* Pour revoir ce point (quiz de l'académie, quiz tactique, mode quiz 3D) */
+.qt-revoir{margin:var(--s-3) 0;padding:var(--s-3);border:1px solid var(--line-2);border-left:3px solid var(--sand);border-radius:var(--r-s);background:rgba(0,0,0,.15)}
+.qt-revoir[hidden]{display:none}
+.qt-revoir-titre{margin:0 0 var(--s-2);font-weight:800}
+.qt-revoir ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.qt-revoir-lib{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:.3em}
+.qt-revoir details{display:inline}
+.qt-revoir details[open]{display:block}
+.qt-revoir summary{cursor:pointer;display:inline}

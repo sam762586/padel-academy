@@ -161,6 +161,7 @@ function introQuiz() {
   texte($('p3d-quiz-question'), n ? 'Lance la lecture : la scène s\'arrêtera ' + (n > 1 ? n + ' fois' : 'une fois') + ' pour te demander ce que tu ferais.' : 'Pas de question pour ce scénario.');
   $('p3d-quiz-choix').replaceChildren();
   $('p3d-quiz-explication').hidden = true;
+  if ($('p3d-quiz-revoir')) $('p3d-quiz-revoir').hidden = true;
   $('p3d-quiz-suite').hidden = true;
 }
 function poserQuestion(i) {
@@ -176,8 +177,29 @@ function poserQuestion(i) {
     return b;
   }));
   $('p3d-quiz-explication').hidden = true;
+  if ($('p3d-quiz-revoir')) $('p3d-quiz-revoir').hidden = true;
   $('p3d-quiz-suite').hidden = true;
   $('p3d-quiz-question').focus({ preventScroll: true });
+}
+// « Pour revoir ce point » après une erreur : article et exercice (assets/3d/revoir.json, chargé à la première erreur)
+let revoirPromesse = null;
+function revoirQuestion(id) {
+  revoirPromesse = revoirPromesse || fetch('assets/3d/revoir.json').then(r => r.ok ? r.json() : {}).catch(() => { revoirPromesse = null; return {}; });
+  return revoirPromesse.then(t => t[id] || null);
+}
+function afficherRevoir(i, r) {
+  let z = $('p3d-quiz-revoir');
+  if (!z) { z = document.createElement('div'); z.id = 'p3d-quiz-revoir'; z.className = 'qt-revoir'; $('p3d-quiz-explication').after(z); }
+  z.replaceChildren();z.hidden = true;
+  if (!r || quiz.enCours !== i) return;
+  const el = (b, t, c) => { const e = document.createElement(b); if (c) e.className = c; if (t) e.textContent = t; return e; };
+  const ul = document.createElement('ul');
+  const li1 = el('li'); li1.append(el('span', 'Article', 'qt-revoir-lib'), ' '); const a = el('a', r.article.titre); a.href = r.article.url; li1.append(a); ul.append(li1);
+  const li2 = el('li'), d = el('details'), s = el('summary');
+  s.append(el('b', r.exercice.titre), ' ', el('span', r.exercice.duree + ' · ' + r.exercice.joueurs, 'ap-tag'));
+  const obj = el('p', null, 'ex-reussite'); obj.append(el('b', 'Objectif : '), r.exercice.reussite);
+  d.append(s, el('p', r.exercice.consigne), obj); li2.append(el('span', 'Exercice', 'qt-revoir-lib'), ' ', d); ul.append(li2);
+  z.append(el('p', 'Pour revoir ce point', 'qt-revoir-titre'), ul); z.hidden = false;
 }
 function repondre(k) {
   const i = quiz.enCours;
@@ -192,6 +214,8 @@ function repondre(k) {
   const ex = $('p3d-quiz-explication');
   ex.hidden = false;
   texte(ex, (k === q.bonne ? 'Bonne réponse. ' : 'Pas tout à fait. ') + q.explication);
+  afficherRevoir(i, null);
+  if (k !== q.bonne) revoirQuestion(etat.scenario.id + '-' + (i + 1)).then(r => afficherRevoir(i, r));
   $('p3d-quiz-suite').hidden = false;
 }
 function suiteQuiz() {
@@ -208,6 +232,7 @@ function afficherScore() {
   $('p3d-quiz').hidden = false;
   $('p3d-quiz-choix').replaceChildren();
   $('p3d-quiz-explication').hidden = true;
+  if ($('p3d-quiz-revoir')) $('p3d-quiz-revoir').hidden = true;
   $('p3d-quiz-suite').hidden = true;
   const b = bonnesReponses();
   texte($('p3d-quiz-score'), 'Quiz terminé');
