@@ -15,7 +15,7 @@ let nb=0;
 function ok(nom){nb++;console.log('OK '+nom);}
 const module3d=f=>import(pathToFileURL(path.join(racine,'assets/js/p3d',f)).href);
 const lireScenario=id=>JSON.parse(fs.readFileSync(path.join(racine,'assets/3d/scenarios',id+'.json'),'utf8'));
-const SCENARIOS=['bandeja-garder-filet','monter-apres-lob','servir-monter','smash-lob-court','defendre-double-vitre'];
+const SCENARIOS=['bandeja-garder-filet','monter-apres-lob','servir-monter','smash-lob-court','defendre-double-vitre','retour-lob','chiquita','duel-filet'];
 
 /* ---- 1. Sans navigateur ---- */
 async function horsNavigateur(){

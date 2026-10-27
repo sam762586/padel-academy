@@ -1,0 +1,46 @@
+{
+  "id": "chiquita",
+  "titre": "La chiquita pour reprendre le filet",
+  "niveau": "Avancé",
+  "duree": 5.2,
+  "situation": "Les adversaires tiennent le filet ; ton partenaire et toi êtes au fond. L'adversaire 1 volée vers ton partenaire.",
+  "explication": [
+    "La chiquita est une balle lente et basse qui tombe dans les pieds des volleyeurs : ils doivent jouer vers le haut.",
+    "Elle se joue au centre ou sur le revers du joueur au filet, sans vitesse : c'est la précision qui gêne, pas la puissance.",
+    "Pendant que la balle vole, vous montez : la volée adverse, forcément haute, est pour vous."
+  ],
+  "erreurs": [
+    "Jouer la chiquita trop haute : le volleyeur l'attaque vers le bas.",
+    "Jouer la chiquita trop vite : la volée revient avant que vous soyez montés.",
+    "Rester au fond après la chiquita : on perd le bénéfice du coup."
+  ],
+  "conclusion": "Balle lente aux pieds des volleyeurs, montée immédiate, volée d'attaque sur leur balle haute.",
+  "exercice": "Sur le terrain : depuis le fond, chiquita aux pieds d'un partenaire au filet, puis monte à la ligne de service et volée sa remise. 3 séries de 10.",
+  "lien": "technique.html#coups",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.3, -8.2], [1.0, -2.0, -7.8], [2.05, -1.6, -5.0], [3.15, -1.4, -3.6], [5.2, -1.4, -3.0]],
+    "A2": [[0, 2.4, -8.2], [0.3, 2.4, -8.2], [1.0, 2.5, -7.86], [2.05, 2.1, -5.2], [3.15, 1.9, -3.8], [5.2, 1.8, -3.1]],
+    "B1": [[0, 1.5, 2.9], [1.4, 1.3, 3.0], [2.05, 1.2, 3.1], [5.2, 1.4, 3.0]],
+    "B2": [[0, -1.8, 3.0], [3.15, -1.6, 3.1], [3.6, -1.4, 3.4], [5.2, -1.6, 4.0]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "volee_cd", "depart": [2.0, 1.0, 2.7], "cible": [2.0, 0.033, -6.6], "vol": 0.85 },
+    { "t": 1.0, "joueur": "A2", "geste": "coup_droit", "cible": [0.7, 0.35, 3.1], "vol": 1.05 },
+    { "t": 2.05, "joueur": "B1", "geste": "volee_revers", "cible": [-1.9, 1.2, -3.6], "vol": 1.1 },
+    { "t": 3.15, "joueur": "A1", "geste": "volee_cd", "cible": [-1.0, 0.033, 5.0], "vol": 0.5 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "La volée adverse", "texte": "L'adversaire 1 volée profond vers ton partenaire, au fond du terrain." },
+    { "t": 1.0, "titre": "La chiquita", "texte": "Ton partenaire joue lentement, juste au-dessus du filet : la balle plonge vers le revers de l'adversaire 1." },
+    { "t": 1.2, "titre": "On monte", "texte": "Pendant que la balle vole, vous montez tous les deux vers le filet." },
+    { "t": 2.05, "titre": "Volée vers le haut", "texte": "La balle arrive dans ses pieds : l'adversaire 1 doit la remonter, sans puissance." },
+    { "t": 3.15, "titre": "La volée d'attaque", "texte": "Tu es monté à temps : volée vers le bas, dans les pieds de l'adversaire 2." },
+    { "t": 3.65, "titre": "Le point", "texte": "Balle basse aux pieds d'un volleyeur : impossible à remettre proprement." }
+  ]
+}

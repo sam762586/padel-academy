@@ -1,0 +1,47 @@
+{
+  "id": "retour-lob",
+  "titre": "Retourner en lob et prendre le filet",
+  "niveau": "Intermédiaire",
+  "duree": 7.3,
+  "situation": "L'adversaire 1 sert et monte au filet, où l'attend son partenaire. Tu es au fond pour retourner, ton partenaire est un peu plus avancé.",
+  "explication": [
+    "En retour, l'équipe qui sert veut le filet. Le lob par-dessus le joueur déjà au filet le force à faire demi-tour.",
+    "Le lob se joue haut et profond, pour rebondir près de la vitre du fond : les adversaires doivent le jouer de dos ou après la vitre.",
+    "Pendant que le lob vole, vous montez à deux : le filet change de camp."
+  ],
+  "erreurs": [
+    "Lober trop court : l'adversaire smashe sans reculer.",
+    "Lober sans monter : vous laissez le filet libre, les adversaires y reviennent.",
+    "Chercher le retour gagnant à plat : le joueur au filet n'attend que ça."
+  ],
+  "conclusion": "Retour en lob profond par-dessus le joueur au filet, puis montée à deux : vous volez le filet à l'équipe qui sert.",
+  "exercice": "Sur le terrain : sur 10 services, retourne en lob par-dessus le joueur au filet et monte à deux. Compte les lobs qui rebondissent dans les deux derniers mètres.",
+  "lien": "tutos.html",
+  "joueurs": [
+    { "id": "A1", "nom": "Toi", "equipe": "A" },
+    { "id": "A2", "nom": "Partenaire", "equipe": "A" },
+    { "id": "B1", "nom": "Adversaire 1", "equipe": "B" },
+    { "id": "B2", "nom": "Adversaire 2", "equipe": "B" }
+  ],
+  "positions": {
+    "A1": [[0, -2.6, -8.4], [1.5, -2.44, -8.0], [2.0, -2.4, -7.6], [4.0, -1.8, -3.6], [5.7, -1.6, -2.8], [7.3, -1.5, -2.8]],
+    "A2": [[0, 2.3, -6.8], [1.5, 2.3, -6.8], [2.0, 2.2, -6.5], [4.0, 1.9, -3.4], [7.3, 1.8, -2.8]],
+    "B1": [[0, 1.4, 7.6], [0.3, 1.4, 7.5], [1.3, 1.4, 4.6], [2.0, 1.5, 4.2], [3.6, 1.7, 7.0], [5.7, 1.6, 7.6], [7.3, 2.4, 7.0]],
+    "B2": [[0, -2.0, 3.0], [1.6, -2.0, 3.1], [2.2, -1.9, 4.0], [4.5, -1.62, 6.6], [5.5, -1.8, 6.4], [7.3, -1.9, 6.6]]
+  },
+  "frappes": [
+    { "t": 0, "joueur": "B1", "geste": "service", "depart": [1.9, 0.7, 7.4], "cible": [-2.2, 0.033, -5.6], "vol": 1.2 },
+    { "t": 1.5, "joueur": "A1", "geste": "lob", "cible": [-1.6, 0.033, 8.4], "vol": 1.9 },
+    { "t": 4.5, "joueur": "B2", "geste": "sortie_vitre", "cible": [-2.1, 1.0, -2.8], "vol": 1.2 },
+    { "t": 5.7, "joueur": "A1", "geste": "volee_cd", "cible": [3.8, 0.033, 5.5], "vol": 0.6 }
+  ],
+  "etapes": [
+    { "t": 0, "titre": "Le service adverse", "texte": "L'adversaire 1 sert dans ton carré, puis monte rejoindre son partenaire au filet." },
+    { "t": 1.2, "titre": "Laisser venir", "texte": "Tu laisses la balle rebondir et monter : tu la frappes au sommet, bien placé derrière elle." },
+    { "t": 1.5, "titre": "Le lob de retour", "texte": "Lob haut et profond, par-dessus l'adversaire 2 déjà au filet." },
+    { "t": 2.0, "titre": "On monte à deux", "texte": "Dès que le lob passe le filet, ton partenaire et toi avancez ensemble." },
+    { "t": 2.4, "titre": "Demi-tour adverse", "texte": "L'adversaire 2, lobé, fait demi-tour ; son partenaire recule aussi." },
+    { "t": 4.5, "titre": "Défense depuis le fond", "texte": "Après la vitre, l'adversaire 2 ne peut que remettre une balle lente vers vous." },
+    { "t": 5.7, "titre": "La volée dans l'angle", "texte": "Placé au filet, tu conclus d'une volée croisée courte, vers la vitre latérale." }
+  ]
+}

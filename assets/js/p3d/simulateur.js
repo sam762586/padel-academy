@@ -12,6 +12,9 @@ const SCENARIOS = [
   { id: 'servir-monter', nom: 'Servir et monter' },
   { id: 'smash-lob-court', nom: 'Smash sur lob court' },
   { id: 'defendre-double-vitre', nom: 'Défendre la double vitre' },
+  { id: 'retour-lob', nom: 'Retourner en lob' },
+  { id: 'chiquita', nom: 'La chiquita' },
+  { id: 'duel-filet', nom: 'Duel au filet' },
 ];
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
