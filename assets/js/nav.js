@@ -3,6 +3,15 @@
    sans ce script, le CSS laisse tous les liens visibles (navigation possible même si ce fichier ne charge pas).
    Aussi : lien « Mon espace » selon la connexion, et zones qui défilent (tableaux .tbl, .acc-scroll) atteignables au clavier. */
 (function(){
+  // Retour de Google ou d'un lien reçu par e-mail arrivé sur une page qui ne gère pas la connexion (par exemple l'accueil,
+  // si Supabase renvoie vers l'adresse du site) : on le transmet à connexion.html, qui ouvre la session ou affiche l'erreur
+  var h=location.hash||'';
+  if(/[#&](access_token|error_code|error_description)=/.test(h)&&!/\/(connexion|compte)\.html$/.test(location.pathname)&&(!window.PA_COMPTE||/[#&]error/.test(h))){
+    var lien=document.querySelector('#nav-menu a[data-espace]');
+    var racine=lien?lien.getAttribute('href').replace(/(espace|connexion)\.html.*$/,''):'';
+    location.replace(racine+'connexion.html'+h);
+    return;
+  }
   document.documentElement.classList.add('nav-js');
   var btn=document.querySelector('.nav-toggle'), ul=document.getElementById('nav-menu');
   if(btn&&ul){

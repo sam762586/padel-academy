@@ -19,7 +19,8 @@ process.on('unhandledRejection',e=>{if(e&&e.name==='TargetClosedError')return;co
 
 // Supabase simulé : session dans sessionStorage « session » ; mot de passe accepté : « bonmotdepasse »
 const SDK=`(function(){
- const session=()=>{const s=sessionStorage.getItem('session');return s?{user:{id:'u1',email:'joueur@test.fr'}}:null;};
+ if(/access_token=/.test(location.hash))sessionStorage.setItem('session',/nouveau/.test(location.hash)?'nouveau':'1');
+ const session=()=>{const s=sessionStorage.getItem('session');return s?{user:{id:'u1',email:'joueur@test.fr',created_at:s==='nouveau'?new Date().toISOString():'2026-01-01T00:00:00Z'}}:null;};
  const ecouteurs=[];
  const requete=()=>{const q=new Proxy({},{get(_,k){
   if(k==='then')return (ok)=>ok({data:[],error:null});
@@ -128,6 +129,23 @@ const serveur=http.createServer((req,res)=>{
   await page.click('#compte-deco');
   await page.waitForURL(/connexion\.html\?suite=compte\.html$/);
   ok('déconnexion depuis compte.html : retour à la connexion');
+  // Retour de Google ou d'un lien : erreurs affichées, jeton arrivé sur l'accueil transmis à la connexion, compte neuf → profil
+  await page.goto(base+'/connexion.html?suite=espace.html#error=server_error&error_code=unexpected_failure&error_description=Database+error+saving+new+user');
+  await page.waitForSelector('#cx-msg:not([hidden])');
+  assert.match(await page.textContent('#cx-msg'),/problème de notre côté/);
+  assert.ok(!/error/.test(await page.evaluate(()=>location.href)),'adresse nettoyée');
+  await page.goto(base+'/connexion.html?error=access_denied&error_code=access_denied&error_description=User+cancelled');
+  await page.waitForSelector('#cx-msg:not([hidden])');
+  assert.match(await page.textContent('#cx-msg'),/Connexion annulée/);
+  await page.goto(base+'/index.html#access_token=jeton&refresh_token=r&type=bearer');
+  await page.waitForURL(/espace\.html$/); // accueil → connexion.html (lit le jeton) → espace
+  ok('retour de Google : erreur affichée (création, annulation), adresse nettoyée ; jeton arrivé sur l\'accueil → connexion → espace');
+  await page.evaluate(()=>sessionStorage.clear());
+  await page.goto(base+'/connexion.html#access_token=jeton&refresh_token=r&nouveau=1');
+  await page.waitForURL(/compte\.html(\?bienvenue=1)?$/);
+  await page.waitForSelector('#compte-profil:not([hidden])');
+  assert.match(await page.textContent('#compte-msg'),/Bienvenue/);
+  ok('compte créé à l\'instant avec Google : direction le profil (compte.html?bienvenue=1)');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
   // 6. Liens « Connecte-toi » du site

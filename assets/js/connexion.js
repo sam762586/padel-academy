@@ -74,12 +74,35 @@
  let modeRecup=/type=recovery/.test(location.hash)||params.get("mode")==="nouveau";
  try{ client.auth.onAuthStateChange((ev)=>{ if(ev==="PASSWORD_RECOVERY"){ modeRecup=true; montrer("nouveau"); } }); }catch(e){}
 
- // Déjà connecté (hors récupération) : on file vers la suite
+ // Erreur renvoyée par Supabase au retour de Google ou d'un lien reçu par e-mail (dans ?… ou #…) :
+ // on l'affiche au lieu de laisser croire que rien ne s'est passé
+ const retourHash=new URLSearchParams(location.hash.replace(/^#/,""));
+ const codeErreur=params.get("error_code")||retourHash.get("error_code")||params.get("error")||retourHash.get("error");
+ const detailErreur=params.get("error_description")||retourHash.get("error_description")||"";
+ function messageRetour(code,detail){
+  const d=(detail||"").toLowerCase();
+  if(code==="otp_expired"||d.includes("expired")) return "Ce lien a expiré ou a déjà servi. Recommence la connexion.";
+  if(code==="access_denied"||d.includes("denied")) return "Connexion annulée. Tu peux réessayer quand tu veux.";
+  if(d.includes("database error")) return "Ton compte n'a pas pu être créé à cause d'un problème de notre côté. Réessaie dans quelques minutes ; si ça continue, écris-nous.";
+  if(d.includes("email")&&d.includes("already")) return "Un compte existe déjà avec cette adresse e-mail. Connecte-toi avec ton mot de passe.";
+  return "La connexion n'a pas abouti"+(detail?" ("+detail.replace(/\+/g," ").slice(0,140)+")":"")+". Réessaie.";
+ }
+
+ // Déjà connecté (hors récupération) : on file vers la suite ; un compte tout neuf (e-mail confirmé, ou créé à l'instant
+ // avec Google) passe d'abord par son profil
  compte.ready.then(()=>{
-  if(compte.user&&!modeRecup){ location.replace(params.get("confirme")==="1"?"compte.html?bienvenue=1":suite); return; }
+  if(compte.user&&!modeRecup){
+   const cree=Date.parse(compte.user.created_at||"");
+   const nouveau=params.get("confirme")==="1"||(!isNaN(cree)&&Date.now()-cree<10*60000);
+   location.replace(nouveau?"compte.html?bienvenue=1":suite); return;
+  }
   if(modeRecup) montrer("nouveau");
   else if(params.get("onglet")==="inscription") montrer("inscription");
-  if(params.get("confirme")==="1") afficher(msgGlobal,"Ton e-mail est confirmé. Tu peux te connecter.","ok");
+  if(codeErreur){
+   afficher(msgGlobal,messageRetour(codeErreur,detailErreur),"err");
+   try{history.replaceState(null,"",location.pathname+"?suite="+encodeURIComponent(suite));}catch(e){}
+  }
+  else if(params.get("confirme")==="1") afficher(msgGlobal,"Ton e-mail est confirmé. Tu peux te connecter.","ok");
  });
 
  // Connexion
