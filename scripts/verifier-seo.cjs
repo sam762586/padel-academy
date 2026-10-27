@@ -83,8 +83,15 @@ ok(`liens internes : ${nbLiens} liens vérifiés, aucun cassé (ancres comprises
 for (const p of pages) for (const m of p.h.matchAll(/<img\b[^>]*>/g)) {
   assert.match(m[0], /\salt="/, p.f + " : image sans alt");
   assert.match(m[0], /\swidth="\d+"[^>]*\sheight="\d+"|\sheight="\d+"[^>]*\swidth="\d+"/, p.f + " : image sans dimensions (décalage de mise en page)");
+  // Grands bandeaux (1600 px) : une version 960 px pour les écrans qui n'ont pas besoin de plus
+  if (/\swidth="1600"/.test(m[0])) assert.match(m[0], /\ssrcset="[^"]*960w/, p.f + " : bandeau sans version 960 px (srcset)");
+  const srcset = (m[0].match(/\ssrcset="([^"]+)"/) || [])[1];
+  if (srcset) for (const c of srcset.split(",")) {
+    const fichier = c.trim().split(/\s+/)[0];
+    assert.ok(fs.existsSync(path.join(racine, path.posix.dirname(p.f), fichier)), p.f + " : srcset vers un fichier absent " + fichier);
+  }
 }
-ok("images : texte alternatif et dimensions partout");
+ok("images : texte alternatif et dimensions partout, bandeaux en deux tailles (srcset)");
 
 // 5) sitemap
 const sitemap = lire("sitemap.xml");

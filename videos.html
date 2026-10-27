@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Vidéos pour apprendre le padel", "item": "https://apprendre-padel.fr/videos.html"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=10e12bf605">
+<link rel="stylesheet" href="assets/style.css?v=ce2111dffb">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -33,7 +33,7 @@
     <ul id="nav-menu"><li><a href="index.html">Accueil</a></li><li class="nav-groupe"><button type="button" class="nav-titre active" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="regles.html">Règles</a></li><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="simulateur-3d.html">Simulateur 3D</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="videos.html" class="active" aria-current="page">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="materiel.html">Matériel</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-entrainer">S'entraîner</button><ul class="nav-sous" id="nav-entrainer"><li><a href="niveau.html">Mon niveau</a></li><li><a href="entrainement.html">Plan d'entraînement</a></li><li><a href="score.html">Compteur de match</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-competition">Compétition</button><ul class="nav-sous" id="nav-competition"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html" data-espace>Mon espace</a></li><li><a class="cta" href="materiel.html#raquette">Choisir sa raquette</a></li></ul>
   </div>
 </nav>
-<div class="banner"><img src="assets/img/photos/videos.webp" width="1600" height="650" alt="Joueuse de padel à la volée" fetchpriority="high"></div>
+<div class="banner"><img src="assets/img/photos/videos.webp" srcset="assets/img/photos/videos-960.webp 960w, assets/img/photos/videos.webp 1600w" sizes="100vw" width="1600" height="650" alt="Joueuse de padel à la volée" fetchpriority="high"></div>
 <section id="videos">
   <div class="wrap">
     <div class="sec-head">
@@ -41,10 +41,10 @@
       <p>Les chaînes qui font référence, et pour chaque coup une recherche YouTube déjà filtrée. Regarde d'abord le geste au ralenti, puis la situation de jeu.</p>
     </div>
     <div class="grid" id="chaines">
-      <a class="card link" href="https://www.youtube.com/@ThePadelSchool" target="_blank" rel="noopener"><div class="top"><h4>The Padel School</h4><span class="tag tech">EN</span></div><p>La chaîne la plus pédagogique : un coup = une vidéo, avec les erreurs et la correction. Sous-titres FR automatiques.</p></a>
-      <a class="card link" href="https://www.youtube.com/@PadelMagazine" target="_blank" rel="noopener"><div class="top"><h4>Padel Magazine</h4><span class="tag tech">FR</span></div><p>Actualité française, tests matériel, conseils de coachs français, tournois FFT.</p></a>
-      <a class="card link" href="https://www.youtube.com/@HelloPadel" target="_blank" rel="noopener"><div class="top"><h4>Hello Padel Academy</h4><span class="tag tech">EN/ES</span></div><p>Mauri Andrini, coach des pros : technique très détaillée, tactique de haut niveau.</p></a>
-      <a class="card link" href="https://www.youtube.com/@PremierPadel" target="_blank" rel="noopener"><div class="top"><h4>Premier Padel</h4><span class="tag tech">Pro</span></div><p>Les meilleurs points du circuit mondial : regarder les déplacements de la paire, pas seulement les smashs.</p></a>
+      <a class="card link" href="https://www.youtube.com/@ThePadelSchool" target="_blank" rel="noopener"><div class="top"><h3 class="h4">The Padel School</h3><span class="tag tech">EN</span></div><p>La chaîne la plus pédagogique : un coup = une vidéo, avec les erreurs et la correction. Sous-titres FR automatiques.</p></a>
+      <a class="card link" href="https://www.youtube.com/@PadelMagazine" target="_blank" rel="noopener"><div class="top"><h3 class="h4">Padel Magazine</h3><span class="tag tech">FR</span></div><p>Actualité française, tests matériel, conseils de coachs français, tournois FFT.</p></a>
+      <a class="card link" href="https://www.youtube.com/@HelloPadel" target="_blank" rel="noopener"><div class="top"><h3 class="h4">Hello Padel Academy</h3><span class="tag tech">EN/ES</span></div><p>Mauri Andrini, coach des pros : technique très détaillée, tactique de haut niveau.</p></a>
+      <a class="card link" href="https://www.youtube.com/@PremierPadel" target="_blank" rel="noopener"><div class="top"><h3 class="h4">Premier Padel</h3><span class="tag tech">Pro</span></div><p>Les meilleurs points du circuit mondial : regarder les déplacements de la paire, pas seulement les smashs.</p></a>
     </div>
     <p class="subhead">Un coup, une recherche</p>
     <div class="vidlinks" id="vidlinks"></div>
