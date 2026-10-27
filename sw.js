@@ -9,7 +9,7 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v23-academie";
+const CACHE = "pa-v24-academie";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -20,7 +20,7 @@ const SHELL = [
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
   "assets/style.css",
   "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",
-  "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/quiz-tactique-donnees.js", "assets/js/quiz-tactique.js", "assets/js/tableau-tactique.js", "assets/js/plan.js", "assets/js/pwa.js",
+  "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/quiz-tactique-donnees.js", "assets/js/quiz-tactique.js", "assets/js/tableau-tactique.js", "assets/js/diagnostic-paire.js", "assets/js/plan.js", "assets/js/pwa.js",
   "assets/js/quiz-niveau.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
   "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/data/pages-tournois.js",

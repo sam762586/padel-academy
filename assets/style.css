@@ -1336,3 +1336,24 @@ section:has(.erreurs-liste){counter-reset:erreur}
   .tb-grille{grid-template-columns:1fr;gap:var(--s-5)}
   .tb-svg{max-width:240px}
 }
+
+/* DIAGNOSTIC DE PAIRE (tactique.html#diagnostic-paire, diagnostic-paire.js) */
+.dp-bloc{margin-top:var(--s-7);scroll-margin-top:84px}
+.dp{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5)}
+.dp-form{display:grid;gap:var(--s-4)}
+.dp-joueurs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4)}
+.dp-joueur{border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-3) var(--s-4) var(--s-4);margin:0;display:grid;gap:var(--s-3);min-width:0}
+.dp-joueur legend{font-weight:800;padding:0 var(--s-2)}
+.dp-paire{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4)}
+.dp-form .btn{justify-self:start}
+.dp-resultat:empty{display:none}
+.dp-resultat{margin-top:var(--s-5);outline:none}
+.dp-resultat h3{margin:0 0 var(--s-4)}
+.dp-resultat h4{margin:var(--s-4) 0 var(--s-2)}
+.dp-priorites{display:grid;gap:var(--s-3);padding-left:1.3em}
+.dp-exo{display:block;color:var(--muted);font-size:var(--fs-s);margin-top:var(--s-1)}
+.dp-avertissement{margin-top:var(--s-4)}
+@media (max-width:720px){
+  .dp{padding:var(--s-4)}
+  .dp-joueurs,.dp-paire{grid-template-columns:1fr}
+}
