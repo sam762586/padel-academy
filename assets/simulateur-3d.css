@@ -56,6 +56,11 @@
 .p3d-fiche li + li{margin-top:6px}
 .p3d-fiche p{color:var(--muted)}
 .p3d-limites{color:var(--muted);max-width:52em}
+.p3d-cle{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0}
+.p3d-cle dt{color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;padding-top:2px}
+.p3d-cle dd{margin:0;font-weight:700}
+.p3d-cle-titre{margin:0 0 6px;color:var(--coral);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+#fiche-coup .lvl{vertical-align:middle;margin-left:6px}
 .p3d-deroule{max-width:52em;padding-left:1.4em;color:var(--muted)}
 .p3d-deroule li+li{margin-top:8px}
 .p3d-deroule b{color:var(--fg)}

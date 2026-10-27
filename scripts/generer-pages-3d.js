@@ -26,6 +26,68 @@ const GROUPES = [...new Set(SCENARIOS.map(x => x.groupe))];
 if (SCENARIOS.length < 10) throw new Error("Liste des scénarios introuvable dans simulateur.js");
 const fiches = Object.fromEntries(SCENARIOS.map(x => [x.id, JSON.parse(lire("assets/3d/scenarios/" + x.id + ".json"))]));
 
+// Cartes de la page Technique (assets/js/coups.js) : chaque coup y désigne son scénario (champ p3d). La page du
+// scénario devient la fiche complète du coup : elle reprend la carte (en bref, quand, où viser, erreurs).
+const COUPS = new Function(lire("assets/js/coups.js").split("function cardCoup")[0] + ";return COUPS;")();
+const cartesDe = id => Object.entries(COUPS).flatMap(([cle, l]) => l.filter(c => c.p3d === id).map(c => ({ ...c, cle })));
+const nbsp = t => String(t).replace(/[  ]/g, " ");
+// Nom court du coup pour le title : « Lob (globo) » → « Lob » ; deux cartes sur une page → nom commun
+const NOMS_COMMUNS = { "smash-par-3": "Smash par 3 et rulo", "servir-monter": "Service et montée au filet" };
+const nomCourt = (id, cartes) => NOMS_COMMUNS[id] || (cartes[0] ? nbsp(cartes[0].n).replace(/\s*\(.*\)$/, "").replace(/\s*\/.*$/, "") : null);
+const ANCRES = { fond: "coups-fond", trans: "coups-trans", filet: "coups-filet", service: "coups-service" };
+function ficheCoup(cartes) {
+  return `<section id="fiche-coup" class="alt">
+  <div class="wrap">
+    <h2>${cartes.length > 1 ? "Les fiches des coups" : "La fiche du coup"}</h2>
+    <div class="p3d-fiche">${cartes.map(c => `
+      <div><h3>${html(nbsp(c.n))} <span class="lvl" data-l="${html(c.lvl)}">${html(c.lvl)}</span></h3>
+        <p>${html(nbsp(c.q))}</p>
+        <dl class="p3d-cle"><dt>Quand le jouer</dt><dd>${html(nbsp(c.quand))}</dd><dt>Où viser</dt><dd>${html(nbsp(c.cible))}</dd></dl>
+        <p class="p3d-cle-titre">Erreurs à éviter</p><ul>${c.err.map(e => `<li>${html(nbsp(e))}</li>`).join("")}</ul></div>`).join("")}
+    </div>
+    <p class="note"><a href="technique.html#${ANCRES[cartes[0].cle]}">Tous les coups du padel</a></p>
+  </div>
+</section>
+`;
+}
+// Descriptions rédigées pour chaque page (160 caractères au plus) ; à défaut, résumé de la carte ou du scénario
+const DESCRIPTIONS = {
+  "coup-droit-fond": "Le coup droit de fond au padel : geste compact après le rebond, balle basse dans les pieds du volleyeur ou long et croisé. Expliqué pas à pas en 3D.",
+  "revers-fond": "Le revers de fond au padel : geste court, revers coupé pour garder la balle basse, croisé bas ou lob. Expliqué pas à pas en 3D, avec quiz.",
+  "monter-apres-lob": "Le lob au padel : balle haute et profonde au-dessus des volleyeurs, puis montée au filet à deux. Quand le jouer, où viser, en 3D pas à pas.",
+  "sortie-vitre-fond": "Sortie de vitre de fond au padel : laisser taper la vitre, pivoter, frapper la balle qui redescend, puis lober. Expliqué pas à pas en 3D.",
+  "sortie-vitre-laterale": "Sortie de vitre latérale au padel : se décaler vers le centre, attendre que la balle revienne, la jouer basse au centre. Expliqué en 3D.",
+  "defendre-double-vitre": "Défendre la double vitre au padel : laisser travailler les deux vitres, jouer lent et bas au centre, attendre la balle à accélérer. En 3D.",
+  "contre-pied": "Le contre-pied au padel : quand les volleyeurs ferment les angles, viser le corps ou les pieds pour gêner la volée. Expliqué pas à pas en 3D.",
+  "chiquita": "La chiquita au padel : balle lente et basse dans les pieds des volleyeurs pour reprendre le filet à deux. Quand la jouer, où viser, en 3D.",
+  "volee-basse-transition": "La volée basse de transition au padel : remettre long au centre la balle qui arrive dans les pieds pendant la montée. Expliquée en 3D.",
+  "bajada": "La bajada au padel : frapper en descendant le lob trop long qui ressort haut de la vitre, puis reprendre le filet. Expliquée pas à pas en 3D.",
+  "amorti": "L'amorti (dejada) au padel : une volée qui tombe juste derrière le filet quand les adversaires sont au fond. Quand le jouer, en 3D.",
+  "volee-coup-droit": "La volée de coup droit au padel : un blocage, raquette ouverte, geste court, balle placée profond ou dans le coin. Expliquée pas à pas en 3D.",
+  "volee-revers": "La volée de revers au padel : coude devant, raquette coupée, geste compact, croisé bas ou au centre. Expliquée pas à pas en 3D, avec quiz.",
+  "duel-filet": "Le duel au filet au padel : remettre basse la balle basse, attaquer celle qui monte, viser les pieds ou le centre. En 3D, pas à pas.",
+  "bandeja-garder-filet": "La bandeja au padel : sur un lob mi-profond, frappe coupée vers la vitre du fond pour garder le filet. Technique et placement en 3D.",
+  "vibora": "La víbora au padel : frappe sur le côté de la balle, plus rapide que la bandeja, vers le coin vitre-grille. Quand la jouer, en 3D.",
+  "smash-lob-court": "Le smash plat au padel : sur un lob court, frapper fort au centre puis remonter au filet. Quand smasher, quand jouer la bandeja, en 3D.",
+  "smash-par-3": "Le smash par 3 et le rulo au padel : smash croisé avec angle vers la vitre latérale pour sortir la balle. Placement et cible en 3D.",
+  "gancho": "Le gancho au padel : smash crochet joué très haut sur un lob trop profond pour la bandeja, lent et profond pour garder le filet. En 3D.",
+  "servir-monter": "Le service au padel et la montée au filet : service à la cuillère sous la taille, montée immédiate, première volée profonde. En 3D.",
+  "retour-lob": "Le retour de service au padel : lob profond par-dessus le joueur au filet ou balle basse dans les pieds du serveur. Expliqué pas à pas en 3D.",
+};
+// Description : texte rédigé, sinon « en bref » de la carte (sinon première idée clé du scénario), 160 caractères au plus
+function descriptionCoup(s, cartes) {
+  if (DESCRIPTIONS[s.id]) return DESCRIPTIONS[s.id];
+  const fin = " Explication pas à pas en 3D.";
+  const q = cartes[0] && nbsp(cartes[0].q);
+  if (!q) return description(s);
+  // Phrases entières de la carte tant qu'elles tiennent, sinon coupure au mot
+  let d = "";
+  for (const phrase of q.match(/[^.!?]+[.!?]+/g) || [q]) { if ((d + phrase).trim().length + fin.length > 160) break; d += phrase; }
+  d = d.trim();
+  if (!d) { d = q.slice(0, 159 - fin.length); d = d.slice(0, d.lastIndexOf(" ")).replace(/[ ,:;]+$/, "") + "…"; }
+  return d + fin;
+}
+
 // Description de moins de 160 caractères : première idée clé, coupée au mot
 function description(s) {
   const fin = " À revoir en 3D, pas à pas, et en mode quiz.";
@@ -52,9 +114,12 @@ const remplacer = (texte, motif, valeur) => {
 const ecrites = [];
 for (const x of SCENARIOS) {
   const s = fiches[x.id], f = page(x.id), url = SITE + f;
-  const titre = s.titre + " au padel, en 3D", desc = description(s);
+  const cartes = cartesDe(x.id), nom = nomCourt(x.id, cartes);
+  // Title : le coup (sujet de la recherche) ; scénario sans carte (situation de jeu) : son titre
+  const titre = nom ? `${nom} au padel : technique et conseils en 3D` : `${s.titre} au padel, en 3D`;
+  const desc = descriptionCoup(s, cartes);
   let t = modele;
-  t = remplacer(t, /<title>[^<]*<\/title>/, `<title>${html(titre)}</title>`);
+  t = remplacer(t, /<title>[^<]*<\/title>/, `<title>${html(titre)} | Apprendre Padel</title>`);
   t = remplacer(t, /<meta name="description" content="[^"]*">/, `<meta name="description" content="${html(desc)}">`);
   t = remplacer(t, /<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${url}">`);
   t = remplacer(t, /<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${url}">`);
@@ -62,13 +127,15 @@ for (const x of SCENARIOS) {
   t = remplacer(t, /<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${html(desc)}">`);
   const ariane = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
     { "@type": "ListItem", position: 1, name: "Accueil", item: SITE },
-    { "@type": "ListItem", position: 2, name: "Simulateur 3D", item: SITE + "simulateur-3d.html" },
-    { "@type": "ListItem", position: 3, name: s.titre, item: url }] };
+    cartes.length ? { "@type": "ListItem", position: 2, name: "Les coups du padel", item: SITE + "technique.html" }
+      : { "@type": "ListItem", position: 2, name: "Simulateur 3D", item: SITE + "simulateur-3d.html" },
+    { "@type": "ListItem", position: 3, name: nom || s.titre, item: url }] };
   t = remplacer(t, /<script type="application\/ld\+json">[^<]*<\/script>/, `<script type="application/ld+json">${JSON.stringify(ariane).replace(/</g, "\\u003c")}</script>`);
   // En-tête : titre du coup, situation ; le simulateur s'ouvre sur ce scénario
   t = remplacer(t, /<section id="simulateur" class="alt">/, `<section id="simulateur" class="alt" data-scenario="${x.id}">`);
   t = remplacer(t, /<div><p class="eyebrow">[^<]*<\/p><h1>[^<]*<\/h1><\/div>\n      <p>[^<]*<\/p>/,
-    `<div><p class="eyebrow">Simulateur 3D · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1></div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
+    `<div><p class="eyebrow">${cartes.length ? "Technique" : "Simulateur 3D"} · ${html(x.groupe)}</p><h1>${html(s.titre)}</h1></div>\n      <p>${html(s.situation)} Regarde la scène sous tous les angles, pas à pas, ou passe en mode quiz.</p>`);
+  if (cartes.length) t = remplacer(t, /<section id="tous-les-coups">/, ficheCoup(cartes) + `<section id="tous-les-coups">`);
   // Textes du scénario écrits dans la page (le script les remplace par les mêmes)
   const li = l => l.map(e => `<li>${html(e)}</li>`).join("");
   t = remplacer(t, /<h2 id="p3d-etape-titre">[^<]*<\/h2>/, `<h2 id="p3d-etape-titre">${html(s.etapes[0].titre)}</h2>`);
@@ -80,18 +147,19 @@ for (const x of SCENARIOS) {
   t = remplacer(t, /<p id="p3d-conclusion"><\/p>/, `<p id="p3d-conclusion">${html(s.conclusion)}</p>`);
   t = remplacer(t, /<p id="p3d-exercice"><\/p>/, `<p id="p3d-exercice">${html(s.exercice)}</p>`);
   if (s.lien) {
-    const libelle = { "technique.html": "Voir la fiche du coup", "tutos.html": "Voir les tutos", "regles.html": "Voir les règles", "tactique.html": "Voir le placement" }[s.lien.split("#")[0]] || "En savoir plus";
+    const libelle = { "technique.html": "Tous les coups du padel", "tutos.html": "Voir les tutos", "regles.html": "Voir les règles", "tactique.html": "Voir le placement" }[s.lien.split("#")[0]] || "En savoir plus";
     t = remplacer(t, /<a id="p3d-lien" href="[^"]*">[^<]*<\/a>/, `<a id="p3d-lien" href="${html(s.lien)}">${libelle}</a>`);
   }
   // Déroulé complet (texte lisible par tous, y compris sans 3D)
-  const deroule = `<section id="deroule" class="alt">
+  const deroule = `<section id="deroule"${cartes.length ? "" : ' class="alt"'}>
   <div class="wrap">
     <h2>Le déroulé, étape par étape</h2>
     <ol class="p3d-deroule">${s.etapes.map(e => `<li><b>${html(e.titre)}.</b> ${html(e.texte)}</li>`).join("")}</ol>
   </div>
 </section>
-<section id="tous-les-coups">`;
-  t = remplacer(t, /<section id="tous-les-coups">/, deroule);
+`;
+  // Ordre : simulateur, à retenir, fiche du coup, déroulé, tous les coups, limites
+  t = remplacer(t, /<section id="tous-les-coups">/, deroule + `<section id="tous-les-coups">`);
   t = remplacer(t, BLOC, bloc(x.id));
   ecrites.push(f);
   const avant = fs.existsSync(path.join(RACINE, f)) ? lire(f) : null;
