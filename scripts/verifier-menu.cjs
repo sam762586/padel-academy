@@ -92,18 +92,21 @@ async function contexte(browser,options,sansNav){
   await titre('S\'entraîner').click();await page.mouse.click(600,600);
   assert.equal(await titre('S\'entraîner').getAttribute('aria-expanded'),'false');
   ok('ordinateur : Échap ferme et rend le focus, clic ailleurs ferme');
-  // Parcours au clavier seul : Tab jusqu'à « S'entraîner », Entrée, Tab jusqu'à « Mon niveau », Entrée
+  // Parcours au clavier seul : Tab jusqu'à « S'entraîner », Entrée, Tab jusqu'à « Mon académie » (première entrée), Entrée
   await page.goto(base+'/bareme.html');await page.mouse.move(5,700);
   let essais=0;
   while(await page.evaluate(()=>document.activeElement.textContent.trim())!=='S\'entraîner'&&essais++<20)await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');
   assert.equal(await titre('S\'entraîner').getAttribute('aria-expanded'),'true');
   await page.keyboard.press('Tab');
-  assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Mon niveau');
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Mon académie');
+  await page.keyboard.press('Tab');
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Test de niveau');
+  await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Enter');
-  await page.waitForURL(/niveau\.html$/);
+  await page.waitForURL(/academie\.html$/);
   assert.equal(await page.locator('.nav-titre.active').textContent(),'S\'entraîner');
-  assert.equal(await page.locator('a[aria-current="page"]').textContent(),'Mon niveau');
+  assert.equal(await page.locator('a[aria-current="page"]').textContent(),'Mon académie');
   ok('ordinateur : navigation complète au clavier, groupe et page actifs à l\'arrivée');
   // Accueil actif sur l'accueil
   await page.goto(base+'/index.html');

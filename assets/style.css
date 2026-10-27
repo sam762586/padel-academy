@@ -1387,3 +1387,28 @@ section:has(.erreurs-liste){counter-reset:erreur}
 
 /* Tournois : la date de mise à jour arrive avec les données ; deux lignes réservées pour que la page ne bouge pas */
 #tournois-maj{display:block;min-height:3.2em}
+
+/* MON ACADÉMIE (academie.html, academie.js) : dix cartes de niveau (grille FFT), niveau déclaré et historique */
+.ac-moi{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-5);scroll-margin-top:84px}
+.ac-moi-titre{font-size:clamp(1.4rem,3.6vw,2rem);margin:0 0 var(--s-2);outline:none}
+.ac-moi-num{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;border-radius:50%;background:var(--turf);color:var(--accent-fg);margin:0 .2em}
+.ac-moi-info{margin:0;color:var(--muted)}
+.ac-historique{margin-top:var(--s-3);color:var(--muted);font-size:var(--fs-s)}
+.ac-historique summary{cursor:pointer;color:var(--fg)}
+.ac-ancien{margin-top:var(--s-3)}
+.ac-accueil{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3);margin:0 0 var(--s-5)}
+.ac-accueil span{color:var(--muted);font-size:var(--fs-s)}
+.ac-niveaux{list-style:none;margin:0 0 var(--s-5);padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:var(--s-4)}
+.ac-carte{display:flex;flex-direction:column;gap:var(--s-3);background:var(--glass);border:1px solid var(--line);border-top:4px solid var(--sky);border-radius:var(--r);padding:var(--s-4);scroll-margin-top:84px}
+.ac-carte.ac-milieu{border-top-color:var(--sand)}
+.ac-carte.ac-haut{border-top-color:var(--coral)}
+.ac-carte.choisi{border-color:var(--turf);box-shadow:0 0 0 2px rgba(var(--turf-rgb),.35)}
+.ac-carte h3{display:flex;align-items:center;gap:var(--s-2);margin:0;font-size:var(--fs-xl)}
+.ac-num{display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:var(--bg-3);font-size:.9em}
+.ac-criteres{margin:0;padding-left:1.1em;display:grid;gap:var(--s-1)}
+.ac-criteres li{line-height:1.45}
+.ac-site{margin-top:auto;border-top:1px solid var(--line);padding-top:var(--s-3);color:var(--muted);font-size:var(--fs-s);display:grid;gap:var(--s-2)}
+.ac-site p{margin:0}
+.ac-choisir{justify-content:center}
+.ac-carte.choisi .ac-choisir{background:var(--turf);color:var(--accent-fg);border-color:var(--turf)}
+@media (max-width:720px){.ac-moi{padding:var(--s-4)}.ac-carte{padding:var(--s-4) var(--s-3)}}

@@ -126,6 +126,27 @@ Plan présenté le 27/10/2026, Samuel commence par 5A. Toutes les suites de test
   materiel.html, H1 « Débuter au padel : les 20 erreurs à corriger ».
 - [x] Relecture et validation du 5D par Samuel (27/10/2026), publié.
 
+## Académie personnalisée — niveaux 1 à 10 (demande de Samuel du 27/10/2026)
+Référence : grille « Niveaux Padel » de la FFT (PDF, juillet 2024), critères cités mot pour mot avec la source (validé
+par Samuel). La grille 1 à 8 de la première demande est remplacée par celle-ci ; aucun système 1 à 8 n'existait.
+Audit : 6 échelles déjà présentes (palier du test 0–5, niveau d'exercice 1–4, `quiz_results.niveau` 1–4,
+`profiles.niveau_declare` 1–4, Débutant / Intermédiaire / Avancé des contenus, classement FFT) : gardées, jamais
+converties. Architecture validée : Mon académie = parcours d'apprentissage, sans compte obligatoire (données sur
+l'appareil) ; Mon espace = suivi sportif ; un seul moteur de recommandations. Aucun push, déploiement ni migration
+en production sans accord explicite. Une phase à la fois, validée avant la suivante.
+- [x] Phase 1 (27/10/2026) : `academie.html` (10 cartes : numéro, intitulé, critères FFT, compétences et scènes 3D
+  proposées par le site, bouton de sélection), niveau déclaré et historique sur l'appareil (`pa-academie`), ancien test
+  affiché à part ; « Mon académie » dans le menu S'entraîner (« Mon niveau » devient « Test de niveau »), accès depuis
+  l'accueil. Test : `scripts/verifier-academie.cjs`.
+- [ ] Validation de la phase 1 par Samuel.
+- [ ] Phase 2 : banque de questions (55 questions existantes reclassées 1–10 et par thème ; nouvelles questions en
+  « brouillon » jusqu'à relecture de Samuel).
+- [ ] Phase 3 : quiz adaptatif (référence N, consolidation N−1, découverte N+1, bornes 1 et 10, non-répétition, reprise).
+- [ ] Phase 4 : classement des contenus 1–10 (tableau à valider), recommandations, Mon académie complète, lien avec
+  Mon espace.
+- [ ] Phase 5 : interface (états vides, erreurs, reprise après interruption).
+- [ ] Phase 6 : qualité ; migration SQL préparée, non appliquée.
+
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
 
