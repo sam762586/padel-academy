@@ -88,10 +88,25 @@ async function dansLeNavigateur(base){
   const defi=await page.textContent('#ac-defi h3');
   assert.equal(defi,await page.evaluate(k=>PA_DEFIS.defi(PA_DEFIS.lundi(new Date()),k).exercice.titre,nivEx),'niveau '+n+' : défi au niveau d’exercice '+nivEx);
  }
- async function planGenerique(page){
+ const GENERIQUE=['La vitre est ton amie','Volée de blocage',"Le lob d'attaque",'Monter à deux','La bandeja','Chiquita et transition','Smash ou pas smash','Semaine match'];
+ async function planGenerique(page,n){
   await page.goto(page.url().replace(/[^/]*$/,'entrainement.html'));
   const t=await page.$$eval('#weeks article.week h3',h=>h.map(x=>x.textContent));
-  assert.deepEqual(t,['La vitre est ton amie','Volée de blocage',"Le lob d'attaque",'Monter à deux','La bandeja','Chiquita et transition','Smash ou pas smash','Semaine match'],'plan 8 semaines générique');
+  assert.deepEqual(t,GENERIQUE,'plan 8 semaines générique');
+  if(!n)return;
+  // Mon plan : les 8 mêmes semaines, priorités en tête, Semaine match en dernier, exercices au niveau d'exercice
+  const mp=await page.evaluate(()=>[...document.querySelectorAll('#mon-plan .mp-semaine')].map(li=>({titre:li.querySelector('h3').textContent,
+   prio:!!li.querySelector('.ap-etat'),exo:(li.querySelector('summary b')||{}).textContent,voisin:!!li.querySelector('.mp-voisin'),i:Number(li.querySelector('.mp-valider').dataset.i)})));
+  assert.deepEqual(mp.map(x=>x.titre).slice().sort(),GENERIQUE.slice().sort(),'niveau '+n+' : les mêmes 8 semaines');
+  assert.equal(mp[7].titre,'Semaine match');
+  const k=mp.findIndex(x=>!x.prio);assert.ok(k>0&&mp.slice(k,7).every(x=>!x.prio),'niveau '+n+' : semaines prioritaires en tête');
+  const nivEx=n<=3?1:n<=5?2:n<=7?3:4;
+  // Au niveau d'exercice, sauf la 2e semaine d'un même thème : niveau voisin, signalé
+  const ex=await page.evaluate(titres=>titres.map(t=>{const e=EXERCICES.find(x=>x.titre===t);return {theme:e.theme,niveaux:e.niveaux};}),mp.map(x=>x.exo));
+  ex.forEach((e,k)=>{const auNiveau=e.niveaux.includes(nivEx);assert.equal(mp[k].voisin,!auNiveau,'niveau '+n+' : '+mp[k].exo);
+   if(!auNiveau)assert.ok(ex.some((f,j)=>j<k&&f.theme===e.theme&&f.niveaux.includes(nivEx)),'niveau '+n+' : niveau voisin seulement pour un thème déjà pris');});
+  assert.ok(mp.filter(x=>x.voisin).length<=1,'niveau '+n+' : au plus une semaine au niveau voisin');
+  assert.equal(new Set(mp.map(x=>x.exo)).size,8,'niveau '+n+' : 8 exercices différents');
  }
  try{
   // 1. Nouvel utilisateur
@@ -103,14 +118,22 @@ async function dansLeNavigateur(base){
    await page.click('.ac-accueil a');await page.waitForURL(/academie\.html#niveaux$/);
    assert.equal(await page.textContent('.ac-moi-titre'),'Choisis ton niveau pour commencer');
    assert.equal(await page.isVisible('[data-semaine-bloc]'),false,'Ta semaine masquée tant que le niveau n\u2019est pas choisi');
+   await page.goto(base+'/entrainement.html');
+   assert.match(await page.textContent('#mon-plan'),/Choisis ton niveau de 1 à 10/,'Mon plan : invitation sans niveau');
+   await page.goto(base+'/academie.html#niveaux');
    await page.click('.ac-rapide-btn[data-choisir="2"]');
    const s=await quizComplet(page,i=>i%2===0);
    assert.equal(s.reponses.length,10);assert.match(await page.textContent('#aq-score'),/^Score : 5 sur 10$/);
    assert.equal(await page.locator('#ap .ap-bloc').count(),6);
    await verifierNiveau(page,2);
-   await planGenerique(page);
-   await page.check('#w0');
+   await planGenerique(page,2);
+   await page.click('#mon-plan .mp-valider[data-i="0"]');
+   assert.equal(await page.isChecked('#w0'),true,'valider dans Mon plan coche le plan générique');
    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-weeks-v2:invite')).done),[0]);
+   assert.equal(await page.getAttribute('#mon-plan .mp-valider[data-i="0"]','aria-pressed'),'true');
+   await page.check('#w1');
+   assert.equal(await page.getAttribute('#mon-plan .mp-valider[data-i="1"]','aria-pressed'),'true','cocher le plan générique met Mon plan à jour');
+   await page.uncheck('#w1');
    await existantIntact(page,'nouvel utilisateur');
    await ctx.close();}
   ok('nouvel utilisateur : accueil → niveau 2 en un toucher → quiz complet → parcours (6 blocs) → défi → semaine 1 du plan validée');
@@ -141,7 +164,7 @@ async function dansLeNavigateur(base){
    assert.match(await page.textContent('.bord-niv-test'),/catégorie de tournoi estimée/);
    assert.match(await page.textContent('.bord-niv-fft'),/12\s500e/);
    assert.match(await page.textContent('#esp-exercices'),new RegExp('niveau déclaré \\('+n+' sur 10'),'Mon espace suit le niveau '+n);
-   await planGenerique(page);
+   await planGenerique(page,n);
    await existantIntact(page,'niveau '+n);
    await ctx.close();
   }

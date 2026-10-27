@@ -1496,3 +1496,18 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .qt-revoir details{display:inline}
 .qt-revoir details[open]{display:block}
 .qt-revoir summary{cursor:pointer;display:inline}
+/* Mon plan (entrainement.html) */
+.mon-plan{margin:var(--s-5) 0;background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-4)}
+.mon-plan h2{margin:0 0 var(--s-2)}
+.mp-intro{margin:0 0 var(--s-3);color:var(--muted)}
+.mp-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.mp-semaine{padding:var(--s-3);border:1px solid var(--line);border-radius:var(--r-s);display:grid;gap:var(--s-2);min-width:0}
+.mp-semaine.done{border-color:var(--turf)}
+.mp-tete{display:flex;gap:var(--s-3);align-items:flex-start}
+.mp-tete h3{margin:0}
+.mp-tete p{margin:2px 0 0}
+.mp-num{flex:none;display:inline-grid;place-items:center;width:2em;height:2em;border-radius:50%;background:var(--turf);color:var(--accent-fg);font-weight:900}
+.mp-semaine .wobj{margin:0}
+.mp-semaine summary{cursor:pointer}
+.mp-valider{justify-self:start}
+.plan-generique-titre{margin:var(--s-5) 0 var(--s-3)}

@@ -191,7 +191,11 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   3D) : section d'article du thème couvrant les niveaux de la question, exercice, scène 3D ; calculé par
   generer-academie-questions.mjs (champ revoir, assets/3d/revoir.json chargé à la première erreur dans le simulateur).
 - [x] Validation du lot 3a par Samuel (27/10/2026).
-- [ ] Lot 4 : « Mon plan » personnalisé, plan générique et progression préservés.
+- [x] Lot 4 (27/10/2026) : « Mon plan, à mon niveau » (mon-plan.js) au-dessus du plan générique inchangé : les mêmes
+  8 semaines, celles des 3 priorités en tête (Semaine match toujours dernière), un exercice par semaine au niveau
+  d'exercice (la 2e semaine « aérien » reçoit celui d'un niveau voisin, signalé : un seul exercice par thème et par
+  niveau). Valider dans Mon plan coche la case du plan générique : même stockage, même synchronisation.
+- [ ] Validation du lot 4 par Samuel.
 - [ ] Lot 3b : 25 à 35 questions de plus (niveaux 8–10, vitres niveau 1, difficulté 3), en brouillon jusqu'à relecture.
 - [ ] Lot 5 : cohérence visuelle (intitulés, .btn.petit, un composant de choix de réponse, test de design étendu).
 
