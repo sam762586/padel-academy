@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Apprendre le padel : coups, tactique, raquettes et tournois</title>
-<meta name="description" content="Apprendre le padel : coups, tactique, tutos interactifs, test de niveau, plan d'entraînement et sélecteur de raquette.">
+<meta name="description" content="Apprendre le padel gratuitement : règles, coups, tactique, test de niveau, compteur de match, tournois en France et choix de raquette. Un parcours pour chaque joueur.">
 <link rel="canonical" href="https://apprendre-padel.fr/">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://apprendre-padel.fr/#site", "url": "https://apprendre-padel.fr/", "name": "Apprendre Padel", "alternateName": "Apprendre le padel", "inLanguage": "fr-FR", "description": "Apprendre le padel : coups, tactique, tutos interactifs, test de niveau, plan d'entraînement et sélecteur de raquette.", "author": {"@id": "https://apprendre-padel.fr/#samuel"}, "publisher": {"@id": "https://apprendre-padel.fr/#org"}}, {"@type": "Person", "@id": "https://apprendre-padel.fr/#samuel", "name": "Samuel", "description": "Joueur de padel de droite, licencié FFT, compétiteur en P50/P100 en Normandie.", "knowsAbout": ["Padel", "Tournois de padel FFT"]}, {"@type": "Organization", "@id": "https://apprendre-padel.fr/#org", "name": "Apprendre Padel", "url": "https://apprendre-padel.fr/", "logo": "https://apprendre-padel.fr/assets/img/icon-512.png"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=053ac53ed4">
+<link rel="stylesheet" href="assets/style.css?v=81e3dc9635">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -36,13 +36,12 @@
 <header class="hero photo" id="top">
   <div class="wrap">
     <div>
-      <p class="eyebrow">Apprendre · Progresser · S'équiper</p>
+      <p class="eyebrow">Apprendre · Progresser · Jouer en tournoi</p>
       <h1 style="margin-top:18px"><span class="ln">Le padel,</span><span class="ln">du premier lob</span><span class="ln hl">à la bandeja</span></h1>
-      <p class="lead">Un guide complet en français : tous les coups expliqués, le placement sur le terrain phase par phase, les règles, le vocabulaire, et un sélecteur qui te recommande 3 raquettes selon ton profil et ton budget.</p>
+      <p class="lead">Le site gratuit pour apprendre le padel, progresser match après match et trouver tes tournois en France. Dis-nous où tu en es : on te montre par où commencer.</p>
       <div class="btns">
-        <a class="btn primary" href="technique.html">Apprendre les coups</a>
+        <a class="btn primary" href="#parcours">Découvrir mon parcours</a>
         <a class="btn ghost" href="niveau.html">Tester mon niveau</a>
-        <a class="btn ghost" href="materiel.html#raquette">Trouver ma raquette →</a>
       </div>
       <div class="hero-facts">
         <div><b>20×10 m</b><small>Terrain</small></div>
@@ -54,15 +53,70 @@
     <figure class="hero-photo"><img src="assets/img/photos/index.webp" width="1000" height="1250" alt="Joueur de padel en pleine volée sur un terrain indoor" fetchpriority="high"><figcaption><b>P25 → P3000</b><span>Du premier tournoi<small>au classement FFT</small></span></figcaption></figure>
   </div>
 </header>
+<section class="parcours" id="parcours" aria-labelledby="parcours-titre">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="eyebrow">Ton parcours</p><h2 id="parcours-titre">Où en es-tu ?</h2></div><p>Choisis ce qui te ressemble : chaque parcours enchaîne les pages et les outils du site dans le bon ordre.</p></div>
+    <div class="profils">
+      <article class="profil profil-debutant" aria-labelledby="profil-debutant">
+        <p class="profil-tag">Débutant</p>
+        <h3 id="profil-debutant">« Je découvre le padel et je veux apprendre les bases. »</h3>
+        <ol class="profil-etapes"><li><a href="regles.html">Les règles essentielles</a></li><li><a href="technique.html">Les coups de base</a></li><li><a href="conseils.html">Les 10 erreurs du débutant</a></li><li><a href="niveau.html">Ton test de niveau</a></li><li><a href="espace.html#esp-bloc-exercices">Tes premiers exercices</a></li></ol>
+        <a class="btn primary" href="regles.html">Commencer à apprendre</a>
+      </article>
+      <article class="profil profil-intermediaire" aria-labelledby="profil-intermediaire">
+        <p class="profil-tag">Joueur régulier</p>
+        <h3 id="profil-intermediaire">« Je joue régulièrement et je veux progresser. »</h3>
+        <ol class="profil-etapes"><li><a href="niveau.html">Ton diagnostic : le test de niveau</a></li><li><a href="tutos.html">Les décisions qui font gagner</a></li><li><a href="technique.html">Les fiches techniques</a></li><li><a href="entrainement.html">Le plan d'entraînement 8 semaines</a></li><li><a href="espace.html">Ton suivi de progression</a></li></ol>
+        <a class="btn primary" href="niveau.html">Améliorer mon jeu</a>
+      </article>
+      <article class="profil profil-competiteur" aria-labelledby="profil-competiteur">
+        <p class="profil-tag">Compétiteur</p>
+        <h3 id="profil-competiteur">« Je joue des tournois et je veux améliorer mes résultats. »</h3>
+        <ol class="profil-etapes"><li><a href="tournois.html">Les tournois près de chez toi</a></li><li><a href="bareme.html">Le barème et ton classement</a></li><li><a href="score.html">Les statistiques de tes matchs</a></li><li><a href="tactique.html">Le placement phase par phase</a></li><li><a href="partenaires.html">Un partenaire pour ton tournoi</a></li></ol>
+        <a class="btn primary" href="tournois.html">Préparer mes compétitions</a>
+      </article>
+    </div>
+  </div>
+</section>
 <section class="pdt" id="pres-de-chez-toi" aria-labelledby="pdt-titre">
   <div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">Tournois · Près de chez toi</p><h2 id="pdt-titre">Cette semaine près de chez toi</h2></div><p>Les prochains tournois de ton département, mis à jour chaque semaine depuis Ten'Up : catégorie, ville, date et ce que ça rapporte.</p></div>
     <div id="pdt-contenu"><p class="acc-muted">Chargement…</p></div>
   </div>
 </section>
-<section>
+<section class="outils-sec" aria-labelledby="outils-titre">
   <div class="wrap">
-    <div class="sec-head"><div><p class="eyebrow">Sommaire</p><h2>Par où commencer ?</h2></div><p>Débutant : Règles → Technique → Conseils → Matériel. Déjà joueur : Test de niveau → Tutos → Plan 8 semaines.</p></div>
+    <div class="sec-head"><div><p class="eyebrow">Gratuit, sans compte</p><h2 id="outils-titre">Les outils du joueur</h2></div><p>Tous les outils marchent sans inscription. Un compte gratuit sert seulement à retrouver tes données sur tous tes appareils.</p></div>
+    <div class="outils"><a class="outil" href="niveau.html"><b>Test de niveau</b><span>14 questions calées sur le classement FFT : ton palier et tes 3 priorités.</span></a><a class="outil" href="score.html"><b>Compteur de match</b><span>Un tap par point pendant le match, le bilan des points gagnés et perdus à la fin.</span></a><a class="outil" href="tournois.html"><b>Tournois en France</b><span>Tous les tournois Ten'Up, mis à jour chaque semaine, filtrés par catégorie et distance.</span></a><a class="outil" href="bareme.html"><b>Barème et simulateur</b><span>Les points de chaque tournoi, du P25 au P3000, et ton classement estimé.</span></a><a class="outil" href="materiel.html#raquette"><b>Choisir sa raquette</b><span>Plus de 170 raquettes de 21 marques comparées selon ton jeu et ton budget.</span></a></div>
+  </div>
+</section>
+<section class="progression-sec" aria-labelledby="progression-titre">
+  <div class="wrap">
+    <div class="progression">
+      <div>
+        <p class="eyebrow">Mon espace</p>
+        <h2 id="progression-titre">Suis ta progression</h2>
+        <p>Ton espace joueur rassemble ce que tu fais sur le site : tu vois tout de suite quoi travailler, et tu retrouves ton historique.</p>
+        <div class="btns"><a class="btn primary" href="espace.html">Ouvrir mon espace</a><a class="btn ghost" href="connexion.html?suite=espace.html&amp;onglet=inscription">Créer un compte gratuit</a></div>
+      </div>
+      <ul class="progression-liste">
+        <li><b>Ton niveau</b><span>Le palier de ton dernier test et tes priorités.</span></li>
+        <li><b>Tes exercices</b><span>Choisis selon ton test et les points perdus en match.</span></li>
+        <li><b>Tes matchs</b><span>Le journal des matchs comptés au compteur ou saisis après coup.</span></li>
+        <li><b>Tes objectifs</b><span>Un rang, des points, des victoires : ton avancement au jour le jour.</span></li>
+        <li><b>Ton classement estimé</b><span>Tes résultats de tournoi et l'évolution de tes points.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section aria-labelledby="contenus-titre">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="eyebrow">Apprendre</p><h2 id="contenus-titre">Tous les contenus</h2></div><p>Débutant : Règles → Technique → Conseils → Matériel. Déjà joueur : Test de niveau → Tutos → Plan 8 semaines.</p></div>
+    <div class="nouveau"><p class="nouveau-titre">Nouveau sur le site · octobre 2026</p><ul>
+      <li><a href="niveau.html">Le test de niveau refait</a> : 6 paliers, de Découverte à P1000, calés sur le classement FFT.</li>
+      <li><a href="materiel.html#raquette">Le sélecteur de raquettes</a> : plus de 170 modèles et le choix par marque.</li>
+      <li><a href="tournois.html">Les tournois</a> : une page par tournoi en Normandie et en Île-de-France.</li>
+    </ul></div>
     <div class="home-grid"><a class="card link" href="technique.html"><div class="thumb"><img src="assets/img/photos/c-technique.webp" width="720" height="450" alt="Joueur en plein smash" loading="lazy"></div><div class="top"><span class="tag tech">Technique</span></div><h3>Tous les coups du padel</h3><p>22 fiches : fond de court, transition, filet, service. Situation, cible, erreurs à éviter.</p><span class="more">Lire →</span></a><a class="card link" href="tactique.html"><div class="thumb"><img src="assets/img/photos/c-tactique.webp" width="720" height="450" alt="Groupe de joueurs au filet" loading="lazy"></div><div class="top"><span class="tag tact">Tactique</span></div><h3>Placement : où se mettre, et quand</h3><p>Les 4 phases du point sur un terrain interactif, joueur de droite vs gauche, 6 principes.</p><span class="more">Lire →</span></a><a class="card link" href="tutos.html"><div class="thumb"><img src="assets/img/photos/c-tutos.webp" width="720" height="450" alt="Joueur qui saute pour smasher" loading="lazy"></div><div class="top"><span class="tag tact">Tutos</span></div><h3>Les 3 décisions qui font gagner</h3><p>Quand monter, quel coup sur un lob, bouger avec son partenaire. Outils interactifs.</p><span class="more">Lire →</span></a><a class="card link" href="niveau.html"><div class="thumb"><img src="assets/img/photos/c-niveau.webp" width="720" height="450" alt="Joueur souriant avec sa raquette" loading="lazy"></div><div class="top"><span class="tag tact">Test</span></div><h3>Quel est ton niveau ?</h3><p>14 questions calées sur le classement FFT : ton palier, de Découverte à P1000, et tes 3 priorités.</p><span class="more">Lire →</span></a><a class="card link" href="entrainement.html"><div class="thumb"><img src="assets/img/photos/c-entrainement.webp" width="720" height="450" alt="Joueur à l'entraînement en extérieur" loading="lazy"></div><div class="top"><span class="tag mat">Entraînement</span></div><h3>Plan de progression 8 semaines</h3><p>Un thème, un objectif mesurable et un exercice clé par semaine. Échauffement inclus.</p><span class="more">Lire →</span></a><a class="card link" href="videos.html"><div class="thumb"><img src="assets/img/photos/c-videos.webp" width="720" height="450" alt="Joueur en position d'attente" loading="lazy"></div><div class="top"><span class="tag tech">Vidéos</span></div><h3>Voir les coups en vidéo</h3><p>Les chaînes de référence et une recherche filtrée pour chaque coup.</p><span class="more">Lire →</span></a><a class="card link" href="regles.html"><div class="thumb"><img src="assets/img/photos/c-regles.webp" width="720" height="450" alt="Raquette posée sur les lignes du terrain" loading="lazy"></div><div class="top"><span class="tag regle">Règles</span></div><h3>Les règles essentielles</h3><p>Service, vitres, grille, let, punto de oro : les 10 règles qui changent du tennis.</p><span class="more">Lire →</span></a><a class="card link" href="conseils.html"><div class="thumb"><img src="assets/img/photos/c-conseils.webp" width="720" height="450" alt="Joueur en position de défense" loading="lazy"></div><div class="top"><span class="tag regle">Conseils</span></div><h3>Les 10 erreurs du débutant</h3><p>Et la correction pour chacune.</p><span class="more">Lire →</span></a><a class="card link" href="materiel.html"><div class="thumb"><img src="assets/img/photos/c-materiel.webp" width="720" height="450" alt="Trois raquettes de padel sur un terrain" loading="lazy"></div><div class="top"><span class="tag mat">Matériel</span></div><h3>Choisir sa raquette</h3><p>Comprendre forme, mousse, poids, et le sélecteur qui te recommande 3 raquettes.</p><span class="more">Lire →</span></a><a class="card link" href="competition.html"><div class="thumb"><img src="assets/img/photos/c-competition.webp" width="720" height="450" alt="Joueur en match sur terrain bleu" loading="lazy"></div><div class="top"><span class="tag regle">Compétition</span></div><h3>Jouer en compétition en France</h3><p>P25 → P2000, Ten'Up, trouver un club, un tournoi, un partenaire.</p><span class="more">Lire →</span></a><a class="card link" href="bareme.html"><div class="thumb"><img src="assets/img/photos/c-bareme.webp" width="720" height="450" alt="Joueur qui se prépare à frapper" loading="lazy"></div><div class="top"><span class="tag regle">Barème</span></div><h3>Barème des points</h3><p>Combien de points rapporte un tournoi, du P25 au P3000, et un simulateur de ton classement FFT.</p><span class="more">Lire →</span></a><a class="card link" href="lexique.html"><div class="thumb"><img src="assets/img/photos/c-lexique.webp" width="720" height="450" alt="Raquette et balle de padel" loading="lazy"></div><div class="top"><span class="tag tech">Lexique</span></div><h3>Lexique du padel</h3><p>Bandeja, víbora, rincón, chiquita… 29 termes expliqués.</p><span class="more">Lire →</span></a></div>
   </div>
 </section>
