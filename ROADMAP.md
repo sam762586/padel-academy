@@ -185,7 +185,7 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
 - [x] Lot 2 (27/10/2026) : carte « Ta semaine » (apSemaine, academie-parcours.js) en haut de Mon académie et de Mon espace :
   niveau, prochain quiz, 3 priorités, 1 exercice (pas le défi), 1 scène 3D, objectif = défi de la semaine. Priorités
   complétées par les compétences des niveaux voisins quand le niveau en a moins de 4 (niveaux 1, 2, 3, 8, 9, 10).
-- [ ] Validation des lots 1 et 2 par Samuel.
+- [x] Validation des lots 1 et 2 par Samuel (27/10/2026).
 - [ ] Lot 3b : intégrer les 120 questions de Samuel (scripts/donnees/academie-questions-samuel.md, reçues le 27/10/2026).
 - [ ] Lot 3a : contenu recommandé après chaque erreur (quiz de l'académie, quiz tactique, mode quiz 3D).
 - [ ] Lot 4 : « Mon plan » personnalisé, plan générique et progression préservés.
