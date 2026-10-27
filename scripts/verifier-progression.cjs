@@ -100,25 +100,34 @@ const serveur=http.createServer((req,res)=>{
  const base='http://127.0.0.1:'+serveur.address().port;
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const erreurs=[];
- const ouvrir=async({activees=[],avant}={})=>{
+ // L'espace est réservé aux joueurs connectés : sauf « visiteur », chaque parcours ouvre une session simulée
+ const ouvrir=async({activees=[],avant,visiteur=false}={})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   await ctx.route('https://**',r=>r.fulfill({body:''}));
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
   await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:CONFIG(activees)}));
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))erreurs.push(m.text());});
-  if(avant){await page.goto(base+'/index.html');await page.evaluate(avant);}
-  await page.goto(base+'/espace.html');await page.waitForSelector('#esp-bord .bord-bloc');
+  await page.goto(base+'/index.html');
+  if(!visiteur)await page.evaluate(()=>sessionStorage.setItem('session','1'));
+  if(avant)await page.evaluate(avant);
+  await page.goto(base+'/espace.html');
+  if(!visiteur)await page.waitForSelector('#esp-bord .bord-bloc');
   return {ctx,page};
  };
  try{
-  // Visiteur sans données
-  let {ctx,page}=await ouvrir();
+  // Visiteur non connecté : redirection vers la connexion
+  let {ctx,page}=await ouvrir({visiteur:true});
+  await page.waitForURL(/connexion\.html\?suite=espace\.html$/);
+  await ctx.close();
+  ok('visiteur non connecté : espace.html redirige vers la connexion');
+  // Joueur connecté sans données
+  ({ctx,page}=await ouvrir());
   assert.match(await page.textContent('#esp-bord .bord-niveau'),/Pas encore de test/);
   assert.equal(await page.getAttribute('#esp-bord .bord-niveau a','href'),'niveau.html');
   assert.match(await page.textContent('#esp-bord .bord-programme'),/ton programme apparaîtra ici/);
   assert.match(await page.textContent('#esp-bord .bord-matchs'),/Aucun match/);
-  ok('visiteur sans données : invitation au test, programme vide expliqué, aucun match');
+  ok('joueur connecté sans données : invitation au test, programme vide expliqué, aucun match');
   // Choisir un objectif : programme expliqué, focus gardé, gardé après rechargement
   await page.click('.bord-puce[data-objectif="bandeja"]');
   assert.equal(await page.getAttribute('.bord-puce[data-objectif="bandeja"]','aria-pressed'),'true');

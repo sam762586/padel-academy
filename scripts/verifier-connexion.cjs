@@ -2,7 +2,7 @@
    1) gabarit : « Mon espace » marqué (data-espace), section active sur connexion.html et compte.html ;
    2) lien « Mon espace » : connexion.html?suite=espace.html sans session, espace.html avec (pages avec et sans compte.js,
       page en sous-dossier) ;
-   3) espace.html reste consultable sans compte, son « Connecte-toi » mène à connexion.html ;
+   3) espace.html sans compte : redirection vers connexion.html ; connecté, l'espace s'affiche ;
    4) compte.html : plus de formulaire de lien magique, redirection vers connexion.html si non connecté ;
    5) connexion.html : mot de passe faux refusé, connexion puis retour sur la page demandée, adresse de retour externe
       refusée, fiche tournoi acceptée ; compte confirmé → compte.html?bienvenue=1, profil en premier ;
@@ -85,12 +85,10 @@ const serveur=http.createServer((req,res)=>{
   assert.equal(await hrefEspace(page),'espace.html');
   await page.evaluate(()=>localStorage.removeItem('sb-test-auth-token'));
   ok('« Mon espace » : connexion.html?suite=espace.html sans session (racine et sous-dossier), espace.html avec une session gardée');
-  // 3. espace.html sans compte : consultable, « Connecte-toi » vers connexion.html
-  await page.goto(base+'/espace.html');await page.waitForTimeout(500);
-  assert.match(page.url(),/espace\.html$/);
-  assert.equal(await hrefEspace(page),'connexion.html?suite=espace.html');
-  assert.equal(await page.getAttribute('#esp-statut a','href'),'connexion.html?suite=espace.html');
-  ok('espace.html sans compte : reste consultable, « Connecte-toi » mène à la connexion');
+  // 3. espace.html sans compte : redirection vers la connexion (décision du 27/10/2026)
+  await page.goto(base+'/espace.html');
+  await page.waitForURL(/connexion\.html\?suite=espace\.html$/);
+  ok('espace.html sans compte : redirection vers connexion.html?suite=espace.html');
   // 4. compte.html non connecté : redirection
   await page.goto(base+'/compte.html');
   await page.waitForURL(/connexion\.html\?suite=compte\.html$/);
@@ -103,7 +101,10 @@ const serveur=http.createServer((req,res)=>{
   await page.fill('#cx-mdp','bonmotdepasse');await page.click('#cx-valider');
   await page.waitForURL(/score\.html$/);
   assert.equal(await hrefEspace(page),'espace.html');
-  ok('connexion : mot de passe faux refusé, puis retour sur la page demandée ; « Mon espace » mène à l\'espace');
+  // Connecté : l'espace s'affiche, sans redirection
+  await page.goto(base+'/espace.html');await page.waitForSelector('#esp-bord .bord-bloc');
+  assert.match(page.url(),/espace\.html$/);assert.equal(await page.locator('#espace').isVisible(),true);
+  ok('connexion : mot de passe faux refusé, puis retour sur la page demandée ; connecté, l\'espace s\'affiche');
   // Déjà connecté : connexion.html renvoie vers la suite ; adresses de retour vérifiées
   await page.goto(base+'/connexion.html?suite='+encodeURIComponent('https://exemple.com/piege.html'));
   await page.waitForURL(/\/espace\.html$/);

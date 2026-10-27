@@ -252,7 +252,7 @@ function qCompte(zone,resultat){
   zone.hidden=false;zone.textContent="";
   if(!compte.user){
    const lien=document.createElement("a");lien.href="connexion.html?suite=niveau.html&onglet=inscription";lien.textContent="Crée un compte gratuit";
-   const p=document.createElement("p");p.append(lien," pour retrouver ton niveau et ton programme sur tous tes appareils. Sans compte, ils restent sur cet appareil.");
+   const p=document.createElement("p");p.append(lien," pour retrouver ton niveau et ton programme dans ton espace joueur, sur tous tes appareils.");
    zone.appendChild(p);return;
   }
   if(!enregistrable){

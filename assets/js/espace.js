@@ -22,6 +22,21 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
  function info(zone,texte,erreur){let p=zone.querySelector(":scope > .esp-msg");if(!p){p=el("p","acc-msg esp-msg");p.setAttribute("role","status");zone.appendChild(p);}p.textContent=texte||"";p.hidden=!texte;p.classList.toggle("acc-err",!!erreur);}
  const lireResultats=()=>B.simNormaliser(lire(B.SIM_KEY,[]));
 
+ /* ---------- Accès : espace réservé aux joueurs connectés (décision du 27/10/2026) ----------
+    Sans session : direction connexion.html?suite=espace.html (aussi après une déconnexion). Le contenu reste masqué
+    tant que la session n'est pas connue. Comptes indisponibles (config vide, fichier local, service injoignable) :
+    l'espace reste affiché, avec les données gardées sur l'appareil. */
+ const compteAcces=window.PA_COMPTE;
+ if(compteAcces&&compteAcces.actif){
+  document.documentElement.classList.add("esp-attente");
+  const verifierAcces=()=>{
+   if(!compteAcces.user){location.replace("connexion.html?suite=espace.html");return;}
+   document.documentElement.classList.remove("esp-attente");
+  };
+  compteAcces.ready.then(verifierAcces,()=>document.documentElement.classList.remove("esp-attente"));
+  compteAcces.onChange(verifierAcces);
+ }
+
  /* ---------- Statut de synchronisation ---------- */
  function rendreStatut(){
   const zone=$("esp-statut"),c=window.PA_COMPTE;zone.textContent="";
