@@ -25,17 +25,19 @@ THEMES_TT = {
     '9-05': 'construction', '9-06': 'lob', '9-07': 'defense', '9-08': 'bandeja',
     '10-06': 'placement', '10-07': 'lob',
 }
-# Faits datés ou chiffrés que le site ne publie pas encore : à confirmer par Samuel avant d'être posés
-A_CONFIRMER = {
-    '7-01': 'Star Point « appliqué sur le circuit professionnel depuis 2026 »',
-    '9-04': 'Star Point : deux avantages au maximum',
-    '9-09': 'Saison FFT 2026/2027 : P1500 devenu P2000, ancien P2000 devenu P3000',
-    '9-10': 'Finale de P100 avec 8 paires : 80 points (85 avec 17 à 20 paires)',
-    '10-08': 'Première saison de Premier Padel en 2022',
-    '10-09': 'Premier championnat du monde en 1992',
-    '10-10': 'Révision des règles FIP au 1er janvier 2026 adoptée à Acapulco',
-    '10-11': 'Enrique Corcuera, inventeur du padel',
-    '8-12': 'Fiche Ten\'Up : « Interdit au top 1 000 »',
+# Faits datés ou chiffrés vérifiés le 28/10/2026 (source de chaque vérification) ; une question ajoutée ici sans
+# vérification reste « brouillon » (mettre sa clé dans A_CONFIRMER)
+A_CONFIRMER = {}
+VERIFICATIONS = {
+    '7-01': 'FIP et Premier Padel, communiqué du 18/12/2025 (Star Point, saison 2026)',
+    '9-04': 'FIP et Premier Padel, communiqué du 18/12/2025 : deux avantages, puis le Star Point',
+    '9-09': 'Règlement FFT 2026/2027 (bareme-donnees.js) : P1500 renommé P2000, ancien P2000 devenu P3000',
+    '9-10': 'Barème FFT 2026/2027 (bareme.html) : finaliste de P100, 80 points de 4 à 8 paires, 85 de 17 à 20',
+    '8-12': 'bareme.html, cuts : catégorie interdite aux joueurs classés dans ce top',
+    '10-08': 'Ooredoo Qatar Major, Doha, 28/03 au 02/04/2022 : premier tournoi de Premier Padel',
+    '10-09': 'FIP (fondée en 1991) : premier championnat du monde en 1992',
+    '10-10': '35e assemblée générale de la FIP, Acapulco, novembre 2025 (règles applicables en 2026)',
+    '10-11': 'FIP, LTA et Wikipédia : Enrique Corcuera, Acapulco, 1969',
 }
 
 texte = SOURCE.read_text(encoding='utf-8')
@@ -62,6 +64,7 @@ for b in blocs:
         'difficulte': 1 if niveau <= 3 else 2 if niveau <= 6 else 3,
         'question': question.strip(), 'choix': choix, 'bonne': bonnes[0], 'explication': explication.strip(),
         **({'a_confirmer': A_CONFIRMER[cle]} if cle in A_CONFIRMER else {}),
+        **({'verification': VERIFICATIONS[cle]} if cle in VERIFICATIONS else {}),
     })
 assert len(questions) == 120, len(questions)
 assert not set(THEMES_TT) - {q['id'][7:] for q in questions}, 'THEMES_TT : identifiant inconnu'

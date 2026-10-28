@@ -190,8 +190,8 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
   academie-questions-samuel.json) : banque de 195 questions, 186 posées (niveau 8 : 17 → 28 ; niveau 10 : 13 → 21).
   3 thèmes ajoutés : Matériel, Compétition, Culture padel (articles materiel.html, competition.html, bareme.html,
   lexique.html ; pas d'exercice pour Matériel et Culture). Thème des questions [Technique] / [Tactique] : table THEMES_TT.
-- [ ] 9 questions de Samuel en brouillon (fait daté ou chiffré à confirmer : Star Point, saison FFT 2026/2027, barème
-  P100, Premier Padel, championnat du monde, FIP à Acapulco, Corcuera, « Interdit au top 1 000 »).
+- [x] Les 9 questions de Samuel à fait daté ou chiffré vérifiées le 28/10/2026 (FIP, Premier Padel, barème FFT du site) et
+  ouvertes au quiz (champ verification dans academie-questions-samuel.json).
 - [x] Validation du lot 3b par Samuel (27/10/2026) ; les 9 brouillons attendent sa confirmation.
 - [x] Lot 3a (27/10/2026) : « Pour revoir ce point » après chaque erreur (quiz de l'académie, quiz tactique, mode quiz
   3D) : section d'article du thème couvrant les niveaux de la question, exercice, scène 3D ; calculé par

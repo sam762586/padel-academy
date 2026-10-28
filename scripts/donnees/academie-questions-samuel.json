@@ -1443,7 +1443,7 @@
   },
   {
    "id": "samuel-7-01",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Règles",
    "theme": "regles",
    "niveaux": [
@@ -1460,7 +1460,7 @@
    ],
    "bonne": 3,
    "explication": "On joue l'avantage deux fois. Si l'égalité revient une troisième fois, un seul point décide du jeu.",
-   "a_confirmer": "Star Point « appliqué sur le circuit professionnel depuis 2026 »"
+   "verification": "FIP et Premier Padel, communiqué du 18/12/2025 (Star Point, saison 2026)"
   },
   {
    "id": "samuel-7-02",
@@ -1904,7 +1904,7 @@
   },
   {
    "id": "samuel-8-12",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Compétition",
    "theme": "competition",
    "niveaux": [
@@ -1921,7 +1921,7 @@
    ],
    "bonne": 1,
    "explication": "C'est le « cut » : il réserve le tournoi aux joueurs du niveau visé.",
-   "a_confirmer": "Fiche Ten'Up : « Interdit au top 1 000 »"
+   "verification": "bareme.html, cuts : catégorie interdite aux joueurs classés dans ce top"
   },
   {
    "id": "samuel-9-01",
@@ -1985,7 +1985,7 @@
   },
   {
    "id": "samuel-9-04",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Règles",
    "theme": "regles",
    "niveaux": [
@@ -2002,7 +2002,7 @@
    ],
    "bonne": 1,
    "explication": "Égalité, avantage, égalité, avantage, égalité : au troisième 40-40, on joue le point décisif.",
-   "a_confirmer": "Star Point : deux avantages au maximum"
+   "verification": "FIP et Premier Padel, communiqué du 18/12/2025 : deux avantages, puis le Star Point"
   },
   {
    "id": "samuel-9-05",
@@ -2086,7 +2086,7 @@
   },
   {
    "id": "samuel-9-09",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Compétition",
    "theme": "competition",
    "niveaux": [
@@ -2103,11 +2103,11 @@
    ],
    "bonne": 2,
    "explication": "Le P1500 est devenu P2000, et l'ancien P2000 est devenu P3000.",
-   "a_confirmer": "Saison FFT 2026/2027 : P1500 devenu P2000, ancien P2000 devenu P3000"
+   "verification": "Règlement FFT 2026/2027 (bareme-donnees.js) : P1500 renommé P2000, ancien P2000 devenu P3000"
   },
   {
    "id": "samuel-9-10",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Compétition",
    "theme": "competition",
    "niveaux": [
@@ -2124,7 +2124,7 @@
    ],
    "bonne": 3,
    "explication": "80 points jusqu'à 8 paires, et 85 points avec 17 à 20 paires : le nombre de paires compte.",
-   "a_confirmer": "Finale de P100 avec 8 paires : 80 points (85 avec 17 à 20 paires)"
+   "verification": "Barème FFT 2026/2027 (bareme.html) : finaliste de P100, 80 points de 4 à 8 paires, 85 de 17 à 20"
   },
   {
    "id": "samuel-9-11",
@@ -2308,7 +2308,7 @@
   },
   {
    "id": "samuel-10-08",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Culture padel",
    "theme": "culture",
    "niveaux": [
@@ -2325,11 +2325,11 @@
    ],
    "bonne": 1,
    "explication": "Le circuit, soutenu par Qatar Sports Investments, a démarré en 2022. Le World Padel Tour avait commencé en 2013.",
-   "a_confirmer": "Première saison de Premier Padel en 2022"
+   "verification": "Ooredoo Qatar Major, Doha, 28/03 au 02/04/2022 : premier tournoi de Premier Padel"
   },
   {
    "id": "samuel-10-09",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Culture padel",
    "theme": "culture",
    "niveaux": [
@@ -2346,11 +2346,11 @@
    ],
    "bonne": 1,
    "explication": "Il a lieu tous les deux ans depuis 1992.",
-   "a_confirmer": "Premier championnat du monde en 1992"
+   "verification": "FIP (fondée en 1991) : premier championnat du monde en 1992"
   },
   {
    "id": "samuel-10-10",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Culture padel",
    "theme": "culture",
    "niveaux": [
@@ -2367,11 +2367,11 @@
    ],
    "bonne": 2,
    "explication": "Un clin d'œil : c'est la ville où le padel est né.",
-   "a_confirmer": "Révision des règles FIP au 1er janvier 2026 adoptée à Acapulco"
+   "verification": "35e assemblée générale de la FIP, Acapulco, novembre 2025 (règles applicables en 2026)"
   },
   {
    "id": "samuel-10-11",
-   "statut": "brouillon",
+   "statut": "validee",
    "categorie": "Culture padel",
    "theme": "culture",
    "niveaux": [
@@ -2388,7 +2388,7 @@
    ],
    "bonne": 3,
    "explication": "En modifiant son terrain de squash à Acapulco. Les trois autres sont des légendes du circuit pro.",
-   "a_confirmer": "Enrique Corcuera, inventeur du padel"
+   "verification": "FIP, LTA et Wikipédia : Enrique Corcuera, Acapulco, 1969"
   },
   {
    "id": "samuel-10-12",
