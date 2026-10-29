@@ -37,8 +37,8 @@ await db.exec(`
  insert into auth.users values ('${A}'), ('${B}');`);
 const migrations = ['2026-10-26-espace-02-fonction-limite-lignes.sql', '2026-10-27-academie-01-table-niveaux.sql', '2026-10-27-academie-02-table-quiz.sql', '2026-10-27-academie-03-triggers-limites.sql'];
 for (let fois = 0; fois < 2; fois++) for (const m of migrations) await db.exec(lire('supabase/migrations/' + m));
-for (const m of migrations.slice(1)) assert.match(lire('supabase/migrations/' + m), /PRÉPARÉ, NON APPLIQUÉ/, m + ' : marqué comme non appliqué');
-ok('migrations academie-01 à 03 rejouables (deux passages sans erreur), marquées « préparé, non appliqué »');
+for (const m of migrations.slice(1)) assert.match(lire('supabase/migrations/' + m), /APPLIQUÉ EN PRODUCTION LE 29\/10\/2026/, m + ' : date d’application notée');
+ok('migrations academie-01 à 03 rejouables (deux passages sans erreur), date d’application en production notée');
 
 // Exécute une requête en tant que joueur connecté (ou anonyme)
 async function en(qui, sql, params = []) {

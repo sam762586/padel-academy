@@ -2,7 +2,7 @@
 -- Niveau de 1 à 10 de la grille « Niveaux Padel » de la FFT, DÉCLARÉ par le joueur : ce n'est ni le palier du test de
 -- niveau (quiz_results), ni profiles.niveau_declare (1 à 4) ; aucune conversion. Une ligne par choix, jamais modifiée :
 -- le niveau actuel est la ligne la plus récente. Chaque joueur ne voit, n'ajoute et ne supprime que ses lignes (RLS).
--- PRÉPARÉ, NON APPLIQUÉ : à exécuter seulement avec l'accord de Samuel, après les migrations espace-01 à 06
+-- APPLIQUÉ EN PRODUCTION LE 29/10/2026 (accord de Samuel), après espace-02 (fonction espace_limite_lignes).
 -- (fonction espace_limite_lignes). Synchronisation côté site : assets/js/academie-sync.js (PA_SUPABASE.activees : "academie").
 create table if not exists public.academie_niveaux (
   id         uuid primary key default gen_random_uuid(),

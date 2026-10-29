@@ -175,9 +175,11 @@ async function dansLeNavigateur(base){
    assert.match(page.url(),/espace\.html$/,'connecté : Mon espace reste ouvert');
    await page.goto(base+'/academie.html');
    await page.click('.ac-rapide-btn[data-choisir="6"]');await quizComplet(page);
-   // Mon académie ne charge pas Supabase : aucune écriture possible vers le compte
-   assert.equal(await page.evaluate(()=>typeof window.supabase),'undefined','Mon académie sans client Supabase');
-   assert.equal(await page.evaluate(()=>window.__ops===undefined),true);
+   // "academie" activé : Mon académie charge Supabase à la demande et envoie le niveau et le quiz dans le compte
+   await page.waitForFunction(()=>(window.__ops||[]).includes('academie_quiz:upsert'),null,{timeout:10000});
+   const ops=await page.evaluate(()=>window.__ops);
+   assert.ok(ops.includes('academie_niveaux:upsert')&&ops.includes('academie_quiz:upsert'),'niveau et quiz envoyés : '+ops.join(', '));
+   assert.ok(ops.every(o=>/^academie_/.test(o)),'aucune autre table touchée : '+ops.join(', '));
    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-academie')).niveau),6);
    await existantIntact(page,'connecté');
    await ctx.close();}
@@ -190,7 +192,7 @@ async function dansLeNavigateur(base){
    assert.match(await page.textContent('.ac-moi-titre'),/Ton niveau déclaré : 3/);
    await existantIntact(page,'non connecté');
    await ctx.close();}
-  ok('connecté : Mon espace ouvert, académie sur l’appareil, aucune écriture en base ; non connecté : Mon espace → connexion, Mon académie utilisable sans compte');
+  ok('connecté : Mon espace ouvert, niveau et quiz de l’académie envoyés dans le compte (et rien d’autre) ; non connecté : Mon espace → connexion, Mon académie utilisable sans compte');
   // 5. Retour après 11 jours
   {let {ctx,page}=await ouvrir({quand:'2026-10-29T10:00:00'});
    await page.goto(base+'/academie.html');

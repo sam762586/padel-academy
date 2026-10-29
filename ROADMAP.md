@@ -170,8 +170,10 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
 - [x] Synchronisation côté site écrite (29/10/2026) : assets/js/academie-sync.js (union des niveaux par date et des quiz
   par séance ; appareil partagé : rien d'un compte n'est envoyé dans un autre), inactive tant que "academie" n'est pas
   dans activees ; testée sur deux appareils et deux comptes avec les vraies migrations (verifier-academie-sync.mjs).
-- [ ] Samuel exécute academie-01 à 03 dans le SQL Editor (prérequis : espace_limite_lignes), puis "academie" est ajouté
-  à activees et le site publié (supabase/LISEZMOI.md, « Mon académie : niveau et quiz dans le compte »).
+- [x] 29/10/2026, à la demande de Samuel : espace-02 (fonction espace_limite_lignes) puis academie-01 à 03 exécutés dans le
+  SQL Editor de production ; vérifié : fonction, 2 déclencheurs, RLS sur les 2 tables, 6 politiques. "academie" ajouté à
+  activees.
+- [ ] Publication de l'activation (accord de Samuel), puis vérification en ligne.
 
 ## Expérience joueur personnalisée (audit du 27/10/2026, plan validé par Samuel)
 Constats vérifiés : accueil en « 6 paliers » à côté du 1 à 10 (vrai) ; menu identique sur les 1 068 pages mais 9 libellés

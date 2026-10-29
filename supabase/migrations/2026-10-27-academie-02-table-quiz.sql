@@ -2,7 +2,7 @@
 -- cle : identifiant de séance du site (s-<date>-<aléa>) ; reponses : [{id, choix, juste, type, theme}] (tableau JSON,
 -- 40 réponses au plus, taille bornée). Le score ne modifie jamais le niveau déclaré. RLS : chacun ses lignes ; pas de
 -- modification (une séance terminée ne change plus).
--- PRÉPARÉ, NON APPLIQUÉ : à exécuter seulement avec l'accord de Samuel, après academie-01.
+-- APPLIQUÉ EN PRODUCTION LE 29/10/2026 (accord de Samuel), après espace-02 (fonction espace_limite_lignes).
 create table if not exists public.academie_quiz (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references auth.users(id) on delete cascade,
