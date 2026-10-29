@@ -84,7 +84,7 @@
    });
   }
   const apercu=$("cj-apercu");
-  if(apercu){apercu.hidden=!complet()||nom==="quiz"||nom==="intro";if(!apercu.hidden)rendreApercu();}
+  if(apercu){apercu.hidden=!complet()||nom==="quiz"||nom==="intro";if(!apercu.hidden)rendreApercu();else if(arretApercu){arretApercu();arretApercu=null;}}
   if(focus){
    const z=page.querySelector('.cj-etape[data-etape="'+nom+'"] h2');
    if(z){z.scrollIntoView({block:"nearest"});z.focus({preventScroll:true});}
@@ -304,49 +304,36 @@
   });
  }
 
- /* ---- Aperçu HTML (.carte-joueur) et description accessible ---- */
+ /* ---- Aperçu (canvas dessiné par carte-rendu.js, même dessin que l'image exportée) et description accessible ---- */
  function initiales(p){
   const R=window.CARTE_RENDU;
   if(R&&typeof R.initiales==="function")return R.initiales(p);
   const m=String(p||"").trim().split(/[\s-]+/).filter(Boolean);
   return m.length?(m.length>1?m[0][0]+m[m.length-1][0]:m[0].slice(0,2)).toUpperCase():"";
  }
- const CODE_POSTE={droite:"DRO",gauche:"GAU",polyvalent:"POL"};
  function description(r){
-  const nom=etat.pseudo||"joueur";
+  const nom=etat.pseudo||"joueur",ini=initiales(etat.pseudo);
   return "Carte de joueur de "+nom+" : "+r.globale+", "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
-   CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+".";
+   CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+". "+(etat.photo?"Avec ta photo.":"Sans photo"+(ini?", initiales "+ini:"")+".");
  }
  function donneesRendu(r){
   return {pseudo:etat.pseudo||"Joueur",poste:libPoste(r.poste),globale:r.globale,rang:r.rang,attributs:CLES.map(k=>({cle:k,note:r.notes[k]})),
    photo:etat.imgPhoto,niveau:repere&&!etat.sansBase?repere.carte:""};
  }
+ // Le dessin (coûteux) est regroupé par image d'écran ; la description et le rang sont posés tout de suite.
+ // Élite : la bordure est animée par CARTE_RENDU.animer, qui renvoie une fonction d'arrêt (appelée avant tout nouveau dessin).
+ let arretApercu=null,apercuPrevu=0;
  function rendreApercu(){
-  const zone=$("cj-apercu-html"),canvas=$("cj-canvas");
-  if(!zone||!complet())return;
+  const canvas=$("cj-apercu-canvas"),R=window.CARTE_RENDU;
+  if(!canvas||!R||!complet())return;
   const r=calculer();
-  zone.textContent="";
-  const c=el("div","carte-joueur rang-"+r.rang);
-  const photo=el("div","cj-photo");
-  if(etat.photo){const img=document.createElement("img");img.alt="";img.src=etat.photo;photo.appendChild(img);}
-  else{
-   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("class","cj-silhouette");svg.setAttribute("viewBox","0 0 300 360");svg.setAttribute("aria-hidden","true");
-   const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d","M150 20a70 70 0 1 1 0 140a70 70 0 1 1 0-140zM0 360c0-120 60-180 150-180s150 60 150 180z");
-   svg.appendChild(p);photo.appendChild(svg);
-   photo.appendChild(el("div","cj-initiales",initiales(etat.pseudo)));
-  }
-  c.appendChild(photo);
-  const marque=el("div","cj-marque");marque.append("Apprendre ",el("b","","Padel"));c.appendChild(marque);
-  c.appendChild(el("span","cj-rang",libRang(r.rang)));
-  const tete=el("div","cj-tete");tete.appendChild(el("span","cj-globale",String(r.globale)));
-  const poste=el("span","cj-poste");poste.append(el("small","","Poste · "+libPoste(r.poste)),el("b","",CODE_POSTE[r.poste]||""));tete.appendChild(poste);
-  c.append(tete,el("div","cj-filet"),el("div","cj-nom",(etat.pseudo||"Joueur").toUpperCase()));
-  const niv=donneesRendu(r).niveau;if(niv)c.appendChild(el("div","cj-niveau",niv));
-  const piste=el("div","cj-piste"),dl=el("dl","cj-attributs");
-  CLES.forEach(k=>{const d=el("div","");const dd=el("dd","",String(r.notes[k]));dd.style.setProperty("--n",String(r.notes[k]));dd.appendChild(el("i",""));d.append(el("dt","",k),dd);dl.appendChild(d);});
-  piste.appendChild(dl);c.append(piste,el("div","cj-site","apprendre-padel.fr"));
-  zone.appendChild(c);
-  if(canvas)canvas.setAttribute("aria-label",description(r));
+  canvas.setAttribute("aria-label",description(r));
+  canvas.className="cj-apercu-canvas rang-"+r.rang;
+  if(apercuPrevu)return;
+  apercuPrevu=requestAnimationFrame(()=>{
+   apercuPrevu=0;if(arretApercu)arretApercu();
+   arretApercu=R.animer(canvas,donneesRendu(calculer()),{format:"carte",largeur:Math.min(1200,Math.round(420*Math.max(1,window.devicePixelRatio||1)))});
+  });
  }
 
  /* ---- Carte finale : image (carte ou story), téléchargement, partage ---- */
@@ -355,15 +342,18 @@
  async function rendreImage(format){
   const R=window.CARTE_RENDU,canvas=$("cj-canvas");
   if(!R||!canvas)throw new Error("rendu indisponible");
-  const r=calculer();
-  await R.dessiner(canvas,donneesRendu(r),{format});
-  canvas.setAttribute("aria-label",description(r)+(format==="story"?" Format story.":""));
+  await R.dessiner(canvas,donneesRendu(calculer()),{format,export:true});
   return canvas;
  }
- const versBlob=canvas=>new Promise((res,rej)=>{try{canvas.toBlob(b=>b?res(b):rej(new Error("image vide")),"image/png");}catch(e){rej(e);}});
+ // Image exportée : WebP quand le navigateur sait l'encoder (Edge, Chrome, Firefox), sinon JPEG (Safari) ; qualité 0,9 dans les deux cas
+ const EXPORT=(()=>{try{const c=document.createElement("canvas");c.width=c.height=1;return c.toDataURL("image/webp").startsWith("data:image/webp")?{type:"image/webp",ext:"webp"}:{type:"image/jpeg",ext:"jpg"};}catch(e){return {type:"image/jpeg",ext:"jpg"};}})();
+ const NOM_FICHIER="ma-carte-padel."+EXPORT.ext;
+ const enBlob=(canvas,q)=>new Promise((res,rej)=>{try{canvas.toBlob(b=>b?res(b):rej(new Error("image vide")),EXPORT.type,q);}catch(e){rej(e);}});
+ // Objectif : 500 Ko au plus (WebP ≈ 300 Ko ; JPEG ≈ 480 Ko, ré-encodé à 0,82 si une photo très détaillée dépasse)
+ const versBlob=async canvas=>{const b=await enBlob(canvas,0.9);return b.size>512000?enBlob(canvas,0.82):b;};
  function telechargerBlob(blob){
   const url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url;a.download="ma-carte-padel.png";document.body.appendChild(a);a.click();a.remove();
+  a.href=url;a.download=NOM_FICHIER;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),10000);
  }
  // Un bouton pendant son travail : désactivé, libellé « … », puis rendu tel quel
@@ -382,14 +372,14 @@
  }
  const btnTel=$("cj-telecharger"),btnPart=$("cj-partager");
  if(btnTel)btnTel.addEventListener("click",()=>avecAttente(btnTel,"Préparation…",async()=>{
-  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);messageFinal("Image prête : ma-carte-padel.png ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
+  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);messageFinal("Image prête : "+NOM_FICHIER+" ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
   catch(e){messageFinal("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
  }));
  if(btnPart)btnPart.addEventListener("click",()=>avecAttente(btnPart,"Préparation…",async()=>{
   try{
    const blob=await versBlob(await rendreImage(formatChoisi()));
    let fichier=null;
-   try{fichier=new File([blob],"ma-carte-padel.png",{type:"image/png"});}catch(e){}
+   try{fichier=new File([blob],NOM_FICHIER,{type:EXPORT.type});}catch(e){}
    if(fichier&&navigator.share&&navigator.canShare&&navigator.canShare({files:[fichier]})){
     try{await navigator.share({files:[fichier],title:"Ma carte de joueur de padel",text:"Ma carte de joueur de padel, faite sur apprendre-padel.fr"});messageFinal("Carte partagée.","msg-ok");}
     catch(e){if(e&&e.name!=="AbortError"){messageFinal("Le partage n'a pas abouti : l'image a été téléchargée à la place.","msg-alerte");telechargerBlob(blob);}}

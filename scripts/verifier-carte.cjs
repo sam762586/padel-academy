@@ -2,8 +2,8 @@
    1) moteur (sans navigateur) : les trois exemples de carte-donnees.js et les extrêmes donnent les notes attendues ;
    2) navigateur (Edge, 390 px, toute adresse https bloquée) : repère lu dans pa-quiz-dernier (jamais écrit), parcours complet
       au clavier jusqu'à la carte (focus sur la question suivante, compteur aria-live, groupe nommé), ajustement borné à ±5,
-      pseudo invalide refusé, photo recadrée et gardée après rechargement, téléchargement PNG aux bonnes dimensions (carte
-      et story), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console.
+      pseudo invalide refusé, photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas
+      l'encoder) aux bonnes dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console.
    Lancer depuis la racine du site : node scripts/verifier-carte.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),vm=require('node:vm'),os=require('node:os');
@@ -47,8 +47,9 @@ const serveur=http.createServer((req,res)=>{
   res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.webmanifest':'application/manifest+json'})[path.extname(p)]||'text/plain');res.end(b);
  });
 });
-// Dimensions d'un PNG (en-tête IHDR)
-function dimsPng(buf){assert.equal(buf.toString('latin1',1,4),'PNG');return [buf.readUInt32BE(16),buf.readUInt32BE(20)];}
+// Dimensions d'une image téléchargée (WebP ou JPEG), lues par le navigateur
+async function dimsImage(page,buf,type){return page.evaluate(([b,t])=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res([i.naturalWidth,i.naturalHeight]);i.onerror=()=>rej(new Error('image illisible'));i.src='data:'+t+';base64,'+b;}),[buf.toString('base64'),type]);}
+const EXT_ATTENDUE='webp',TYPE_ATTENDU='image/webp'; // Edge encode le WebP ; Safari tomberait sur ma-carte-padel.jpg
 // Répond à une question au clavier : le bouton voulu reçoit le focus, Entrée
 async function repondreClavier(page,reponses){
  for(let i=0;i<12;i++){
@@ -104,8 +105,9 @@ async function repondreClavier(page,reponses){
   assert.equal(await page.textContent('#cj-globale'),'63');assert.equal(await page.textContent('#cj-rang-tag'),'Argent');
   assert.equal(await page.getAttribute('#cj-postes button:nth-child(1)','aria-pressed'),'true','suggestion droite pressée');
   assert.equal(await page.locator('#cj-apercu').isVisible(),true);
-  assert.equal(await page.locator('#cj-apercu-html .carte-joueur.rang-argent').count(),1);
-  ok('notes : Hugo → VOL 64, AER 59, globale 63 Argent, droite suggérée et pressée, aperçu HTML en rang argent');
+  assert.equal(await page.locator('#cj-apercu-canvas.rang-argent').count(),1);
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/: 63, Argent, poste droite\./);
+  ok('notes : Hugo → VOL 64, AER 59, globale 63 Argent, droite suggérée et pressée, aperçu canvas en rang argent et décrit');
   // Poste : gauche change la globale
   await page.click('#cj-postes button:nth-child(2)');
   assert.equal(await page.getAttribute('#cj-postes button:nth-child(2)','aria-pressed'),'true');
@@ -142,7 +144,7 @@ async function repondreClavier(page,reponses){
   await page.evaluate(()=>{const z=document.getElementById('cj-zoom');z.value='1.5';z.dispatchEvent(new Event('input',{bubbles:true}));});
   assert.equal(await page.textContent('#cj-zoom-val'),'×1,5');
   await page.waitForFunction(a=>localStorage.getItem('pa-carte-photo')!==a,avant);
-  assert.equal(await page.locator('#cj-apercu-html .cj-photo img').count(),1);
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/Avec ta photo\./);
   assert.equal(await page.locator('#cj-retirer-photo').isVisible(),true);
   ok('photo : fichier accepté, recadrage 600 × 480 en JPEG < 1 Mo, déplacement au clavier et zoom régénèrent la photo, aperçu avec image');
   // Pseudo : invalide refusé, puis valide
@@ -157,31 +159,32 @@ async function repondreClavier(page,reponses){
   await page.fill('#cj-pseudo','Hugo D.');await page.keyboard.press('Enter');
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.equal(await page.evaluate(()=>document.activeElement.closest('.cj-etape').id),'cj-final');
-  assert.equal(await page.textContent('#cj-apercu-html .cj-nom'),'HUGO D.');
-  assert.match(await page.getAttribute('#cj-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: \d+, Argent, poste droite\. Volée 69, Jeu aérien 54/);
-  assert.equal(await page.getAttribute('#cj-canvas','role'),'img');
-  // Le canvas rendu porte bien la photo : le disque jaune du fichier de test est au centre de la zone photo
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: \d+, Argent, poste droite\. Volée 69, Jeu aérien 54/);
+  assert.equal(await page.getAttribute('#cj-apercu-canvas','role'),'img');
+  assert.equal(await page.getAttribute('#cj-canvas','aria-hidden'),'true',"canvas d'export masqué aux lecteurs d'écran (doublon)");
+  // Le canvas d'export porte bien la photo en duotone : le disque jaune (clair) du fichier de test, au centre de la zone photo,
+  // devient la couleur du rang (argent, bleu-gris clair) alors que le fond vert (plus sombre) tire vers le bleu terrain
   await page.waitForFunction(()=>document.getElementById('cj-canvas').width===1200);
-  const px=await page.evaluate(()=>[...document.getElementById('cj-canvas').getContext('2d').getImageData(600,300,1,1).data]);
-  assert.ok(px[0]>180&&px[1]>120&&px[2]<140,'pixel de la photo sur le canvas : '+px.join(','));
-  ok('pseudo : « a », e-mail et numéro refusés (aria-invalid + message) ; « Hugo D. » accepté, carte décrite sur le canvas, photo dessinée');
-  // Téléchargement : PNG carte puis story
+  const px=await page.evaluate(()=>{const d=document.getElementById('cj-canvas').getContext('2d').getImageData(598,298,5,5).data;let m=[0,0,0];for(let i=0;i<d.length;i+=4)if(d[i]+d[i+1]+d[i+2]>m[0]+m[1]+m[2])m=[d[i],d[i+1],d[i+2]];return m;});
+  assert.ok(px[0]>100&&px[1]>130&&px[2]>150&&px[2]>px[0],'pixel de la photo (duotone argent) sur le canvas : '+px.join(','));
+  ok('pseudo : « a », e-mail et numéro refusés (aria-invalid + message) ; « Hugo D. » accepté, aperçu décrit (role img), export aria-hidden, photo dessinée en duotone');
+  // Téléchargement : WebP carte puis story, ≤ 500 Ko
   let [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
-  assert.equal(dl.suggestedFilename(),'ma-carte-padel.png');
-  let f=path.join(dossier,'carte.png');await dl.saveAs(f);
-  let buf=fs.readFileSync(f);assert.ok(buf.length>20000,'PNG carte non vide');assert.deepEqual(dimsPng(buf),[1200,1800]);
+  assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
+  let f=path.join(dossier,'carte.'+EXT_ATTENDUE);await dl.saveAs(f);
+  let buf=fs.readFileSync(f);assert.ok(buf.length>20000&&buf.length<=512000,'image carte entre 20 et 500 Ko ('+buf.length+')');assert.deepEqual(await dimsImage(page,buf,TYPE_ATTENDU),[1200,1800]);
   await page.click('.cj-formats label:has(input[value="story"])'); // le bouton radio est masqué, c'est son libellé qui se clique
   assert.equal(await page.isChecked('input[name="cj-format"][value="story"]'),true);
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
-  f=path.join(dossier,'story.png');await dl.saveAs(f);
-  buf=fs.readFileSync(f);assert.ok(buf.length>20000,'PNG story non vide');assert.deepEqual(dimsPng(buf),[1080,1920]);
-  assert.match(await page.textContent('#cj-final-msg'),/Image prête/);
+  f=path.join(dossier,'story.'+EXT_ATTENDUE);await dl.saveAs(f);
+  buf=fs.readFileSync(f);assert.ok(buf.length>20000&&buf.length<=512000,'image story entre 20 et 500 Ko ('+buf.length+')');assert.deepEqual(await dimsImage(page,buf,TYPE_ATTENDU),[1080,1920]);
+  assert.match(await page.textContent('#cj-final-msg'),new RegExp('Image prête : ma-carte-padel\.'+EXT_ATTENDUE));
   assert.equal(await page.isEnabled('#cj-telecharger'),true);
-  ok('téléchargement : ma-carte-padel.png en 1200 × 1800 (carte) et 1080 × 1920 (story), message de confirmation');
+  ok('téléchargement : ma-carte-padel.'+EXT_ATTENDUE+' en 1200 × 1800 (carte) et 1080 × 1920 (story), ≤ 500 Ko, message de confirmation');
   // Partager sans navigator.share : repli sur le téléchargement
   await page.evaluate(()=>{Object.defineProperty(navigator,'canShare',{value:undefined,configurable:true});Object.defineProperty(navigator,'share',{value:undefined,configurable:true});});
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-partager')]);
-  assert.equal(dl.suggestedFilename(),'ma-carte-padel.png');
+  assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
   ok('partager sans navigator.share : l\'image est téléchargée à la place');
   // Rien n'a été écrit dans les repères
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);
@@ -192,15 +195,13 @@ async function repondreClavier(page,reponses){
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.match(await page.textContent('#cj-retrouvee'),/gardée sur cet appareil/);
   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
-  assert.equal(await page.locator('#cj-apercu-html .cj-photo img').count(),1);
-  assert.equal(await page.textContent('#cj-apercu-html .cj-globale'),String(gAj));
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(': '+gAj+', Argent.*Avec ta photo\.'));
   assert.equal(await page.evaluate(()=>document.activeElement===document.body),true);
   ok('rechargement : carte, pseudo, ajustements et photo retrouvés, sans déplacer le focus');
   // Retirer la photo : initiales
   await page.click('#cj-modifier-photo');await page.click('#cj-retirer-photo');
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),null);
-  assert.equal(await page.locator('#cj-apercu-html .cj-photo img').count(),0);
-  assert.equal(await page.textContent('#cj-apercu-html .cj-initiales'),'HD');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/Sans photo, initiales HD\./);
   ok('« Retirer la photo » : pa-carte-photo effacée, initiales HD sur la carte');
   // Repère ignoré : notes sans repère (plage 16 à 90)
   await page.click('#cj-retour-notes');await page.click('#cj-refaire-1');
