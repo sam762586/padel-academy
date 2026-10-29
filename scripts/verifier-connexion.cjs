@@ -15,7 +15,12 @@
    9) flux PKCE (6.6) : client en flowType "pkce" ; inscription, lien magique, Google et mot de passe oublié reviennent
       sur connexion.html ; ?code= échangé seulement avec le vérificateur de ce navigateur ; récupération seulement après
       un code échangé avec le vérificateur « mot de passe oublié » ; autre navigateur, code refusé ou périmé : message
-      clair ; lien piégé #access_token=… : aucune session, adresse nettoyée, visiteur connecté pas déconnecté.
+      clair ; lien piégé #access_token=… : aucune session, adresse nettoyée, visiteur connecté pas déconnecté ;
+      correctif P2 : supabase-js ne lit plus l'adresse (detectSessionInUrl:false, échange manuel du ?code= avec
+      vérificateur) : ?access_token=, #%61ccess_token=, ?error_description=, #error_description= ne déconnectent plus ;
+      ?code= arrivé sur une fiche tournoi (sans SDK) transmis à connexion.html ;
+   10) déconnexion : session inconnue du serveur (AuthSessionMissingError de supabase-js 2.45.4) → session terminée sur
+      l'appareil (jeton local effacé), y compris après la suppression du compte ; réseau coupé : message, rien d'effacé.
    Supabase est simulé (aucun appel réseau). Lancer depuis la racine du site : node scripts/verifier-connexion.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -29,12 +34,16 @@ process.on('unhandledRejection',e=>{if(e&&e.name==='TargetClosedError')return;co
 // Supabase simulé : session dans sessionStorage « session » ; mot de passe accepté : « bonmotdepasse ».
 // Imite supabase-js 2.45.4 : avec flowType "pkce", les demandes qui produisent un lien (signUp, signInWithOtp,
 // signInWithOAuth, resetPasswordForEmail) posent un vérificateur dans localStorage (« …/PASSWORD_RECOVERY » pour la
-// récupération) ; à l'initialisation, un ?code= n'est échangé que si ce vérificateur existe (code « bon » ou « neuf » :
-// session ouverte, code retiré de l'adresse, SIGNED_IN ; autre code : erreur bad_code_verifier, « perime » :
-// flow_state_expired) ; jamais d'événement PASSWORD_RECOVERY en PKCE. Un fragment #access_token= en PKCE : erreur et
-// session supprimée (comportement réel) ; en flux implicite, il ouvrirait la session (faille corrigée en 6.6).
+// récupération) ; exchangeCodeForSession(code) lit et retire ce vérificateur (code « bon » ou « neuf » : session ouverte,
+// SIGNED_IN, redirectType ; autre code : erreur bad_code_verifier, « perime » : flow_state_expired, session en place
+// gardée) ; jamais d'événement PASSWORD_RECOVERY en PKCE. Avec detectSessionInUrl:true (plus utilisé depuis le
+// correctif P2), l'initialisation lirait l'adresse comme le vrai SDK : query et fragment, clés décodées ; un
+// access_token ou un error_description en PKCE : erreur et session supprimée (c'est la déconnexion par lien forgé).
 const SDK=`(function(){
- const session=()=>{const s=sessionStorage.getItem('session');return s?{user:{id:'u1',email:'joueur@test.fr',created_at:s==='nouveau'?new Date().toISOString():'2026-01-01T00:00:00Z'}}:null;};
+ // « jetonLocal » : la session n'existe que tant que le jeton est aussi dans localStorage (comme le vrai SDK, qui la lit là)
+ const session=()=>{const s=sessionStorage.getItem('session');
+  if(s&&sessionStorage.getItem('jetonLocal')&&!localStorage.getItem('sb-bvhfizdfgccrkhdfqzkf-auth-token'))return null;
+  return s?{user:{id:'u1',email:'joueur@test.fr',created_at:s==='nouveau'?new Date().toISOString():'2026-01-01T00:00:00Z'}}:null;};
  const ecouteurs=[];
  // Appels notés dans sessionStorage « appels » (gardés d'une page à l'autre)
  const noter=(nom,args)=>{const l=JSON.parse(sessionStorage.getItem('appels')||'[]');l.push({nom,args});sessionStorage.setItem('appels',JSON.stringify(l));};
@@ -50,22 +59,29 @@ const SDK=`(function(){
   const cleV='sb-'+new URL(url).hostname.split('.')[0]+'-auth-token-code-verifier';
   const poserVerificateur=recup=>{if(pkce)localStorage.setItem(cleV,JSON.stringify('verif123'+(recup?'/PASSWORD_RECOVERY':'')));};
   const supprimerSession=()=>{if(sessionStorage.getItem('session'))noter('sessionSupprimee',{});sessionStorage.removeItem('session');};
+  // Échange PKCE (comme _exchangeCodeForSession de 2.45.4 : vérificateur retiré dans tous les cas, session gardée en cas d'échec)
+  const echanger=code=>{
+   const verif=JSON.parse(localStorage.getItem(cleV)||'null');
+   localStorage.removeItem(cleV);
+   noter('tentativeEchange',{code});
+   if(!verif||(code!=='bon'&&code!=='neuf'))
+    return {data:{session:null,user:null,redirectType:null},error:code==='perime'?{code:'flow_state_expired',message:'invalid flow state, flow state has expired'}:{code:'bad_code_verifier',message:'code challenge does not match previously saved code verifier'}};
+   noter('echange',{code});
+   sessionStorage.setItem('session',code==='neuf'?'nouveau':'1');
+   prevenir('SIGNED_IN');
+   return {data:{session:session(),user:session().user,redirectType:verif.split('/')[1]||null},error:null};
+  };
   const init=(async()=>{
    await new Promise(r=>setTimeout(r,0));
+   if(!auth.detectSessionInUrl)return {error:null};
    const u=new URL(location.href),p={};
    new URLSearchParams(u.hash.slice(1)).forEach((v,k)=>p[k]=v);u.searchParams.forEach((v,k)=>p[k]=v);
    if(p.access_token||p.refresh_token)noter('jetonVuParLeSdk',{});
-   const verif=localStorage.getItem(cleV);
-   if(pkce&&p.code&&verif){
-    localStorage.removeItem(cleV);
-    if(p.code!=='bon'&&p.code!=='neuf'){supprimerSession();
-     return {error:p.code==='perime'?{code:'flow_state_expired',message:'invalid flow state, flow state has expired'}:{code:'bad_code_verifier',message:'code challenge does not match previously saved code verifier'}};}
-    noter('echange',{code:p.code});
-    sessionStorage.setItem('session',p.code==='neuf'?'nouveau':'1');
-    u.searchParams.delete('code');history.replaceState(history.state,'',u.toString());
-    prevenir('SIGNED_IN');return {error:null};
+   if(pkce&&p.code&&localStorage.getItem(cleV)){
+    const r=echanger(p.code);if(r.error){supprimerSession();return {error:r.error};}
+    u.searchParams.delete('code');history.replaceState(history.state,'',u.toString());return {error:null};
    }
-   if(auth.detectSessionInUrl&&(p.access_token||p.error_description)){
+   if(p.access_token||p.error_description){
     if(pkce){supprimerSession();return {error:{message:'Not a valid PKCE flow url.'}};}
     if(p.access_token){sessionStorage.setItem('session','1');location.hash='';prevenir(p.type==='recovery'?'PASSWORD_RECOVERY':'SIGNED_IN');}
    }
@@ -74,13 +90,19 @@ const SDK=`(function(){
   return {
   auth:{
    initialize:()=>init,
+   exchangeCodeForSession:async code=>{await init;return echanger(code);},
    getSession:async()=>{await init;return {data:{session:session()}};},
    onAuthStateChange:f=>{ecouteurs.push(f);return {data:{subscription:{unsubscribe(){}}}};},
    signInWithPassword:async({password})=>{if(password!=='bonmotdepasse')return {data:{},error:{message:'Invalid login credentials'}};
     sessionStorage.setItem('session','1');ecouteurs.forEach(f=>f('SIGNED_IN',session()));return {data:{session:session()},error:null};},
    signUp:async(o)=>{poserVerificateur(false);noter('signUp',{email:o.email,options:o.options});return {data:{user:{identities:[{}]},session:null},error:null};},
    signInWithOAuth:async(o)=>{poserVerificateur(false);noter('signInWithOAuth',o);return {data:{},error:null};},
-   signOut:async()=>{sessionStorage.removeItem('session');ecouteurs.forEach(f=>f('SIGNED_OUT',null));return {error:null};},
+   // « signOutManquant » : le serveur ne connaît plus la session (session_not_found) ; comme 2.45.4, le SDK renvoie
+   // AuthSessionMissingError et GARDE la session locale, quel que soit le scope. « signOutReseau » : réseau coupé.
+   signOut:async(o)=>{noter('signOut',o||{});
+    if(sessionStorage.getItem('signOutManquant'))return {error:{name:'AuthSessionMissingError',message:'Auth session missing!',status:400}};
+    if(sessionStorage.getItem('signOutReseau'))return {error:{name:'AuthRetryableFetchError',message:'Failed to fetch',status:0}};
+    sessionStorage.removeItem('session');ecouteurs.forEach(f=>f('SIGNED_OUT',null));return {error:null};},
    signInWithOtp:async(o)=>{poserVerificateur(false);noter('signInWithOtp',o);return {error:null};},
    resetPasswordForEmail:async(email,o)=>{poserVerificateur(true);noter('resetPasswordForEmail',{email,options:o});return {error:null};},
    updateUser:async(o)=>{noter('updateUser',o);return {error:null};}},
@@ -186,6 +208,38 @@ const serveur=http.createServer((req,res)=>{
   await page.click('#compte-deco');
   await page.waitForURL(/connexion\.html\?suite=compte\.html$/);
   ok('déconnexion depuis compte.html : retour à la connexion');
+  // Session inconnue du serveur (fermée ailleurs, compte supprimé) : AuthSessionMissingError → déconnexion terminée ici
+  const cleJeton='sb-bvhfizdfgccrkhdfqzkf-auth-token';
+  const ouvrirSessionLocale=()=>page.evaluate(c=>{sessionStorage.setItem('session','1');sessionStorage.setItem('jetonLocal','1');
+   localStorage.setItem(c,JSON.stringify({access_token:'a',refresh_token:'r',expires_at:4102444800}));localStorage.setItem(c+'-code-verifier','"v"');},cleJeton);
+  await ouvrirSessionLocale();
+  await page.evaluate(()=>sessionStorage.setItem('signOutReseau','1'));
+  await page.goto(base+'/compte.html');await page.waitForSelector('#compte-profil:not([hidden])');
+  await page.click('#compte-deco');
+  await page.waitForFunction(()=>/réseau/.test(document.getElementById('pf-msg').textContent));
+  assert.match(page.url(),/\/compte\.html$/);
+  assert.ok(await page.evaluate(c=>!!localStorage.getItem(c),cleJeton),'réseau coupé : rien n\'est effacé');
+  assert.equal(await page.isEnabled('#compte-deco'),true);
+  await page.evaluate(()=>{sessionStorage.removeItem('signOutReseau');sessionStorage.setItem('signOutManquant','1');});
+  await page.click('#compte-deco');
+  await page.waitForURL(/connexion\.html\?suite=compte\.html$/);
+  assert.equal(await page.evaluate(c=>localStorage.getItem(c),cleJeton),null,'plus de jeton local');
+  assert.equal(await page.evaluate(c=>localStorage.getItem(c+'-code-verifier'),cleJeton),null);
+  assert.ok((await page.evaluate(()=>JSON.parse(sessionStorage.getItem('appels')||'[]').filter(a=>a.nom==='signOut').map(a=>a.args.scope||'global'))).includes('local'));
+  await page.waitForTimeout(200);
+  assert.match(page.url(),/connexion\.html\?suite=compte\.html$/,'la page de connexion reste affichée (déconnecté)');
+  assert.ok(await page.isVisible('#cx-form-connexion'));
+  assert.equal(await hrefEspace(page),'connexion.html?suite=espace.html');
+  ok('« Me déconnecter » quand le serveur ne connaît plus la session (AuthSessionMissingError) : déconnecté, plus de jeton local ; réseau coupé : message, rien d\'effacé');
+  // Suppression du compte : même fin de session locale si le serveur a déjà oublié la session
+  await ouvrirSessionLocale();
+  await page.goto(base+'/compte.html');await page.waitForSelector('#compte-profil:not([hidden])');
+  // (compte.html renvoie vers la connexion dès que la session est terminée)
+  await page.evaluate(()=>{window.PA_COMPTE.deleteAccount({effacer:false});});
+  await page.waitForURL(/connexion\.html\?suite=compte\.html$/);
+  assert.equal(await page.evaluate(c=>localStorage.getItem(c),cleJeton),null);
+  await page.evaluate(()=>{['signOutManquant','jetonLocal','session'].forEach(k=>sessionStorage.removeItem(k));});
+  ok('suppression du compte puis session inconnue du serveur : session terminée sur l\'appareil');
   // Retour de Google ou d'un lien : erreurs affichées, jeton arrivé sur l'accueil transmis à la connexion, compte neuf → profil
   await page.goto(base+'/connexion.html?suite=espace.html#error=server_error&error_code=unexpected_failure&error_description=Database+error+saving+new+user');
   await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
@@ -311,8 +365,8 @@ const serveur=http.createServer((req,res)=>{
   await page.goto(base+'/connexion.html');
   await page.waitForFunction(()=>window.PA_COMPTE&&window.PA_COMPTE.actif);
   const optionsAuth=await page.evaluate(()=>window.__optionsAuth);
-  assert.deepEqual(optionsAuth,{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true});
-  ok('client Supabase en flux PKCE (persistSession, autoRefreshToken, detectSessionInUrl gardés)');
+  assert.deepEqual(optionsAuth,{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false});
+  ok('client Supabase en flux PKCE (persistSession, autoRefreshToken), adresse jamais lue par le SDK (detectSessionInUrl:false)');
   const appels=nom=>page.evaluate(n=>JSON.parse(sessionStorage.getItem('appels')||'[]').filter(a=>a.nom===n).map(a=>a.args),nom);
   const verificateur=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier')));
   const poserVerif=()=>page.evaluate(()=>localStorage.setItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier',JSON.stringify('verif123')));
@@ -403,6 +457,44 @@ const serveur=http.createServer((req,res)=>{
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
   assert.equal((await appels('sessionSupprimee')).length,0);
   ok('lien piégé sur une page avec compte.js : la session du visiteur connecté reste intacte');
+  // Correctif P2 : liens forgés qui faisaient supprimer la session par le SDK (query, clé encodée, error_description)
+  for(const lien of ['/espace.html?access_token=x','/espace.html#%61ccess_token=x','/espace.html?%72efresh_token=x&provider_token=y',
+   '/connexion.html?error_description=x','/connexion.html#error_description=x']){
+   // Passage par une autre page : sinon espace.html → espace.html#… ne serait qu'un saut d'ancre, sans rechargement
+   await page.goto(base+'/lexique.html');
+   await page.goto(base+lien);
+   await page.waitForURL(/\/espace\.html$/,{timeout:5000}).catch(()=>{throw new Error(lien+' -> '+page.url());});
+   await page.waitForSelector('#esp-bord .bord-bloc');
+   await page.waitForTimeout(200);
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1','session gardée ('+lien+')');
+   assert.equal((await appels('sessionSupprimee')).length,0,'aucune suppression de session ('+lien+')');
+   assert.ok(!/token|error/.test(page.url()),'adresse nettoyée ('+lien+') : '+page.url());
+   assert.equal(await page.locator('#espace').isVisible(),true);
+  }
+  ok('lien forgé (espace.html?access_token=x, #%61ccess_token=x, connexion.html?error_description=x et #error_description=x) : visiteur connecté pas déconnecté, adresse nettoyée');
+  // Jetons dans la query : retirés, le reste de l'adresse gardé (visiteur non connecté)
+  await page.evaluate(()=>sessionStorage.clear());
+  await page.goto(base+'/score.html?x=1&access_token=a&%72efresh_token=b#regles');
+  await page.waitForTimeout(300);
+  assert.equal(await page.evaluate(()=>location.search+location.hash),'?x=1#regles');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),null);
+  assert.equal((await appels('jetonVuParLeSdk')).length,0);
+  ok('jetons dans la query (clé encodée comprise) : retirés de l\'adresse, autres paramètres et ancre gardés, aucune session');
+  // Code sans vérificateur dans ce navigateur : aucun échange tenté
+  const tentatives=(await appels('tentativeEchange')).length;
+  await page.evaluate(()=>localStorage.removeItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier'));
+  await page.goto(base+'/connexion.html?code=bon');
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.equal((await appels('tentativeEchange')).length,tentatives,'aucun échange sans vérificateur');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),null);
+  // Code refusé alors qu'une session est ouverte : la session reste
+  await page.evaluate(()=>sessionStorage.setItem('session','1'));
+  await poserVerif();
+  await page.goto(base+'/espace.html?code=piege');
+  await page.waitForFunction(()=>window.PA_COMPTE&&window.PA_COMPTE.erreurCode==='bad_code_verifier');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
+  assert.equal((await appels('sessionSupprimee')).length,0);
+  ok('?code= : échangé seulement avec un vérificateur ; un code refusé ne ferme pas la session ouverte');
   await page.evaluate(()=>sessionStorage.clear());
   // ?code= et erreur arrivés sur l'accueil (adresse de retour non autorisée) : transmis à connexion.html
   await poserVerif();
@@ -415,6 +507,15 @@ const serveur=http.createServer((req,res)=>{
   await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
   assert.match(await page.textContent('#cx-msg'),/expiré ou a déjà servi/);
   ok('?code= et erreurs arrivés sur l\'accueil : transmis à connexion.html (code échangé une seule fois)');
+  // Fiche tournoi (compte.js sans SDK : PA_COMPTE inactif) : le ?code= est transmis à connexion.html malgré le vérificateur
+  await page.evaluate(()=>sessionStorage.clear());
+  await poserVerif();
+  await page.goto(base+'/tournoi/'+fs.readdirSync(path.join(racine,'tournoi'))[0]+'?code=bon');
+  await page.waitForURL(/\/espace\.html$/);
+  assert.equal((await appels('echange')).length,1,'code échangé une seule fois, sur connexion.html');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
+  await page.evaluate(()=>sessionStorage.clear());
+  ok('?code= arrivé sur une fiche tournoi (sans SDK) : transmis à connexion.html, session ouverte');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
 

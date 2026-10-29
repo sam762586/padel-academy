@@ -49,12 +49,21 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
  /* ---------- Retours de connexion (flux PKCE, revue de sécurité 6.6) ----------
     Le client est en flux PKCE : une session ne s'ouvre qu'avec un ?code= échangé contre le « code_verifier » gardé
     dans CE navigateur au moment de la demande (inscription, lien magique, Google, mot de passe oublié). Un lien piégé
-    (code d'un autre, ou jetons #access_token=… d'un autre compte) n'ouvre donc aucune session. */
- // Jetons du flux implicite dans le fragment : plus jamais acceptés. Effacés de l'adresse AVANT la création du client
- // (sinon supabase-js, en PKCE, rejette le fragment mais déconnecte au passage le visiteur déjà connecté).
- if(/(^#|&)(access_token|refresh_token|provider_token)=/.test(location.hash||"")){
-  try{ history.replaceState(history.state,"",location.pathname+location.search); }catch(e){}
- }
+    (code d'un autre, ou jetons #access_token=… d'un autre compte) n'ouvre donc aucune session.
+    supabase-js ne lit PAS l'adresse (detectSessionInUrl:false) : avec la lecture automatique, un lien forgé
+    (?access_token=x, #%61ccess_token=x, ?error_description=x…) était pris pour un flux implicite, rejeté en PKCE, et le
+    SDK supprimait au passage la session du visiteur connecté. L'échange du ?code= est fait ici, à la main (compte.ready). */
+ // Jetons du flux implicite (query ou fragment, clés décodées : %61ccess_token = access_token) : plus jamais acceptés.
+ // Effacés de l'adresse, sans aucun effet sur la session. Fragment qui en contient : piégé, retiré en entier.
+ const PA_CLES_JETONS=["access_token","refresh_token","provider_token"];
+ try{
+  const adresse=new URL(location.href);
+  let modifiee=false;
+  PA_CLES_JETONS.forEach(cle=>{ if(adresse.searchParams.has(cle)){ adresse.searchParams.delete(cle); modifiee=true; } });
+  const fragment=new URLSearchParams(adresse.hash.replace(/^#/,""));
+  if(PA_CLES_JETONS.some(cle=>fragment.has(cle))){ adresse.hash=""; modifiee=true; }
+  if(modifiee) history.replaceState(history.state,"",adresse.pathname+adresse.search+adresse.hash);
+ }catch(e){}
  // Clé de stockage de supabase-js 2.45.4 : sb-<sous-domaine du projet>-auth-token ; le vérificateur PKCE est gardé sous
  // « <clé>-code-verifier ». resetPasswordForEmail y ajoute « /PASSWORD_RECOVERY » : c'est la preuve, propre à ce
  // navigateur, que le code reçu vient d'une demande de récupération du mot de passe faite ici.
@@ -63,16 +72,18 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
  const codeArrive=()=>{ try{ return new URLSearchParams(location.search).has("code"); }catch(e){ return false; } };
  const codeAuDepart=codeArrive();
  let retourRecuperation=false;
+ let verificateurPresent=false; // une demande faite dans ce navigateur attend son code : seul cas où l'on échange
  if(codeAuDepart&&cleStockage){
   let verificateur=null;
   try{ verificateur=localStorage.getItem(cleStockage+"-code-verifier"); }catch(e){}
   try{ verificateur=JSON.parse(verificateur); }catch(e){}
-  retourRecuperation=typeof verificateur==="string"&&/\/PASSWORD_RECOVERY$/.test(verificateur);
+  verificateurPresent=typeof verificateur==="string"&&verificateur.length>0;
+  retourRecuperation=verificateurPresent&&/\/PASSWORD_RECOVERY$/.test(verificateur);
  }
 
  let client=null;
  if(!raisonInactif){
-  try{ client=window.supabase.createClient(config.url,config.anonKey,{auth:{flowType:"pkce",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }
+  try{ client=window.supabase.createClient(config.url,config.anonKey,{auth:{flowType:"pkce",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}); }
   catch(e){ client=null; raisonInactif="cdn"; }
  }
 
@@ -187,23 +198,37 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
   if(brut.includes("flow state")) return "flow_state_not_found";
   return "";
  }
- // Session initiale. Retour d'un lien ou de Google (?code=) : supabase-js fait l'échange pendant son initialisation
- // (detectSessionInUrl), puis retire « code » de l'adresse s'il a réussi. Sans vérificateur dans ce navigateur, il
- // n'y touche pas : le code reste dans l'adresse, connexion.js l'explique au visiteur.
+ // Session initiale. Retour d'un lien ou de Google (?code=) : échangé ici, seulement si ce navigateur garde un
+ // vérificateur PKCE (la demande a été faite ici) ; en cas de succès, « code » est retiré de l'adresse (suite,
+ // confirme et mode sont gardés pour connexion.js). Sans vérificateur, on n'y touche pas : le code reste dans
+ // l'adresse, connexion.js l'explique au visiteur. Un échange raté ne ferme pas une session déjà ouverte.
  compte.retourCode=codeAuDepart;  // l'adresse portait un ?code= à l'arrivée
  compte.erreurCode="";            // échec de l'échange (vide : réussi, ou pas tenté faute de vérificateur)
+ function retirerCodeDeLAdresse(){
+  try{
+   const adresse=new URL(location.href);
+   adresse.searchParams.delete("code");
+   history.replaceState(history.state,"",adresse.pathname+adresse.search+adresse.hash);
+  }catch(e){}
+ }
  compte.ready=(async()=>{
   try{
-   if(typeof client.auth.initialize==="function"){
-    const init=await client.auth.initialize();
-    if(codeAuDepart&&init&&init.error) compte.erreurCode=codeErreurEchange(init.error)||"echec";
+   if(typeof client.auth.initialize==="function") await client.auth.initialize();
+   let echangeReussi=false;
+   if(codeAuDepart&&verificateurPresent&&typeof client.auth.exchangeCodeForSession==="function"){
+    let code="";
+    try{ code=new URLSearchParams(location.search).get("code")||""; }catch(e){}
+    let reponse=null;
+    try{ reponse=await client.auth.exchangeCodeForSession(code); }catch(e){ reponse={error:e}; }
+    if(!reponse||reponse.error) compte.erreurCode=codeErreurEchange(reponse&&reponse.error)||"echec";
+    else{ echangeReussi=true; retirerCodeDeLAdresse(); }
    }
    const {data}=await client.auth.getSession();
    definirUtilisateur(data&&data.session);
-   // Récupération du mot de passe : seulement si le code a vraiment été échangé ici (plus dans l'adresse, session
-   // ouverte, aucune erreur) ET que le vérificateur avait été posé par « mot de passe oublié » dans ce navigateur.
+   // Récupération du mot de passe : seulement si le code a vraiment été échangé ici (session ouverte, aucune erreur)
+   // ET que le vérificateur, lu avant l'échange, avait été posé par « mot de passe oublié » dans ce navigateur.
    // En PKCE, supabase-js 2.45.4 n'émet pas PASSWORD_RECOVERY au retour (seulement SIGNED_IN) : ce marqueur le remplace.
-   if(retourRecuperation&&compte.user&&!compte.erreurCode&&!codeArrive()) compte.recuperation=true;
+   if(retourRecuperation&&echangeReussi&&compte.user&&!compte.erreurCode) compte.recuperation=true;
    compte.verifierAppareil();
   }catch(e){ compte.user=null; }
  })();
@@ -230,14 +255,36 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
    return {ok:true};
   }catch(e){ return echec(e,"Impossible d'envoyer le lien. Réessaie dans un instant."); }
  };
+ /* Déconnexion. supabase-js 2.45.4 prévient le serveur (POST /logout) AVANT d'effacer la session de l'appareil ; si le
+    serveur ne connaît plus cette session (déjà fermée ailleurs par une déconnexion « tous les appareils », compte
+    supprimé, session expirée côté serveur alors que le jeton d'accès local est encore valide), il répond
+    session_not_found, le SDK renvoie AuthSessionMissingError (statut 400) et garde la session locale : le joueur
+    restait connecté avec « Déconnexion impossible. ». Dans ce cas, la session est terminée sur l'appareil. */
+ const sessionAbsente=e=>!!e&&(e.name==="AuthSessionMissingError"||e.code==="session_not_found"||[400,401,403,404].includes(e.status));
+ const erreurReseau=e=>!!e&&(e.name==="AuthRetryableFetchError"||/failed to fetch|network|load failed/i.test(String(e.message||"")));
+ // Termine la session sur cet appareil seulement, sans dépendre du serveur : signOut local du SDK (son erreur est
+ // ignorée : en 2.45.4 il interroge aussi le serveur), puis effacement des clés de session et abonnés prévenus
+ async function terminerSessionLocale(){
+  try{ await client.auth.signOut({scope:"local"}); }catch(e){}
+  if(cleStockage){
+   [cleStockage,cleStockage+"-code-verifier",cleStockage+"-user"].forEach(cle=>{try{localStorage.removeItem(cle);}catch(e){}});
+  }
+  if(definirUtilisateur(null)) prevenir();
+ }
+ compte.terminerSessionLocale=terminerSessionLocale;
  // options.effacer : efface aussi les données de jeu gardées sur l'appareil (appareil partagé)
  compte.signOut=async function(options){
-  try{
-   const {error}=await client.auth.signOut();
-   if(error) return echec(error,"Déconnexion impossible.");
-   if(options&&options.effacer) effacerDonneesAppareil();
-   return {ok:true};
-  }catch(e){ return echec(e,"Déconnexion impossible."); }
+  let erreur=null;
+  try{ erreur=(await client.auth.signOut({scope:"local"})).error||null; }catch(e){ erreur=e||new Error("echec"); }
+  if(erreur&&!sessionAbsente(erreur)){
+   // Réseau absent : rien n'est effacé ; l'interface peut proposer compte.terminerSessionLocale() (déconnexion de cet
+   // appareil seulement, la session restant ouverte côté serveur jusqu'à son expiration)
+   if(erreurReseau(erreur)) return {ok:false,reseau:true,message:"Connexion impossible : vérifie ton réseau puis réessaie."};
+   return echec(erreur,"Déconnexion impossible.");
+  }
+  if(erreur) await terminerSessionLocale();  // (succès : supabase-js a déjà effacé la session et émis SIGNED_OUT, suivi par onAuthStateChange)
+  if(options&&options.effacer) effacerDonneesAppareil();
+  return {ok:true};
  };
 
  // Profil
@@ -433,7 +480,11 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
    try{localStorage.removeItem("pa-weeks-v2:"+proprietaire);}catch(e){}
    if(options&&options.effacer) effacerDonneesAppareil();
    else oublierProprietaire(proprietaire);
-   try{ await client.auth.signOut(); }catch(e){}
+   // Compte supprimé : le serveur ne connaît plus la session (session_not_found, user_not_found…) et supabase-js 2.45.4
+   // garderait alors la session locale ; quelle que soit l'erreur, la session est terminée sur l'appareil
+   let erreurDeconnexion=null;
+   try{ erreurDeconnexion=(await client.auth.signOut()).error||null; }catch(e){ erreurDeconnexion=e||new Error("echec"); }
+   if(erreurDeconnexion) await terminerSessionLocale();
    return {ok:true};
   }catch(e){ return echec(e,"Suppression impossible pour le moment."); }
  };

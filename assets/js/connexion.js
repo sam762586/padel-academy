@@ -7,8 +7,10 @@
    fiche tournoi/<id>.html) ; ?confirme=1 (retour du lien de confirmation : premier passage par compte.html?bienvenue=1) ;
    ?mode=nouveau (retour du lien « mot de passe oublié » : le formulaire ne s'ouvre que si compte.js a constaté un vrai
    retour de récupération, jamais pour ?mode=nouveau seul ni pour une simple session ouverte) ; ?code= (flux PKCE :
-   échangé par supabase-js contre le vérificateur gardé dans ce navigateur ; s'il reste dans l'adresse, l'échange a
-   échoué ou le lien a été ouvert dans un autre navigateur : message clair, adresse nettoyée).
+   échangé par compte.js (exchangeCodeForSession) contre le vérificateur gardé dans ce navigateur ; s'il reste dans
+   l'adresse, l'échange a échoué ou le lien a été ouvert dans un autre navigateur : message clair, adresse nettoyée).
+   Les paramètres error, error_code et error_description ne sont lus qu'ici (supabase-js ne lit plus l'adresse) :
+   seul le code connu choisit le message, la session en cours n'est jamais touchée.
    Accessibilité : les zones de message restent dans la page (vides quand il n'y a rien à dire) ; une erreur passe en
    role=alert, marque le champ en cause (aria-invalid + aria-describedby vers le message) et y place le focus.
    Âge : il faut avoir 15 ans ou plus pour créer un compte (décision du 29/10/2026, RGPD art. 8, loi Informatique

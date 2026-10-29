@@ -6,22 +6,28 @@
   // Jetons du flux implicite (#access_token=…&refresh_token=…) : le site est en flux PKCE (compte.js), ces jetons ne
   // sont plus jamais acceptés. Un tel lien peut être un piège (jetons du compte d'un autre) : on l'efface de l'adresse
   // sans ouvrir de session et sans le transmettre à connexion.html.
+  // Clés lues décodées (#%61ccess_token=… vaut #access_token=…), dans le fragment comme dans la query.
   var h=location.hash||'', q=location.search||'';
-  if(/(^#|&)(access_token|refresh_token|provider_token)=/.test(h)){
-    try{history.replaceState(history.state,'',location.pathname+q);}catch(e){}
-    h='';
-  }
+  try{
+    var clesJetons=['access_token','refresh_token','provider_token'];
+    var aJeton=function(params){return clesJetons.some(function(c){return params.has(c);});};
+    var paramsQ=new URLSearchParams(q), modifiee=false;
+    if(aJeton(paramsQ)){clesJetons.forEach(function(c){paramsQ.delete(c);});q=paramsQ.toString()?'?'+paramsQ.toString():'';modifiee=true;}
+    if(aJeton(new URLSearchParams(h.replace(/^#/,'')))){h='';modifiee=true;}
+    if(modifiee) history.replaceState(history.state,'',location.pathname+q+h);
+  }catch(e){}
   // Retour de Google ou d'un lien reçu par e-mail (?code=, ou erreur) arrivé sur une autre page que connexion.html (par
   // exemple l'accueil, si Supabase renvoie vers l'adresse du site) : transmis à connexion.html, qui ouvre la session ou
-  // affiche l'erreur. Un ?code= reste ici si la page a compte.js et que ce navigateur garde un vérificateur PKCE :
-  // supabase-js l'échange déjà sur cette page (le transmettre en même temps le ferait servir deux fois).
+  // affiche l'erreur. Un ?code= reste ici si la page a un compte actif (compte.js et son SDK) et que ce navigateur garde
+  // un vérificateur PKCE : compte.js l'échange déjà sur cette page (le transmettre en même temps le ferait servir deux
+  // fois). Page sans SDK (fiche tournoi) : PA_COMPTE existe mais n'est pas actif, le code part vers connexion.html.
   var verificateurPkce=function(){
     try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token-code-verifier$/.test(localStorage.key(i)||'')) return true;}}catch(e){}
     return false;
   };
   var erreurRetour=/[?#&](error|error_code|error_description)=/.test(q+h);
   var codeRetour=/[?&]code=/.test(q);
-  if((erreurRetour||(codeRetour&&(!window.PA_COMPTE||!verificateurPkce())))&&!/\/connexion\.html$/.test(location.pathname)){
+  if((erreurRetour||(codeRetour&&(!window.PA_COMPTE||!window.PA_COMPTE.actif||!verificateurPkce())))&&!/\/connexion\.html$/.test(location.pathname)){
     var lien=document.querySelector('#nav-menu a[data-espace]');
     var racine=lien?lien.getAttribute('href').replace(/(espace|connexion)\.html.*$/,''):'';
     // compte.js chargé à la demande (Mon académie) ne doit pas échanger le code sur cette page pendant le départ
