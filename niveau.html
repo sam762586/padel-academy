@@ -21,18 +21,20 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Test de niveau padel", "item": "https://apprendre-padel.fr/niveau.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=5044927434">
+<link rel="stylesheet" href="assets/style.css?v=31e95a6f94">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
 <body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
 <nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
     <a class="brand" href="index.html"><i></i>Apprendre <span>Padel</span></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>
     <ul id="nav-menu"><li><a href="index.html">Accueil</a></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-apprendre">Apprendre</button><ul class="nav-sous" id="nav-apprendre"><li><a href="regles.html">Règles</a></li><li><a href="technique.html">Technique</a></li><li><a href="tactique.html">Tactique</a></li><li><a href="tutos.html">Tutos</a></li><li><a href="conseils.html">Conseils</a></li><li><a href="videos.html">Vidéos</a></li><li><a href="lexique.html">Lexique</a></li><li><a href="materiel.html">Matériel</a></li></ul></li><li class="nav-groupe"><button type="button" class="nav-titre active" aria-expanded="false" aria-controls="nav-entrainer">S'entraîner</button><ul class="nav-sous" id="nav-entrainer"><li><a href="academie.html">Mon académie</a></li><li><a href="niveau.html" class="active" aria-current="page">Test de niveau</a></li><li><a href="entrainement.html">Plan d'entraînement</a></li><li><a href="score.html">Compteur de match</a></li></ul></li><li><a href="simulateur-3d.html">Tactique 3D</a></li><li class="nav-groupe"><button type="button" class="nav-titre" aria-expanded="false" aria-controls="nav-competition">Compétition</button><ul class="nav-sous" id="nav-competition"><li><a href="tournois.html">Trouver un tournoi</a></li><li><a href="premier-tournoi.html">Ton premier tournoi</a></li><li><a href="competition.html">Jouer en compétition</a></li><li><a href="bareme.html">Barème des points</a></li><li><a href="partenaires.html">Trouver un partenaire</a></li></ul></li><li><a href="espace.html" data-espace>Mon espace</a></li><li><a class="cta" href="materiel.html#raquette"><span class="cta-long">Choisir sa raquette</span><span class="cta-court" aria-hidden="true">Raquette</span></a></li></ul>
   </div>
 </nav>
+<main id="contenu" tabindex="-1">
 <div class="banner"><img src="assets/img/photos/niveau.webp" srcset="assets/img/photos/niveau-640.webp 640w, assets/img/photos/niveau-960.webp 960w, assets/img/photos/niveau-1280.webp 1280w, assets/img/photos/niveau.webp 1600w" sizes="100vw" width="1600" height="650" alt="Chaussures, raquette et balle de padel vus de dessus" fetchpriority="high"></div>
 <section id="niveau">
   <div class="wrap">
@@ -50,7 +52,7 @@
       <div class="qresult" id="qresult" hidden></div>
     </div>
 
-    <h2 class="subhead" style="line-height:1.6">Les 6 paliers <small>· classement messieurs indicatif (dames : divise par 10)</small></h2>
+    <h2 class="subhead">Les 6 paliers <small>· classement messieurs indicatif (dames : divise par 10)</small></h2>
     <div class="grid">
       <div class="card">
         <div class="top"><h3>Découverte</h3><span class="tag tact">Pas encore de tournoi</span></div>
@@ -79,7 +81,7 @@
     </div>
     <p class="note">Comment le palier est calculé : si tu donnes ton classement FFT, il fait foi (le test ne te place un palier au-dessus que si ton jeu décrit est nettement meilleur). Sinon, tes résultats en tournoi servent de plancher. Sans tournoi, le test ne dépasse pas le P250 : c'est le terrain qui le confirmera. Ton temps de jeu limite aussi ce que la technique seule peut annoncer : on n'est pas P250 après six mois de padel sans passé en raquette. Les classements indiqués sont des repères, cohérents avec les catégories interdites aux joueurs les mieux classés (voir le <a href="bareme.html">barème</a>).</p>
 
-    <h2 class="subhead" style="line-height:1.6">Passer au niveau suivant</h2>
+    <h2 class="subhead">Passer au niveau suivant</h2>
     <div class="card">
       <ul class="steps numbered">
         <li><b>Un point faible à la fois.</b> Prends le premier thème de ta liste et travaille-le deux semaines. Les quatre en même temps, c'est zéro progrès visible.</li>
@@ -90,7 +92,7 @@
       </ul>
     </div>
 
-    <h2 class="subhead" style="line-height:1.6">Questions fréquentes</h2>
+    <h2 class="subhead">Questions fréquentes</h2>
     <div class="faq">
       <details><summary>Le résultat du test correspond-il à mon classement FFT ?</summary><p>Si tu donnes ton classement, le test part de lui : c'est la mesure la plus fiable. Sans classement, il estime le palier où tu serais à ta place en tournoi. Ton classement officiel dépend uniquement de tes résultats en tournois homologués FFT, avec une licence.</p></details>
       <details><summary>Pourquoi le test me place plus bas que ce que je pensais ?</summary><p>Souvent pour deux raisons. Sans résultat en tournoi, il ne dépasse pas le P250. Et ton temps de jeu limite ce que la technique seule peut annoncer : les matchs serrés se gagnent à l'expérience. Si tu réponds sur ce que tu réussis à l'entraînement plutôt qu'en match, le résultat te flatte ; le test essaie justement d'éviter ça.</p></details>
@@ -100,18 +102,19 @@
     </div>
   </div>
 </section>
+</main>
 <footer>
   <div class="wrap">
     <div><b>Apprendre Padel</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par un joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie.</div>
-    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel<span class="sr-only"> (nouvel onglet)</span></a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)<span class="sr-only"> (nouvel onglet)</span></a></div>
     <div><a href="confidentialite.html">Confidentialité</a> · <a href="mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js?v=b8b45cefe2"></script>
 <script src="assets/js/compte.js?v=c34ea7a593"></script>
-<script src="assets/js/quiz-niveau.js?v=699aae7882"></script>
-<script src="assets/js/nav.js?v=6ec1140ce4"></script>
+<script src="assets/js/quiz-niveau.js?v=bcc29c325d"></script>
+<script src="assets/js/nav.js?v=3b2a8172fd"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
