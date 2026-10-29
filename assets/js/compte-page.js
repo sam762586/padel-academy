@@ -43,7 +43,7 @@ const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-
   const raison=compte?compte.raisonInactif:"config";
   let texte="Les comptes ne sont pas encore activés. Le reste du site fonctionne normalement, sans compte.";
   if(raison==="file") texte="Ouvre le site en ligne pour te connecter : les comptes ne fonctionnent pas quand la page est ouverte depuis un fichier.";
-  if(raison==="cdn") texte="Le service de comptes ne répond pas pour le moment. Vérifie ta connexion puis recharge la page. Le reste du site fonctionne normalement.";
+  if(raison==="cdn") texte="Les comptes sont indisponibles pour le moment. Vérifie ta connexion puis recharge la page. Le reste du site fonctionne normalement.";
   afficher(zoneMessage,texte,"");
   return;
  }
@@ -111,7 +111,7 @@ const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-
    if(c.dataset.touchee!=="1")c.checked=dansLeCompte;
    const aide=aidesEffacement[c.id];if(!aide)return;
    aide.textContent=dansLeCompte
-    ?"Tout est sauvegardé dans ton compte : tu retrouveras tes données en te reconnectant. Laisse la case cochée sur un appareil partagé."
+    ?"Tout est sauvegardé dans ton compte : tu retrouveras tes données en te reconnectant. Sur un appareil partagé, garde la case cochée."
     :"Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.";
   });
  }
@@ -253,12 +253,16 @@ const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-
  boutonConfirmer.addEventListener("click",async()=>{
   boutonConfirmer.disabled=true;afficher(messageSuppression,"Suppression en cours…","");
   const caseEffacer=document.getElementById("sup-effacer");
-  const reponse=await compte.deleteAccount({effacer:!!(caseEffacer&&caseEffacer.checked)});
+  const effacerAppareil=!!(caseEffacer&&caseEffacer.checked);
+  const reponse=await compte.deleteAccount({effacer:effacerAppareil});
   boutonConfirmer.disabled=false;
   if(reponse.ok){
    modeConfirmation(false);
    compteSupprime=true;
-   afficher(zoneMessage,"Ton compte et toutes tes données ont été supprimés.","ok");
+   // Message fidèle au choix de la case : les données de l'appareil ne sont effacées que si elle était cochée
+   afficher(zoneMessage,effacerAppareil
+    ?"Ton compte et les données de cet appareil ont été supprimés."
+    :"Ton compte et les données qu'il contenait ont été supprimés. Les données gardées sur cet appareil y sont restées.","ok");
    afficherEtat();
    // Les boutons de suppression disparaissent avec le profil : le focus va sur le message de confirmation
    zoneMessage.setAttribute("tabindex","-1");zoneMessage.focus();

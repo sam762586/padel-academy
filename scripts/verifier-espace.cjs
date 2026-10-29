@@ -234,7 +234,7 @@ const serveur=http.createServer((req,res)=>{
   await ctx.close();
   ({ctx,page}=await nouveau({sdk:FAUX,config:CONFIG_ACTIVE,etat:[serveurU1(),localAutre]}));
   await page.waitForSelector('#esp-appareil-effacer');
-  assert.match(await page.textContent('#esp-statut'),/peuvent être les tiennes, enregistrées avant ta connexion/);
+  assert.match(await page.textContent('#esp-statut'),/sont peut-être les tiennes, enregistrées avant ta connexion/);
   // Confirmation obligatoire : un clic n'efface rien, focus sur « Annuler », liste de ce qui sera effacé « définitivement »
   const avantEffacement=await page.evaluate(()=>JSON.stringify(localStorage));
   await page.click('#esp-appareil-effacer');
@@ -362,7 +362,7 @@ const serveur=http.createServer((req,res)=>{
   assert.ok(!(await page.evaluate(()=>window.__base.appels)).some(a=>a.startsWith('profil')),'rien n\'est envoyé');
   await page.fill('#pf-pseudo','refus serveur');await page.click('#pf-enregistrer');
   await page.waitForFunction(()=>document.getElementById('pf-pseudo').getAttribute('aria-invalid')==='true');
-  assert.match(await page.textContent('#pf-msg'),/Pseudo\s: 2 à 30 caractères/);
+  assert.match(await page.textContent('#pf-msg'),/2 à 30 caractères\s: lettres, chiffres, espaces.*Pas d.e-mail, de numéro, de lien ni de nom de réseau social\./);
   await page.fill('#pf-pseudo','Léo_76 d\'Évreux');await page.click('#pf-enregistrer');
   await page.waitForFunction(()=>window.__base.appels.includes("profil:Léo_76 d'Évreux"));
   assert.equal(await page.textContent('#pf-msg'),'Profil enregistré.');

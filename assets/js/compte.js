@@ -14,7 +14,8 @@
      pa-exercices-faits, pa-quiz-dernier (test de niveau), pa-weeks et pa-weeks-v2:<compte> (plan 8 semaines),
      pa-ma-position (position approximative), pa-appareil-compte (propriétaire des listes ci-dessus),
      pa-academie et pa-academie-quiz (Mon académie), pa-academie-synchro:<compte>, pa-academie-priorites,
-     pa-defis, pa-tableaux-tactiques, pa-quiz-tactique, pa-diagnostic-paire, pa-p3d-qualite (réglage du simulateur 3D).
+     pa-defis, pa-tableaux-tactiques, pa-quiz-tactique, pa-diagnostic-paire.
+   Gardées : pa-mon-departement, pa-tournois-filtres (recherche de tournois) et pa-p3d-qualite (réglage du simulateur 3D).
    Une nouvelle clé « pa-* » est donc effacée par défaut : l'ajouter ici seulement si c'est un pur réglage. */
 const PA_CLES_TECHNIQUES_GARDEES=["pa-mon-departement","pa-tournois-filtres","pa-p3d-qualite"];
 // Listes envoyées automatiquement dans le compte connecté (joueur-sync.js, journal.js, favoris.js, academie-sync.js) : c'est leur contenu
@@ -28,7 +29,7 @@ const PA_CLE_PROPRIETAIRE="pa-appareil-compte";
 // Pseudo public : vérifié avant l'envoi ; même règle que la contrainte SQL profiles_pseudo_format prévue (lot S2 bis, pas encore
 // appliquée : en attendant, seule cette vérification côté navigateur s'applique)
 const PA_PSEUDO_VALIDE=/^[\p{L}\p{N} _.'’-]{2,30}$/u;
-const PA_MESSAGE_PSEUDO="Pseudo : 2 à 30 caractères (lettres, chiffres, espaces, _ . ' -), sans e-mail ni numéro de téléphone.";
+const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . ' - (apostrophe droite ou courbe). Pas d'e-mail, de numéro, de lien ni de nom de réseau social.";
 
 (function(){
  const config=window.PA_SUPABASE||{};
@@ -116,7 +117,7 @@ const PA_MESSAGE_PSEUDO="Pseudo : 2 à 30 caractères (lettres, chiffres, espac
   try{localStorage.setItem(PA_CLE_PROPRIETAIRE,compte.user.id);}catch(e){}
   return true;
  };
- const appareilBloque=()=>({ok:false,message:"Des données d'un autre compte sont sur cet appareil : choisis dans ton espace joueur si tu les ajoutes à ton compte. En attendant, rien n'est envoyé."});
+ const appareilBloque=()=>({ok:false,message:"Des données d'un autre compte sont sur cet appareil : choisis dans ton espace joueur si tu veux les ajouter à ton compte. En attendant, rien n'est envoyé."});
  // Pseudo : vide (null) ou conforme à la règle publique (longueur, caractères, pas de coordonnées)
  compte.pseudoValide=function(pseudo){
   if(pseudo===null||pseudo==="")return true;

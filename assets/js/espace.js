@@ -122,7 +122,7 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
   const activees=(window.PA_SUPABASE||{}).activees||[];
   if(["espace","journal","favoris","academie"].some(n=>activees.includes(n))&&J.appareilAutreCompte&&J.appareilAutreCompte()){
    const bloc=el("div","acc-msg acc-err");bloc.id="esp-appareil";
-   bloc.append(el("p","","Cet appareil contient des données d'un autre compte ou d'une session précédente (résultats, objectifs, matchs, favoris, niveau et quiz de Mon académie). Ces données peuvent être les tiennes, enregistrées avant ta connexion : elles ne partent pas dans ton compte sans ton accord."));
+   bloc.append(el("p","","Cet appareil contient des données d'un autre compte ou d'une session précédente : résultats, objectifs, matchs, favoris, niveau et quiz de Mon académie. Elles sont peut-être les tiennes, enregistrées avant ta connexion. Elles ne partent pas dans ton compte sans ton accord."));
    if(appareilAConfirmer){rendreConfirmationAppareil(bloc);zone.appendChild(bloc);return;}
    const btns=el("div","btns");
    const ajouter=el("button","btn ghost","Les ajouter à mon compte");ajouter.type="button";ajouter.id="esp-appareil-ajouter";

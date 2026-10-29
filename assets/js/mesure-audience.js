@@ -24,7 +24,7 @@
     exclu: 'Tes visites ne sont plus comptées sur cet appareil.',
     compte: 'Tes visites sont comptées dans des statistiques globales, sans ton nom ni ton e-mail.',
     // U+00A0 avant « : »
-    indisponible: 'Ton navigateur bloque le stockage local : impossible d\'enregistrer ce choix sur cet appareil.'
+    indisponible: 'Ton navigateur bloque le stockage local : impossible d\'enregistrer ce choix sur cet appareil.'
   };
 
   /* Lecture de l'état : true = visites exclues, false = comptées, null = stockage inaccessible */

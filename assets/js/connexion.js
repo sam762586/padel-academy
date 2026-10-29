@@ -83,7 +83,7 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
 
  if(!compte||!compte.actif){
   const raison=compte&&compte.raisonInactif;
-  erreur(msgGlobal,raison==="file"?"Les comptes ne marchent pas quand la page est ouverte depuis un fichier : ouvre le site en ligne.":"Les comptes sont indisponibles pour le moment (service non joignable). Réessaie dans un instant.");
+  erreur(msgGlobal,raison==="file"?"Les comptes ne marchent pas quand la page est ouverte depuis un fichier : ouvre le site en ligne.":"Les comptes sont indisponibles pour le moment. Réessaie dans un instant.");
   document.querySelectorAll(".cx-panneau button, .cx-panneau input").forEach(e=>e.disabled=true);
   return;
  }
@@ -231,7 +231,7 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
   }
   if(data&&data.session){ location.replace("compte.html?bienvenue=1"); return; }
   $("cx-form-inscription").hidden=true;
-  afficher(msg,"C'est presque fini : ouvre l'e-mail que l'on vient de t'envoyer et clique sur « Confirmer mon adresse ». Pense à regarder dans tes courriers indésirables.","ok");
+  afficher(msg,"C'est presque fini : ouvre l'e-mail que l'on vient de t'envoyer et clique sur le lien de confirmation. Pense à regarder dans tes courriers indésirables.","ok");
   // Le formulaire a disparu : le focus va sur la confirmation
   msg.setAttribute("tabindex","-1"); msg.focus();
  });
