@@ -1,0 +1,19 @@
+# Publication GitHub Pages (Jekyll) : seuls les fichiers du site sont publiés.
+# Contrôlé par scripts/verifier-seo.cjs. Ne pas créer .nojekyll.
+exclude:
+  - CLAUDE.md
+  - README.md
+  - ROADMAP.md
+  - ANALYSE-STRATEGIE.md
+  - SEO.md
+  - agents-a-installer
+  - scripts
+  - supabase
+  - strat
+  - .claude
+  - "*.bat"
+  - "*.ps1"
+  - "*.sql"
+  - package.json
+  - package-lock.json
+  - node_modules

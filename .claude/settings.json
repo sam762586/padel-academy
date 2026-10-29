@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/*)",
+      "PowerShell(node scripts/*)",
+      "Bash(node --check *)",
+      "PowerShell(node --check *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "PowerShell(git push *)",
+      "Bash(node scripts/scrape-tenup.js *)",
+      "PowerShell(node scripts/scrape-tenup.js *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./scripts/.env)"
+    ]
+  }
+}

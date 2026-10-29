@@ -1,2 +1,5 @@
+# Fichiers texte : toujours en LF dans la copie de travail, comme dans le dépôt
+# (les générateurs et les tests comparent le texte exact ; core.autocrlf=true sous Windows mettait du CRLF)
+* text=auto eol=lf
 # cmd.exe exige des fins de ligne Windows
 *.bat text eol=crlf

@@ -11,3 +11,6 @@ scripts/maj-tournois.lock
 
 # Worktrees des agents Claude Code
 .claude/worktrees/
+
+# Fichiers SQL generes (tournois_ref), a recreer par scripts/generer-tournois-ref.js
+supabase/donnees/
