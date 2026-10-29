@@ -5,12 +5,14 @@
    - Simulateur 3D (assets/3d/ : moteur, modèle, scénarios, environ 1,5 Mo) : jamais précaché, « network-first »
      à la demande ; la page simulateur-3d.html elle-même n'est pas dans le shell.
    - supabase-js est hébergé sur le site (assets/vendor/) et précaché comme le reste du shell.
+   - Pages (navigation) : clé de cache SANS la query (une seule entrée par page, pas une par ?suite=…). Si la query porte
+     un retour de connexion (code, error*, access_token, token_hash…), la page est servie du réseau sans aucune mise en cache.
    - Tout ce qui vient d'un autre domaine (Supabase, IGN...) n'est JAMAIS intercepté ni mis en cache.
    - Style et scripts sont appelés avec « ?v=<empreinte> » (scripts/gabarit.js) : une nouvelle version a une autre adresse,
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v40-supabase-local";
+const CACHE = "pa-v41-cache-sans-query";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -79,14 +81,32 @@ async function retirerAnciennesVersions(cache, adresse) {
   }
 }
 
+// Paramètres d'un retour de connexion : jamais gardés dans Cache Storage
+const PARAMS_SENSIBLES = ["code", "error", "error_code", "error_description", "access_token", "refresh_token", "token_hash", "type"];
+const estSensible = url => PARAMS_SENSIBLES.some(p => url.searchParams.has(p));
+const sansQuery = adresse => { const u = new URL(adresse); u.search = ""; u.hash = ""; return u.href; };
+
+async function navigationSensible(requete) {
+  try {
+    return await fetch(requete);
+  } catch (erreur) {
+    const cache = await caches.open(CACHE);
+    const copie = await cache.match(requete, { ignoreSearch: true }) || await cache.match("hors-ligne.html");
+    if (copie) return copie;
+    throw erreur;
+  }
+}
+
 async function perimeEtRevalide(requete, estNavigation) {
   const cache = await caches.open(CACHE);
+  // Une page est gardée sous son adresse sans query (une seule entrée par page)
+  const cle = estNavigation ? sansQuery(requete.url) : requete;
   // Les pages sont retrouvées sans leur paramètre (ex. partenaires.html?tournoi=12)
-  const copie = await cache.match(requete, { ignoreSearch: estNavigation });
+  const copie = await cache.match(cle, { ignoreSearch: estNavigation });
   const versionne = new URL(requete.url).searchParams.has("v");
   const miseAJour = fetch(requete).then(reponse => {
     if (reponse.ok && reponse.type === "basic") {
-      cache.put(requete, reponse.clone());
+      cache.put(cle, reponse.clone());
       if (versionne) retirerAnciennesVersions(cache, requete.url);
     }
     return reponse;
@@ -121,5 +141,10 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.pathname.includes("/assets/data/")) return; // copies .js et .json hors liste : pas de cache
-  event.respondWith(perimeEtRevalide(requete, requete.mode === "navigate"));
+  const navigation = requete.mode === "navigate";
+  if (navigation && estSensible(url)) {
+    event.respondWith(navigationSensible(requete));
+    return;
+  }
+  event.respondWith(perimeEtRevalide(requete, navigation));
 });

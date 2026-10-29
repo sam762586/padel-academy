@@ -84,6 +84,17 @@ const serveur=http.createServer((req,res)=>{
   const cles=await page.evaluate(async()=>{const noms=await caches.keys();const c=await caches.open(noms.find(n=>n.startsWith('pa-')));return (await c.keys()).map(r=>r.url).filter(u=>u.includes('style.css'));});
   assert.equal(cles.length,1);assert.match(cles[0],/v=000002/);
   ok('cache : une seule version du style gardée');
+  // Retour de connexion : jamais de query sensible ni de variante ?suite= dans Cache Storage
+  await page.goto(base+'/connexion.html?code=abc&suite=espace.html');
+  await page.goto(base+'/connexion.html?suite=compte.html');
+  await page.goto(base+'/connexion.html?error_description=x&error=y');
+  await page.waitForTimeout(300);
+  const toutes=await page.evaluate(async()=>{const r=[];for(const n of await caches.keys()){const c=await caches.open(n);for(const k of await c.keys())r.push(k.url);}return r;});
+  const mauvaises=toutes.filter(u=>/[?&](code|error|error_code|error_description|access_token|refresh_token|token_hash|type)=/.test(u));
+  assert.deepEqual(mauvaises,[],'clés sensibles dans Cache Storage');
+  assert.equal(toutes.filter(u=>/connexion\.html/.test(u)).length,1,'connexion.html : une seule entrée attendue');
+  ok('cache : aucune clé avec code=/error=…, une seule entrée connexion.html');
+  await page.goto(base+'/index.html');
   // Hors connexion : page et style de la dernière version
   await ctx.setOffline(true);
   await page.reload();
