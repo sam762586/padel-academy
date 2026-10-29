@@ -224,7 +224,7 @@ Bilan du 29/10/2026 (fait par erreur sur une ancienne branche, `feature/ux-parco
 - [x] **6.2 Connexion et appareil partagé** ✅ 29/10/2026, 6abb69fe, 97c10755, e3396c8d, d25bee08 : case « J'ai 15 ans ou plus », messages annoncés, `error_description` jamais affiché, récupération du mot de passe sur `PASSWORD_RECOVERY`, anti-cadre (connexion, compte, espace, partenaires), données d'un autre compte jamais envoyées sans choix, effacement de l'appareil confirmé, cache pa-v39 avec `compte.js` versionné.
 - [x] **6.3 Pages légales** ✅ 29/10/2026, 6822ef89 : confidentialité et mentions légales fidèles au site (académie, Google, jsDelivr, droits, CNIL, LCEN), opposition à GoatCounter, registre des photos.
 - [x] **6.4 Accessibilité** ✅ 29/10/2026, 1a5bca43, c58f0456, 816f6e83 : lien d'évitement et `<main>`, focus visible du menu, bordures 3:1 (à recalculer pour #101F35), mouvement réduit global, cibles 44 px, clavier du test de niveau et du tuto « la paire », annonces (tutos, placement).
-- [ ] **6.5 Textes** : tutoiement des exercices (`exercices-donnees.js`), « reviens », libellés.
+- [x] **6.5 Textes** ✅ 29/10/2026 : tutoiement des exercices (`exercices-donnees.js`), « reviens », libellés.
 - [ ] **6.6 Vitesse et sécurité** : supabase-js hébergé sur le site (plus de jsDelivr), connexion en PKCE (lien piégé `#access_token`), `defer`, `srcset` des cartes.
 - [ ] **6.7 Communauté** : migrations s2-01 à s2-42, `tournois_ref`, JS de la communauté (reprenables de `feature/ux-parcours-joueur-v2`), puis contrôle `securite-sql` avec les migrations academie.
 
