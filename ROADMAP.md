@@ -167,7 +167,11 @@ en production sans accord explicite. Une phase à la fois, validée avant la sui
   mémoire (`scripts/verifier-academie-sql.mjs`, pglite installé hors package.json) ; synchronisation côté site à écrire
   plus tard ; Mon académie dans le test de performance ; quiz au clavier seul ; 38 suites de tests.
 - [x] Validation de la phase 6 par Samuel et accord de publication (27/10/2026) : académie publiée.
-- [ ] Plus tard, sur accord de Samuel : synchronisation côté site, puis application des migrations academie-01 à 03.
+- [x] Synchronisation côté site écrite (29/10/2026) : assets/js/academie-sync.js (union des niveaux par date et des quiz
+  par séance ; appareil partagé : rien d'un compte n'est envoyé dans un autre), inactive tant que "academie" n'est pas
+  dans activees ; testée sur deux appareils et deux comptes avec les vraies migrations (verifier-academie-sync.mjs).
+- [ ] Samuel exécute academie-01 à 03 dans le SQL Editor (prérequis : espace_limite_lignes), puis "academie" est ajouté
+  à activees et le site publié (supabase/LISEZMOI.md, « Mon académie : niveau et quiz dans le compte »).
 
 ## Expérience joueur personnalisée (audit du 27/10/2026, plan validé par Samuel)
 Constats vérifiés : accueil en « 6 paliers » à côté du 1 à 10 (vrai) ; menu identique sur les 1 068 pages mais 9 libellés

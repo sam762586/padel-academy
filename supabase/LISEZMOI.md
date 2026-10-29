@@ -121,3 +121,23 @@ modifiable après coup ; la suppression du compte efface tout en cascade. Ce niv
 (`scripts/verifier-academie-sql.mjs`). La synchronisation côté site (copier `pa-academie` et `pa-academie-quiz` vers ces
 tables) reste à écrire : tant qu'elle ne l'est pas, Mon académie marche entièrement sur l'appareil, et ajouter
 "academie" à `PA_SUPABASE.activees` n'aurait aucun effet.
+
+# Mon académie : niveau et quiz dans le compte
+
+Sans cette étape, Mon académie marche comme avant : le niveau déclaré et les quiz restent sur l'appareil. Avec elle, un
+joueur connecté retrouve son niveau (1 à 10) et ses quiz terminés sur tous ses appareils.
+
+1. **Prérequis** : la fonction `espace_limite_lignes` doit exister (migration `2026-10-26-espace-02-fonction-limite-lignes.sql`).
+   Pour le savoir, lance dans le *SQL Editor* : `select proname from pg_proc where proname = 'espace_limite_lignes';`
+   Une ligne : c'est bon. Aucune ligne : exécute d'abord `2026-10-26-espace-02-fonction-limite-lignes.sql`.
+2. **Exécute, dans l'ordre**, `2026-10-27-academie-01-table-niveaux.sql`, `-02-table-quiz.sql`, `-03-triggers-limites.sql`.
+   Ils sont relançables sans risque et ne touchent à aucune table existante.
+3. **Préviens Claude** (ou ajoute toi-même `"academie"` à `window.PA_SUPABASE.activees` dans `assets/js/supabase-config.js`),
+   puis publie le site.
+
+Ce que fait le site (`assets/js/academie-sync.js`) : union des choix de niveau (par date) et des quiz terminés (par
+séance) entre l'appareil et le compte ; le niveau actuel est le choix le plus récent. Les tables n'acceptent que des
+ajouts : rien n'est jamais modifié ni effacé, sauf à la suppression du compte (cascade). Sur un appareil partagé, ce qui a
+déjà été synchronisé avec un compte n'est jamais envoyé dans un autre. Tests : `scripts/verifier-academie-sync.mjs`
+(deux appareils, deux comptes, vrai Postgres en mémoire avec ces migrations).
+

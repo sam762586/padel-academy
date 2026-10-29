@@ -3,7 +3,7 @@
 -- niveau (quiz_results), ni profiles.niveau_declare (1 à 4) ; aucune conversion. Une ligne par choix, jamais modifiée :
 -- le niveau actuel est la ligne la plus récente. Chaque joueur ne voit, n'ajoute et ne supprime que ses lignes (RLS).
 -- PRÉPARÉ, NON APPLIQUÉ : à exécuter seulement avec l'accord de Samuel, après les migrations espace-01 à 06
--- (fonction espace_limite_lignes). La synchronisation côté site reste à écrire (PA_SUPABASE.activees : "academie").
+-- (fonction espace_limite_lignes). Synchronisation côté site : assets/js/academie-sync.js (PA_SUPABASE.activees : "academie").
 create table if not exists public.academie_niveaux (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references auth.users(id) on delete cascade,

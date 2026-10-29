@@ -15,6 +15,7 @@ window.PA_SUPABASE = { url: "https://bvhfizdfgccrkhdfqzkf.supabase.co", anonKey:
 //   "quiz2"       : migrations 2026-10-26-quiz-03 à 05 (test de niveau v2 enregistré dans le profil)
 //   "progression" : migrations 2026-10-27-progression-01 et 02, avec "espace" (objectifs de jeu synchronisés)
 //   "diagnostic"  : migrations 2026-10-27-diagnostic-01 et 02, avec "journal" (bilans après match dans le compte)
+//   "academie"    : migrations 2026-10-27-academie-01 à 03, après "espace" (niveau déclaré et quiz de Mon académie)
 window.PA_SUPABASE.activees = [];
 // Bouton « Continuer avec Google » (connexion.html) : fournisseur Google configuré dans Supabase le 27/10/2026.
 window.PA_SUPABASE.google = true;
