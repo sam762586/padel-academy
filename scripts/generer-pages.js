@@ -153,7 +153,7 @@ ${jsonLd.map(o => `<script type="application/ld+json">${jsonDansHtml(o)}</script
 </head>
 <body>
 ${nav}
-<main class="gen">
+<main class="gen" id="contenu" tabindex="-1">
 <div class="wrap">
 ${h1}
 ${corps}
@@ -299,7 +299,7 @@ function ecrire(chemin, html, { indexer = true } = {}) {
   const h = crypto.createHash("sha1").update(html).digest("hex").slice(0, 16);
   const avant = empreintes[chemin];
   // Empreinte du contenu : entre la navigation et le pied de page, sans les numéros de version
-  const hc = crypto.createHash("sha1").update((html.split("</nav>")[1] || html).split("<footer")[0].replace(/\?v=[0-9a-f]+/g, "")).digest("hex").slice(0, 16);
+  const hc = crypto.createHash("sha1").update((html.split("</nav>")[1] || html).split("<footer")[0].replace(/\?v=[0-9a-f]+/g, "").replace(' id="contenu" tabindex="-1"', "")).digest("hex").slice(0, 16);
   if (!avant || avant.h !== h || !fs.existsSync(f)) {
     fs.mkdirSync(path.dirname(f), { recursive: true });
     fs.writeFileSync(f, html);

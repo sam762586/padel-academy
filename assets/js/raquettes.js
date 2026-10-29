@@ -265,6 +265,6 @@ function render(){
 }
 const bud=document.getElementById("budget"),out=document.getElementById("budget-out");
 bud.addEventListener("input",()=>{out.textContent=bud.value+" €";});
-document.getElementById("quiz").addEventListener("submit",e=>{e.preventDefault();render();document.getElementById("results").scrollIntoView({behavior:"smooth",block:"nearest"});});
+document.getElementById("quiz").addEventListener("submit",e=>{e.preventDefault();render();document.getElementById("results").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"nearest"});});
 document.getElementById("quiz").addEventListener("change",render);
 render();

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-/* Recopie le menu et le pied de page du gabarit (scripts/gabarit.js) dans toutes les pages HTML de la racine,
+/* Recopie le menu (avec le lien d'évitement) et le pied de page du gabarit (scripts/gabarit.js) dans toutes les pages HTML
+   de la racine, entoure le contenu d'un <main id="contenu"> s'il manque (poserMain),
    et versionne les liens vers le style et les scripts (?v=<empreinte>) : à relancer après chaque modification de CSS ou de JS.
    La page courante est marquée « active » dans le menu quand elle y figure.
    Usage :
@@ -8,7 +9,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES } = require("./gabarit");
+const { nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, poserMain } = require("./gabarit");
 
 const RACINE = path.join(__dirname, "..");
 const verifier = process.argv.includes("--verifier");
@@ -34,7 +35,9 @@ for (const f of fs.readdirSync(RACINE).filter(n => n.endsWith(".html")).sort()) 
     if (!motif.test(apres)) throw new Error(f + " : bloc introuvable " + motif);
     apres = apres.replace(motif, () => html);
   };
-  remplacer(/<nav class="nav"[\s\S]*?<\/nav>/, nav(f, prefixe));
+  // Le lien d'évitement (« Aller au contenu ») fait partie du bloc menu : remplacé avec lui, jamais dupliqué
+  remplacer(/(?:<a class="evitement"[^>]*>[^<]*<\/a>\s*)?<nav class="nav"[\s\S]*?<\/nav>/, nav(f, prefixe));
+  apres = poserMain(apres); // <main id="contenu"> entre le menu et le pied de page (rien si la page en a déjà un)
   remplacer(/<footer>[\s\S]*?<\/footer>/, footer(prefixe));
   apres = versionner(apres); // style.css et scripts : ?v=<empreinte>
   if (apres !== avant) {

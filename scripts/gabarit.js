@@ -41,10 +41,14 @@ function nav(actif, prefixe = "") {
     return `<li class="nav-groupe"><button type="button" class="nav-titre${dedans ? " active" : ""}" aria-expanded="false" aria-controls="nav-${e.id}">${e.nom}</button>`
       + `<ul class="nav-sous" id="nav-${e.id}">${e.liens.map(lien).join("")}</ul></li>`;
   };
-  return `<nav class="nav" aria-label="Navigation principale">
+  // Lien d'évitement (WCAG 2.4.1) : premier élément focalisable, mène à <main id="contenu"> posé par appliquer-gabarit.js
+  // (pages de la racine) et par generer-pages.js (pages tournois) ; il fait partie du bloc menu remplacé par appliquer-gabarit.js,
+  // donc jamais dupliqué. Hamburger : nom fixe « Menu », l'état est porté par aria-expanded (nav.js garde ce nom).
+  return `<a class="evitement" href="#contenu">Aller au contenu</a>
+<nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
     <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><i></i>Apprendre <span>Padel</span></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>
     <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}"><span class="cta-long">${APPEL[1]}</span><span class="cta-court" aria-hidden="true">${APPEL[2]}</span></a></li></ul>
   </div>
 </nav>`;
@@ -53,7 +57,7 @@ function footer(prefixe = "") {
   return `<footer>
   <div class="wrap">
     <div><b>${NOM_SITE}</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par un ${AUTEUR.presentation}.</div>
-    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel</a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)</a></div>
+    <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel<span class="sr-only"> (nouvel onglet)</span></a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)<span class="sr-only"> (nouvel onglet)</span></a></div>
     <div><a href="${prefixe}confidentialite.html">Confidentialité</a> · <a href="${prefixe}mentions-legales.html">Mentions légales</a></div>
   </div>
 </footer>`;
@@ -101,4 +105,14 @@ function carteModules() {
   for (const cle of Object.keys(imports)) imports[cle] += "?v=" + empreinte(imports[cle].slice(2));
   return JSON.stringify({ imports });
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, empreinte, carteModules };
+/* Repère principal (WCAG 2.4.1, 1.3.1) : tout ce qui est entre le menu et le pied de page va dans <main id="contenu">,
+   cible du lien d'évitement (tabindex="-1" : le focus y va vraiment, la lecture et le Tab suivant partent du contenu).
+   Idempotent : une page qui a déjà un <main> n'est pas touchée. Fins de ligne LF (.gitattributes). */
+const MAIN_OUVERT = '<main id="contenu" tabindex="-1">';
+function poserMain(html) {
+  if (/<main[\s>]/.test(html)) return html;
+  const motif = /(<nav class="nav"[\s\S]*?<\/nav>)\n?([\s\S]*?)\n?<footer>/;
+  if (!motif.test(html)) throw new Error("menu ou pied de page introuvable : <main> non posé");
+  return html.replace(motif, (m, menu, corps) => `${menu}\n${MAIN_OUVERT}\n${corps}\n</main>\n<footer>`);
+}
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, empreinte, carteModules, poserMain, MAIN_OUVERT };

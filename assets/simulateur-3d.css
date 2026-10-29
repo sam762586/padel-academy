@@ -2,7 +2,7 @@
    Les jetons (couleurs, polices, rayons) sont ceux de style.css. */
 .p3d-choix{margin-bottom:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .p3d-label{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--muted)}
-#p3d-scenarios{flex:1 1 260px;min-width:0;max-width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line-2);border-radius:999px;padding:10px 14px;font:inherit;font-weight:700}
+#p3d-scenarios{flex:1 1 260px;min-width:0;max-width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--field-line);border-radius:999px;padding:10px 14px;font:inherit;font-weight:700}
 .p3d-mode{margin:0}
 .p3d-mode[hidden]{display:none}
 /* Mode quiz : la question s'affiche sous la scène, la lecture reprend après la réponse */
@@ -33,7 +33,7 @@
 .p3d-commandes .btn.primary{min-width:7.5em;justify-content:center}
 .p3d-temps{flex:1 1 180px;min-width:140px;accent-color:var(--turf)}
 .p3d-chrono{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700;min-width:4.2em;text-align:right}
-.p3d-commandes select{background:var(--bg);color:var(--fg);border:1px solid var(--line-2);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700}
+.p3d-commandes select{background:var(--bg);color:var(--fg);border:1px solid var(--field-line);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700}
 .p3d-vues{margin-top:12px}
 .p3d-aide-libre{color:var(--dim);font-size:.82rem;min-height:1.3em;margin-top:4px}
 .p3d-panneau{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass)}
@@ -41,7 +41,7 @@
 .p3d-panneau h2{font-size:clamp(1.6rem,4vw,2.2rem);margin:6px 0 8px}
 .p3d-etape-texte{color:var(--fg);max-width:46em}
 .p3d-etapes{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:14px 0 0;counter-reset:etape}
-.p3d-etapes button{counter-increment:etape;font:inherit;font-size:.78rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer}
+.p3d-etapes button{counter-increment:etape;font:inherit;font-size:.78rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--field-line);border-radius:999px;padding:6px 12px;cursor:pointer}
 .p3d-etapes button::before{content:counter(etape) " · "}
 .p3d-etapes button[aria-current="step"]{border-color:var(--turf);color:var(--turf)}
 .p3d-etapes[hidden]{display:none}
@@ -116,11 +116,11 @@
 /* Affichage : trajectoire complète, zones de placement, qualité */
 .p3d-affichage{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
 .p3d-affichage[hidden],.p3d-legende[hidden]{display:none}
-.p3d-bascule{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:40px}
+.p3d-bascule{font:inherit;font-size:.82rem;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--field-line);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:40px}
 .p3d-bascule[aria-pressed="true"]{color:var(--accent-fg);background:var(--turf);border-color:var(--turf)}
 .p3d-bascule:hover{border-color:var(--turf)}
 .p3d-affichage .p3d-label{margin-left:auto}
-.p3d-affichage select{background:var(--bg);color:var(--fg);border:1px solid var(--line-2);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700;min-height:40px}
+.p3d-affichage select{background:var(--bg);color:var(--fg);border:1px solid var(--field-line);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700;min-height:40px}
 .p3d-legende{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-size:.82rem;color:var(--muted)}
 .p3d-legende span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .p3d-legende .zone-filet::before{background:#c8f14b}
