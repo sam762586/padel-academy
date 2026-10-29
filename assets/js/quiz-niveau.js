@@ -99,7 +99,7 @@ const PN_SITUATIONS=[
  {theme:"communication",q:"Pendant le match, avec ton partenaire…",o:[
   ["On ne se parle pas pendant le point",0],
   ["On annonce parfois, souvent trop tard",1],
-  ["« Moi », « toi », « lob » à chaque balle disputée",2],
+  ["« Moi », « toi », « lob » à chaque balle disputée",2],
   ["On parle aussi entre les points : où servir, qui prend les balles au centre",3],
   ["On a un plan de jeu et on l'adapte aux adversaires pendant le match",4]]},
 ];
@@ -161,17 +161,21 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
  const el=(b,c,t)=>{const x=document.createElement(b);if(c)x.className=c;if(t!==undefined)x.textContent=t;return x;};
  function melanger(n){const a=[...Array(n).keys()];for(let k=n-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;}
  function rangEnregistre(){try{const r=JSON.parse(localStorage.getItem("pa-classement-fft")||"null");return r&&Number.isInteger(r.rang)&&["messieurs","dames"].includes(r.sexe)?r:null;}catch(e){return null;}}
- function suivant(){i++;if(i<etapes.length)rendre();else resultat();}
- function rendre(){
-  const et=etapes[i],opts=document.getElementById("qopts");
+ // Clavier et lecteurs d'écran : le bouton cliqué disparaît à chaque étape, le focus va donc sur le titre de la question suivante
+ function suivant(){i++;if(i<etapes.length)rendre(true);else resultat();}
+ // focus : vrai après une réponse ou « Refaire le test », faux au premier affichage (on ne déplace pas le visiteur qui arrive)
+ function rendre(focus){
+  const et=etapes[i],opts=document.getElementById("qopts"),titre=document.getElementById("qtext");
+  const placerFocus=()=>{if(focus&&titre)titre.focus();};
   document.getElementById("qnum").textContent=(i<=PN_REPERES.length?"Repères":"En match")+" · "+(i+1)+" / "+etapes.length;
   document.getElementById("qbarfill").style.width=(i/etapes.length*100)+"%";
   opts.textContent="";
   if(et.type==="rang"){
-   document.getElementById("qtext").textContent="As-tu un classement FFT padel ?";
+   titre.textContent="As-tu un classement FFT padel ?";
    const f=el("form","qrang");f.noValidate=true;
    const deja=rangEnregistre();
-   const sexes=el("div","qrang-sexe");sexes.setAttribute("role","radiogroup");sexes.setAttribute("aria-label","Classement");
+   // Le choix dit de quel classement vient le rang (messieurs ou dames) : groupe nommé par une légende lue par les lecteurs d'écran
+   const sexes=el("fieldset","qrang-sexe");sexes.appendChild(el("legend","sr-only","Classement messieurs ou dames"));
    [["messieurs","Messieurs"],["dames","Dames"]].forEach(([v,l],k)=>{
     const lab=el("label","");const r=document.createElement("input");r.type="radio";r.name="qsexe";r.value=v;r.checked=deja?deja.sexe===v:k===0;lab.append(r," "+l);sexes.appendChild(lab);
    });
@@ -179,20 +183,23 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
    if(deja)champ.value=deja.rang;
    lab.appendChild(champ);
    const valider=el("button","btn primary","Valider mon rang");valider.type="submit";
-   const err=el("p","acc-err");err.setAttribute("role","status");
+   const err=el("p","acc-err");err.id="qrang-err";err.setAttribute("role","status");
+   champ.setAttribute("aria-describedby","qrang-err");
+   champ.addEventListener("input",()=>{champ.removeAttribute("aria-invalid");});
    f.append(sexes,lab,valider,err);
    f.addEventListener("submit",ev=>{
     ev.preventDefault();
     const n=Number(champ.value);
-    if(!Number.isInteger(n)||n<1||n>500000){err.textContent="Entre ton rang (un nombre entier), ou choisis « Je ne suis pas classé ».";champ.focus();return;}
+    if(!Number.isInteger(n)||n<1||n>500000){err.textContent="Entre ton rang (un nombre entier), ou choisis « Je ne suis pas classé ».";champ.setAttribute("aria-invalid","true");champ.focus();return;}
     rep.rang=n;rep.sexe=f.querySelector('input[name="qsexe"]:checked').value;suivant();
    });
    const non=el("button","qopt","Je ne suis pas classé(e)");non.type="button";
    non.addEventListener("click",()=>{rep.rang=null;rep.sexe=null;suivant();});
    opts.append(f,non);
+   placerFocus();
    return;
   }
-  document.getElementById("qtext").textContent=et.d.q;
+  titre.textContent=et.d.q;
   melanger(et.d.o.length).forEach(k=>{
    const b=el("button","qopt",et.d.o[k][0]);b.type="button";
    b.addEventListener("click",()=>{
@@ -202,13 +209,17 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
    });
    opts.appendChild(b);
   });
+  placerFocus();
  }
  function resultat(){
   const r=pnEstimer(rep),P=PN_PALIERS[r.palier];
   const fiabilite={classement:"Fiable : basé sur ton classement FFT",resultats:"Assez fiable : basé sur tes résultats en tournoi",technique:"Indicatif : à confirmer en tournoi"}[r.source];
   carte.hidden=true;
   const z=document.getElementById("qresult");z.hidden=false;z.textContent="";
-  z.append(el("span","vtag "+P.cls,P.nom),el("p","score",fiabilite),el("p","",P.txt));
+  // Titre du résultat : il reçoit le focus (le bouton de la dernière réponse a disparu)
+  const titre=el("h3","");titre.tabIndex=-1;
+  titre.append(el("span","sr-only","Ton palier : "),el("span","vtag "+P.cls,P.nom));
+  z.append(titre,el("p","score",fiabilite),el("p","",P.txt));
   z.appendChild(el("p","qnote","Ce résultat estime la catégorie de tournoi qui te correspond. Ton niveau de 1 à 10 (grille FFT) se choisit à part, dans Mon académie : l'un n'est pas converti en l'autre."));
   r.notes.forEach(n=>z.appendChild(el("p","qnote",n)));
   if(r.priorites.length){
@@ -239,8 +250,8 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   try{localStorage.setItem("pa-quiz-dernier",JSON.stringify({date:new Date().toISOString(),...resume,priorites:r.priorites,methode:"test-niveau-v2",source:r.source,
    reperes:{anciennete:rep.anciennete,frequence:rep.frequence,raquette:rep.raquette,resultats:rep.resultats===undefined?null:rep.resultats}}));}catch(e){}
   qCompte(save,resume);
-  encore.addEventListener("click",()=>{i=0;rep={};z.hidden=true;carte.hidden=false;rendre();});
-  z.querySelector(".vtag").scrollIntoView({block:"nearest"});
+  encore.addEventListener("click",()=>{i=0;rep={};z.hidden=true;carte.hidden=false;rendre(true);});
+  titre.scrollIntoView({block:"nearest"});titre.focus({preventScroll:true});
  }
  rendre();
 })();

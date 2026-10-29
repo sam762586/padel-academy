@@ -18,5 +18,8 @@ function renderMonter(){
  const v=document.querySelector('input[name="monter"]:checked').value, d=MONTER[v];
  document.getElementById("monter-verdict").innerHTML=`<span class="vtag ${d.cls}">${d.ok}</span><p>${d.t}</p><ul>${d.c.map(x=>`<li>${x}</li>`).join("")}</ul>`;
 }
-document.getElementById("monter-opts").addEventListener("change",renderMonter);renderMonter();
-document.getElementById("monter-rules").innerHTML=MONTER_RULES.map(([a,b])=>`<div class="rule"><span>${a}</span><b>${b}</b></div>`).join("");
+// Le script peut être inclus sur une page sans ce tuto : rien à brancher dans ce cas
+if(document.getElementById("monter-opts")&&document.getElementById("monter-verdict")){
+ document.getElementById("monter-opts").addEventListener("change",renderMonter);renderMonter();
+}
+if(document.getElementById("monter-rules"))document.getElementById("monter-rules").innerHTML=MONTER_RULES.map(([a,b])=>`<div class="rule"><span>${a}</span><b>${b}</b></div>`).join("");

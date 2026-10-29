@@ -41,15 +41,16 @@
       <p>14 questions : tes repères (classement, résultats, temps de jeu), puis 9 situations de match. Réponds sur ce qui se passe vraiment en match, pas sur ce que tu sais qu'il faudrait faire. À la fin : ton palier, sa fiabilité et tes trois priorités.</p>
     </div>
     <div class="quizlvl" id="quizlvl">
+      <h2 class="sr-only">Le test</h2>
       <div class="qcard" id="qcard">
-        <div class="qprog"><span id="qnum">Repères · 1 / 14</span><div class="qbar"><i id="qbarfill"></i></div></div>
-        <h2 class="sr-only">Les questions du test</h2><h3 id="qtext"></h3>
-        <div class="qopts" id="qopts"></div>
+        <div class="qprog"><span id="qnum" aria-live="polite">Repères · 1 / 14</span><div class="qbar" aria-hidden="true"><i id="qbarfill"></i></div></div>
+        <h3 id="qtext" tabindex="-1"></h3>
+        <div class="qopts" id="qopts" role="group" aria-labelledby="qtext"></div>
       </div>
       <div class="qresult" id="qresult" hidden></div>
     </div>
 
-    <p class="subhead">Les 6 paliers <small>· classement messieurs indicatif (dames : divise par 10)</small></p>
+    <h2 class="subhead" style="line-height:1.6">Les 6 paliers <small>· classement messieurs indicatif (dames : divise par 10)</small></h2>
     <div class="grid">
       <div class="card">
         <div class="top"><h3>Découverte</h3><span class="tag tact">Pas encore de tournoi</span></div>
@@ -78,7 +79,7 @@
     </div>
     <p class="note">Comment le palier est calculé : si tu donnes ton classement FFT, il fait foi (le test ne te place un palier au-dessus que si ton jeu décrit est nettement meilleur). Sinon, tes résultats en tournoi servent de plancher. Sans tournoi, le test ne dépasse pas le P250 : c'est le terrain qui le confirmera. Ton temps de jeu limite aussi ce que la technique seule peut annoncer : on n'est pas P250 après six mois de padel sans passé en raquette. Les classements indiqués sont des repères, cohérents avec les catégories interdites aux joueurs les mieux classés (voir le <a href="bareme.html">barème</a>).</p>
 
-    <p class="subhead">Passer au niveau suivant</p>
+    <h2 class="subhead" style="line-height:1.6">Passer au niveau suivant</h2>
     <div class="card">
       <ul class="steps numbered">
         <li><b>Un point faible à la fois.</b> Prends le premier thème de ta liste et travaille-le deux semaines. Les quatre en même temps, c'est zéro progrès visible.</li>
@@ -89,7 +90,7 @@
       </ul>
     </div>
 
-    <p class="subhead">Questions fréquentes</p>
+    <h2 class="subhead" style="line-height:1.6">Questions fréquentes</h2>
     <div class="faq">
       <details><summary>Le résultat du test correspond-il à mon classement FFT ?</summary><p>Si tu donnes ton classement, le test part de lui : c'est la mesure la plus fiable. Sans classement, il estime le palier où tu serais à ta place en tournoi. Ton classement officiel dépend uniquement de tes résultats en tournois homologués FFT, avec une licence.</p></details>
       <details><summary>Pourquoi le test me place plus bas que ce que je pensais ?</summary><p>Souvent pour deux raisons. Sans résultat en tournoi, il ne dépasse pas le P250. Et ton temps de jeu limite ce que la technique seule peut annoncer : les matchs serrés se gagnent à l'expérience. Si tu réponds sur ce que tu réussis à l'entraînement plutôt qu'en match, le résultat te flatte ; le test essaie justement d'éviter ça.</p></details>

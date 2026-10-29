@@ -3,8 +3,8 @@
       existe, page et groupe actifs marqués, aucune page de contenu oubliée ;
    2) ordinateur (900, 1024, 1280 px) : menu sur une ligne, groupes au clic, un seul ouvert, Échap (focus rendu), clic ailleurs,
       parcours complet au clavier ;
-   3) mobile (390 px, et 320 px) : hamburger, groupe de la page en cours déplié, accordéon, panneau opaque, Échap ferme et rend
-      le focus, aucun débordement ;
+   3) mobile (390 px, et 320 px) : hamburger (nom fixe « Menu » + aria-expanded), groupe de la page en cours déplié, accordéon,
+      panneau opaque, Échap ferme et rend le focus, aucun débordement (focusout et sortie du panneau : verifier-clavier.cjs) ;
    4) sans nav.js : liens visibles et utilisables (mobile et ordinateur) ;
    5) accessibilité : zones qui défilent atteignables au clavier, liens du pied de page ≥ 24 px, liste du compteur stylée ;
    6) toutes les pages : au plus une page active, aucune erreur console.
@@ -119,7 +119,9 @@ async function contexte(browser,options,sansNav){
   assert.equal(await page.locator('#nav-menu').isVisible(),false);
   await page.click('.nav-toggle');
   assert.equal(await page.locator('#nav-menu').isVisible(),true);
-  assert.equal(await page.getAttribute('.nav-toggle','aria-label'),'Fermer le menu');
+  // Nom fixe « Menu » : l'état est porté par aria-expanded seul
+  assert.equal(await page.getAttribute('.nav-toggle','aria-label'),'Menu');
+  assert.equal(await page.getAttribute('.nav-toggle','aria-expanded'),'true');
   assert.equal(await page.locator('.nav-titre',{hasText:'Compétition'}).getAttribute('aria-expanded'),'true');
   assert.equal(await page.locator('#nav-apprendre').isVisible(),false);
   assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('nav-menu')).backgroundColor),'rgb(16, 31, 53)');

@@ -42,11 +42,11 @@
     </div>
 
     <!-- ---- TUTO 1 : QUAND MONTER ---- -->
-    <p class="subhead">Tuto 1 <small>· Quand monter au filet ?</small></p>
+    <h2 class="subhead" style="line-height:1.6">Tuto 1 <small>· Quand monter au filet ?</small></h2>
     <div class="tuto">
       <div class="tuto-ctl">
-        <p class="q">Je suis au fond. Je viens de jouer…</p>
-        <div class="opts" id="monter-opts">
+        <p class="q" id="monter-q">Je suis au fond. Je viens de jouer…</p>
+        <div class="opts" id="monter-opts" role="radiogroup" aria-labelledby="monter-q">
           <label><input type="radio" name="monter" value="lobP" id="m1" checked>Un lob profond (il recule)</label>
           <label><input type="radio" name="monter" value="lobC" id="m2">Un lob court (il va smasher)</label>
           <label><input type="radio" name="monter" value="chiq" id="m3">Une chiquita dans ses pieds</label>
@@ -56,7 +56,7 @@
           <label><input type="radio" name="monter" value="retour" id="m7">Un retour de service lobé</label>
         </div>
       </div>
-      <div class="verdict" id="monter-verdict"></div>
+      <div class="verdict" id="monter-verdict" aria-live="polite"></div>
     </div>
     <div class="rules-row" id="monter-rules"></div>
     <div class="two" style="margin-top:18px">
@@ -91,7 +91,7 @@
 
 
     <!-- ---- TUTO 2 : QUEL COUP SUR LOB ---- -->
-    <p class="subhead">Tuto 2 <small>· Smash, bandeja, víbora ou laisser passer ?</small></p>
+    <h2 class="subhead" style="line-height:1.6">Tuto 2 <small>· Smash, bandeja, víbora ou laisser passer ?</small></h2>
     <div class="tuto">
       <div class="tuto-ctl">
         <fieldset><legend>Profondeur du lob adverse</legend>
@@ -116,7 +116,7 @@
             <label><input type="radio" name="lscore" value="chaud" id="ls2">Balle de jeu / de set</label>
           </div></fieldset>
       </div>
-      <div class="verdict" id="lob-verdict"></div>
+      <div class="verdict" id="lob-verdict" aria-live="polite"></div>
     </div>
 
     <div class="tbl" style="margin-top:18px"><table>
@@ -131,24 +131,24 @@
       </tbody>
     </table></div>
     <div class="grid" style="margin-top:14px">
-      <div class="card"><div class="top"><h4>Smash plat</h4><span class="lvl" data-l="Intermédiaire">Intermédiaire</span></div><p>Contact 15–20 cm devant l'épaule, bras tendu, balle dans le carré de service. Erreur : plat sur balle basse → filet ou balle qui remonte.</p></div>
-      <div class="card"><div class="top"><h4>Smash lifté / rulo</h4><span class="lvl" data-l="Avancé">Avancé</span></div><p>Topspin : la balle rebondit haut sur la vitre et passe au-dessus de l'adversaire. Pour balles hautes avec du temps. Le rulo, c'est ce smash lifté : brossé de bas en haut, il cherche le rebond haut sur la vitre du fond.</p></div>
-      <div class="card"><div class="top"><h4>Par 3</h4><span class="lvl" data-l="Avancé">Avancé</span></div><p>Sort au-dessus de la grille latérale (3 m). Angle + lift, rebond posé à 1–2 m de la grille, cible vitre à 2–3 m de haut. Joué près du filet.</p></div>
-      <div class="card"><div class="top"><h4>Par 4</h4><span class="lvl" data-l="Avancé">Avancé</span></div><p>Sort au-dessus du fond (vitre + grille = 4 m). Sur un lob très court, qu'on avance pour frapper. Si ça ne franchit pas les 4 m, la balle revient : il faut être sûr.</p></div>
-      <div class="card"><div class="top"><h4>Bandeja</h4><span class="lvl" data-l="Intermédiaire">Intermédiaire</span></div><p>Hauteur épaule, coupée, balle qui meurt avant de ressortir de la vitre. Le coup aérien le plus joué chez les pros, surtout chez les femmes. Erreur : bandeja en reculant, on ne revient pas au filet.</p></div>
-      <div class="card"><div class="top"><h4>Víbora</h4><span class="lvl" data-l="Avancé">Avancé</span></div><p>Frappée à l'extérieur de la balle, un peu plus devant que la bandeja, effet latéral. Cibles : grille latérale, « pico » (jonction vitre-grille), centre. Alterner bandeja / víbora pour être illisible.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Smash plat</h3><span class="lvl" data-l="Intermédiaire">Intermédiaire</span></div><p>Contact 15–20 cm devant l'épaule, bras tendu, balle dans le carré de service. Erreur : plat sur balle basse → filet ou balle qui remonte.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Smash lifté / rulo</h3><span class="lvl" data-l="Avancé">Avancé</span></div><p>Topspin : la balle rebondit haut sur la vitre et passe au-dessus de l'adversaire. Pour balles hautes avec du temps. Le rulo, c'est ce smash lifté : brossé de bas en haut, il cherche le rebond haut sur la vitre du fond.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Par 3</h3><span class="lvl" data-l="Avancé">Avancé</span></div><p>Sort au-dessus de la grille latérale (3 m). Angle + lift, rebond posé à 1–2 m de la grille, cible vitre à 2–3 m de haut. Joué près du filet.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Par 4</h3><span class="lvl" data-l="Avancé">Avancé</span></div><p>Sort au-dessus du fond (vitre + grille = 4 m). Sur un lob très court, qu'on avance pour frapper. Si ça ne franchit pas les 4 m, la balle revient : il faut être sûr.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Bandeja</h3><span class="lvl" data-l="Intermédiaire">Intermédiaire</span></div><p>Hauteur épaule, coupée, balle qui meurt avant de ressortir de la vitre. Le coup aérien le plus joué chez les pros, surtout chez les femmes. Erreur : bandeja en reculant, on ne revient pas au filet.</p></div>
+      <div class="card"><div class="top"><h3 class="h4">Víbora</h3><span class="lvl" data-l="Avancé">Avancé</span></div><p>Frappée à l'extérieur de la balle, un peu plus devant que la bandeja, effet latéral. Cibles : grille latérale, « pico » (jonction vitre-grille), centre. Alterner bandeja / víbora pour être illisible.</p></div>
     </div>
 
     <!-- ---- TUTO 3 : BOUGER AVEC SON PARTENAIRE ---- -->
-    <p class="subhead">Tuto 3 <small>· Bouger avec son partenaire selon la balle</small></p>
+    <h2 class="subhead" style="line-height:1.6">Tuto 3 <small>· Bouger avec son partenaire selon la balle</small></h2>
     <div class="court-wrap">
       <div class="court-box">
-        <div class="phases">
+        <div class="phases" role="group" aria-label="Où est notre paire ?">
           <button type="button" data-mode="att" aria-pressed="true">Nous sommes au filet</button>
           <button type="button" data-mode="def" aria-pressed="false">Nous sommes au fond</button>
         </div>
-        <p style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Clique (ou touche) n'importe où sur le terrain pour placer la balle. Les deux joueurs se replacent.</p>
-        <svg id="pair" viewBox="0 0 440 240" role="img" aria-label="Terrain interactif : placement de la paire selon la balle" style="cursor:crosshair;touch-action:manipulation">
+        <p id="pair-aide" style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Clique (ou touche) n'importe où sur le terrain pour placer la balle. Au clavier, appuie sur Tab pour atteindre le terrain, puis déplace la balle avec les flèches. Les deux joueurs se replacent.</p>
+        <svg id="pair" viewBox="0 0 440 240" tabindex="0" role="application" aria-roledescription="terrain interactif" aria-label="Placement de la paire selon la balle" aria-describedby="pair-aide" style="cursor:crosshair;touch-action:manipulation">
           <defs><linearGradient id="turf2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1c7f4a"/><stop offset="1" stop-color="#0f5a33"/></linearGradient></defs>
           <rect x="10" y="10" width="420" height="220" rx="6" fill="url(#turf2)" stroke="#fff" stroke-width="3"/>
           <line x1="220" y1="10" x2="220" y2="230" stroke="#eaf2ff" stroke-width="5"/>
@@ -166,7 +166,7 @@
         <div class="legend"><span><i style="background:#C8F14B"></i>Nous (la corde pointillée = 3–4 m max)</span><span><i style="background:#fff;border:1px solid #333"></i>Eux</span><span><i style="background:#f5f04a"></i>Balle</span></div>
       </div>
       <div>
-        <div class="verdict" id="pair-verdict"></div>
+        <div class="verdict" id="pair-verdict" aria-live="polite"></div>
         <div class="phase-text on" style="margin-top:16px">
           <h3 style="font-size:1.4rem">La règle de la corde</h3>
           <p>Imagine une corde de 3–4 m maximum entre ton partenaire et toi. Elle ne doit jamais être tendue (trou au centre) ni traîner par terre (on est collés). Quand la balle va à droite, on glisse tous les deux vers la droite ; quand elle va à gauche, tous les deux vers la gauche. Celui qui est côté balle couvre la ligne, l'autre couvre le centre. Les coachs parlent aussi d'« essuie-glace » : les deux se déplacent de la même manière, en gardant le même écart, comme reliés par un tendeur.</p>
@@ -200,20 +200,20 @@
         <ul class="steps">
           <li><b>Le lob ne le repousse pas profond</b> → il recule seul, joue bandeja, re-sprinte au filet. Toi, tu bouges à peine : tu couvres le centre, un demi-pas en retrait.</li>
           <li><b>Il doit reculer pour défendre</b> → tu recules avec lui. On se replace en zone défensive à deux, puis on remonte ensemble. Celui qui défend sur la vitre a besoin que tu lui dises où sont les adversaires.</li>
-          <li><b>Il est tiré loin sur l'aile</b> → tu glisses au centre ; au filet le temps de réaction est plus court qu'au fond, c'est encore plus important. Si le lob est imprenable pour lui, tu croises derrière pour le jouer et vous échangez de côté.</li>
+          <li><b>Il est tiré loin sur l'aile</b> → tu glisses au centre ; au filet le temps de réaction est plus court qu'au fond, c'est encore plus important. Si le lob est imprenable pour lui, tu croises derrière pour le jouer : tu prends son côté et il prend le tien.</li>
         </ul>
         <p class="note">En 3D : <a href="simulateur-3d-bandeja-garder-filet.html">la bandeja pour garder le filet</a> et <a href="simulateur-3d-smash-lob-court.html">le smash sur un lob court</a>.</p>
       </div>
       <div class="card">
         <div class="top"><h3>3 exercices à faire au club</h3><span class="tag mat">Entraînement</span></div>
         <ul class="steps">
-          <li><b>La corde</b> — 2 vs 2, échanges libres, mais une vraie corde (ou une serviette) tenue entre vous deux. Si elle se tend ou tombe, point perdu. 3 × 5 min.</li>
+          <li><b>La corde</b> — 2 vs 2, échanges libres, mais une vraie corde (ou une serviette) tenue entre toi et ton partenaire. Si elle se tend ou tombe, point perdu. 3 × 5 min.</li>
           <li><b>Lob → montée → split</b> — ton partenaire au filet te lance 10 balles, tu lobes, tu montes à petits pas, split step à sa frappe, volée longue au centre. 3 séries de 10, changer de rôle.</li>
           <li><b>Bandeja ou smash ?</b> — un lanceur envoie 20 lobs de profondeurs variées. Tu annonces le coup à voix haute AVANT de le jouer (« bandeja ! », « smash ! », « laisse ! »). Compte les bonnes décisions, pas les points.</li>
         </ul>
       </div>
     </div>
-    <p class="subhead">Questions fréquentes</p>
+    <h2 class="subhead" style="line-height:1.6">Questions fréquentes</h2>
     <div class="faq">
       <details><summary>Faut-il monter dès que possible ?</summary><p>Non. Aux niveaux intermédiaire et plus, « monter dès que possible » fait perdre des points : on reçoit la balle à mi-court sans appuis ni raquette prête. On monte derrière une balle qui fait reculer les adversaires, ou derrière son service (le seul coup où la montée est systématique).</p></details>
       <details><summary>À quelle distance du filet se placer ?</summary><p>2 à 2,5 m. Plus près, le lob te passe par-dessus ; plus loin, tu voles sous le niveau de la bande. Débutant comme confirmé, la base reste 2–2,5 m ; tu n'avances plus près que pour conclure.</p></details>

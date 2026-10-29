@@ -17,5 +17,8 @@ function lobDecision(){
  }
  document.getElementById("lob-verdict").innerHTML=`<span class="vtag ${cls}">${coup}</span><p>${why}</p><ul>${tips.map(x=>`<li>${x}</li>`).join("")}</ul>`;
 }
-["lprof","lhaut","lpos","lscore"].forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(i=>i.addEventListener("change",lobDecision)));
-lobDecision();
+// Le script peut être inclus sur une page sans ce tuto : rien à brancher dans ce cas
+if(document.getElementById("lob-verdict")&&document.querySelector('input[name="lprof"]')){
+ ["lprof","lhaut","lpos","lscore"].forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(i=>i.addEventListener("change",lobDecision)));
+ lobDecision();
+}

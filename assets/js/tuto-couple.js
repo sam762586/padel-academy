@@ -75,7 +75,21 @@ function drawPair(){
  document.getElementById("pair-verdict").innerHTML=`<span class="vtag ${pairMode==="att"?"go":"maybe"}">${pairMode==="att"?"Nous au filet":"Nous au fond"}</span><ul>${p.txt.map(t=>`<li>${t}</li>`).join("")}</ul>`;
 }
 const pairSvg=document.getElementById("pair");
+// Balle bornée au terrain, au clic comme au clavier
+const placerBalle=(x,y)=>{ball={x:clamp(x,15,425),y:clamp(y,15,225)};drawPair();};
+// Clavier : chaque flèche déplace la balle de 20 unités du schéma (le terrain fait 420 × 220)
+const PAS_CLAVIER=20;
+const FLECHES={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
 function svgPoint(e){const pt=pairSvg.createSVGPoint();const t=e.touches?e.touches[0]:e;pt.x=t.clientX;pt.y=t.clientY;const m=pairSvg.getScreenCTM().inverse();return pt.matrixTransform(m);}
-pairSvg.addEventListener("click",e=>{const p=svgPoint(e);ball={x:clamp(p.x,15,425),y:clamp(p.y,15,225)};drawPair();});
-document.querySelectorAll('#tutos .phases button[data-mode]').forEach(b=>b.addEventListener("click",()=>{pairMode=b.dataset.mode;document.querySelectorAll('#tutos .phases button[data-mode]').forEach(x=>x.setAttribute("aria-pressed",String(x===b)));ball=pairMode==="att"?{x:340,y:175}:{x:70,y:175};drawPair();}));
-drawPair();
+// Le script peut être inclus sur une page sans le terrain : rien à brancher dans ce cas
+if(pairSvg&&document.getElementById("pair-verdict")){
+ pairSvg.addEventListener("click",e=>{const p=svgPoint(e);placerBalle(p.x,p.y);});
+ pairSvg.addEventListener("keydown",e=>{
+  const d=FLECHES[e.key];
+  if(!d)return;
+  e.preventDefault(); // la page ne défile pas pendant qu'on déplace la balle
+  placerBalle(ball.x+d[0]*PAS_CLAVIER,ball.y+d[1]*PAS_CLAVIER);
+ });
+ document.querySelectorAll('#tutos .phases button[data-mode]').forEach(b=>b.addEventListener("click",()=>{pairMode=b.dataset.mode;document.querySelectorAll('#tutos .phases button[data-mode]').forEach(x=>x.setAttribute("aria-pressed",String(x===b)));ball=pairMode==="att"?{x:340,y:175}:{x:70,y:175};drawPair();}));
+ drawPair();
+}
