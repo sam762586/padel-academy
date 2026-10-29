@@ -16,7 +16,7 @@ const MENU = [
   ["index.html", "Accueil"],
   { id: "apprendre", nom: "Apprendre", liens: [["regles.html", "Règles"], ["technique.html", "Technique"], ["tactique.html", "Tactique"],
     ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
-  { id: "entrainer", nom: "S'entraîner", liens: [["academie.html", "Mon académie"], ["niveau.html", "Test de niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
+  { id: "entrainer", nom: "S'entraîner", liens: [["academie.html", "Mon académie"], ["niveau.html", "Test de niveau"], ["carte.html", "Ma carte de joueur"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
   ["simulateur-3d.html", "Tactique 3D"],
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["premier-tournoi.html", "Ton premier tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },

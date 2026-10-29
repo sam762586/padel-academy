@@ -125,3 +125,52 @@
   .cj-atelier{grid-template-columns:1fr}
   .cj-apercu{position:static}
 }
+
+/* ---- Ajouts dev-front (29/10/2026) : éléments de la page non couverts ci-dessus (à reprendre librement par le webdesigner) :
+   fil d'étapes, étapes, liste des notes (curseurs ±5), dépôt de photo (deux boutons), cadre de recadrage, tag de rang ---- */
+.cj-etapes{display:grid;gap:var(--s-4);min-width:0}
+.cj-etape[hidden],.cj-apercu[hidden]{display:none} /* .card et .cj-apercu posent un display : l'attribut hidden doit gagner */
+.cj-etape h2{margin-bottom:var(--s-3)}
+.cj-etape h2:focus{outline:none}
+.cj-etape h2:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:4px}
+.cj-etape .btns{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-4)}
+.cj-etape .btn{min-height:48px}
+.cj-etape .msg{margin-top:var(--s-4)}
+.cj-etape .msg a{color:var(--turf)}
+.cj-pas{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s-2);counter-reset:pas}
+.cj-pas li{counter-increment:pas;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px 0 6px;border:1px solid var(--line-2);border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.cj-pas li::before{content:counter(pas);display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--glass-2);color:var(--fg);font-family:var(--display);font-size:.9rem}
+.cj-pas li[aria-current="step"]{border-color:var(--turf);color:var(--fg)}
+.cj-pas li[aria-current="step"]::before,.cj-pas li.cj-pas-fait::before{background:var(--turf);color:var(--accent-fg)}
+.cj-pas li.cj-pas-fait{color:var(--muted)}
+.cj-base{margin-bottom:var(--s-4)}
+.cj-base-choix{display:inline-flex;align-items:center;gap:8px;margin-top:var(--s-2);min-height:44px;cursor:pointer}
+.cj-base-choix input{width:20px;height:20px;accent-color:var(--turf)}
+.cj-globale-txt{display:flex;align-items:center;gap:var(--s-3);font-weight:700;color:var(--muted)}
+.cj-globale-txt b{font-family:var(--display);font-weight:900;font-size:2.6rem;line-height:1;color:var(--sand);font-variant-numeric:tabular-nums}
+.tag.rang-bronze{border-color:var(--coral);color:var(--coral)}
+.tag.rang-argent{border-color:#B8C7DA;color:#B8C7DA}
+.tag.rang-or{border-color:var(--sand);color:var(--sand)}
+.tag.rang-elite{border-color:var(--turf);color:var(--turf)}
+.cj-notes #cj-postes,.cj-etape .phases{margin:var(--s-3) 0 var(--s-4)}
+.cj-notes-liste{list-style:none;margin:var(--s-3) 0 0;padding:0;display:grid;gap:var(--s-3)}
+.cj-note{display:grid;gap:4px;padding:var(--s-3) 0;border-top:1px solid var(--line)}
+.cj-note-libelle{display:grid;gap:2px}
+.cj-note-libelle b{font-weight:800}
+.cj-note-libelle small{color:var(--dim);font-size:var(--fs-s)}
+.cj-note .range input{min-height:44px;accent-color:var(--turf)}
+.cj-note .range output{font-size:1.6rem}
+.cj-depot{position:relative}
+.cj-depot-boutons{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s-2)}
+.cj-depot label.btn{min-height:48px;text-transform:none;letter-spacing:0;font-size:var(--fs-s)}
+.cj-recadrage{display:grid;gap:var(--s-3);margin-top:var(--s-4)}
+.cj-recadrage h3{font-size:1.1rem}
+.cj-cadre{display:block;width:100%;max-width:300px;aspect-ratio:5/4;border:1px solid var(--field-line);border-radius:var(--r-s);background:var(--navy);touch-action:none;cursor:grab}
+.cj-cadre:active{cursor:grabbing}
+.cj-cadre:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.cj-recadrage .range label{font-weight:700;font-size:var(--fs-s)}
+.cj-recadrage .range output{font-size:1.2rem;color:var(--fg)}
+.cj-formats-bloc{border:0;padding:0;margin:var(--s-4) 0}
+.cj-formats-bloc legend{font-weight:700;font-size:var(--fs-s);margin-bottom:var(--s-2)}
+.cj-actions .btn{min-height:48px}
+.cj-apercu h2{margin:0}
