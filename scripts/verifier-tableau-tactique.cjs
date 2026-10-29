@@ -56,7 +56,7 @@ async function dansLeNavigateur(base){
  try{
   // Ordinateur : souris, clavier, départs, sauvegarde, export
   let ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:1280,height:900}});
-  await ctx.route('https://**',r=>r.fulfill({status:200,body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
   let page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
   await page.goto(base+'/tactique.html#tableau');
@@ -148,7 +148,7 @@ async function dansLeNavigateur(base){
   // Mobile : flèche au doigt (deux touchers), pas de débordement
   for(const [largeur,hauteur] of [[390,844],[320,700]]){
    ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:hauteur},hasTouch:true,isMobile:true});
-   await ctx.route('https://**',r=>r.fulfill({status:200,body:''}));
+   await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
    page=await ctx.newPage();
    page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
    await page.goto(base+'/tactique.html#tableau');

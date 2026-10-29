@@ -89,7 +89,7 @@ const serveur=http.createServer((req,res)=>{
  const erreurs=[];
  const ouvrir=async({activees=[],connecte=true,avant}={})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  await ctx.route('https://**',r=>r.fulfill({body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({body:''}));
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
   await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:CONFIG(activees)}));
   const page=await ctx.newPage();

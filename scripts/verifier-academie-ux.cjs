@@ -23,7 +23,7 @@ async function dansLeNavigateur(base){
  const erreurs=[];
  const contexte=async(largeur,hauteur,init)=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:hauteur}});
-  await ctx.route('https://**',r=>r.fulfill({status:200,body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
   if(init)await ctx.addInitScript(init);
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!/404|Failed to load resource/.test(m.text()))erreurs.push(m.text());});

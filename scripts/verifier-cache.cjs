@@ -44,7 +44,7 @@ const serveur=http.createServer((req,res)=>{
  try{
   const ctx=await browser.newContext({viewport:{width:1280,height:800}});
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
-  await ctx.route('https://**',r=>r.fulfill({body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({body:''}));
   const page=await ctx.newPage();
   const etat=()=>page.evaluate(()=>({page:Number(document.querySelector('h1').dataset.version),style:Number(getComputedStyle(document.body).getPropertyValue('--version-style')),sw:!!navigator.serviceWorker.controller}));
   await page.goto(base+'/index.html');

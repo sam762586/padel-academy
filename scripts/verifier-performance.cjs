@@ -74,7 +74,7 @@ const serveur=http.createServer((req,res)=>{
 
 async function mesurer(browser,url){
  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
- await ctx.route('https://**',r=>r.fulfill({status:200,body:''}));
+ await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
  const page=await ctx.newPage();
  const cdp=await ctx.newCDPSession(page);
  await cdp.send('Network.enable');

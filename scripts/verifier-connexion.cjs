@@ -65,7 +65,7 @@ const serveur=http.createServer((req,res)=>{
  const ouvrir=async()=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   // La dernière route déclarée est prioritaire : Supabase simulé après le filet « tout le reste »
-  await ctx.route('https://**',r=>r.fulfill({body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({body:''}));
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));

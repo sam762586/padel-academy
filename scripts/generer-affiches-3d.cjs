@@ -23,7 +23,7 @@ const serveur=http.createServer((req,res)=>{
  try{
   fs.mkdirSync(dossier,{recursive:true});
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:1280,height:900}});
-  await ctx.route('https://**',r=>r.fulfill({status:200,body:''})); // aucun accès extérieur
+  await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''})); // aucun accès extérieur
   await ctx.addInitScript(()=>{try{localStorage.setItem('pa-p3d-qualite','elevee');}catch(e){}});
   const page=await ctx.newPage();
   page.on('pageerror',e=>console.error('page :',e.message));page.on('console',m=>{if(m.type()==='error')console.error('console :',m.text());});

@@ -72,7 +72,7 @@ async function dansLeNavigateur(base){
  try{
   for(const [largeur,hauteur] of [[1280,900],[390,844],[320,700]]){
    const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:hauteur}});
-   await ctx.route('https://**',r=>r.fulfill({status:200,body:''}));
+   await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
    const page=await ctx.newPage();
    page.on('pageerror',e=>erreurs.push(e.message));
    page.on('console',m=>{if(m.type()==='error'&&!/WebGL|3D/i.test(m.text()))erreurs.push(m.text());});

@@ -35,7 +35,7 @@ const serveur=http.createServer((req,res)=>{
  const ouvrir=async({reponse,repli='echec',page:url='/tournois.html',mobile=true})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
   await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
-  await ctx.route('https://**',r=>r.fulfill({body:''}));
+  await ctx.route(/^https:/,r=>r.fulfill({body:''}));
   let n=0;
   await ctx.route('**/assets/data/tournois.json*',async r=>{n++;await reponse(r,n);});
   await ctx.route(/\/assets\/data\/tournois\.js(\?|$)/,r=>repli==='ok'?r.fulfill({contentType:'text/javascript',body:'window.TOURNOIS_DATA='+JSON_OK+';'}):r.abort('connectionrefused'));
@@ -126,7 +126,7 @@ const serveur=http.createServer((req,res)=>{
   // 9. Accueil, bloc « près de chez toi » : erreur puis « Réessayer », et vraie absence
   for(const cas of ['erreur','vide']){
    const c2=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true});
-   await c2.route('https://**',r=>r.fulfill({body:''}));
+   await c2.route(/^https:/,r=>r.fulfill({body:''}));
    let n=0;
    await c2.route('**/assets/data/prochains/76.json*',r=>{n++;
     if(cas==='erreur'&&n===1)return r.fulfill({status:503,body:''});
