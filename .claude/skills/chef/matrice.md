@@ -23,7 +23,7 @@ En cas de doute sur ce qu'une suite couvre : lire son en-tête dans `scripts/ver
 | tournois (robot, `assets/data/`, `generer-pages.js`) | `node scripts/verifier-json.js` → `node scripts/generer-pages.js` | json, pages, tournois, accueil, seo |
 | `sw.js` ou la liste SHELL | changer `CACHE` dans sw.js | cache |
 | images, polices | `appliquer-gabarit.js` si un lien change | performance, design, seo |
-| migration SQL (`supabase/migrations/`) | aucune exécution en ligne ; vérification sur Postgres en mémoire (modèle `verifier-academie-sql.mjs`) | academie-sql + la vérification du lot, revue de `securite` |
+| migration SQL (`supabase/migrations/`) | aucune exécution en ligne ; vérification sur Postgres en mémoire (modèle `verifier-academie-sql.mjs`) | academie-sql, securite-sql + la vérification du lot, revue de `securite` |
 | nouvelle page | copier le squelette d'une page existante, `appliquer-gabarit.js`, sitemap par le générateur | design, menu, seo, performance |
 | avant toute publication | — | toutes : `node scripts/tout-verifier.cjs` |
 

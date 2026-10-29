@@ -1,4 +1,5 @@
 -- T4 · 8/12 — Contrôles à l'écriture d'un avis : charte acceptée, pseudo, tournoi commencé.
+-- ATTENTION (S2) : remplacé en partie par les migrations 2026-10-29-s2. Si tu relances ce fichier après elles, relance ensuite s2-30 (sinon la faille corrigée par S2 revient).
 create or replace function public.avis_avant_insertion()
 returns trigger
 language plpgsql

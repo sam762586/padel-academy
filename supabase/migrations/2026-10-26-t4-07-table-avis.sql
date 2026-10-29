@@ -1,4 +1,5 @@
 -- T4 · 7/12 — Table « avis » : 3 questions + texte court, un avis par joueur et par tournoi.
+-- ATTENTION (S2) : remplacé en partie par les migrations 2026-10-29-s2. Si tu relances ce fichier après elles, relance ensuite s2-07 à s2-10 (sinon la faille corrigée par S2 revient).
 -- tournoi_* et club = instantané des données du tournoi (tournois.json est statique).
 -- Lecture publique (même sans compte) des avis non masqués, une fois le tournoi terminé.
 create table if not exists public.avis (

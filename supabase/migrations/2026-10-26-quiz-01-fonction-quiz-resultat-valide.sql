@@ -16,7 +16,7 @@ begin
   if p_score is null or p_score < 0 or p_score > 30 or p_niveau is null then
     return false;
   end if;
-  if p_niveau <> case when p_score < 9 then 1 when p_score < 17 then 2 when p_score < 24 then 3 else 4 end then
+  if p_niveau <> (case when p_score < 9 then 1 when p_score < 17 then 2 when p_score < 24 then 3 else 4 end) then
     return false;
   end if;
   -- Les anciens clients pouvaient omettre les réponses : score et niveau restent contrôlés

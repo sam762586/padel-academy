@@ -1,4 +1,5 @@
 -- T4 · 2/12 — Remplit pseudo et classement depuis le profil ; pseudo obligatoire.
+-- ATTENTION (S2) : remplacé en partie par les migrations 2026-10-29-s2. Si tu relances ce fichier après elles, relance ensuite s2-31 (sinon la faille corrigée par S2 revient).
 create or replace function public.presences_avant_insertion()
 returns trigger
 language plpgsql

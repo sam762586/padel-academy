@@ -1,4 +1,5 @@
 -- T4 · 1/12 — Table « presences » : « J'y vais » sur la fiche d'un tournoi.
+-- ATTENTION (S2) : remplacé en partie par les migrations 2026-10-29-s2. Si tu relances ce fichier après elles, relance ensuite s2-11 à s2-14 puis s2-31 et s2-32 (sinon la faille corrigée par S2 revient).
 -- À exécuter après schema.sql et schema-partenaires.sql. Relançable sans risque.
 -- Pseudo et classement sont copiés au moment du clic (la table profiles n'est lisible que par son propriétaire).
 create table if not exists public.presences (

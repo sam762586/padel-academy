@@ -1,5 +1,8 @@
 -- Padel Academy : schéma Supabase (phase 2 : « Trouver un partenaire » pour un tournoi)
 -- À exécuter à la main dans Supabase > SQL Editor, APRÈS schema.sql. Peut être relancé sans risque (idempotent).
+-- ATTENTION (S2) : plusieurs objets de ce fichier sont remplacés par les migrations 2026-10-29-s2 : message_sans_contact (s2-24, s2-25),
+-- annonces_avant_insertion (s2-29), signaler_annonce (s2-34), règle reponses_select (s2-37, s2-38), droits de lecture des annonces
+-- et des réponses sans user_id (s2-39, s2-40). Si tu relances ce fichier après elles, relance ensuite ces fichiers, dans l'ordre.
 --
 -- Règles appliquées ici :
 --  - les annonces ne sont lisibles que par les utilisateurs connectés (RLS, jamais par les anonymes) ;

@@ -1,4 +1,5 @@
 -- T4 · 11/12 — Signaler un avis : un signalement par joueur ; masqué automatiquement à 3 joueurs différents.
+-- ATTENTION (S2 bis) : remplacé(e) par 2026-10-29-s2-33. Si tu relances ce fichier, relance ensuite s2-33 (sinon la faille corrigée revient).
 create or replace function public.signaler_avis(p_avis uuid, p_motif text)
 returns integer
 language plpgsql
