@@ -1,0 +1,127 @@
+/* MA CARTE DE JOUEUR (carte.css) : styles de la page « Ma carte de joueur » et de l'aperçu HTML de la carte.
+   Chargé seulement par cette page, après style.css ; les jetons (couleurs, polices, rayons, espaces) sont ceux du design system v3.
+   Rendu image : assets/js/carte-rendu.js dessine le même design sur un canvas (formats carte 2:3 et story 1080×1920).
+
+   PRINCIPE DU DESSIN (identité padel, pas un blason FUT) : la carte est un terrain vu de dessus.
+   - Moitié haute : la photo du joueur (ou ses initiales), fondue vers le bleu nuit ; en bas à gauche, la note globale en grand
+     et le poste (code de 3 lettres : DRO, GAU, POL). En haut : marque à gauche, rang (Bronze, Argent, Or, Élite) à droite.
+   - Le filet (double ligne pointillée, balle verte) sépare les deux moitiés ; le nom passe juste dessous.
+   - Moitié basse : la demi-piste en bleu terrain avec ligne centrale et ligne de service ; les 6 attributs occupent
+     les deux carrés de service (3 à gauche, 3 à droite), chacun avec sa jauge sur 99 ; la mention apprendre-padel.fr
+     tient dans la zone de fond (entre la ligne de service et la vitre).
+   - Le rang change la couleur dominante : corail (bronze), argent froid (argent), sable (or), vert énergie (élite).
+
+   TOUTES LES COTES sont exprimées en unités --u : 1 unité = 1/600 de la largeur de la carte (1cqw), le dessin est donc identique
+   à toute largeur et sur le canvas (qui travaille en pixels sur une base de 600 × 900). Sans container queries : carte à 360 px.
+
+   CONTRASTES (texte sur bleu nuit #101F35) : blanc froid 15,4:1 · --muted 7,8:1 · --dim 5,9:1 ·
+   corail 5,9:1 · argent #B8C7DA 9,6:1 · sable 9,4:1 · vert énergie 12,7:1 ; texte bleu nuit sur la pastille de rang : mêmes ratios.
+   Sur la surface de la demi-piste (nuit + 16 % de bleu terrain = #112D47) : blanc 13,1 · --dim 5,0 · corail 5,0 · argent 8,2 · sable 8,0 · vert 10,8. */
+
+/* ---- La carte (aperçu HTML) ---- */
+.carte-joueur{
+  /* Variables propres à ce composant : argent (blanc froid grisé, 9,6:1 sur le fond) et triplet du sable pour les transparences */
+  --cj-argent:#B8C7DA; --cj-argent-rgb:184,199,218; --cj-sand-rgb:255,181,71;
+  --cj-rang:var(--sand); --cj-rang-rgb:var(--cj-sand-rgb); --cj-rang-nom:"Or";
+  --u:calc(1cqw / 6);
+  container-type:inline-size;
+  position:relative; width:100%; max-width:600px; aspect-ratio:2/3; margin:0 auto; overflow:hidden;
+  border-radius:calc(28*var(--u)); background:var(--navy); color:var(--fg);
+  box-shadow:0 0 0 1.5px rgba(var(--cj-rang-rgb),.7),var(--shadow),0 0 60px rgba(var(--cj-rang-rgb),.18);
+  font-family:var(--body); line-height:1; -webkit-user-select:none; user-select:none;
+}
+@supports not (font-size:1cqw){.carte-joueur{--u:.6px;width:360px;max-width:100%}} /* 360 px fixes */
+/* ---- Rangs : couleur dominante (après .carte-joueur pour l'emporter ; utilisable aussi sur la légende des rangs) ---- */
+.rang-bronze{--cj-rang:var(--coral);--cj-rang-rgb:var(--coral-rgb);--cj-rang-nom:"Bronze"}
+.rang-argent{--cj-rang:var(--cj-argent);--cj-rang-rgb:var(--cj-argent-rgb);--cj-rang-nom:"Argent"}
+.rang-or{--cj-rang:var(--sand);--cj-rang-rgb:var(--cj-sand-rgb);--cj-rang-nom:"Or"}
+.rang-elite{--cj-rang:var(--turf);--cj-rang-rgb:var(--turf-rgb);--cj-rang-nom:"Élite"}
+
+/* Trame de points (grille) et cadre intérieur fin */
+.carte-joueur::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.06) calc(.9*var(--u)),transparent calc(1.4*var(--u)));
+  background-size:calc(24*var(--u)) calc(24*var(--u));background-position:calc(12*var(--u)) calc(12*var(--u))}
+.carte-joueur::after{content:"";position:absolute;inset:calc(10*var(--u));border:1px solid rgba(var(--cj-rang-rgb),.35);border-radius:calc(22*var(--u));pointer-events:none}
+
+/* Zone photo : moitié haute (480/900), fondue vers le bleu nuit ; teinte du rang en haut à droite */
+.cj-photo{position:absolute;left:0;top:0;width:100%;height:calc(480*var(--u));overflow:hidden;
+  background:radial-gradient(calc(360*var(--u)) calc(320*var(--u)) at 50% 40%,rgba(var(--terrain-rgb),.55),transparent 70%),var(--navy)}
+.cj-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.cj-photo::before{content:"";position:absolute;inset:0;background:radial-gradient(calc(420*var(--u)) calc(380*var(--u)) at 88% 6%,rgba(var(--cj-rang-rgb),.26),transparent 70%);pointer-events:none}
+.cj-photo::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(var(--bg-rgb),0) calc(230*var(--u)),rgba(var(--bg-rgb),.92) calc(440*var(--u)),var(--navy) 100%)}
+/* Sans photo : silhouette légère (tête, épaules) et initiales */
+.cj-silhouette{position:absolute;left:50%;top:calc(96*var(--u));width:calc(300*var(--u));height:calc(360*var(--u));transform:translateX(-50%);fill:rgba(var(--sky-rgb),.1)}
+.cj-initiales{position:absolute;left:0;right:0;top:calc(150*var(--u));text-align:center;font-family:var(--display);font-weight:900;font-size:calc(220*var(--u));line-height:1;letter-spacing:.02em;
+  color:rgba(255,255,255,.1);-webkit-text-stroke:calc(2*var(--u)) rgba(var(--cj-rang-rgb),.45)}
+
+/* Marque et pastille de rang */
+.cj-marque{position:absolute;left:calc(32*var(--u));top:calc(28*var(--u));display:flex;align-items:center;gap:calc(8*var(--u));
+  font-family:var(--display);font-weight:900;font-size:calc(20*var(--u));letter-spacing:.05em;text-transform:uppercase;color:#fff;text-shadow:0 1px 8px rgba(var(--bg-rgb),.7)}
+.cj-marque::before{content:"";width:calc(10*var(--u));height:calc(10*var(--u));border-radius:50%;background:var(--turf);box-shadow:0 0 calc(12*var(--u)) var(--turf)}
+.cj-marque b{color:var(--turf);font-weight:900}
+.cj-rang{position:absolute;right:calc(32*var(--u));top:calc(26*var(--u));min-height:calc(28*var(--u));padding:0 calc(13*var(--u));display:inline-flex;align-items:center;
+  border-radius:var(--r-pill);background:var(--cj-rang);color:var(--navy);font-weight:800;font-size:calc(13*var(--u));letter-spacing:.16em;text-transform:uppercase;line-height:1;
+  box-shadow:0 0 calc(18*var(--u)) rgba(var(--cj-rang-rgb),.45)}
+
+/* Note globale et poste, posés sur le fondu de la photo */
+.cj-tete{position:absolute;left:calc(30*var(--u));bottom:calc(100% - 472*var(--u));display:flex;align-items:flex-end;gap:calc(16*var(--u))}
+.cj-globale{font-family:var(--display);font-weight:900;font-size:calc(170*var(--u));line-height:.74;letter-spacing:-.01em;color:var(--cj-rang);
+  text-shadow:0 calc(4*var(--u)) calc(30*var(--u)) rgba(var(--bg-rgb),.9);font-variant-numeric:tabular-nums}
+.cj-poste{display:grid;gap:calc(8*var(--u))}
+.cj-poste small{font-size:calc(12*var(--u));font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.cj-poste b{font-family:var(--display);font-weight:800;font-size:calc(58*var(--u));line-height:.74;letter-spacing:.02em;color:#fff}
+
+/* Filet : double ligne et mailles, balle verte à droite */
+.cj-filet{position:absolute;left:0;right:0;top:calc(492*var(--u));height:calc(9*var(--u));border-top:calc(2*var(--u)) solid var(--cj-rang);border-bottom:1px solid rgba(var(--cj-rang-rgb),.55);
+  background:repeating-linear-gradient(90deg,rgba(var(--cj-rang-rgb),.35) 0 1px,transparent 1px calc(10*var(--u)))}
+.cj-filet::after{content:"";position:absolute;right:calc(34*var(--u));top:50%;width:calc(15*var(--u));height:calc(15*var(--u));transform:translateY(-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--turf-hover),var(--turf) 55%,var(--turf-deep));box-shadow:0 0 calc(12*var(--u)) rgba(var(--turf-rgb),.6)}
+
+/* Nom (ajusté sur une ligne) et niveau facultatif */
+.cj-nom{position:absolute;left:calc(32*var(--u));right:calc(32*var(--u));top:calc(514*var(--u));text-align:center;font-family:var(--display);font-weight:900;font-size:calc(56*var(--u));line-height:1;
+  letter-spacing:.02em;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cj-niveau{position:absolute;left:calc(32*var(--u));right:calc(32*var(--u));top:calc(576*var(--u));text-align:center;font-size:calc(13*var(--u));font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Demi-piste : surface bleu terrain, ligne centrale, ligne de service ; les attributs dans les deux carrés de service */
+.cj-piste{position:absolute;left:calc(32*var(--u));right:calc(32*var(--u));top:calc(604*var(--u));height:calc(232*var(--u));
+  border:calc(2*var(--u)) solid rgba(var(--sky-rgb),.45);border-radius:calc(4*var(--u));background:rgba(var(--terrain-rgb),.16)}
+.cj-piste::before{content:"";position:absolute;left:0;right:0;bottom:calc(44*var(--u));border-top:calc(2*var(--u)) solid rgba(var(--sky-rgb),.45)}
+.cj-piste::after{content:"";position:absolute;left:50%;top:0;bottom:calc(44*var(--u));width:calc(2*var(--u));margin-left:calc(-1*var(--u));background:rgba(var(--sky-rgb),.45)}
+/* 3 attributs par carré de service : remplissage par colonne (1-3 à gauche, 4-6 à droite) */
+.cj-attributs{position:absolute;left:calc(14*var(--u));right:calc(14*var(--u));top:calc(8*var(--u));margin:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:calc(32*var(--u));row-gap:0}
+.cj-attributs>div{position:relative;height:calc(60*var(--u));display:grid;grid-template-columns:1fr auto;align-items:end;padding:0 0 calc(17*var(--u))}
+.cj-attributs dt{font-weight:800;font-size:calc(16*var(--u));letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+.cj-attributs dd{margin:0;font-family:var(--display);font-weight:900;font-size:calc(44*var(--u));line-height:.74;color:var(--cj-rang);font-variant-numeric:tabular-nums}
+/* Jauge (dans le dd, pour un <dl> valide) : --n = note sur 99 */
+.cj-attributs dd i{position:absolute;left:0;right:0;bottom:calc(8*var(--u));height:calc(5*var(--u));border-radius:calc(3*var(--u));background:rgba(255,255,255,.12);overflow:hidden}
+.cj-attributs dd i::before{content:"";display:block;height:100%;width:calc(var(--n,0) * 1% / .99);max-width:100%;border-radius:inherit;background:var(--cj-rang)}
+.cj-site{position:absolute;left:0;right:0;bottom:calc(76*var(--u));text-align:center;font-size:calc(12*var(--u));font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+
+/* Élite : halo plus marqué */
+.carte-joueur.rang-elite{box-shadow:0 0 0 1.5px rgba(var(--cj-rang-rgb),.85),var(--shadow),0 0 80px rgba(var(--cj-rang-rgb),.28)}
+
+/* ---- La page : atelier (questionnaire à gauche, aperçu à droite), actions, légende des rangs, dépôt de photo ---- */
+.cj-atelier{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(min(100%,320px),.9fr);gap:var(--s-6);align-items:start}
+.cj-apercu{position:sticky;top:84px;display:grid;gap:var(--s-4)}
+.cj-apercu .carte-joueur{max-width:420px}
+.cj-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--s-3)}
+.cj-canvas{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none} /* canvas de rendu hors écran (export) */
+.cj-formats{display:flex;gap:var(--s-2);flex-wrap:wrap}
+.cj-formats label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border:1px solid var(--field-line);border-radius:var(--r-pill);font-weight:600;font-size:var(--fs-s);color:var(--muted);cursor:pointer}
+.cj-formats label:has(input:checked){background:var(--turf);border-color:var(--turf);color:var(--accent-fg);font-weight:800}
+.cj-formats input{position:absolute;opacity:0;width:0;height:0}
+.cj-formats label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+.cj-rangs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:var(--s-2)}
+.cj-rangs li{--cj-argent:#B8C7DA;--cj-argent-rgb:184,199,218;--cj-sand-rgb:255,181,71;display:grid;gap:2px;padding:var(--s-3) var(--s-4);border:1px solid rgba(var(--cj-rang-rgb),.45);border-left:4px solid var(--cj-rang);border-radius:var(--r-s);background:var(--glass)}
+.cj-rangs b{font-family:var(--display);font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em;color:var(--cj-rang)}
+.cj-rangs span{font-size:var(--fs-s);color:var(--muted)}
+.cj-depot{display:grid;gap:var(--s-2);justify-items:center;padding:var(--s-5) var(--s-4);border:1px dashed var(--field-line);border-radius:var(--r);background:rgba(0,0,0,.2);text-align:center;color:var(--muted);font-size:var(--fs-s)}
+.cj-depot:focus-within{border-color:var(--focus);outline:3px solid var(--focus);outline-offset:2px}
+.cj-depot input{position:absolute;opacity:0;width:0;height:0}
+.cj-depot b{color:var(--fg)}
+.cj-depot img{width:96px;height:96px;object-fit:cover;object-position:50% 22%;border-radius:50%;border:2px solid var(--cj-rang,var(--line-2))}
+@media (max-width:860px){
+  .cj-atelier{grid-template-columns:1fr}
+  .cj-apercu{position:static}
+}
