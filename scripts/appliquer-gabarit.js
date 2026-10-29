@@ -8,13 +8,23 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { nav, footer, versionner } = require("./gabarit");
+const { nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES } = require("./gabarit");
 
 const RACINE = path.join(__dirname, "..");
 const verifier = process.argv.includes("--verifier");
 const PREFIXES = { "404.html": "/" }; // la 404 est servie à n'importe quelle adresse : liens absolus
 
 const differentes = [];
+// Scripts qui chargent d'autres scripts à la volée : leurs chemins reçoivent aussi « ?v= » (voir gabarit.js)
+for (const rel of SCRIPTS_DYNAMIQUES) {
+  const fichier = path.join(RACINE, rel);
+  const avant = fs.readFileSync(fichier, "utf8");
+  const apres = versionnerJs(avant);
+  if (apres !== avant) {
+    differentes.push(rel);
+    if (!verifier) fs.writeFileSync(fichier, apres);
+  }
+}
 for (const f of fs.readdirSync(RACINE).filter(n => n.endsWith(".html")).sort()) {
   const fichier = path.join(RACINE, f);
   const avant = fs.readFileSync(fichier, "utf8");

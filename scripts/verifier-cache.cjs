@@ -18,6 +18,23 @@ for(const f of fs.readdirSync(racine).filter(n=>n.endsWith('.html'))){
 }
 ok('pages de la racine : style et scripts tous versionnés');
 
+// Scripts chargés à la volée (academie-sync.js -> compte.js) : versionnés, et fichiers du shell tous présents
+{
+ const sync=fs.readFileSync(path.join(racine,'assets/js/academie-sync.js'),'utf8');
+ assert.match(sync,/"assets\/js\/compte\.js\?v=[0-9a-f]{10}"/,'academie-sync.js : compte.js chargé sans empreinte à jour');
+ const {empreinte}=require('./gabarit.js');
+ assert.ok(sync.includes('compte.js?v='+empreinte('assets/js/compte.js')),'academie-sync.js : empreinte de compte.js périmée (appliquer-gabarit)');
+ const sw=fs.readFileSync(path.join(racine,'sw.js'),'utf8');
+ const shell=eval(sw.match(/const SHELL = (\[[\s\S]*?\n\]);/)[1]);
+ const absents=shell.filter(u=>u!=='./'&&!fs.existsSync(path.join(racine,u)));
+ assert.deepEqual(absents,[],'sw.js : fichiers du SHELL absents');
+ assert.ok(/\(fiches\|prochains\)/.test(sw),'sw.js : prochains/*.json en network-first');
+ for(const f of fs.readdirSync(racine).filter(n=>n.endsWith('.html')))
+  for(const m of fs.readFileSync(path.join(racine,f),'utf8').matchAll(/src="(assets\/js\/[\w-]+\.js)/g))
+   assert.ok(shell.includes(m[1]),f+' : '+m[1]+' absent du SHELL');
+}
+ok('academie-sync : compte.js versionné ; SHELL complet, sans fichier absent ; prochains en network-first');
+
 // Serveur : le site réel, sauf index.html et style.css qui changent à la « publication »
 let version=1;
 const pageIndex=()=>fs.readFileSync(path.join(racine,'index.html'),'utf8').replace(/assets\/style\.css\?v=[0-9a-f]+/,'assets/style.css?v=00000'+version)

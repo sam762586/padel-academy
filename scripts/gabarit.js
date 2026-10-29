@@ -70,9 +70,18 @@ const path = require("path");
 const crypto = require("crypto");
 const RACINE = path.join(__dirname, "..");
 const empreintes = {};
+/* Scripts qui en chargent d'autres dynamiquement (createElement("script")) : leurs chemins "assets/js/xxx.js" entre guillemets
+   reçoivent aussi « ?v=<empreinte> ». Sans cela le service worker (stale-while-revalidate) pourrait servir un ancien script
+   chargé à la volée. L'empreinte d'un tel fichier est calculée sur son contenu déjà réécrit ; appliquer-gabarit.js l'écrit. */
+const SCRIPTS_DYNAMIQUES = ["assets/js/academie-sync.js"];
+function versionnerJs(source) {
+  return source.replace(/(["'])(assets\/js\/[\w-]+\.js)(?:\?v=[0-9a-f]+)?\1/g,
+    (m, q, fichier) => `${q}${fichier}?v=${empreinte(fichier)}${q}`);
+}
 function empreinte(relatif) {
   if (!(relatif in empreintes)) {
-    const contenu = fs.readFileSync(path.join(RACINE, relatif), "utf8").replace(/\r\n/g, "\n");
+    let contenu = fs.readFileSync(path.join(RACINE, relatif), "utf8").replace(/\r\n/g, "\n");
+    if (SCRIPTS_DYNAMIQUES.includes(relatif)) contenu = versionnerJs(contenu);
     empreintes[relatif] = crypto.createHash("sha256").update(contenu).digest("hex").slice(0, 10);
   }
   return empreintes[relatif];
@@ -92,4 +101,4 @@ function carteModules() {
   for (const cle of Object.keys(imports)) imports[cle] += "?v=" + empreinte(imports[cle].slice(2));
   return JSON.stringify({ imports });
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, empreinte, carteModules };
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, empreinte, carteModules };
