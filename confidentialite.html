@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Confidentialité", "item": "https://apprendre-padel.fr/confidentialite.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=e71edbc04e">
+<link rel="stylesheet" href="assets/style.css?v=5044927434">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -37,49 +37,102 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">Tes données</p><h1>Confidentialité</h1></div>
-      <p>Apprendre Padel fonctionne sans compte. Si tu en crées un, voici exactement ce qui est stocké et ce que tu peux en faire.</p>
+      <p>Apprendre Padel fonctionne sans compte. Si tu en crées un, voici exactement ce qui est stocké, pourquoi, où, combien de temps, et ce que tu peux en faire. Dernière mise à jour : 29 octobre 2026.</p>
     </div>
     <div class="acc-card prose">
-      <h2 class="sr-only">Tes données, en détail</h2><h3>Ce qui est stocké</h3>
+      <h2 class="sr-only">Tes données, en détail</h2>
+
+      <h3 id="responsable">Qui est responsable</h3>
+      <p>Le responsable du traitement est l'éditeur du site, Apprendre Padel (voir les <a href="mentions-legales.html">mentions légales</a>). Pour toute question ou demande : <a href="mailto:samuelkyllian@hotmail.com">samuelkyllian@hotmail.com</a>.</p>
+
+      <h3 id="sans-compte">Sans compte</h3>
+      <p>Tout le site se consulte sans compte, sauf ton espace joueur. Sans compte, rien de ce que tu fais (test de niveau, plan, académie, compteur de match, tableaux tactiques…) n'est envoyé à nos serveurs : tout reste sur ton appareil (voir <a href="#appareil">Sur ton appareil</a>). Deux services tiers voient quand même ta visite : la mesure d'audience et, sur certaines pages, un service qui diffuse un fichier de code (voir <a href="#audience">Mesure d'audience</a> et <a href="#tiers">Services tiers et transferts</a>).</p>
+
+      <h3 id="compte">Ce qui est stocké dans ton compte</h3>
+      <p>Un compte est facultatif et gratuit. Les données sont hébergées chez Supabase, dans une région de l'Union européenne (eu-west-1). Chaque compte ne peut lire et modifier que ses propres lignes (règles de sécurité de la base, dites RLS), sauf les annonces et réponses du partenaire décrites plus bas.</p>
       <ul>
-        <li>Ton adresse e-mail (pour t'envoyer le lien de connexion).</li>
-        <li>Ton pseudo.</li>
-        <li>Les champs facultatifs de ton profil : niveau déclaré, classement P, côté de jeu, main forte, club ou ville.</li>
-        <li>Les résultats du quiz de niveau que tu choisis d'enregistrer (date, score, niveau, réponses).</li>
-        <li>Les semaines du plan d'entraînement que tu as validées.</li>
-        <li>Ton espace joueur, si tu l'utilises : tes résultats de tournois (catégorie, place, nombre de paires, date), tes objectifs et le rang FFT que tu saisis.</li>
-        <li>Ton journal de matchs : les matchs comptés avec le compteur et ceux que tu ajoutes après coup (date, type, partenaire et adversaires tels que tu les écris, score, résultat).</li>
-        <li>Si tu utilises « Trouver un partenaire » : tes annonces, tes réponses, tes signalements et la date à laquelle tu as confirmé avoir 15 ans ou plus et accepté la charte (détails plus bas).</li>
+        <li><b>Connexion.</b> Ton adresse e-mail. Selon ta façon de te connecter : un mot de passe (que Supabase ne conserve que sous forme hachée, nous ne pouvons pas le lire), un lien magique envoyé par e-mail, ou ton compte Google (voir <a href="#google">Connexion avec Google</a>). Ton navigateur garde la session ouverte pour que tu n'aies pas à te reconnecter à chaque page. <i>Pourquoi :</i> créer ton compte et te reconnaître. <i>Base légale :</i> le service que tu demandes en créant un compte (article 6, 1, b du RGPD).</li>
+        <li><b>Âge.</b> À l'inscription, une déclaration t'est demandée : « J'ai 15 ans ou plus ». Elle ne sert qu'à vérifier la condition d'âge ; en France, un mineur de moins de 15 ans ne peut pas consentir seul à l'usage d'un service en ligne (<a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000886460" target="_blank" rel="noopener">loi Informatique et Libertés du 6 janvier 1978</a>).</li>
+        <li><b>Profil</b> (tout est facultatif) : pseudo, niveau déclaré, classement P, côté de jeu, main forte, club ou ville. <i>Pourquoi :</i> retrouver ton profil sur tous tes appareils. <i>Base légale :</i> ton consentement, que tu donnes en remplissant ces champs et que tu retires en les effaçant.</li>
+        <li><b>Plan d'entraînement.</b> Les semaines que tu as validées. <i>Pourquoi :</i> garder ta progression d'un appareil à l'autre. <i>Base légale :</i> le service que tu demandes.</li>
+        <li><b>Test de niveau.</b> Quand l'enregistrement dans le profil t'est proposé et que tu l'acceptes : date, score, niveau et réponses du test. <i>Base légale :</i> ton consentement.</li>
+        <li><b>Mon académie.</b> Si tu es connecté, ton niveau déclaré et tes quiz sont synchronisés avec ton compte, pour que tu les retrouves sur tous tes appareils. Ce qui est envoyé : (1) ton niveau déclaré (de 1 à 10, grille « Niveaux Padel » de la FFT) avec la date de chaque choix, l'historique n'étant jamais réécrit ; (2) pour chaque séance de quiz terminée : son identifiant, ton niveau au moment du quiz, l'heure de début et de fin, ton score, le nombre de questions et, pour chaque question, ta réponse, si elle était juste, son type et son thème (40 réponses au plus par séance). Le score d'un quiz ne modifie jamais ton niveau déclaré. Rien n'est envoyé si tu n'es pas connecté, ni d'un compte vers un autre sur un appareil partagé. <i>Base légale :</i> le service que tu demandes.</li>
+        <li><b>Trouver un partenaire.</b> Annonces, réponses, signalements et dates de confirmation de la charte : voir <a href="#partenaires">plus bas</a>.</li>
       </ul>
-      <h3>Pourquoi</h3>
-      <p>Uniquement pour te permettre de retrouver ton profil, tes résultats et ta progression sur tous tes appareils. Rien d'autre.</p>
-      <h3>Où</h3>
-      <p>Les données sont hébergées chez Supabase, dans une région de l'Union européenne. Chaque compte ne peut lire et modifier que ses propres données.</p>
-      <h3>Combien de temps</h3>
-      <p>Jusqu'à la suppression de ton compte.</p>
-      <h3>Tout supprimer</h3>
-      <p>Depuis la page <a href="compte.html">Mon compte</a>, le bouton « Supprimer mon compte » efface immédiatement et définitivement ton compte et toutes les données associées.</p>
-      <h3>Revente et publicité</h3>
-      <p>Rien n'est revendu ni partagé à des fins publicitaires, et le site n'utilise aucun traceur publicitaire ni cookie de mesure d'audience (voir <a href="#audience">Mesure d'audience</a>).</p>
+      <p>Certaines fonctions du site ne sont pas reliées au compte à ce jour : le journal de matchs et les bilans après match, les résultats de tournois, objectifs et rang FFT de ton espace joueur, les étoiles de tournois, ainsi que « J'y vais » et les avis sur les fiches de tournoi. Leurs données restent uniquement sur ton appareil. Si l'une d'elles est un jour reliée au compte, cette page le dira.</p>
+
+      <h3 id="duree">Combien de temps</h3>
+      <ul>
+        <li><b>Données du compte :</b> jusqu'à la suppression de ton compte, ou plus tôt si tu supprimes toi-même un élément.</li>
+        <li><b>Annonces du partenaire :</b> voir <a href="#partenaires">plus bas</a> (30 jours après la date du tournoi).</li>
+        <li><b>Sur ton appareil :</b> jusqu'à ce que tu effaces les données du site dans ton navigateur.</li>
+      </ul>
+
+      <h3 id="supprimer">Tout supprimer</h3>
+      <p>Depuis la page <a href="compte.html">Mon compte</a>, le bouton « Supprimer mon compte » efface immédiatement et définitivement ton compte et toutes les données associées (profil, plan, quiz, niveau déclaré, annonces, réponses, signalements…). Tu peux aussi nous écrire à <a href="mailto:samuelkyllian@hotmail.com">samuelkyllian@hotmail.com</a>.</p>
+
+      <h3 id="droits">Tes droits</h3>
+      <p>Tu peux accéder à tes données, les faire rectifier ou effacer, en demander la limitation, les récupérer dans un format lisible (portabilité), t'opposer à leur traitement et retirer ton consentement à tout moment (articles 15 à 21 du RGPD). Une grande partie se fait seul depuis <a href="compte.html">Mon compte</a> ; pour le reste, écris à <a href="mailto:samuelkyllian@hotmail.com">samuelkyllian@hotmail.com</a> : la réponse arrive dans un délai d'un mois au plus (article 12 du RGPD). Si tu estimes que tes droits ne sont pas respectés, tu peux saisir la CNIL : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener">cnil.fr/fr/plaintes</a>.</p>
+
+      <h3 id="revente">Revente et publicité</h3>
+      <p>Rien n'est revendu ni partagé à des fins publicitaires, et le site n'utilise aucun traceur publicitaire.</p>
+
       <h3 id="audience">Mesure d'audience</h3>
-      <p>Pour savoir quelles pages sont utiles, le site utilise <a href="https://www.goatcounter.com" target="_blank" rel="noopener">GoatCounter</a>, un outil de statistiques sans cookie et sans traceur publicitaire. Il compte les pages vues et enregistre des informations générales : page visitée, site d'où tu viens, type de navigateur et d'appareil, taille d'écran, pays. Il ne dépose rien sur ton appareil, ne te suit pas d'un site à l'autre et ne permet pas de t'identifier : ton adresse IP n'est pas conservée. C'est pourquoi aucun bandeau de consentement ne s'affiche.</p>
-      <h3>Page Tournois</h3>
-      <p>Quand tu cherches une ville sur la page Tournois, le texte que tu tapes est envoyé à l'API publique de géocodage de l'IGN (Géoplateforme) pour proposer des communes. Si tu utilises « Autour de moi », ta position reste dans ton navigateur : elle sert uniquement à calculer les distances, elle n'est ni envoyée ni enregistrée.</p>
+      <p>Pour savoir quelles pages sont utiles, le site utilise <a href="https://www.goatcounter.com" target="_blank" rel="noopener">GoatCounter</a>, un outil de statistiques sans cookie et sans traceur publicitaire. Il compte les pages vues et en tire des totaux : page visitée, site d'où tu viens, navigateur, système, taille d'écran, langue et pays approximatif. Sans identification directe : GoatCounter ne conserve ni ton adresse IP ni ton identifiant de navigateur complet. Pour reconnaître une visite répétée, il combine brièvement ces informations en mémoire, 8 heures au plus, sans les écrire dans sa base (<a href="https://www.goatcounter.com/privacy" target="_blank" rel="noopener">politique de GoatCounter</a>). Ses serveurs sont en Finlande et en Allemagne ; il est exploité depuis l'Irlande. Ces statistiques ne sont ni recoupées avec d'autres données, ni utilisées pour te suivre d'un site à l'autre, ni transmises à des tiers.</p>
+      <p>Base légale : l'intérêt légitime de l'éditeur à connaître la fréquentation de son site (article 6, 1, f du RGPD). La CNIL dispense de consentement les outils de mesure d'audience qui se limitent à produire des statistiques, sans recoupement ni suivi global de ta navigation (<a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/regles/cookies-solutions-pour-les-outils-de-mesure-daudience" target="_blank" rel="noopener">page de la CNIL sur la mesure d'audience</a>) : c'est pourquoi aucun bandeau ne s'affiche. Tu peux t'y opposer à tout moment :</p>
+      <div id="mesure-audience-choix"></div>
+      <noscript><p>Cette case demande JavaScript. Sans JavaScript, aucune statistique n'est de toute façon comptée.</p></noscript>
+      <p>Ce choix est gardé sur cet appareil, dans le navigateur (clé « skipgc », celle que lit GoatCounter) ; il vaut pour les visites suivantes.</p>
+
+      <h3 id="google">Connexion avec Google</h3>
+      <p>Le bouton « Continuer avec Google » te redirige vers Google, qui te demande ton accord, puis renvoie à Supabase les informations de ton compte Google (au minimum ton adresse e-mail ; Google peut y joindre ton nom et ta photo, que Supabase peut conserver avec ton compte). Google traite ces données selon <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">sa propre politique</a>. Si tu ne veux pas de Google, utilise l'e-mail avec mot de passe ou le lien magique.</p>
+
+      <h3 id="tournois">Page Tournois</h3>
+      <p>Les tournois affichés viennent d'informations publiques de Ten'Up (FFT), relevées une fois par semaine. Quand tu cherches une ville sur la page Tournois, le texte que tu tapes est envoyé à l'API publique de géocodage de l'IGN (Géoplateforme) pour proposer des communes. Si tu utilises « Autour de moi », ta position n'est envoyée à personne : elle sert uniquement à calculer les distances. Elle est gardée sur ton appareil (clé <code>pa-ma-position</code>) pour afficher les distances sur les fiches tournoi ; tu l'effaces avec les données du site.</p>
+
       <h3 id="partenaires">Trouver un partenaire (annonces de tournoi)</h3>
-      <p>Cette fonction est facultative et réservée aux personnes de 15 ans ou plus. Avant ta première annonce ou réponse, tu confirmes ton âge et tu acceptes la <a href="partenaires.html#charte">charte</a> ; la date de ces deux confirmations est enregistrée dans ton profil.</p>
+      <p>Cette fonction est facultative et réservée aux personnes de 15 ans ou plus. Avant ta première annonce ou réponse, tu confirmes ton âge et tu acceptes la <a href="partenaires.html#charte">charte</a> ; la date de ces deux confirmations est enregistrée dans ton profil.</p>
       <ul>
-        <li><b>Ce qui est stocké :</b> pour chaque annonce, le tournoi visé (nom, date, ville, département, catégorie), ton pseudo, ton niveau déclaré et ton classement P (copiés de ton profil au moment de la publication), ton côté de jeu préféré, l'épreuve cherchée et ton message libre. Pour chaque réponse : ton pseudo et ton message. Pour chaque signalement : le motif, un détail facultatif et l'annonce concernée.</li>
-        <li><b>Qui peut voir quoi :</b> les annonces sont visibles uniquement par les personnes connectées, jamais par les visiteurs sans compte, et ne sont plus affichées dès que la date du tournoi est passée. Ton adresse e-mail n'est jamais affichée. Une réponse n'est lisible que par l'auteur de l'annonce et par toi. Un signalement n'est visible que par son auteur et par l'administrateur du site, jamais par la personne signalée.</li>
-        <li><b>Contacts :</b> les annonces refusent les e-mails, numéros de téléphone et liens. Si tu écris tes coordonnées dans une réponse privée, tu les transmets volontairement à la seule personne concernée.</li>
-        <li><b>Modération :</b> une annonce signalée par 3 joueurs différents est masquée automatiquement. L'administrateur du site peut voir les annonces signalées, les masquer, les rétablir ou les supprimer.</li>
-        <li><b>Durée :</b> chaque annonce (et ses réponses et signalements) est supprimée 30 jours après la date du tournoi, ou plus tôt si tu la supprimes toi-même depuis <a href="compte.html#mes-annonces">Mon compte</a>, ou si tu supprimes ton compte. Tu peux supprimer à tout moment chacune de tes annonces et de tes réponses.</li>
-        <li><b>Base légale :</b> ton consentement, que tu donnes en cochant les deux cases et que tu retires en supprimant tes annonces ou ton compte.</li>
+        <li><b>Ce qui est stocké :</b> pour chaque annonce, le tournoi visé (nom, date, ville, département, catégorie), ton pseudo, ton niveau déclaré et ton classement P (copiés de ton profil au moment de la publication), ton côté de jeu préféré, l'épreuve cherchée et ton message libre. Pour chaque réponse : ton pseudo et ton message. Pour chaque signalement : le motif, un détail facultatif et l'annonce concernée.</li>
+        <li><b>Qui peut voir quoi :</b> les annonces sont visibles uniquement par les personnes connectées, jamais par les visiteurs sans compte, et ne sont plus affichées dès que la date du tournoi est passée. Ton adresse e-mail n'est jamais affichée. Une réponse n'est lisible que par l'auteur de l'annonce et par toi. Un signalement n'est visible que par son auteur et par l'administrateur du site, jamais par la personne signalée.</li>
+        <li><b>Contacts :</b> les annonces refusent les e-mails, numéros de téléphone et liens. Si tu écris tes coordonnées dans une réponse privée, tu les transmets volontairement à la seule personne concernée.</li>
+        <li><b>Modération et signalement :</b> une annonce signalée par 3 joueurs différents est masquée automatiquement. L'administrateur du site peut voir les annonces signalées, les masquer, les rétablir ou les supprimer. Pour signaler une annonce, utilise le bouton de signalement ; pour un contenu manifestement illicite ou une atteinte à tes droits, écris à <a href="mailto:samuelkyllian@hotmail.com">samuelkyllian@hotmail.com</a> en indiquant la page, le contenu visé et la raison.</li>
+        <li><b>Durée :</b> chaque annonce (et ses réponses et signalements) est supprimée 30 jours après la date de fin du tournoi, ou plus tôt si tu la supprimes toi-même depuis <a href="compte.html#mes-annonces">Mon compte</a>, ou si tu supprimes ton compte. Tu peux supprimer à tout moment chacune de tes annonces et de tes réponses.</li>
+        <li><b>Base légale :</b> ton consentement, que tu donnes en cochant les deux cases et que tu retires en supprimant tes annonces ou ton compte.</li>
       </ul>
-      <h3>Sur ton appareil</h3>
-      <p>Le site garde aussi, dans ton navigateur, quelques préférences de confort (par exemple les semaines cochées du plan). La progression locale est séparée par compte. Sans compte, elle reste distincte et peut être importée à ta demande. Quand tu es connecté, les changements en attente sont envoyés à ton compte au retour de la connexion sur la page Entraînement. Tu peux effacer les copies locales avec les données du site dans ton navigateur.</p>
+
+      <h3 id="retrait-tournois">Retrait des données d'un tournoi</h3>
+      <p>Les fiches de tournoi ne reprennent que des informations publiques de Ten'Up (nom, dates, club, catégorie…). Si tu es organisateur ou concerné et que tu veux faire corriger ou retirer une information, écris à <a href="mailto:samuelkyllian@hotmail.com">samuelkyllian@hotmail.com</a> avec l'adresse de la fiche : la demande est traitée dans un délai d'un mois au plus.</p>
+
+      <h3 id="appareil">Sur ton appareil</h3>
+      <p>Le site garde dans ton navigateur (stockage local, clés commençant par <code>pa-</code>) ce qui te sert à reprendre là où tu t'étais arrêté. Rien de cela n'est envoyé à nos serveurs, sauf ce qui est décrit plus haut quand tu es connecté. À la date de cette page :</p>
+      <ul>
+        <li><b>Plan et progression :</b> <code>pa-weeks-v2</code> (semaines cochées du plan, une copie par compte), <code>pa-progression</code>, <code>pa-exercices-faits</code>, <code>pa-defis</code>.</li>
+        <li><b>Mon académie :</b> <code>pa-academie</code> (niveau déclaré), <code>pa-academie-quiz</code> (séances de quiz), <code>pa-academie-priorites</code>, <code>pa-academie-reprendre</code>, <code>pa-academie-synchro</code> (état de la synchronisation avec le compte).</li>
+        <li><b>Tests et diagnostics :</b> <code>pa-quiz-dernier</code>, <code>pa-quiz-tactique</code>, <code>pa-diagnostics</code>, <code>pa-diagnostic-paire</code>, <code>pa-sim-resultats</code> (simulateur de barème).</li>
+        <li><b>Espace joueur et journal :</b> <code>pa-objectifs</code>, <code>pa-objectifs-jeu</code>, <code>pa-classement-fft</code>, <code>pa-journal-manuels</code>, <code>pa-journal-suppressions</code>, <code>pa-synchro-…</code>.</li>
+        <li><b>Compteur de match :</b> <code>pa-score-en-cours</code>, <code>pa-score-historique</code>.</li>
+        <li><b>Tableaux tactiques et simulateur 3D :</b> <code>pa-tableaux-tactiques</code>, <code>pa-p3d-qualite</code>.</li>
+        <li><b>Tournois :</b> <code>pa-mon-departement</code>, <code>pa-ma-position</code>, <code>pa-tournois-filtres</code>, <code>pa-tournois-favoris</code>, <code>pa-tournois-favoris-attente</code>.</li>
+        <li><b>Session de compte :</b> quand tu te connectes, la bibliothèque de connexion de Supabase garde ta session dans le stockage local. Elle disparaît quand tu te déconnectes.</li>
+        <li><b>Hors connexion :</b> une copie des pages du site est gardée dans la mémoire cache du navigateur pour que le site marche sans réseau.</li>
+        <li><b>Mesure d'audience :</b> la clé <code>skipgc</code>, seulement si tu as coché la case d'opposition ci-dessus.</li>
+      </ul>
+      <p>Sans compte, ces données restent séparées et peuvent être importées dans ton compte à ta demande. Quand tu es connecté, les changements en attente sont envoyés à ton compte au retour de la connexion. Ces données servent uniquement au fonctionnement du site, sans publicité, et ne demandent pas de consentement : elles sont strictement nécessaires au service que tu utilises. Tu peux les effacer avec les données du site dans ton navigateur.</p>
+
+      <h3 id="tiers">Services tiers et transferts</h3>
+      <ul>
+        <li><b>GitHub Pages</b> (GitHub Inc., États-Unis) héberge les pages du site ; comme tout serveur web, il voit l'adresse IP des visiteurs pour répondre.</li>
+        <li><b>Supabase</b> héberge les comptes, en région UE (eu-west-1) ; sa politique prévoit des clauses contractuelles types de la Commission européenne pour les transferts hors Union (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>).</li>
+        <li><b>jsDelivr</b> (cdn.jsdelivr.net) diffuse la bibliothèque de connexion Supabase sur les pages qui gèrent les comptes (compte, connexion, espace, entraînement, test de niveau, partenaires, compteur de match, tournois et fiches de tournoi) et, si tu es connecté, sur Mon académie. Comme tout serveur, il voit ton adresse IP à ce moment-là ; il ne reçoit aucune donnée de ton compte (<a href="https://www.jsdelivr.com/terms/privacy-policy" target="_blank" rel="noopener">politique de jsDelivr</a>).</li>
+        <li><b>GoatCounter</b> : voir <a href="#audience">Mesure d'audience</a>. <b>Google</b> : voir <a href="#google">Connexion avec Google</a>. <b>IGN</b> : voir <a href="#tournois">Page Tournois</a>.</li>
+        <li>Les polices du site sont hébergées sur le site lui-même : aucun service de polices externe n'est appelé.</li>
+      </ul>
+      <p>Les prestataires établis hors de l'Union européenne appliquent leurs propres garanties de transfert : consulte leurs politiques pour le détail.</p>
     </div>
   </div>
 </section>
+<script src="assets/js/mesure-audience.js?v=67c18ec524" defer></script>
 <footer>
   <div class="wrap">
     <div><b>Apprendre Padel</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par Samuel, joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie.</div>
