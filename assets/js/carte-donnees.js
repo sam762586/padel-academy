@@ -41,9 +41,9 @@
 // Thèmes du test de niveau (QL_THEMES de quiz-niveau.js) : vitre, service, aerien, couple, placement, montee,
 // regularite, transition, communication, compet. "themes" = ceux qui nourrissent l'attribut, le premier est le principal.
 const CARTE_ATTRIBUTS=[
- {cle:"VOL",libelle:"Volée",desc:"Bloquer au filet à 2–2,5 m, première volée après le service, volée basse.",themes:["placement","service"]},
+ {cle:"VOL",libelle:"Volée",desc:"Bloquer au filet à 2–2,5 m, première volée après le service, volée basse.",themes:["placement","service"]},
  {cle:"AER",libelle:"Jeu aérien",desc:"Bandeja pour garder le filet, víbora, smash pour conclure sur un lob court.",themes:["aerien"]},
- {cle:"DEF",libelle:"Défense",desc:"Sorties de vitre, double vitre, tenir l'échange à 1–1,5 m de la vitre sans faute.",themes:["vitre","regularite"]},
+ {cle:"DEF",libelle:"Défense",desc:"Sorties de vitre, double vitre, tenir l'échange à 1–1,5 m de la vitre sans faute.",themes:["vitre","regularite"]},
  {cle:"LOB",libelle:"Lob et montée",desc:"Lob haut et profond, puis reprendre le filet à deux.",themes:["montee","couple"]},
  {cle:"SER",libelle:"Service et retour",desc:"Service slicé et placé, retour en lob ou dans les pieds du serveur.",themes:["service"]},
  {cle:"TAC",libelle:"Tactique",desc:"Lire le jeu, choisir le bon coup, parler et construire avec son partenaire.",themes:["communication","transition","couple"]},
@@ -58,7 +58,7 @@ const CARTE_CLES=CARTE_ATTRIBUTS.map(a=>a.cle);
    CARTE_SUGGESTION) ; la page peut afficher la suggestion à côté du choix. */
 const CARTE_POSTES=[
  {cle:"droite",libelle:"Droite",desc:"Tu construis le point : volées sûres, lobs profonds, peu de fautes.",poids:{VOL:1.3,TAC:1.3,DEF:1.1,LOB:1.1,SER:1.0,AER:0.7}},
- {cle:"gauche",libelle:"Gauche",desc:"Tu conclus le point : bandeja, víbora et smash, balles au centre.",poids:{AER:1.6,VOL:1.1,TAC:1.0,DEF:1.0,LOB:0.8,SER:0.8}},
+ {cle:"gauche",libelle:"Gauche",desc:"Tu conclus le point : bandeja, víbora et smash sur les balles hautes.",poids:{AER:1.6,VOL:1.1,TAC:1.0,DEF:1.0,LOB:0.8,SER:0.8}},
  {cle:"polyvalent",libelle:"Polyvalent",desc:"Tu joues des deux côtés selon ton partenaire.",poids:{VOL:1,AER:1,DEF:1,LOB:1,SER:1,TAC:1}},
 ];
 /* Suggestion de poste : on compare la position de l'aérien à celle de la volée et de la tactique, chacune ramenée
@@ -112,7 +112,7 @@ const CARTE_RANGS=[
    Repères du site : zone offensive à 2–2,5 m du filet, défense à 1–1,5 m de la vitre, 3–4 m entre partenaires,
    on monte à deux ou personne, bandeja = garder le filet, smash = conclure sur lob court. */
 const CARTE_QUESTIONS=[
- {id:"q01",attr:"VOL",q:"Tu es au filet, à 2–2,5 m, et une balle adverse arrive à mi-hauteur sur ton revers. Le plus souvent…",r:[
+ {id:"q01",attr:"VOL",q:"Tu es au filet, à 2–2,5 m, et une balle adverse arrive à mi-hauteur sur ton revers. Le plus souvent…",r:[
   {t:"Je frappe fort pour conclure ; une fois sur deux, elle finit dans le filet",effets:{VOL:+2,TAC:-2}},
   {t:"Je bloque, geste court, raquette ouverte, long au centre : l'adversaire doit rejouer",effets:{VOL:+14,TAC:+2}},
   {t:"Je recule ou je la laisse à mon partenaire : le revers à la volée, ce n'est pas mon coup",effets:{VOL:-6,TAC:-2}},
@@ -121,13 +121,13 @@ const CARTE_QUESTIONS=[
   {t:"Je monte, mais elle part souvent dans le filet ou reste courte",effets:{VOL:+2}},
   {t:"Je reste au fond après mon service",effets:{VOL:-6,SER:-4,TAC:-2}},
   {t:"Split step au moment où le relanceur frappe, puis volée profonde vers la vitre latérale ou au centre",effets:{VOL:+14,SER:+4,TAC:+2}},
-  {t:"Elle est correcte, mais je la joue souvent à mi-court plutôt qu'à 2–3 m du filet",effets:{VOL:+8,SER:+2}}]},
+  {t:"Elle est correcte, mais je la joue souvent à mi-court plutôt qu'à 2–3 m du filet",effets:{VOL:+8,SER:+2}}]},
  {id:"q03",attr:"AER",q:"Lob adverse mi-profond, tu es au filet. Ce qui se passe le plus souvent :",r:[
   {t:"Bandeja profonde qui me laisse au filet environ 7 fois sur 10",effets:{AER:+8}},
   {t:"Je recule en courant et je la renvoie comme je peux, souvent après le rebond",effets:{AER:-6,LOB:-2}},
   {t:"Bandeja ou víbora selon la hauteur, placée vers la grille ou sur le moins bon défenseur, et je garde le filet",effets:{AER:+14,TAC:+3}},
   {t:"Bandeja la plupart du temps, mais elle sort ou reste courte au milieu",effets:{AER:+2}}]},
- {id:"q04",attr:"AER",q:"Lob court : tu es sous la balle, à 3 m du filet. Tu fais quoi ?",r:[
+ {id:"q04",attr:"AER",q:"Lob court : tu es sous la balle, à 3 m du filet. Tu fais quoi ?",r:[
   {t:"Je smashe de toutes mes forces : filet, dehors, ou la balle ressort de la vitre et ils contre-attaquent",effets:{AER:-6,TAC:-2}},
   {t:"Une bandeja de sécurité, même sur un lob court",effets:{AER:+3,TAC:+1}},
   {t:"Smash puissant mais à plat et pas toujours placé : il termine le point une fois sur deux",effets:{AER:+8}},
@@ -139,17 +139,17 @@ const CARTE_QUESTIONS=[
   {t:"Je laisse revenir la balle, de profil, puis lob profond ou balle basse au centre selon les volleyeurs, double vitre comprise",effets:{DEF:+14,LOB:+3,TAC:+2}}]},
  {id:"q06",attr:"DEF",q:"Les adversaires volleyent dans tes pieds, balle après balle. Toi :",r:[
   {t:"Je remets 2 ou 3 balles, ensuite je fais la faute",effets:{DEF:-6,TAC:-2}},
-  {t:"Je tiens l'échange autant qu'il faut, à 1–1,5 m de la vitre, et j'attends la balle plus haute pour lober",effets:{DEF:+14,LOB:+3,TAC:+2}},
+  {t:"Je tiens l'échange autant qu'il faut, à 1–1,5 m de la vitre, et j'attends la balle plus haute pour lober",effets:{DEF:+14,LOB:+3,TAC:+2}},
   {t:"Je remets quelques balles, puis je perds patience et je tente un coup",effets:{DEF:+2,TAC:-2}},
   {t:"Je remets autant qu'il faut ; mes fautes viennent quand ils accélèrent",effets:{DEF:+8}}]},
  {id:"q07",attr:"LOB",q:"Tu es au fond, les deux adversaires au filet. Ton lob, en match :",r:[
-  {t:"Il passe le volleyeur mais retombe souvent à mi-court ; on hésite à monter",effets:{LOB:+8}},
+  {t:"Il passe au-dessus du volleyeur, mais retombe souvent à mi-court ; on hésite à monter",effets:{LOB:+8}},
   {t:"Je ne lobe presque jamais : je préfère frapper fort entre les deux",effets:{LOB:-6,TAC:-2}},
   {t:"Haut et profond, il retombe dans le dernier mètre, et on monte à deux dès qu'il les fait reculer",effets:{LOB:+14,TAC:+3}},
   {t:"Trop court une fois sur deux : il se fait smasher",effets:{LOB:+2}}]},
- {id:"q08",attr:"LOB",q:"Ton lob vient de passer les adversaires, ils reculent. Et vous ?",r:[
+ {id:"q08",attr:"LOB",q:"Ton lob vient de passer les adversaires, ils reculent. Et toi, avec ton partenaire ?",r:[
   {t:"On reste au fond : au filet, on prend des balles dans les pieds",effets:{LOB:-6,VOL:-2,TAC:-2}},
-  {t:"On monte à deux, à petits pas, split step au moment de leur frappe, et on se place à 2–2,5 m du filet",effets:{LOB:+14,VOL:+3,TAC:+2}},
+  {t:"On monte à deux, à petits pas, split step au moment de leur frappe, et on se place à 2–2,5 m du filet",effets:{LOB:+14,VOL:+3,TAC:+2}},
   {t:"Je monte seul, mon partenaire reste au fond",effets:{LOB:+2,TAC:-2}},
   {t:"On monte, mais pas toujours ensemble : un au filet, l'autre à mi-court",effets:{LOB:+8}}]},
  {id:"q09",attr:"SER",q:"Ton service, sur un match entier :",r:[

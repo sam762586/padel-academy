@@ -55,7 +55,7 @@ async function repondreClavier(page,reponses){
  for(let i=0;i<12;i++){
   // Après chaque réponse, le focus est sur le titre de la question suivante (la première : vérifié après « Commencer »)
   if(i)assert.equal(await page.evaluate(()=>document.activeElement&&document.activeElement.id),'cj-qtext','focus sur la question '+(i+1));
-  assert.match(await page.textContent('#cj-qnum'),new RegExp('Situation '+(i+1)+' / 12'));
+  assert.match(await page.textContent('#cj-qnum'),new RegExp('Situation '+(i+1)+'\\ssur\\s12'));
   const texte=await page.evaluate(i=>window.PA_CARTE.QUESTIONS[i].r[0].t,i); // on vérifie que les 4 réponses sont là, mélangées ou non
   assert.equal(await page.locator('#cj-qopts .qopt').count(),4);
   const voulu=await page.evaluate(([i,k])=>window.PA_CARTE.QUESTIONS[i].r[k].t,[i,reponses[i]]);
@@ -90,7 +90,7 @@ async function repondreClavier(page,reponses){
   // Commencer au clavier
   await page.focus('#cj-commencer');await page.keyboard.press('Enter');
   assert.equal(await page.locator('#cj-quiz').isVisible(),true);
-  assert.match(await page.textContent('#cj-base-txt'),/Tes notes partent de ton niveau\s: P100 \(test de niveau\)/);
+  assert.match(await page.textContent('#cj-base-txt'),/Tes notes partent de ton repère\s: P100 \(test de niveau\)/);
   assert.equal(await page.getAttribute('#cj-qnum','aria-live'),'polite');
   assert.equal(await page.getAttribute('#cj-qopts','role'),'group');
   assert.equal(await page.getAttribute('#cj-qopts','aria-labelledby'),'cj-qtext');
@@ -120,7 +120,7 @@ async function repondreClavier(page,reponses){
   await page.evaluate(()=>{const i=document.getElementById('cj-n-VOL');i.value='99';i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));});
   assert.equal(await page.inputValue('#cj-n-VOL'),'69');
   assert.equal(await page.evaluate(()=>document.querySelector('#cj-n-VOL+output').textContent),'69');
-  assert.match(await page.getAttribute('#cj-n-VOL','aria-valuetext'),/69 sur 99, calcul 64/);
+  assert.match(await page.getAttribute('#cj-n-VOL','aria-valuetext'),/69\ssur\s99, valeur calculée 64/);
   await page.focus('#cj-n-AER');for(let k=0;k<9;k++)await page.keyboard.press('ArrowLeft');
   assert.equal(await page.inputValue('#cj-n-AER'),'54');
   const gAj=Number(await page.textContent('#cj-globale'));
@@ -178,7 +178,7 @@ async function repondreClavier(page,reponses){
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
   f=path.join(dossier,'story.'+EXT_ATTENDUE);await dl.saveAs(f);
   buf=fs.readFileSync(f);assert.ok(buf.length>20000&&buf.length<=512000,'image story entre 20 et 500 Ko ('+buf.length+')');assert.deepEqual(await dimsImage(page,buf,TYPE_ATTENDU),[1080,1920]);
-  assert.match(await page.textContent('#cj-final-msg'),new RegExp('Image prête : ma-carte-padel\.'+EXT_ATTENDUE));
+  assert.match(await page.textContent('#cj-final-msg'),new RegExp('Image prête\\s: ma-carte-padel\\.'+EXT_ATTENDUE));
   assert.equal(await page.isEnabled('#cj-telecharger'),true);
   ok('téléchargement : ma-carte-padel.'+EXT_ATTENDUE+' en 1200 × 1800 (carte) et 1080 × 1920 (story), ≤ 500 Ko, message de confirmation');
   // Partager sans navigator.share : repli sur le téléchargement

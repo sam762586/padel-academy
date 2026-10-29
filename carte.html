@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ma carte de joueur de padel | Apprendre Padel</title>
-<meta name="description" content="Crée ta carte de joueur de padel : 12 situations de match, 6 notes (volée, aérien, défense, lob, service, tactique), ta photo, ton poste. Image à partager.">
+<meta name="description" content="Crée ta carte de joueur de padel : 12 situations de match, 6 notes (volée, jeu aérien, défense, lob, service, tactique), ta photo, ton poste. Image à partager.">
 <link rel="canonical" href="https://apprendre-padel.fr/carte.html">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -40,7 +40,7 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">S'entraîner · Ma carte de joueur</p><h1>Ma carte de joueur</h1></div>
-      <p>Comme les cartes de joueurs des jeux de football, mais avec des notes de padel : volée, jeu aérien, défense, lob, service et tactique. Douze situations de match, ta photo, ton poste, et une image à partager. C'est un jeu : ta carte ne remplace ni le <a href="niveau.html">test de niveau</a>, ni ton classement.</p>
+      <p>Comme les cartes de joueurs des jeux de football, mais avec des notes de padel : volée, jeu aérien, défense, lob, service et tactique. Douze situations de match, ta photo, ton poste, et une image à partager. C'est un jeu : ta carte ne remplace ni le <a href="niveau.html">test de niveau</a>, ni ton classement.</p>
     </div>
 
     <div id="cj-page" class="cj-atelier">
@@ -56,9 +56,9 @@
 
         <!-- 1. Intro -->
         <div class="cj-etape card" id="cj-intro" data-etape="intro">
-          <h2 tabindex="-1">Deux minutes pour faire ta carte</h2>
+          <h2 tabindex="-1">Quelques minutes pour faire ta carte</h2>
           <p>Réponds à 12 situations de match comme ça se passe vraiment sur le terrain, pas comme il faudrait. Tu obtiens six notes de 1 à 99 et une note globale, tu choisis ton poste, tu ajoutes ta photo et ton nom. La carte se télécharge en image, au format carte ou story.</p>
-          <p class="msg" role="note"><b>Ta photo ne quitte pas ton appareil.</b> Réponses, notes, photo et nom sont gardés dans ton navigateur, rien n'est envoyé à un serveur. Détails sur la page <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
+          <p class="msg" role="note"><b>Ta photo n'est envoyée à aucun serveur du site.</b> Réponses, notes, photo et nom sont gardés dans ton navigateur, rien n'est envoyé à un serveur. Détails sur la page <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
           <div class="btns"><button type="button" class="btn primary" id="cj-commencer">Commencer</button></div>
         </div>
 
@@ -67,9 +67,9 @@
           <h2 class="sr-only" tabindex="-1">Le questionnaire</h2>
           <div class="msg msg-info" id="cj-base" hidden>
             <p id="cj-base-txt"></p>
-            <label class="cj-base-choix"><input type="checkbox" id="cj-sans-base"> Ne pas en tenir compte : partir de zéro</label>
+            <label class="cj-base-choix"><input type="checkbox" id="cj-sans-base"> Ne pas en tenir compte : partir de zéro</label>
           </div>
-          <div class="qprog"><span id="cj-qnum" aria-live="polite">Situation 1 / 12</span><div class="qbar" aria-hidden="true"><i id="cj-qbar"></i></div></div>
+          <div class="qprog"><span id="cj-qnum" aria-live="polite">Situation 1 sur 12</span><div class="qbar" aria-hidden="true"><i id="cj-qbar"></i></div></div>
           <h3 id="cj-qtext" tabindex="-1"></h3>
           <div class="qopts" id="cj-qopts" role="group" aria-labelledby="cj-qtext"></div>
         </div>
@@ -80,18 +80,18 @@
           <p class="cj-globale-txt" aria-live="polite">Note globale <b id="cj-globale">–</b> <span class="tag" id="cj-rang-tag">–</span></p>
           <p id="cj-suggestion" class="champ-aide"></p>
           <div class="phases" role="group" aria-label="Ton poste" id="cj-postes"></div>
-          <p class="champ-aide">Tu peux ajuster chaque note de 5 points au plus, dans un sens ou dans l'autre, par rapport au calcul.</p>
+          <p class="champ-aide">Tu peux ajuster chaque note de 5 points au plus, dans un sens ou dans l'autre, par rapport au calcul.</p>
           <ul class="cj-notes-liste" id="cj-notes-liste"></ul>
-          <div class="btns"><button type="button" class="btn primary" id="cj-vers-photo">Continuer : ma photo</button><button type="button" class="btn ghost" id="cj-refaire-1">Refaire le questionnaire</button></div>
+          <div class="btns"><button type="button" class="btn primary" id="cj-vers-photo">Continuer : ma photo</button><button type="button" class="btn ghost" id="cj-refaire-1">Refaire le questionnaire</button></div>
         </div>
 
         <!-- 4. Photo -->
         <div class="cj-etape card" id="cj-photo" data-etape="photo" hidden>
           <h2 tabindex="-1">Ta photo</h2>
-          <p>Facultative : sans photo, la carte affiche tes initiales. Elle est redimensionnée et gardée dans ton navigateur, jamais envoyée.</p>
+          <p>Facultative : sans photo, la carte affiche tes initiales. Elle est redimensionnée et gardée dans ton navigateur, jamais envoyée.</p>
           <div class="cj-depot" id="cj-depot">
             <b>Choisir une image</b>
-            <span>JPG, PNG ou WebP. Visage au centre, de préférence en hauteur.</span>
+            <span>JPG, PNG ou WebP. Visage au centre, de préférence au format portrait.</span>
             <div class="cj-depot-boutons">
               <label class="btn ghost"><input type="file" id="cj-fichier" accept="image/*"> Depuis mes photos</label>
               <label class="btn ghost"><input type="file" id="cj-capture" accept="image/*" capture="user"> Prendre une photo</label>
@@ -102,10 +102,10 @@
           <div class="cj-recadrage" id="cj-recadrage" hidden>
             <h3>Recadrer</h3>
             <canvas id="cj-cadre" class="cj-cadre" width="600" height="480" tabindex="0" role="img" aria-label="Cadre de recadrage de ta photo" aria-describedby="cj-cadre-aide"></canvas>
-            <p id="cj-cadre-aide" class="champ-aide">Glisse la photo pour la placer dans le cadre (flèches du clavier quand le cadre a le focus), puis règle le zoom.</p>
+            <p id="cj-cadre-aide" class="champ-aide">Glisse la photo pour la placer dans le cadre (flèches du clavier quand le cadre est sélectionné), puis règle le zoom.</p>
             <div class="range"><label for="cj-zoom">Zoom</label><input type="range" id="cj-zoom" min="1" max="3" step="0.05" value="1"><output for="cj-zoom" id="cj-zoom-val">×1,0</output></div>
           </div>
-          <div class="btns"><button type="button" class="btn primary" id="cj-vers-pseudo">Continuer : mon nom</button><button type="button" class="btn ghost" id="cj-retirer-photo" hidden>Retirer la photo</button><button type="button" class="btn ghost" id="cj-retour-notes">Retour aux notes</button></div>
+          <div class="btns"><button type="button" class="btn primary" id="cj-vers-pseudo">Continuer : mon nom</button><button type="button" class="btn ghost" id="cj-retirer-photo" hidden>Retirer la photo</button><button type="button" class="btn ghost" id="cj-retour-notes">Retour aux notes</button></div>
         </div>
 
         <!-- 5. Pseudo -->
@@ -115,7 +115,7 @@
             <div class="champ">
               <label for="cj-pseudo">Pseudo ou prénom</label>
               <input type="text" id="cj-pseudo" maxlength="30" autocomplete="nickname" aria-describedby="cj-pseudo-aide cj-pseudo-err">
-              <p class="champ-aide" id="cj-pseudo-aide">2 à 30 caractères : lettres, chiffres, espaces, _ . ' -. Pas d'e-mail, de numéro ni de lien.</p>
+              <p class="champ-aide" id="cj-pseudo-aide">2 à 30 caractères : lettres, chiffres, espaces, tirets bas, points, apostrophes ou tirets. Pas d'e-mail, de numéro ni de lien.</p>
               <p class="champ-erreur" id="cj-pseudo-err" role="status"></p>
             </div>
             <div class="btns"><button type="submit" class="btn primary">Voir ma carte</button><button type="button" class="btn ghost" id="cj-retour-photo">Retour à la photo</button></div>
@@ -128,8 +128,8 @@
           <p id="cj-resume"></p>
           <fieldset class="cj-formats-bloc"><legend>Format de l'image</legend>
             <div class="cj-formats">
-              <label><input type="radio" name="cj-format" value="carte" checked> Carte (1200 × 1800)</label>
-              <label><input type="radio" name="cj-format" value="story"> Story (1080 × 1920)</label>
+              <label><input type="radio" name="cj-format" value="carte" checked> Carte (1200 × 1800)</label>
+              <label><input type="radio" name="cj-format" value="story"> Story (1080 × 1920)</label>
             </div>
           </fieldset>
           <div class="cj-actions">
@@ -143,7 +143,7 @@
             <button type="button" class="btn ghost" id="cj-modifier-pseudo">Changer le nom</button>
             <button type="button" class="btn ghost" id="cj-refaire-2">Refaire le questionnaire</button>
           </div>
-          <p class="msg" role="note"><b>Ta photo ne quitte pas ton appareil.</b> L'image est fabriquée dans ton navigateur ; « Partager » ouvre le menu de partage de ton téléphone, rien ne passe par nos serveurs. Voir <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
+          <p class="msg" role="note"><b>Ta photo n'est envoyée à aucun serveur du site.</b> L'image est fabriquée dans ton navigateur ; « Partager » ouvre le menu de partage de ton appareil, ou télécharge l'image si celui-ci ne le permet pas. Rien ne passe par nos serveurs. Voir <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
         </div>
       </div>
 
@@ -156,12 +156,12 @@
 
     <h2 class="subhead">Les quatre rangs</h2>
     <ul class="cj-rangs">
-      <li class="rang-bronze"><b>Bronze</b><span>Note globale de 1 à 49 : on apprend, et c'est le meilleur moment.</span></li>
-      <li class="rang-argent"><b>Argent</b><span>De 50 à 69 : les bases en match, lob, défense et première volée.</span></li>
-      <li class="rang-or"><b>Or</b><span>De 70 à 84 : bandeja fiable, montée à deux, plan de jeu.</span></li>
-      <li class="rang-elite"><b>Élite</b><span>85 et plus : tu conclus les points, en attaque comme en défense.</span></li>
+      <li class="rang-bronze"><b>Bronze</b><span>Note globale de 1 à 49 : on apprend, et c'est le meilleur moment.</span></li>
+      <li class="rang-argent"><b>Argent</b><span>De 50 à 69 : les bases en match, lob, défense et première volée.</span></li>
+      <li class="rang-or"><b>Or</b><span>De 70 à 84 : bandeja fiable, montée à deux, plan de jeu.</span></li>
+      <li class="rang-elite"><b>Élite</b><span>85 et plus : tu conclus les points, en attaque comme en défense.</span></li>
     </ul>
-    <p class="note">Les notes sont calculées à partir de tes réponses, et resserrées autour de ton palier du <a href="niveau.html">test de niveau</a> ou de ton niveau déclaré dans <a href="academie.html">Mon académie</a> si tu en as un (lecture seule : la carte ne modifie ni l'un ni l'autre, et ne convertit jamais un palier en niveau). Sans repère, elles vont de 16 à 90.</p>
+    <p class="note">Les notes sont calculées à partir de tes réponses, et resserrées autour de ton palier du <a href="niveau.html">test de niveau</a> ou de ton niveau déclaré dans <a href="academie.html">Mon académie</a> si tu en as un. La carte ne modifie ni l'un ni l'autre, et ne convertit jamais un palier en niveau (lecture seule). Sans repère, elles vont de 16 à 90.</p>
 
     <h2 class="subhead">Faire monter tes notes</h2>
     <div class="grid">
@@ -182,9 +182,9 @@
 <script src="assets/vendor/supabase-2.45.4.js?v=8596965fe9" defer></script>
 <script src="assets/js/supabase-config.js?v=b8b45cefe2" defer></script>
 <script src="assets/js/compte.js?v=4c78bab497" defer></script>
-<script src="assets/js/carte-donnees.js?v=636e57a828" defer></script>
+<script src="assets/js/carte-donnees.js?v=9231b920ed" defer></script>
 <script src="assets/js/carte-rendu.js?v=aa75e5e01d" defer></script>
-<script src="assets/js/carte.js?v=324fef59b2" defer></script>
+<script src="assets/js/carte.js?v=0bdec7f54d" defer></script>
 <script src="assets/js/nav.js?v=31b69caab2" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

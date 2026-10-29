@@ -32,7 +32,7 @@
   const q=lireJ("pa-quiz-dernier",null);
   if(q&&Number.isInteger(q.palier)&&q.palier>=0&&q.palier<=5)return {palier:q.palier,libelle:PALIERS[q.palier]+" (test de niveau)",carte:PALIERS[q.palier]+" · test de niveau"};
   const a=lireJ("pa-academie",null);
-  if(a&&Number.isInteger(a.niveau)&&a.niveau>=1&&a.niveau<=10)return {niveau:a.niveau,libelle:"niveau "+a.niveau+" sur 10 (Mon académie)",carte:"Niveau "+a.niveau+"/10 · Mon académie"};
+  if(a&&Number.isInteger(a.niveau)&&a.niveau>=1&&a.niveau<=10)return {niveau:a.niveau,libelle:"niveau "+a.niveau+" sur 10 (Mon académie)",carte:"Niveau "+a.niveau+" sur 10 · Mon académie"};
   return null;
  }
  const repere=lireRepere();
@@ -98,13 +98,13 @@
   if(!bloc||!txt||!case_)return;
   if(!repere){bloc.hidden=true;return;}
   bloc.hidden=false;
-  txt.textContent="Tes notes partent de ton niveau : "+repere.libelle+". Elles resteront dans une plage cohérente avec ce repère.";
+  txt.textContent="Tes notes partent de ton repère : "+repere.libelle+". Elles resteront dans une plage cohérente avec ce repère.";
   case_.checked=etat.sansBase;
   case_.onchange=()=>{etat.sansBase=case_.checked;if(complet()){rendreNotes();sauver();}};
  }
  function rendreQuestion(focus){
   const q=D.QUESTIONS[iQuestion],titre=$("cj-qtext"),opts=$("cj-qopts");
-  $("cj-qnum").textContent="Situation "+(iQuestion+1)+" / "+NB;
+  $("cj-qnum").textContent="Situation "+(iQuestion+1)+" sur "+NB;
   $("cj-qbar").style.width=(iQuestion/NB*100)+"%";
   titre.textContent=q.q;
   opts.textContent="";
@@ -132,7 +132,7 @@
   const r=calculer();
   $("cj-globale").textContent=r.globale;
   const tag=$("cj-rang-tag");tag.textContent=libRang(r.rang);tag.className="tag rang-"+r.rang;
-  $("cj-suggestion").textContent="Poste suggéré d'après tes réponses : "+libPoste(r.posteSuggere)+"."+(etat.poste?"":" Choisis ton poste, ou garde la suggestion.");
+  $("cj-suggestion").textContent="Poste suggéré d'après tes réponses : "+libPoste(r.posteSuggere)+"."+(etat.poste?"":" Choisis ton poste, ou garde la suggestion.");
   const postes=$("cj-postes");postes.textContent="";
   D.POSTES.forEach(p=>{
    const b=el("button","",p.libelle);b.type="button";b.setAttribute("aria-pressed",String(r.poste===p.cle));b.title=p.desc;
@@ -146,13 +146,13 @@
    const range=el("div","range");
    const inp=document.createElement("input");inp.type="range";inp.id="cj-n-"+a.cle;inp.step="1";
    const brute=r.brutes[a.cle];inp.min=String(Math.max(1,brute-5));inp.max=String(Math.min(99,brute+5));inp.value=String(r.notes[a.cle]);
-   inp.setAttribute("aria-valuetext",r.notes[a.cle]+" sur 99, calcul "+brute);
+   inp.setAttribute("aria-valuetext",r.notes[a.cle]+" sur 99, valeur calculée "+brute);
    const out=el("output","",String(r.notes[a.cle]));out.htmlFor=inp.id;
    inp.addEventListener("input",()=>{
     const v=Math.max(Number(inp.min),Math.min(Number(inp.max),Math.round(Number(inp.value)||brute)));
     etat.ajustements[a.cle]=v-brute;
     const rr=calculer();
-    out.textContent=rr.notes[a.cle];inp.setAttribute("aria-valuetext",rr.notes[a.cle]+" sur 99, calcul "+brute);
+    out.textContent=rr.notes[a.cle];inp.setAttribute("aria-valuetext",rr.notes[a.cle]+" sur 99, valeur calculée "+brute);
     $("cj-globale").textContent=rr.globale;tag.textContent=libRang(rr.rang);tag.className="tag rang-"+rr.rang;
     rendreApercu();
    });
@@ -206,7 +206,7 @@
   if(ap){ap.hidden=!url;if(url)ap.src=url;else ap.removeAttribute("src");}
   if(ret)ret.hidden=!url;
   if(sauvegarder){
-   if(url){if(!ecrire(CLE_PHOTO,url))messagePhoto("La photo est gardée pour cette visite seulement : ton navigateur manque de place pour la conserver.","msg-alerte");}
+   if(url){if(!ecrire(CLE_PHOTO,url))messagePhoto("La photo est gardée pour cette visite seulement : ton navigateur manque de place pour la conserver.","msg-alerte");}
    else retirer(CLE_PHOTO);
   }
   if(!url){etat.imgPhoto=null;rendreApercu();return;}
@@ -232,7 +232,7 @@
    dessinerCadre();validerRecadrage();
    cadre.focus({preventScroll:true});cadre.scrollIntoView({block:"nearest"});
   };
-  img.onerror=()=>{URL.revokeObjectURL(url);messagePhoto("Ce format d'image n'est pas lu par ton navigateur. Essaie en JPG ou PNG.");};
+  img.onerror=()=>{URL.revokeObjectURL(url);messagePhoto("Ce format d'image n'est pas lu par ton navigateur. Essaie avec un JPG ou un PNG.");};
   img.src=url;
  }
  ["cj-fichier","cj-capture"].forEach(id=>{const i=$(id);if(i)i.addEventListener("change",()=>{chargerFichier(i.files&&i.files[0]);i.value="";});});
@@ -264,7 +264,7 @@
  if(zoom)zoom.addEventListener("input",()=>{if(!rec.img)return;reglerZoom(Number(zoom.value));dessinerCadre();recadragePlusTard();});
  const retirerBtn=$("cj-retirer-photo");
  if(retirerBtn)retirerBtn.addEventListener("click",()=>{
-  rec.img=null;$("cj-recadrage").hidden=true;poserPhoto(null,true);messagePhoto("Photo retirée : la carte affichera tes initiales.","msg-info");
+  rec.img=null;$("cj-recadrage").hidden=true;poserPhoto(null,true);messagePhoto("Photo retirée : la carte affichera tes initiales.","msg-info");
   const f=$("cj-fichier");if(f)f.focus();
  });
 
@@ -285,7 +285,7 @@
   ev.preventDefault();
   const v=(champPseudo.value||"").trim();
   if(!pseudoValide(v)){
-   errPseudo.textContent=v.length<2?"Entre au moins 2 caractères.":"Ce nom n'est pas accepté : 2 à 30 caractères, lettres, chiffres, espaces, _ . ' -, sans e-mail, numéro ni lien.";
+   errPseudo.textContent=v.length<2?"Entre au moins 2 caractères.":"Ce nom n'est pas accepté. 2 à 30 caractères : lettres, chiffres, espaces, tirets bas, points, apostrophes ou tirets. Pas d'e-mail, de numéro ni de lien.";
    champPseudo.setAttribute("aria-invalid","true");champPseudo.closest(".champ").classList.add("invalide");champPseudo.focus();return;
   }
   errPseudo.textContent="";champPseudo.removeAttribute("aria-invalid");champPseudo.closest(".champ").classList.remove("invalide");
@@ -312,8 +312,8 @@
   return m.length?(m.length>1?m[0][0]+m[m.length-1][0]:m[0].slice(0,2)).toUpperCase():"";
  }
  function description(r){
-  const nom=etat.pseudo||"joueur",ini=initiales(etat.pseudo);
-  return "Carte de joueur de "+nom+" : "+r.globale+", "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
+  const nom=etat.pseudo?" de "+etat.pseudo:"",ini=initiales(etat.pseudo);
+  return "Carte de joueur"+nom+" : "+r.globale+", "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
    CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+". "+(etat.photo?"Avec ta photo.":"Sans photo"+(ini?", initiales "+ini:"")+".");
  }
  function donneesRendu(r){
@@ -363,8 +363,8 @@
  }
  function rendreFinal(){
   const r=calculer();
-  $("cj-resume").textContent=(etat.pseudo||"Toi")+" : "+r.globale+" en "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
-   (etat.photo?"Avec ta photo.":"Sans photo : tes initiales apparaissent.")+" Choisis un format puis télécharge ou partage l'image.";
+  $("cj-resume").textContent=(etat.pseudo||"Toi")+" : "+r.globale+" en "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
+   (etat.photo?"Avec ta photo.":"Sans photo : tes initiales apparaissent.")+" Choisis un format puis télécharge ou partage l'image.";
   messageFinal("");
   const R=window.CARTE_RENDU,t=$("cj-telecharger"),p=$("cj-partager");
   if(!R){t.disabled=true;p.disabled=true;messageFinal("Le rendu de l'image n'est pas disponible sur cette version de la page.","msg-alerte");}
@@ -372,7 +372,7 @@
  }
  const btnTel=$("cj-telecharger"),btnPart=$("cj-partager");
  if(btnTel)btnTel.addEventListener("click",()=>avecAttente(btnTel,"Préparation…",async()=>{
-  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);messageFinal("Image prête : "+NOM_FICHIER+" ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
+  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);messageFinal("Image prête : "+NOM_FICHIER+" ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
   catch(e){messageFinal("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
  }));
  if(btnPart)btnPart.addEventListener("click",()=>avecAttente(btnPart,"Préparation…",async()=>{
@@ -382,8 +382,8 @@
    try{fichier=new File([blob],NOM_FICHIER,{type:EXPORT.type});}catch(e){}
    if(fichier&&navigator.share&&navigator.canShare&&navigator.canShare({files:[fichier]})){
     try{await navigator.share({files:[fichier],title:"Ma carte de joueur de padel",text:"Ma carte de joueur de padel, faite sur apprendre-padel.fr"});messageFinal("Carte partagée.","msg-ok");}
-    catch(e){if(e&&e.name!=="AbortError"){messageFinal("Le partage n'a pas abouti : l'image a été téléchargée à la place.","msg-alerte");telechargerBlob(blob);}}
-   }else{telechargerBlob(blob);messageFinal("Ton navigateur ne propose pas le partage de fichiers : l'image est téléchargée, à partager depuis tes fichiers.","msg-info");}
+    catch(e){if(e&&e.name!=="AbortError"){messageFinal("Le partage n'a pas abouti : l'image a été téléchargée à la place.","msg-alerte");telechargerBlob(blob);}}
+   }else{telechargerBlob(blob);messageFinal("Ton navigateur ne propose pas le partage de fichiers : l'image est téléchargée, à partager depuis ton dossier de téléchargements.","msg-info");}
   }catch(e){messageFinal("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
  }));
  page.querySelectorAll('input[name="cj-format"]').forEach(r=>r.addEventListener("change",()=>{if(etat.etape==="final")rendreImage(formatChoisi()).catch(()=>{});}));
@@ -410,7 +410,7 @@
   montrerRepere();rendreNotes();
   if(champPseudo)champPseudo.value=etat.pseudo;
   const quand=(()=>{try{return new Date(sauvee.date).toLocaleDateString("fr-FR",{day:"numeric",month:"long"});}catch(e){return "";}})();
-  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous, et tu peux la modifier ou refaire le questionnaire.";}
+  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous, et tu peux la modifier ou refaire le questionnaire.";}
   if(etat.pseudo){rendreFinal();allerA("final",false);}
   else allerA("pseudo",false);
  }else allerA("intro",false);
