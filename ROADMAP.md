@@ -225,7 +225,7 @@ Bilan du 29/10/2026 (fait par erreur sur une ancienne branche, `feature/ux-parco
 - [x] **6.3 Pages légales** ✅ 29/10/2026, 6822ef89 : confidentialité et mentions légales fidèles au site (académie, Google, jsDelivr, droits, CNIL, LCEN), opposition à GoatCounter, registre des photos.
 - [x] **6.4 Accessibilité** ✅ 29/10/2026, 1a5bca43, c58f0456, 816f6e83 : lien d'évitement et `<main>`, focus visible du menu, bordures 3:1 (à recalculer pour #101F35), mouvement réduit global, cibles 44 px, clavier du test de niveau et du tuto « la paire », annonces (tutos, placement).
 - [x] **6.5 Textes** ✅ 29/10/2026 : tutoiement des exercices (`exercices-donnees.js`), « reviens », libellés.
-- [ ] **6.6 Vitesse et sécurité** : supabase-js hébergé sur le site (plus de jsDelivr), connexion en PKCE (lien piégé `#access_token`), `defer`, `srcset` des cartes.
+- [x] **6.6 Vitesse et sécurité** ✅ 29/10/2026, 69aa031f, aee0949b (2 P2 de la revue à corriger : déconnexion par lien forgé, pages ?code= en cache) : supabase-js hébergé sur le site (plus de jsDelivr), connexion en PKCE (lien piégé `#access_token`), `defer`, `srcset` des cartes.
 - [ ] **6.7 Communauté** : migrations s2-01 à s2-42, `tournois_ref`, JS de la communauté (reprenables de `feature/ux-parcours-joueur-v2`), puis contrôle `securite-sql` avec les migrations academie.
 
 ---
@@ -386,3 +386,4 @@ L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, co
 **Publié le 29/10/2026 (2e publication)** : corrections de la relecture (synchronisation réelle annoncée sur connexion et espace, pages légales : matchs du compteur, liste de suppression du compte, déclaration d'âge datée, annonces, registre des photos) et retrait du prénom de l'auteur partout (décision de Samuel). Seconde relecture non faite, à la demande de Samuel.
 **Publié le 29/10/2026 (3e publication)** : 6.4 accessibilité (lien d'évitement et main sur toutes les pages, focus visible, bordures 3:1, mouvement réduit, cibles 44 px, test de niveau, tutos, tactique et menu au clavier). 39 suites vertes.
 **Publié le 29/10/2026 (4e publication)** : 6.5 textes (exercices au tutoiement, thèmes harmonisés, plus de « vous » pluriel). 39 suites vertes ; textes revus par expert-padel, sans passage du relecteur.
+**Publié le 29/10/2026 (5e publication)** : 6.6 supabase-js hébergé (plus de jsDelivr), connexion en flux PKCE, defer, srcset, cache pa-v40. Supabase : Redirect URL `https://apprendre-padel.fr/connexion.html**` ajoutée (par Claude, dans le navigateur de Samuel), modèles d'e-mail vérifiés ({{ .ConfirmationURL }}). À tester en vrai par Samuel : inscription, lien magique, Google, mot de passe oublié.
