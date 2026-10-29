@@ -11,8 +11,8 @@
    faits ces 6 derniers jours mis de côté), utilisé par le tableau de bord (progression.js).
    Dépend de exercices-donnees.js (EXERCICES, MOTIF_VERS_THEME, MOTIF_EXPLICATION, OBJECTIFS_JEU), journal.js (PA_JOURNAL)
    et joueur-sync.js (PA_JOUEUR, objectifs de jeu). */
-const EX_LIBELLES_THEMES={vitre:"Sorties de vitre",service:"Service et montée",aerien:"Bandeja, víbora et smash",couple:"Bouger avec son partenaire",
- placement:"Placement au filet",montee:"Monter au filet",regularite:"Régularité",transition:"Transition et chiquita",communication:"Communication",compet:"Compétition"};
+const EX_LIBELLES_THEMES={vitre:"Sorties de vitre",service:"Service et première volée",aerien:"Bandeja, víbora et smash",couple:"Bouger avec son partenaire",
+ placement:"Placement au filet",montee:"Reprendre le filet",regularite:"Régularité en défense",transition:"Balles basses et chiquita",communication:"Communication",compet:"Compétition"};
 const EX_PALIERS=["Découverte","P25","P100","P250","P500","P1000 et +"]; // mêmes noms que quiz-niveau.js
 const EX_CLE_FAITS="pa-exercices-faits";
 const EX_NB_MATCHS=10;      // matchs comptés pris en compte

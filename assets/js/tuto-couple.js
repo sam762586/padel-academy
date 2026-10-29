@@ -16,7 +16,7 @@ function pairPositions(){
    if(bx<=220){ // ball on our side while we're at the net: it's a lob over us or a ball at our feet
      if(bx<120){ // deep: lob passed over us
        us=[[80,yA,"Recul"],[95,yB,"Recul"]];
-       txt=["<b>Lob passé :</b> la balle est derrière vous deux. Celui qui est lobé recule en diagonale, l'autre recule aussi (jamais un au filet, un au fond).","Le lobé joue bajada ou lob ; on remonte ensemble ensuite.","Si le lob est vraiment imprenable, c'est le partenaire qui croise derrière pour le jouer (« cambio ») et on échange de côté."];
+       txt=["<b>Lob passé :</b> la balle est derrière ton partenaire et toi. Celui qui est lobé recule en diagonale, l'autre recule aussi (jamais un au filet, un au fond).","Le lobé joue bajada ou lob ; on remonte ensemble ensuite.","Si le lob est vraiment imprenable, c'est le partenaire qui croise derrière pour le jouer (« cambio ») et on échange de côté."];
      } else {
        us=[[185,yA,"Volée"],[180,yB,"Couvre"]];
        txt=["<b>Balle dans nos pieds :</b> celui du côté de la balle la joue en volée basse, l'autre reste à hauteur et couvre le centre.","Volée de sécurité : longue, au centre, pas de tentative gagnante sur une balle basse.","On reste à 2–2,5 m du filet, on ne recule pas sur une balle basse."];
@@ -31,7 +31,7 @@ function pairPositions(){
      if(lobRisk){us[0][0]-=15;us[1][0]-=15;}
      txt=[`<b>Balle côté ${ballTop?"haut":"bas"} du schéma :</b> on glisse tous les deux vers la balle. Le joueur côté balle ferme la ligne (1 pas plus avancé), l'autre ferme le centre, un demi-pas en retrait.`,
           lobRisk?"<b>Adversaire au fond près de la vitre :</b> risque de lob, on recule d'un demi-pas tous les deux et on lève la raquette.":"<b>Adversaire à mi-court :</b> il va jouer bas ou vite. Raquette devant, poids sur l'avant, prêts à bloquer.",
-          "La corde entre vous deux ne doit jamais être tendue, ni dépasser 3–4 m : tendue, elle ouvre un trou au centre."];
+          "La corde entre ton partenaire et toi ne doit jamais être tendue, ni dépasser 3–4 m : tendue, elle ouvre un trou au centre."];
    }
  } else {
    // we're at the back, they're at net

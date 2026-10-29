@@ -107,7 +107,7 @@ async function repondre(page,choix){
   await repondre(page,id=>({resultats:null,anciennete:1,frequence:2,raquette:0}[id]!==undefined?{resultats:null,anciennete:1,frequence:2,raquette:0}[id]:3));
   await page.waitForSelector('#qresult:not([hidden])');
   assert.equal(await page.textContent('#qresult .vtag'),'P100');
-  assert.match(await page.textContent('#qresult'),/Indicatif : à confirmer en tournoi/);
+  assert.match(await page.textContent('#qresult'),/Indicatif\s: à confirmer en tournoi/);
   assert.match(await page.textContent('#qresult'),/temps de jeu/);
   assert.equal(await page.locator('#qsave').isHidden(),true);
   const q=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-quiz-dernier')));
@@ -130,7 +130,7 @@ async function repondre(page,choix){
   await repondre(page,id=>({resultats:4,anciennete:3,frequence:3,raquette:0}[id]!==undefined?{resultats:4,anciennete:3,frequence:3,raquette:0}[id]:3));
   await page.waitForSelector('#qresult:not([hidden])');
   assert.equal(await page.textContent('#qresult .vtag'),'P500');
-  assert.match(await page.textContent('#qresult'),/Fiable : basé sur ton classement FFT/);
+  assert.match(await page.textContent('#qresult'),/Fiable\s: basé sur ton classement FFT/);
   assert.equal(await page.locator('#qresult .qprofil-liste li').count(),9);
   ok('rang de l\'espace pré-rempli : P500, fiabilité « classement », profil sur 9 thèmes');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
