@@ -200,7 +200,8 @@ async function repondreClavier(page,reponses){
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
   assert.equal((await gc(page)).length,3,'aucun événement si skipgc = t');
   await page.evaluate(()=>localStorage.removeItem('skipgc'));
-  assert.deepEqual(demandesCompteur,[],'total public pas demandé tant que COMPTEUR.actif est false');
+  // Compteur public activé (option GoatCounter cochée par Samuel le 30/10/2026) : lu en lecture seule, sur la seule adresse de l'événement
+  assert.ok(demandesCompteur.every(u=>/\/counter\/carte-generee\.json$/.test(u)),'total public : seule l\'adresse du compteur de cartes est lue');
   ok('GoatCounter : événement « carte-generee » (path, title, event seulement) à chaque téléchargement ou partage, aucun si skipgc');
   // Rien n'a été écrit dans les repères
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);

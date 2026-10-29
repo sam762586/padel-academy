@@ -33,7 +33,7 @@ async function horsNavigateur(){
  for(let n=1;n<=10;n++)assert.ok(A.filter(a=>a.niveaux[0]<=n&&n<=a.niveaux[1]).length>=2,'niveau '+n+' : 2 articles au moins');
  THEMES.forEach(t=>assert.ok(A.some(a=>a.themes.includes(t)),t+' : un article au moins'));
  // Compétences des niveaux = cartes de academie.html
- const LIBELLES={'Règles':'regles','Volée':'volee','Transition':'transition','Vitres':'vitres','Défense':'defense','Lob':'lob','Bandeja':'bandeja','Vibora':'vibora','Construction du point':'construction','Placement':'placement','Communication':'communication'};
+ const LIBELLES={'Règles':'regles','Volée':'volee','Transition':'transition','Vitres':'vitres','Défense':'defense','Lob':'lob','Bandeja':'bandeja','Vibora':'vibora','Víbora':'vibora','Construction du point':'construction','Placement':'placement','Communication':'communication'};
  const h=lire('academie.html');
  for(let n=1;n<=10;n++){
   const carte=h.match(new RegExp('id="niveau-'+n+'"[\\s\\S]*?</li>\\n'))[0];
