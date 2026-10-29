@@ -77,7 +77,7 @@ const empreintes = {};
 /* Scripts qui en chargent d'autres dynamiquement (createElement("script")) : leurs chemins "assets/js/xxx.js" entre guillemets
    reçoivent aussi « ?v=<empreinte> ». Sans cela le service worker (stale-while-revalidate) pourrait servir un ancien script
    chargé à la volée. L'empreinte d'un tel fichier est calculée sur son contenu déjà réécrit ; appliquer-gabarit.js l'écrit. */
-const SCRIPTS_DYNAMIQUES = ["assets/js/academie-sync.js"];
+const SCRIPTS_DYNAMIQUES = ["assets/js/academie-sync.js", "assets/js/presence.js"];
 // supabase-js, hébergé sur le site (licence MIT : assets/vendor/LICENSE-supabase-js.txt) ; la version est dans le nom du fichier
 const SDK_SUPABASE = "assets/vendor/supabase-2.45.4.js";
 function versionnerJs(source) {

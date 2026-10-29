@@ -22,7 +22,7 @@
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css?v=31e95a6f94">
-<link rel="stylesheet" href="assets/carte.css?v=11f38b0061">
+<link rel="stylesheet" href="assets/carte.css?v=5e87e2b27c">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -39,7 +39,8 @@
 <section id="carte">
   <div class="wrap">
     <div class="sec-head">
-      <div><p class="eyebrow">S'entraîner · Ma carte de joueur</p><h1>Ma carte de joueur</h1></div>
+      <div><p class="eyebrow">S'entraîner · Ma carte de joueur</p><h1>Ma carte de joueur</h1>
+        <p class="acc-muted presence-ligne"><span class="presence" id="pa-presence"><span data-presence-texte aria-hidden="true">&nbsp;</span><span class="sr-only" data-presence-annonce aria-live="polite"></span></span> <span id="cj-compteur"></span></p></div>
       <p>Comme les cartes de joueurs des jeux de football, mais avec des notes de padel : volée, jeu aérien, défense, lob, service et tactique. Douze situations de match, ta photo, ton poste, et une image à partager. C'est un jeu : ta carte ne remplace ni le <a href="niveau.html">test de niveau</a>, ni ton classement.</p>
     </div>
 
@@ -126,6 +127,10 @@
         <div class="cj-etape card" id="cj-final" data-etape="final" hidden>
           <h2 tabindex="-1">Ta carte</h2>
           <p id="cj-resume"></p>
+          <div class="cj-modeles-bloc" id="cj-modeles-bloc" hidden>
+            <h3 id="cj-modeles-titre">Choisis ton modèle</h3>
+            <div class="cj-modeles" id="cj-modeles" role="group" aria-label="Modèle de carte"></div>
+          </div>
           <fieldset class="cj-formats-bloc"><legend>Format de l'image</legend>
             <div class="cj-formats">
               <label><input type="radio" name="cj-format" value="carte" checked> Carte (1200 × 1800)</label>
@@ -183,9 +188,10 @@
 <script src="assets/js/supabase-config.js?v=b8b45cefe2" defer></script>
 <script src="assets/js/compte.js?v=4c78bab497" defer></script>
 <script src="assets/js/carte-donnees.js?v=9231b920ed" defer></script>
-<script src="assets/js/carte-rendu.js?v=aa75e5e01d" defer></script>
-<script src="assets/js/carte.js?v=0bdec7f54d" defer></script>
+<script src="assets/js/carte-rendu.js?v=229d731a43" defer></script>
+<script src="assets/js/carte.js?v=72d90dfc55" defer></script>
 <script src="assets/js/nav.js?v=31b69caab2" defer></script>
+<script src="assets/js/presence.js?v=d4f54033b9" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

@@ -1,12 +1,14 @@
 /* MA CARTE DE JOUEUR · logique de la page carte.html.
    Données et moteur : carte-donnees.js (window.PA_CARTE) ; rendu image : carte-rendu.js (window.CARTE_RENDU) ;
    styles : assets/carte.css. Tout se passe sur l'appareil :
-   - pa-carte : réponses, ajustements, poste, pseudo, choix du repère (JSON, version 1) ;
+   - pa-carte : réponses, ajustements, poste, pseudo, choix du repère, modèle de carte (JSON, version 1) ;
    - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée ;
    - pa-quiz-dernier (palier du test de niveau) et pa-academie (niveau Mon académie) : LUS pour proposer un point de départ,
      jamais écrits, jamais convertis l'un en l'autre.
    Parcours : intro → questionnaire (12 situations, une par une) → notes et poste → photo → nom → carte (image à télécharger
-   ou partager). Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier. */
+   ou partager). Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
+   Mesure : un téléchargement ou un partage réussi envoie à GoatCounter l'événement « carte-generee », sans aucune donnée
+   de la carte (rien si le visiteur a refusé la mesure : clé skipgc). Le total public n'est lu que si COMPTEUR.actif. */
 (function(){
  "use strict";
  const page=document.getElementById("cj-page"),D=window.PA_CARTE;
@@ -24,8 +26,18 @@
  const retirer=cle=>{try{localStorage.removeItem(cle);}catch(e){}};
 
  /* ---- État ---- */
- const etat={reponses:Array(NB).fill(null),ajustements:{},poste:null,pseudo:"",sansBase:false,photo:null,imgPhoto:null,etape:"intro"};
+ const etat={reponses:Array(NB).fill(null),ajustements:{},poste:null,pseudo:"",sansBase:false,photo:null,imgPhoto:null,etape:"intro",modele:"neon"};
  let iQuestion=0;
+
+ /* ---- Modèles de carte (dessinés par carte-rendu.js) : repli sur le seul modèle Néon si la liste n'existe pas ---- */
+ const MODELE_DEFAUT={cle:"neon",nom:"Néon",description:""};
+ function modeles(){
+  const R=window.CARTE_RENDU,l=R&&Array.isArray(R.MODELES)?R.MODELES.filter(m=>m&&typeof m.cle==="string"&&m.cle):[];
+  return l.length?l:[MODELE_DEFAUT];
+ }
+ const choixPossible=()=>modeles().length>1;
+ const modeleValide=cle=>modeles().some(m=>m.cle===cle);
+ const modeleCourant=()=>modeles().find(m=>m.cle===etat.modele)||modeles()[0];
 
  /* ---- Repère de départ (lecture seule) : palier du test, sinon niveau Mon académie ---- */
  function lireRepere(){
@@ -55,7 +67,7 @@
  function sauver(){
   if(!complet())return;
   ecrire(CLE_CARTE,{version:1,date:new Date().toISOString(),reponses:etat.reponses.slice(),ajustements:CLES.reduce((o,k)=>{o[k]=ajustement(k);return o;},{}),
-   poste:etat.poste,pseudo:etat.pseudo,sansBase:etat.sansBase,base:baseCalcul()});
+   poste:etat.poste,pseudo:etat.pseudo,sansBase:etat.sansBase,base:baseCalcul(),modele:modeleCourant().cle});
  }
  function restaurer(){
   const s=lireJ(CLE_CARTE,null);
@@ -66,6 +78,7 @@
   etat.poste=D.POSTES.some(p=>p.cle===s.poste)?s.poste:null;
   etat.pseudo=typeof s.pseudo==="string"?s.pseudo:"";
   etat.sansBase=!!s.sansBase;
+  if(typeof s.modele==="string"&&modeleValide(s.modele))etat.modele=s.modele; // modèle inconnu (retiré depuis) : premier de la liste
   return s;
  }
 
@@ -314,7 +327,8 @@
  function description(r){
   const nom=etat.pseudo?" de "+etat.pseudo:"",ini=initiales(etat.pseudo);
   return "Carte de joueur"+nom+" : "+r.globale+", "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
-   CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+". "+(etat.photo?"Avec ta photo.":"Sans photo"+(ini?", initiales "+ini:"")+".");
+   CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+". "+(etat.photo?"Avec ta photo.":"Sans photo"+(ini?", initiales "+ini:"")+".")+
+   (choixPossible()?" Modèle "+modeleCourant().nom+".":"");
  }
  function donneesRendu(r){
   return {pseudo:etat.pseudo||"Joueur",poste:libPoste(r.poste),globale:r.globale,rang:r.rang,attributs:CLES.map(k=>({cle:k,note:r.notes[k]})),
@@ -329,11 +343,56 @@
   const r=calculer();
   canvas.setAttribute("aria-label",description(r));
   canvas.className="cj-apercu-canvas rang-"+r.rang;
+  canvas.dataset.modele=modeleCourant().cle;
+  if(etat.etape==="final")miniaturesPlusTard();
   if(apercuPrevu)return;
   apercuPrevu=requestAnimationFrame(()=>{
    apercuPrevu=0;if(arretApercu)arretApercu();
-   arretApercu=R.animer(canvas,donneesRendu(calculer()),{format:"carte",largeur:Math.min(1200,Math.round(420*Math.max(1,window.devicePixelRatio||1)))});
+   arretApercu=R.animer(canvas,donneesRendu(calculer()),{format:"carte",modele:modeleCourant().cle,largeur:Math.min(1200,Math.round(420*Math.max(1,window.devicePixelRatio||1)))});
   });
+ }
+
+ /* ---- Choix du modèle : un bouton par modèle, avec une miniature dessinée avec les vraies données (sans animation) ---- */
+ const groupeModeles=$("cj-modeles"),blocModeles=$("cj-modeles-bloc");
+ let miniaturesPrevu=0,generationMiniatures=0;
+ function construireModeles(){
+  if(!groupeModeles)return;
+  const liste=modeles();
+  if(blocModeles)blocModeles.hidden=liste.length<2; // un seul modèle : rien à choisir, groupe masqué
+  if(liste.length<2||groupeModeles.childElementCount)return;
+  liste.forEach(m=>{
+   const b=el("button","cj-modele");b.type="button";b.dataset.modele=m.cle;
+   if(m.description)b.title=m.description;
+   const c=document.createElement("canvas");c.width=300;c.height=450;c.setAttribute("aria-hidden","true");
+   b.append(c,el("span","cj-modele-nom",m.nom||m.cle));
+   b.addEventListener("click",()=>choisirModele(m.cle));
+   groupeModeles.appendChild(b);
+  });
+ }
+ function majBoutonsModeles(){
+  if(!groupeModeles)return;
+  const cle=modeleCourant().cle;
+  groupeModeles.querySelectorAll(".cj-modele").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.modele===cle)));
+ }
+ // Nouveau modèle : aperçu, image d'export et sauvegarde ; le questionnaire n'est pas refait
+ function choisirModele(cle){
+  if(!modeleValide(cle)||cle===etat.modele)return;
+  etat.modele=cle;majBoutonsModeles();sauver();rendreApercu();
+  if(etat.etape==="final")rendreImage(formatChoisi()).catch(()=>{});
+ }
+ // Miniatures redessinées une à une (la page reste fluide) quand les données de la carte changent
+ function miniaturesPlusTard(){
+  if(!groupeModeles||!choixPossible())return;
+  clearTimeout(miniaturesPrevu);miniaturesPrevu=setTimeout(dessinerMiniatures,120);
+ }
+ async function dessinerMiniatures(){
+  const R=window.CARTE_RENDU;
+  if(!R||!complet())return;
+  const gen=++generationMiniatures,donnees=donneesRendu(calculer());
+  for(const b of groupeModeles.querySelectorAll(".cj-modele")){
+   if(gen!==generationMiniatures)return; // un dessin plus récent a été demandé
+   try{await R.dessiner(b.querySelector("canvas"),donnees,{format:"carte",modele:b.dataset.modele,largeur:300});}catch(e){}
+  }
  }
 
  /* ---- Carte finale : image (carte ou story), téléchargement, partage ---- */
@@ -342,7 +401,7 @@
  async function rendreImage(format){
   const R=window.CARTE_RENDU,canvas=$("cj-canvas");
   if(!R||!canvas)throw new Error("rendu indisponible");
-  await R.dessiner(canvas,donneesRendu(calculer()),{format,export:true});
+  await R.dessiner(canvas,donneesRendu(calculer()),{format,modele:modeleCourant().cle,export:true});
   return canvas;
  }
  // Image exportée : WebP quand le navigateur sait l'encoder (Edge, Chrome, Firefox), sinon JPEG (Safari) ; qualité 0,9 dans les deux cas
@@ -368,11 +427,36 @@
   messageFinal("");
   const R=window.CARTE_RENDU,t=$("cj-telecharger"),p=$("cj-partager");
   if(!R){t.disabled=true;p.disabled=true;messageFinal("Le rendu de l'image n'est pas disponible sur cette version de la page.","msg-alerte");}
+  construireModeles();majBoutonsModeles();miniaturesPlusTard();
   rendreImage(formatChoisi()).catch(()=>{});
+ }
+ /* ---- Mesure : une carte générée = un événement GoatCounter, sans aucune donnée de la carte ---- */
+ function compterCarte(){
+  try{if(localStorage.getItem("skipgc")==="t")return;}catch(e){} // refus de la mesure (case de la page Confidentialité)
+  try{const g=window.goatcounter;if(g&&typeof g.count==="function")g.count({path:"carte-generee",title:"Carte de joueur générée",event:true});}catch(e){}
+ }
+ /* Total public des cartes générées : compteur de visites GoatCounter au format JSON, {count:"1 234"} (chaîne avec le
+    séparateur de milliers choisi dans les réglages ; 404 tant qu'aucune carte n'a été comptée). Tant que l'option
+    « Allow adding visitor counts on your website » n'est pas cochée dans GoatCounter, l'adresse répond 403 sans en-tête
+    CORS, ce qui affiche une erreur dans la console du visiteur : actif reste à false jusqu'à ce que Samuel l'ait cochée. */
+ const COMPTEUR={actif:false,adresse:"https://apprendre-padel.goatcounter.com/counter/carte-generee.json"};
+ function afficherCompteur(){
+  const zone=$("cj-compteur");
+  if(!zone||!COMPTEUR.actif||navigator.onLine===false||typeof fetch!=="function")return;
+  try{
+   fetch(COMPTEUR.adresse,{credentials:"omit",cache:"no-store"})
+    .then(r=>r.ok?r.json():null)
+    .then(j=>{
+     const n=j&&(typeof j.count==="string"||typeof j.count==="number")?parseInt(String(j.count).replace(/\D/g,""),10):NaN;
+     if(!Number.isFinite(n)||n<1)return;
+     zone.textContent=n.toLocaleString("fr-FR")+(n>1?" cartes créées":" carte créée")+" sur Apprendre Padel";
+    })
+    .catch(()=>{});
+  }catch(e){}
  }
  const btnTel=$("cj-telecharger"),btnPart=$("cj-partager");
  if(btnTel)btnTel.addEventListener("click",()=>avecAttente(btnTel,"Préparation…",async()=>{
-  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);messageFinal("Image prête : "+NOM_FICHIER+" ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
+  try{const blob=await versBlob(await rendreImage(formatChoisi()));telechargerBlob(blob);compterCarte();messageFinal("Image prête : "+NOM_FICHIER+" ("+(formatChoisi()==="story"?"1080 × 1920":"1200 × 1800")+").","msg-ok");}
   catch(e){messageFinal("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
  }));
  if(btnPart)btnPart.addEventListener("click",()=>avecAttente(btnPart,"Préparation…",async()=>{
@@ -381,9 +465,9 @@
    let fichier=null;
    try{fichier=new File([blob],NOM_FICHIER,{type:EXPORT.type});}catch(e){}
    if(fichier&&navigator.share&&navigator.canShare&&navigator.canShare({files:[fichier]})){
-    try{await navigator.share({files:[fichier],title:"Ma carte de joueur de padel",text:"Ma carte de joueur de padel, faite sur apprendre-padel.fr"});messageFinal("Carte partagée.","msg-ok");}
-    catch(e){if(e&&e.name!=="AbortError"){messageFinal("Le partage n'a pas abouti : l'image a été téléchargée à la place.","msg-alerte");telechargerBlob(blob);}}
-   }else{telechargerBlob(blob);messageFinal("Ton navigateur ne propose pas le partage de fichiers : l'image est téléchargée, à partager depuis ton dossier de téléchargements.","msg-info");}
+    try{await navigator.share({files:[fichier],title:"Ma carte de joueur de padel",text:"Ma carte de joueur de padel, faite sur apprendre-padel.fr"});compterCarte();messageFinal("Carte partagée.","msg-ok");}
+    catch(e){if(e&&e.name!=="AbortError"){messageFinal("Le partage n'a pas abouti : l'image a été téléchargée à la place.","msg-alerte");telechargerBlob(blob);compterCarte();}}
+   }else{telechargerBlob(blob);compterCarte();messageFinal("Ton navigateur ne propose pas le partage de fichiers : l'image est téléchargée, à partager depuis ton dossier de téléchargements.","msg-info");}
   }catch(e){messageFinal("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
  }));
  page.querySelectorAll('input[name="cj-format"]').forEach(r=>r.addEventListener("change",()=>{if(etat.etape==="final")rendreImage(formatChoisi()).catch(()=>{});}));
@@ -406,6 +490,7 @@
  if(photoGardee)poserPhoto(photoGardee,false);
  const sauvee=restaurer();
  proposerPseudoDuProfil();
+ afficherCompteur();
  if(sauvee){
   montrerRepere();rendreNotes();
   if(champPseudo)champPseudo.value=etat.pseudo;

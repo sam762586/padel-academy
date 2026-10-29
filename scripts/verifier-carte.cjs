@@ -3,7 +3,9 @@
    2) navigateur (Edge, 390 px, toute adresse https bloquée) : repère lu dans pa-quiz-dernier (jamais écrit), parcours complet
       au clavier jusqu'à la carte (focus sur la question suivante, compteur aria-live, groupe nommé), ajustement borné à ±5,
       pseudo invalide refusé, photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas
-      l'encoder) aux bonnes dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console.
+      l'encoder) aux bonnes dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console ;
+      choix du modèle (4 boutons aria-pressed, miniatures, aperçu et export changés, modèle gardé, repli sans MODELES) ;
+      événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public affiché ou rien.
    Lancer depuis la racine du site : node scripts/verifier-carte.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),vm=require('node:vm'),os=require('node:os');
@@ -73,6 +75,10 @@ async function repondreClavier(page,reponses){
  try{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true});
   await ctx.route(/^https:/,r=>r.fulfill({status:204,body:''})); // aucun service externe
+  // Faux GoatCounter : count.js est bloqué, window.goatcounter.count enregistre les événements envoyés
+  await ctx.addInitScript(()=>{window.__gc=[];window.goatcounter={count:o=>{window.__gc.push(JSON.parse(JSON.stringify(o)));}};});
+  const demandesCompteur=[];ctx.on('request',r=>{if(/goatcounter\.com\/counter\//.test(r.url()))demandesCompteur.push(r.url());});
+  const gc=p=>p.evaluate(()=>window.__gc);
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));
   page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
@@ -173,6 +179,8 @@ async function repondreClavier(page,reponses){
   assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
   let f=path.join(dossier,'carte.'+EXT_ATTENDUE);await dl.saveAs(f);
   let buf=fs.readFileSync(f);assert.ok(buf.length>20000&&buf.length<=512000,'image carte entre 20 et 500 Ko ('+buf.length+')');assert.deepEqual(await dimsImage(page,buf,TYPE_ATTENDU),[1200,1800]);
+  const evenement={path:'carte-generee',title:'Carte de joueur générée',event:true};
+  assert.deepEqual(await gc(page),[evenement],'un événement GoatCounter par téléchargement, sans aucune donnée de la carte');
   await page.click('.cj-formats label:has(input[value="story"])'); // le bouton radio est masqué, c'est son libellé qui se clique
   assert.equal(await page.isChecked('input[name="cj-format"][value="story"]'),true);
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
@@ -186,6 +194,14 @@ async function repondreClavier(page,reponses){
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-partager')]);
   assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
   ok('partager sans navigator.share : l\'image est téléchargée à la place');
+  assert.deepEqual(await gc(page),[evenement,evenement,evenement],'carte, story et partage : trois événements');
+  // Refus de la mesure (clé skipgc de count.js) : aucun événement
+  await page.evaluate(()=>localStorage.setItem('skipgc','t'));
+  [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
+  assert.equal((await gc(page)).length,3,'aucun événement si skipgc = t');
+  await page.evaluate(()=>localStorage.removeItem('skipgc'));
+  assert.deepEqual(demandesCompteur,[],'total public pas demandé tant que COMPTEUR.actif est false');
+  ok('GoatCounter : événement « carte-generee » (path, title, event seulement) à chaque téléchargement ou partage, aucun si skipgc');
   // Rien n'a été écrit dans les repères
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-academie')),acadAvant);
@@ -198,6 +214,63 @@ async function repondreClavier(page,reponses){
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(': '+gAj+', Argent.*Avec ta photo\.'));
   assert.equal(await page.evaluate(()=>document.activeElement===document.body),true);
   ok('rechargement : carte, pseudo, ajustements et photo retrouvés, sans déplacer le focus');
+  // Choix du modèle : un bouton par modèle de CARTE_RENDU.MODELES, miniature dessinée, aperçu et export changés, choix gardé
+  const MODELES=await page.evaluate(()=>window.CARTE_RENDU.MODELES);
+  assert.ok(Array.isArray(MODELES)&&MODELES.length===4,'4 modèles dans CARTE_RENDU.MODELES');
+  assert.equal(await page.locator('#cj-modeles-bloc').isVisible(),true);
+  assert.equal(await page.getAttribute('#cj-modeles','role'),'group');assert.equal(await page.getAttribute('#cj-modeles','aria-label'),'Modèle de carte');
+  assert.equal(await page.locator('#cj-modeles button.cj-modele[type="button"]').count(),4);
+  assert.deepEqual(await page.$$eval('#cj-modeles .cj-modele',bs=>bs.map(b=>b.getAttribute('aria-pressed'))),['true','false','false','false'],'Néon par défaut');
+  assert.deepEqual(await page.$$eval('#cj-modeles .cj-modele .cj-modele-nom',s=>s.map(x=>x.textContent)),MODELES.map(m=>m.nom));
+  await page.waitForFunction(()=>[...document.querySelectorAll('#cj-modeles .cj-modele canvas')].every(c=>{const d=c.getContext('2d').getImageData(c.width/2,c.height/2,1,1).data;return d[3]>0;}),null,{timeout:15000});
+  const reponsesAvant=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).reponses);
+  const apercuAvant=await page.evaluate(()=>document.getElementById('cj-apercu-canvas').toDataURL());
+  const exportAvant=await page.evaluate(()=>document.getElementById('cj-canvas').toDataURL('image/jpeg',.5));
+  const deuxieme=MODELES[1];
+  await page.click('#cj-modeles .cj-modele:nth-child(2)');
+  assert.deepEqual(await page.$$eval('#cj-modeles .cj-modele',bs=>bs.map(b=>b.getAttribute('aria-pressed'))),['false','true','false','false']);
+  await page.waitForFunction(a=>document.getElementById('cj-apercu-canvas').toDataURL()!==a,apercuAvant,{timeout:15000});
+  await page.waitForFunction(a=>document.getElementById('cj-canvas').toDataURL('image/jpeg',.5)!==a,exportAvant,{timeout:15000});
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(' Modèle '+deuxieme.nom+'\\.$'));
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).modele),deuxieme.cle);
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).reponses),reponsesAvant,'réponses inchangées');
+  assert.equal(await page.locator('#cj-final').isVisible(),true,'toujours à l\'étape carte : pas de questionnaire refait');
+  [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
+  assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
+  await page.goto(base+'/carte.html');
+  await page.waitForSelector('#cj-modeles .cj-modele');
+  assert.equal(await page.getAttribute('#cj-modeles .cj-modele:nth-child(2)','aria-pressed'),'true','modèle retrouvé au rechargement');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(' Modèle '+deuxieme.nom+'\\.$'));
+  await page.click('#cj-modeles .cj-modele:nth-child(1)');
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).modele),'neon');
+  ok('modèles : 4 boutons (groupe nommé, aria-pressed, miniatures dessinées) ; '+deuxieme.nom+' change aperçu et export, aria-label, gardé dans pa-carte et au rechargement, sans refaire le questionnaire');
+  // Repli : carte-rendu.js sans MODELES (ancienne version en cache) → un seul modèle, groupe masqué, rien ne casse
+  {
+   const p2=await ctx.newPage();p2.on('pageerror',e=>erreurs.push(e.message));
+   await p2.route(/\/assets\/js\/carte-rendu\.js/,async r=>{const rep=await r.fetch();r.fulfill({response:rep,body:(await rep.text())+';delete window.CARTE_RENDU.MODELES;'});});
+   await p2.goto(base+'/carte.html');
+   assert.equal(await p2.locator('#cj-final').isVisible(),true);
+   assert.equal(await p2.locator('#cj-modeles-bloc').isHidden(),true);
+   assert.equal(await p2.locator('#cj-modeles .cj-modele').count(),0);
+   assert.ok(!/Modèle/.test(await p2.getAttribute('#cj-apercu-canvas','aria-label')));
+   await p2.close();
+  }
+  ok('repli sans CARTE_RENDU.MODELES : groupe masqué, carte affichée normalement');
+  // Total public des cartes (COMPTEUR.actif forcé à true pour le test) : réponse simulée affichée, rien en cas d'échec
+  for(const [reponse,attendu] of [[{status:200,body:'{"count":"1 234","count_unique":"1 234"}'},/^1\s234 cartes créées sur Apprendre Padel$/],[{status:200,body:'{"count":"1"}'},/^1 carte créée sur Apprendre Padel$/],[{status:403,body:'<!DOCTYPE html>'},/^$/],[null,/^$/]]){
+   const p3=await ctx.newPage();const erreursJs=[];p3.on('pageerror',e=>erreursJs.push(e.message));
+   await p3.route(/\/assets\/js\/carte\.js/,async r=>{const rep=await r.fetch();r.fulfill({response:rep,body:(await rep.text()).replace('actif:false','actif:true')});});
+   let demande=false;
+   await p3.route(/goatcounter\.com\/counter\/carte-generee\.json$/,r=>{demande=true;if(!reponse)return r.abort('failed');r.fulfill({status:reponse.status,contentType:reponse.status===200?'application/json':'text/html',headers:{'Access-Control-Allow-Origin':'*'},body:reponse.body});});
+   await p3.goto(base+'/carte.html');
+   if(reponse&&reponse.status===200)await p3.waitForFunction(()=>document.getElementById('cj-compteur').textContent!=='');
+   else await p3.waitForTimeout(500);
+   assert.equal(demande,true,'total demandé à GoatCounter');
+   assert.match(await p3.textContent('#cj-compteur'),attendu);
+   assert.deepEqual(erreursJs,[],'aucune exception');
+   await p3.close();
+  }
+  ok('compteur : « 1 234 cartes créées sur Apprendre Padel », singulier pour 1, rien si 403 ou réseau en échec, aucune exception');
   // Retirer la photo : initiales
   await page.click('#cj-modifier-photo');await page.click('#cj-retirer-photo');
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),null);
