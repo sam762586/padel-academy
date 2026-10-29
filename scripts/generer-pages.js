@@ -322,14 +322,14 @@ function retirerNoms(noms) {
   const mots = noms.match(/\S+/g) || [];
   let k = 0;
   while (k < mots.length && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, "")) && !/^(et|ou)$/i.test(mots[k])) k++;
-  // « Sonia DELMOND et Christophe CAPPELLAZZO » : on enchaîne les noms reliés par « et »
+  // « Jean DUPONT et Marie MARTIN » : on enchaîne les noms reliés par « et »
   while (k + 1 < mots.length && /^et$/i.test(mots[k]) && !NOMS_PROPRES.has(mots[k + 1].replace(/[.,;:]+$/, ""))) { k += 2; while (k < mots.length && /^[A-ZÀ-ÝŒ]/.test(mots[k]) && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, ""))) k++; }
   return [k, mots.slice(k).join(" ")];
 }
 function nettoyerCommentaire(texte) {
   if (!texte) return texte;
   let s = String(texte);
-  // « juge-arbitre : JC REYNAUD », « auprès du JA, Corentin, au … » (séparateur obligatoire : « JA Padel » reste intact)
+  // « juge-arbitre : Jean DUPONT », « auprès du JA, Corentin, au … » (séparateur obligatoire : « JA Padel » reste intact)
   s = s.replace(new RegExp(String.raw`\b([Jj]uges?[\s-]?[Aa]rbitres?|JA)(\s*(?::|;|,|–|—|-{1,2}|=)\s*)((?:(?:${MOT_NOM}|et)[\s,]*){1,8})`, "g"), (m, mot, sep, noms) => {
     const [k, reste] = retirerNoms(noms);
     return k === 0 ? m : mot + sep.trimEnd() + " " + reste + " ";
