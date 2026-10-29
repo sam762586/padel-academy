@@ -34,6 +34,7 @@ Dossier statique : glisser-déposer sur Netlify Drop, ou GitHub Pages, ou n'impo
 1. le robot Ten'Up (`scripts/scrape-tenup.js --edge`, 1 requête par seconde, reprise automatique après une coupure) ;
 2. la vérification des JSON de `assets/data` ;
 3. la génération des pages (`scripts/generer-pages.js` : `tournoi/`, `tournois/`, `sitemap.xml`, `assets/data/prochains/`) ;
+3 bis. la génération des fichiers SQL de la table Supabase `tournois_ref` (`scripts/generer-tournois-ref.js` → `supabase/donnees/tournois-ref-NN.sql`, ignorés par git, aucun envoi) : à coller ensuite dans le SQL Editor, voir `supabase/LISEZMOI.md` (« Stabilisation S2 ») ;
 4. un commit local des seules données et pages générées. **Pas de push** : vérifie, puis publie avec `git push`.
 
 Journal : `scripts/logs/maj-hebdo.log`. Essai sur quelques départements : `scripts\maj-hebdo.bat --departements 76,27` (les autres départements gardent leurs données ; le sitemap n'est pas modifié).

@@ -39,6 +39,11 @@ if errorlevel 1 (
   goto fin
 )
 
+rem 3 bis. Fichiers SQL de la table Supabase tournois_ref (supabase\donnees\, ignore par git) : generation seulement, aucun envoi.
+rem     Samuel les colle ensuite dans le SQL Editor (supabase\LISEZMOI.md, Stabilisation S2). Un echec ici n'empeche pas le commit.
+node scripts\generer-tournois-ref.js >> "%JOURNAL%" 2>&1
+if errorlevel 1 echo %date% %time% Fichiers tournois_ref en echec : voir le journal.>> "%JOURNAL%"
+
 rem 4. Commit des seules donnees et pages generees (jamais les autres modifications en cours), sans push
 git add -- assets/data scripts/cache tournoi tournois sitemap.xml >> "%JOURNAL%" 2>&1
 git diff --cached --quiet -- assets/data scripts/cache tournoi tournois sitemap.xml
