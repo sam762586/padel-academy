@@ -226,7 +226,7 @@ Bilan du 29/10/2026 (fait par erreur sur une ancienne branche, `feature/ux-parco
 - [x] **6.4 Accessibilité** ✅ 29/10/2026, 1a5bca43, c58f0456, 816f6e83 : lien d'évitement et `<main>`, focus visible du menu, bordures 3:1 (à recalculer pour #101F35), mouvement réduit global, cibles 44 px, clavier du test de niveau et du tuto « la paire », annonces (tutos, placement).
 - [x] **6.5 Textes** ✅ 29/10/2026 : tutoiement des exercices (`exercices-donnees.js`), « reviens », libellés.
 - [x] **6.6 Vitesse et sécurité** ✅ 29/10/2026, 69aa031f, aee0949b (2 P2 de la revue à corriger : déconnexion par lien forgé, pages ?code= en cache) : supabase-js hébergé sur le site (plus de jsDelivr), connexion en PKCE (lien piégé `#access_token`), `defer`, `srcset` des cartes.
-- [ ] **6.7 Communauté** : migrations s2-01 à s2-42, `tournois_ref`, JS de la communauté (reprenables de `feature/ux-parcours-joueur-v2`), puis contrôle `securite-sql` avec les migrations academie.
+- [x] **6.7 Communauté** ✅ 29/10/2026, de1e3863, 50555804, 288ddccf (SQL écrit, NON exécuté ; ordre pour Samuel dans supabase/LISEZMOI.md, section « Communauté (phase 6.7) ») : migrations s2-01 à s2-42, `tournois_ref`, JS de la communauté (reprenables de `feature/ux-parcours-joueur-v2`), puis contrôle `securite-sql` avec les migrations academie.
 
 ---
 
