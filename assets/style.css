@@ -22,7 +22,7 @@
   /* Action (vert énergie), liens (bleu terrain éclairci), niveaux et alertes */
   --turf:#C8F14B; --turf-rgb:200,241,75; --turf-hover:#DAF784; --turf-deep:#8FB52A;
   --terrain-rgb:22,116,166; --sky:#5CB2E3; --sky-rgb:92,178,227;
-  --sand:#ffb547; --coral:#ff6b57; --ok:var(--turf); --erreur:#ff8a7a;
+  --sand:#ffb547; --coral:#ff6b57; --coral-rgb:255,107,87; --ok:var(--turf); --erreur:#ff8a7a;
   --accent:var(--turf); --accent-fg:#101F35; --focus:var(--sand);
   /* Typographie */
   --display:"Big Shoulders Display","Big Shoulders repli","Arial Narrow",Impact,sans-serif; --body:"Manrope","Manrope repli","Segoe UI",Helvetica,Arial,sans-serif;
@@ -322,7 +322,7 @@ a.card.link:hover h4{color:var(--turf)}
 .acc-bar{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:12px}
 .acc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--turf-deep),var(--turf))}
 .acc-danger{border-color:rgba(255,93,74,.4)}
-.btn.danger{background:var(--coral);color:#fff}
+.btn.danger{background:var(--coral);color:var(--accent-fg)} /* texte nuit sur corail : 5,9:1 (le blanc ne donnait que 2,8:1) */
 .btn:disabled{opacity:.6;cursor:default;transform:none}
 .acc-save{margin-top:16px}
 .acc-save p{margin-top:10px}
@@ -1008,7 +1008,7 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 .cx-onglet.actif{background:var(--turf);color:var(--accent-fg)}
 .cx-champ{position:relative}
 .cx-champ input{width:100%;padding-right:96px}
-.cx-oeil{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--turf);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;padding:6px}
+.cx-oeil{position:absolute;right:4px;top:50%;transform:translateY(-50%);min-height:44px;min-width:44px;border:0;border-radius:var(--r-s);background:transparent;color:var(--turf);font-family:var(--body);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;padding:6px 10px}
 .cx-aide{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
 .cx-aide a{color:var(--turf);font-weight:700}
 .cx-sep{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;margin:18px 0}
@@ -1511,7 +1511,7 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .plan-generique-titre{margin:var(--s-5) 0 var(--s-3)}
 /* Composants communs (lot 5) : une seule définition, réutilisée partout */
 /* Petit bouton : .btn.petit, et les barres d'outils qui n'ont que des petits boutons */
-.btn.petit,:is(.tbarre,.carte-tete,.pt-actions,.pt-confirm,.pt-reponse,.tb-actions,.tb-liste,.esp-filtres) .btn{padding:10px 16px;font-size:.8rem}
+.btn.petit,:is(.tbarre,.carte-tete,.pt-actions,.pt-confirm,.pt-reponse,.tb-actions,.tb-liste,.esp-filtres,.acc-msg .btns,.esp-confirmation) .btn{padding:10px 16px;font-size:.8rem}
 /* Choix de réponse : test de niveau (.qopt), quiz de l'académie et quiz tactique (.qt-reponse), mode quiz 3D */
 .qopt,.qt-reponse,.p3d-quiz-choix button{text-align:left;font:600 var(--fs-m)/1.4 var(--body);color:var(--fg);background:var(--glass-2);border:1px solid var(--line-2);border-radius:var(--r-s);padding:var(--s-3) var(--s-4);min-height:48px;cursor:pointer;transition:border-color var(--t),background var(--t)}
 :is(.qopt,.qt-reponse,.p3d-quiz-choix button):hover:not(:disabled){border-color:var(--turf);background:rgba(var(--turf-rgb),.1)}
@@ -1522,3 +1522,25 @@ section:has(.erreurs-liste){counter-reset:erreur}
 :is(.qt-reponse,.p3d-quiz-choix button).fausse::after{content:" ✗";color:var(--erreur)}
 /* Bouton qui a l'air d'un lien */
 .lien-btn,.esp-lien,.ct-lien{background:none;border:0;padding:8px 0;min-height:40px;color:var(--sky);font:inherit;text-decoration:underline;cursor:pointer}
+/* ESPACE JOUEUR ET CONNEXION (report S3 en v3) : boutons-liens, cases à cocher, messages d'annonce, confirmations */
+/* Boutons qui remplacent d'anciens liens « # » de la connexion : apparence du lien commun (.esp-lien), cible de 44 px */
+.esp-lien.cx-lien{display:inline-flex;align-items:center;min-height:44px;padding-block:0;font-weight:700;text-underline-offset:3px;border-radius:6px;vertical-align:middle}
+.esp-lien.cx-lien:hover{text-decoration-thickness:2px}
+/* Afficher le mot de passe : l'état enfoncé se voit (fond et filet), pas seulement par le libellé */
+.cx-oeil[aria-pressed="true"]{background:rgba(var(--turf-rgb),.16);box-shadow:inset 0 0 0 1px var(--turf);color:var(--fg)}
+/* Case à cocher + libellé : case native 22 px alignée sur la première ligne, ligne entière cliquable, 44 px mini.
+   Annule le style des étiquettes de formulaire (petites majuscules) et celui des champs texte (largeur, fond, marge) */
+.cx-case{min-height:44px;padding-block:11px;cursor:pointer;line-height:1.45}
+:is(.acc-form,.esp-form) label.cx-case{display:flex;margin:0;font-size:var(--fs-s);font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)}
+:is(.acc-form,.esp-form) .cx-case input,.cx-case input[type="checkbox"]{flex:none;width:22px;height:22px;min-height:0;margin:0;padding:0;accent-color:var(--turf);cursor:pointer}
+.cx-case a{color:var(--sky)}
+/* Zones de message toujours présentes (annonces pour lecteur d'écran) : sans place quand elles sont vides, jamais masquées */
+.acc-msg:empty{margin:0;min-height:0}
+/* Alerte avec choix (appareil partagé) et confirmation de suppression d'un match : encadré corail, texte clair,
+   petits boutons (règle commune .btn.petit) de 44 px qui passent à la ligne à 320 px */
+.acc-msg.acc-err:has(.btns),.esp-journal li.esp-confirmation{display:block;max-width:760px;padding:var(--s-3) var(--s-4);border:1px solid var(--coral);border-left-width:4px;border-radius:var(--r-s);background:rgba(var(--coral-rgb),.08);color:var(--fg)}
+.esp-journal li.esp-confirmation{margin-top:calc(-1 * var(--s-1))}
+.esp-confirmation p{margin:0 0 var(--s-2);color:var(--fg);font-weight:600}
+:is(.acc-msg,.esp-confirmation) .btns{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-3)}
+.esp-confirmation p+.btns{margin-top:0}
+:is(.acc-msg,.esp-confirmation) .btns .btn{min-height:44px;max-width:100%;justify-content:center;text-align:center}
