@@ -392,3 +392,8 @@ L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, co
 **29/10/2026, validation de Samuel** : déconnexion testée après la 6e publication (Chrome et téléphone : se déconnecter sur l'un laisse l'autre connecté, « Me déconnecter » fonctionne) : OK.
 **Publié le 29/10/2026 (7e publication)** : 6.7 communauté (JS avec repli, 42 migrations dans le dépôt NON exécutées, générateur tournois_ref). Phase 6 terminée. Ouverture de la communauté : SQL à exécuter par Samuel (supabase/LISEZMOI.md, « Communauté (phase 6.7) »), puis confidentialite.html à compléter (activité Mon académie comptée pour la purge).
 **Publié le 29/10/2026 (8e publication)** : « Ma carte de joueur » (carte.html, V4 première partie) : 12 situations, 6 notes ajustables, poste, photo sur l'appareil, carte Néon en 4 rangs, export WebP/JPEG et story, partage ; confidentialité à jour ; cache pa-v42. 42 suites vertes, relecture faite. Reste : galerie publique (2e temps, SQL + modération), à lancer sur demande de Samuel.
+
+### 30/10/2026 — Modèles de carte, visiteurs en direct, compteur de cartes
+**Fait** : 4 modèles de carte au choix (Néon, Blason inspiré des cartes de football mais dessin original, Stade, Vignette), validés par Samuel ; pastille « joueurs sur le site en ce moment » (Supabase Realtime Presence, accueil et page carte, sans donnée ni stockage) ; événement GoatCounter « carte-generee » et total public affiché (option « visitor counts » cochée par Samuel) ; confidentialité à jour ; cache pa-v43. 44 suites vertes.
+**À faire par Samuel** : GoatCounter : tableau de bord visible par « N'importe qui » (à restreindre si non voulu) et conservation des données à 0 jour = illimitée (CNIL : 25 mois max).
+**Publié le 30/10/2026 (9e publication).**
