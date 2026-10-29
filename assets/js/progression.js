@@ -62,18 +62,18 @@
    const v2=Number.isInteger(quiz.palier)&&E.PALIERS[quiz.palier];
    ligne("test","Test de niveau (catégorie de tournoi estimée)",el("span","bord-palier",v2?E.PALIERS[quiz.palier]:"Niveau "+quiz.niveau+" sur 4"),
     "Test du "+dateFr(quiz.date)+(quiz.source&&FIABILITE[quiz.source]?" · "+FIABILITE[quiz.source]:"")+". ",["Refaire le test de niveau","niveau.html"]);
-  }else ligne("test","Test de niveau (catégorie de tournoi estimée)",null,"Pas encore de test : 14 questions pour estimer ta catégorie de tournoi et tes 3 priorités. ",["Passer le test de niveau","niveau.html"]);
+  }else ligne("test","Test de niveau (catégorie de tournoi estimée)",null,"Pas encore de test : 14 questions pour estimer ta catégorie de tournoi et tes 3 priorités. ",["Passer le test de niveau","niveau.html"]);
   // 4. Classement FFT saisi dans Mon padel
   const r=lire("pa-classement-fft",null);
   if(r&&Number.isInteger(r.rang))ligne("fft","Classement FFT",el("b","bord-niv-valeur",r.rang.toLocaleString("fr-FR")+"e"),r.sexe?" ("+r.sexe+"). ":". ",["Modifier","#mon-padel"]);
   else ligne("fft","Classement FFT",null,"Non renseigné. ",["Saisir mon classement","#mon-padel"]);
   b.appendChild(dl);
-  b.appendChild(el("p","bord-avert","Seul le classement FFT est officiel : il vient de tes résultats en tournoi. Le niveau déclaré, les quiz et le test servent à personnaliser ton parcours ; aucun n'est converti en un autre."));
+  b.appendChild(el("p","bord-avert","Seul le classement FFT est officiel : il vient de tes résultats en tournoi. Le niveau déclaré, les quiz et le test servent à personnaliser ton parcours ; aucun n'est converti en un autre."));
   return b;
  }
  function blocObjectifs(){
   const b=el("div","bord-bloc bord-objectifs");b.appendChild(el("h3","","Mes objectifs de jeu"));
-  b.appendChild(el("p","acc-muted","Choisis ce que tu veux travailler (2 ou 3, c'est l'idéal) : ton programme en tient compte."));
+  b.appendChild(el("p","acc-muted","Choisis ce que tu veux travailler (2 ou 3, c'est l'idéal) : ton programme en tient compte."));
   const actifs=new Set(objectifsActifs().map(o=>o.objectif));
   const liste=el("div","bord-puces");liste.setAttribute("role","group");liste.setAttribute("aria-label","Objectifs de jeu");
   OBJECTIFS_JEU.forEach(o=>{
@@ -90,7 +90,7 @@
   const declare=window.PA_ACADEMIE_CONTENUS?window.PA_ACADEMIE_CONTENUS.niveauExerciceDeclare():null;
   const niveau=declare||(quiz&&Number.isInteger(quiz.niveau)&&quiz.niveau>=1&&quiz.niveau<=4?quiz.niveau:2);
   if(!themes.length){
-   b.appendChild(el("p","acc-muted","Passe le test de niveau, choisis un objectif ou compte un match : ton programme apparaîtra ici."));
+   b.appendChild(el("p","acc-muted","Passe le test de niveau, choisis un objectif ou compte un match : ton programme apparaîtra ici."));
    return b;
   }
   const f=faits(),programme=E.programme(themes,niveau,freq,f);
@@ -103,10 +103,17 @@
    if(!fait&&!prochainMarque){li.classList.add("bord-prochain");li.appendChild(el("span","bord-etiquette","Prochain exercice"));prochainMarque=true;}
    li.appendChild(el("b","",e.titre));
    li.appendChild(el("span","bord-meta",e.duree+" · "+e.joueurs+" · "+(E.LIBELLES[p.theme]||p.theme)));
-   li.appendChild(el("span","bord-pourquoi","Pourquoi : "+[...new Set(p.raisons)].slice(0,2).join(" · ")));
+   li.appendChild(el("span","bord-pourquoi","Pourquoi : "+[...new Set(p.raisons)].slice(0,2).join(" · ")));
    const bt=el("button","btn ghost bord-fait-btn",fait?"Fait le "+new Date(f[e.id]).toLocaleDateString("fr-FR"):"Je l'ai fait");
-   bt.type="button";bt.setAttribute("aria-pressed",String(!!fait));
-   bt.addEventListener("click",()=>{const g=faits();if(g[e.id]&&fait)delete g[e.id];else g[e.id]=new Date().toISOString();ecrire(E.CLE_FAITS,g);signaler();});
+   bt.type="button";bt.dataset.exercice=e.id;bt.setAttribute("aria-pressed",String(!!fait));
+   bt.addEventListener("click",()=>{
+    const g=faits(),annuler=!!(g[e.id]&&fait);
+    if(annuler)delete g[e.id];else g[e.id]=new Date().toISOString();
+    // Après le rendu : « fait » → focus sur le prochain exercice (sinon le titre du programme) ; annulé → même bouton
+    focusFait={id:e.id,annuler};
+    ecrire(E.CLE_FAITS,g);signaler();
+    annoncer(annuler?"« "+e.titre+" » n'est plus marqué comme fait.":"« "+e.titre+" » marqué comme fait.");
+   });
    li.appendChild(bt);
    ol.appendChild(li);
   });
@@ -157,8 +164,17 @@
   zone.append(blocNiveau(quiz),blocObjectifs(),blocProgramme(quiz,themes),blocMatchs(),blocHistorique());
   // Le focus reste sur la puce qu'on vient de basculer
   if(focusObjectif){const p=zone.querySelector('.bord-puce[data-objectif="'+focusObjectif+'"]');if(p)p.focus();focusObjectif=null;}
+  if(focusFait){
+   const prochain=zone.querySelector(".bord-prochain .bord-fait-btn"),meme=zone.querySelector('.bord-fait-btn[data-exercice="'+focusFait.id+'"]');
+   const titre=zone.querySelector(".bord-programme h3");
+   const cible=focusFait.annuler?meme:prochain;
+   if(cible)cible.focus();else if(titre){titre.setAttribute("tabindex","-1");titre.focus();}
+   focusFait=null;
+  }
  }
- let focusObjectif=null;
+ let focusObjectif=null,focusFait=null;
+ // Annonce pour les lecteurs d'écran (zone #esp-annonce d'espace.html)
+ function annoncer(texte){const z=document.getElementById("esp-annonce");if(!z)return;z.textContent="";setTimeout(()=>{z.textContent=texte;},60);}
  zone.addEventListener("click",e=>{const p=e.target.closest(".bord-puce");if(p)focusObjectif=p.dataset.objectif;},true);
  window.addEventListener("pa-progression",rendre);
  if(window.PA_JOURNAL)window.PA_JOURNAL.onChange(rendre);

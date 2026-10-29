@@ -8,6 +8,8 @@
        (seulement si "progression" est aussi dans activees : SQL 2026-10-27-progression-*)
    Fusion à trois voies : on compare l'appareil, le compte et la dernière version synchronisée (pa-synchro-<liste>:<compte>).
    Un ajout, une modification ou une suppression faits d'un côté sont donc reportés de l'autre, même faits hors connexion.
+   Appareil partagé : si les listes de l'appareil appartiennent à un autre compte (PA_COMPTE.verifierAppareil), rien n'est
+   envoyé ni fusionné ; etat().conflit vaut true jusqu'au choix du joueur (resoudreAppareil("ajouter" ou "effacer")).
    Rien n'est appelé tant que "espace" n'est pas dans PA_SUPABASE.activees (SQL : supabase/migrations/2026-10-26-espace-*). */
 const JS_CLE_OBJECTIFS="pa-objectifs";
 const JS_CLE_RANG="pa-classement-fft";
@@ -136,12 +138,30 @@ const JS_OBJECTIFS_JEU=["defense","vitre","volees","bandeja","placement","fautes
   }
  }
 
+ // Appareil partagé (compte.js) : vrai si les listes de l'appareil appartiennent à un autre compte que celui connecté
+ const appareilAutreCompte=()=>{const c=compte();return !!(c&&c.user&&typeof c.verifierAppareil==="function"&&c.verifierAppareil());};
+ // Choix du joueur : "ajouter" (synchronisation normale) ou "effacer" (données de l'appareil effacées, page rechargée :
+ // les autres modules gardent une copie en mémoire). Renvoie true si le choix est pris en compte.
+ function resoudreAppareil(choix){
+  const c=compte();
+  if(!c||typeof c.resoudreAppareil!=="function"||!c.resoudreAppareil(choix))return false;
+  etat={texte:"",erreur:false,derniere:etat.derniere};
+  if(choix==="effacer"){location.reload();return true;}
+  prevenir();synchroniser();
+  if(window.PA_JOURNAL&&window.PA_JOURNAL.synchroniser)window.PA_JOURNAL.synchroniser();
+  if(window.PA_FAVORIS&&window.PA_FAVORIS.synchroniser)window.PA_FAVORIS.synchroniser();
+  if(window.PA_ACADEMIE_SYNC&&window.PA_ACADEMIE_SYNC.synchroniser)window.PA_ACADEMIE_SYNC.synchroniser(); // Mon académie (academie-sync.js)
+  return true;
+ }
+
  let enCours=null;
  async function synchroniser(){
   if(!activee()||!compte()||!compte().actif)return;
   await compte().ready;
   if(!compte().user)return;
   if(enCours)return enCours;
+  // Données d'un autre compte sur l'appareil : rien ne part dans ce compte sans l'accord du joueur (espace.js)
+  if(appareilAutreCompte()){if(!etat.conflit){etat={texte:"",erreur:false,conflit:true,derniere:etat.derniere};prevenir();}return;}
   const id=compte().user.id;
   enCours=(async()=>{
    try{
@@ -155,15 +175,15 @@ const JS_OBJECTIFS_JEU=["defense","vitre","volees","bandeja","placement","fautes
    }catch(e){
     const brut=String((e&&e.message)||"").toLowerCase(),code=e&&e.code;
     etat={texte:code==="42P01"||code==="PGRST205"||brut.indexOf("schema cache")>=0
-     ?"La sauvegarde dans le compte n'est pas encore activée : tes données restent sur cet appareil."
-     :"Synchronisation impossible pour le moment : tes données restent sur cet appareil et partiront plus tard.",erreur:true,derniere:etat.derniere};
+     ?"La sauvegarde dans le compte n'est pas encore activée : tes données restent sur cet appareil."
+     :"Synchronisation impossible pour le moment : tes données restent sur cet appareil et partiront plus tard.",erreur:true,derniere:etat.derniere};
    }finally{enCours=null;prevenir();}
   })();
   return enCours;
  }
 
  window.PA_JOUEUR={
-  activee,synchroniser,
+  activee,synchroniser,appareilAutreCompte,resoudreAppareil,
   onChange(f){if(typeof f==="function")ecouteurs.push(f);},
   etat:()=>etat,
   lireObjectifs:()=>normaliserObjectifs(lire(JS_CLE_OBJECTIFS,[])),

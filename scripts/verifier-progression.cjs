@@ -25,7 +25,7 @@ function moteur(){
  const P=bac.window.PA_EXERCICES,O=J(bac.__O);
  // Objectifs de jeu : thèmes et raison
  let r=J(P.themesPrioritaires(null,[],['bandeja']));
- assert.equal(r[0].theme,'aerien');assert.match(r[0].raisons[0],/Ton objectif : maîtriser la bandeja/);
+ assert.equal(r[0].theme,'aerien');assert.match(r[0].raisons[0],/Ton objectif\s: maîtriser la bandeja/);
  r=J(P.themesPrioritaires(null,[],['defense']));
  assert.deepEqual(r.map(x=>x.theme),['regularite','vitre']);
  assert.equal(J(P.themesPrioritaires(null,[],['inconnu'])).length,0);
@@ -132,7 +132,7 @@ const serveur=http.createServer((req,res)=>{
   await page.click('.bord-puce[data-objectif="bandeja"]');
   assert.equal(await page.getAttribute('.bord-puce[data-objectif="bandeja"]','aria-pressed'),'true');
   assert.equal(await page.evaluate(()=>document.activeElement.dataset.objectif),'bandeja');
-  assert.match(await page.textContent('.bord-programme'),/Ton objectif : maîtriser la bandeja/);
+  assert.match(await page.textContent('.bord-programme'),/Ton objectif\s: maîtriser la bandeja/);
   assert.equal(await page.locator('.bord-ex').count(),2);
   assert.match(await page.textContent('#esp-exercices'),/Bandeja/);
   await page.reload();await page.waitForSelector('#esp-bord .bord-bloc');
@@ -149,9 +149,18 @@ const serveur=http.createServer((req,res)=>{
   assert.notEqual(await page.locator('.bord-prochain b').textContent(),premier);
   assert.match(await page.textContent('.bord-historique'),/1\s*exercice fait ces 30 derniers jours/);
   assert.match(await page.textContent('#esp-exercices'),/Fait le/);
+  // Accessibilité : annonce et focus sur le prochain exercice (le bouton cliqué a été redessiné)
+  await page.waitForFunction(()=>/marqué comme fait/.test(document.getElementById('esp-annonce').textContent));
+  assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('.bord-prochain .bord-fait-btn')),true);
+  // Annuler : le focus reste sur le même exercice
+  await page.locator('.bord-ex',{hasText:premier}).locator('.bord-fait-btn').click();
+  await page.waitForFunction(t=>document.activeElement.classList.contains('bord-fait-btn')&&document.activeElement.closest('.bord-ex').querySelector('b').textContent===t,premier);
+  assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-pressed')),'false');
+  await page.waitForFunction(()=>/n.est plus marqué/.test(document.getElementById('esp-annonce').textContent));
+  await page.evaluate(()=>document.activeElement.click());
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
-  ok('« Je l\'ai fait » : exercice marqué, le suivant devient prochain, historique et carte des exercices à jour ; 390 px');
+  ok('« Je l\'ai fait » : exercice marqué, le suivant devient prochain, historique et carte des exercices à jour ; annonce et focus sur le prochain exercice (même bouton si annulé) ; 390 px');
   // Test passé (P100, 2-3 fois par semaine) et un match : niveau, fréquence, matchs
   ({ctx,page}=await ouvrir({avant:()=>{
    const d=new Date().toISOString();
@@ -169,7 +178,7 @@ const serveur=http.createServer((req,res)=>{
   ok('test passé : palier et fiabilité, distinct du classement FFT ; programme réglé sur la fréquence ; derniers matchs et historique');
   // Test de niveau → « Voir mon programme »
   ({ctx,page}=await ouvrir());
-  await page.goto(base+'/niveau.html');await page.click('text=Je ne suis pas classé(e)');
+  await page.goto(base+'/niveau.html');await page.click('button.qopt:has-text("Je ne suis pas classé(e)")');
   const textes=await page.evaluate(()=>[...PA_NIVEAU.REPERES,...PA_NIVEAU.SITUATIONS].map(x=>x.o[0][0]));
   for(const t of textes)await page.locator('#qopts .qopt',{hasText:t}).first().click();
   await page.waitForSelector('#qresult:not([hidden])');
@@ -193,7 +202,7 @@ const serveur=http.createServer((req,res)=>{
   ok('connecté : objectifs de jeu envoyés au compte seulement si "espace" et "progression" sont actifs');
   // Connecté, test enregistrable plus tard : message clair sur niveau.html
   ({ctx,page}=await ouvrir({activees:['espace'],avant:()=>sessionStorage.setItem('session','1')}));
-  await page.goto(base+'/niveau.html');await page.click('text=Je ne suis pas classé(e)');
+  await page.goto(base+'/niveau.html');await page.click('button.qopt:has-text("Je ne suis pas classé(e)")');
   const t2=await page.evaluate(()=>[...PA_NIVEAU.REPERES,...PA_NIVEAU.SITUATIONS].map(x=>x.o[0][0]));
   for(const t of t2)await page.locator('#qopts .qopt',{hasText:t}).first().click();
   await page.waitForSelector('#qsave:not([hidden]) p');

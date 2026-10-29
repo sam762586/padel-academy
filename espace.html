@@ -22,8 +22,9 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Mon espace joueur", "item": "https://apprendre-padel.fr/espace.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=e71edbc04e">
+<link rel="stylesheet" href="assets/style.css?v=5044927434">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/anti-cadre.js?v=4892f456eb"></script>
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
 <body>
@@ -39,10 +40,11 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">Mon espace · Joueur</p><h1>Mon espace joueur</h1></div>
-      <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. Tout marche sans compte ; connecté, tu retrouves tout sur tes autres appareils.</p>
+      <p>Ton classement estimé, tes objectifs, tes résultats de tournois et ta progression, au même endroit. L'espace joueur demande un compte gratuit : tu y retrouves tout, sur ton téléphone comme sur ton ordinateur.</p>
     </div>
     <div id="esp-statut" class="esp-statut"></div>
-    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bloc-semaine">Ta semaine</a><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#mon-padel">Résumé</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <p class="sr-only" id="esp-annonce" role="status" aria-live="polite"></p>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bloc-semaine">Ta semaine</a><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#mon-padel">Mon padel</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
     <div class="acc-card esp-carte ac-semaine-carte" id="esp-bloc-semaine" data-semaine-bloc>
       <h2 class="esp-titre">Ta semaine</h2>
       <div id="ac-semaine"><p class="note">Ta semaine a besoin de JavaScript.</p></div>
@@ -65,7 +67,7 @@
           <div class="btns"><a class="btn ghost" href="bareme.html#b-form">Saisir mes résultats</a></div>
         </div>
         <div class="mp-bloc">
-          <h3>Mon rang et le prochain cut</h3>
+          <h3>Mon classement FFT et le prochain cut</h3>
           <form class="mp-form-rang" id="mp-form-rang" novalidate>
             <div><label for="mp-rang">Mon classement FFT</label><input type="number" id="mp-rang" name="mp-rang" min="1" max="500000" step="1" inputmode="numeric" placeholder="Ex. 4512"></div>
             <fieldset><legend>Classement</legend>
@@ -108,7 +110,7 @@
     <div class="acc-card esp-carte" id="esp-bloc-exercices">
       <h2 class="esp-titre">Exercices recommandés</h2>
       <div id="esp-exercices"></div>
-      <p class="note">Les exercices changent avec ton dernier test de niveau et tes derniers matchs comptés. Pour un programme complet : le <a href="entrainement.html">plan 8 semaines</a>. Pour travailler ta lecture du jeu : le <a href="tactique.html#quiz">quiz tactique</a>, des situations tirées des scénarios 3D.</p>
+      <p class="note">Les exercices changent avec ton dernier test de niveau et tes derniers matchs comptés. Pour un programme complet : le <a href="entrainement.html">plan d'entraînement 8 semaines</a>. Pour travailler ta lecture du jeu : le <a href="tactique.html#quiz">quiz tactique</a>, des situations tirées des scénarios 3D.</p>
     </div>
     <div class="acc-card esp-carte" id="esp-bloc-matchs">
       <h2 class="esp-titre">Mes matchs</h2>
@@ -136,7 +138,7 @@
         </div>
         <fieldset><legend>Résultat</legend><div class="tchips"><label class="tchip"><input type="radio" name="esp-m-resultat" value="0"><span>Victoire</span></label><label class="tchip"><input type="radio" name="esp-m-resultat" value="1"><span>Défaite</span></label></div></fieldset>
         <button type="submit" class="btn primary">Ajouter le match</button>
-        <p class="note">Les matchs comptés avec le <a href="score.html">compteur</a> arrivent ici tout seuls. Pense à indiquer ton partenaire dans les réglages du compteur.</p>
+        <p class="note">Les matchs comptés avec le <a href="score.html">compteur</a> arrivent ici automatiquement. Pense à indiquer ton partenaire dans les réglages du compteur.</p>
       </form>
     </div>
     <div class="acc-card esp-carte" id="esp-bloc-resultats">
@@ -154,12 +156,12 @@
         <button type="submit" class="btn primary">Ajouter le résultat</button>
       </form>
       <div id="esp-resultats"></div>
-      <p class="note">Même liste que le simulateur de la page Barème : un résultat ajouté ici y apparaît aussi.</p>
+      <p class="note">Même liste que le simulateur de la page Barème : un résultat ajouté ici y apparaît aussi.</p>
     </div>
     <div class="acc-card esp-carte" id="esp-bloc-progression">
       <h2 class="esp-titre">Ma progression</h2>
       <p class="acc-muted">Ton classement estimé à la fin de chaque mois, sur les 12 derniers mois.</p>
-      <div class="esp-graphe"><div id="esp-progression"></div><p class="esp-bulle" id="esp-bulle" role="status" hidden></p></div>
+      <div class="esp-graphe"><div id="esp-progression"></div><p class="esp-bulle" id="esp-bulle" aria-hidden="true" hidden></p></div>
     </div>
   </div>
 </section>
@@ -172,11 +174,11 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js?v=b8b45cefe2"></script>
-<script src="assets/js/compte.js?v=b59d3d49f1"></script>
+<script src="assets/js/compte.js?v=e010abe739"></script>
 <script src="assets/js/bareme-donnees.js?v=4720c55275"></script>
 <script src="assets/js/score.js?v=f09e8d396a"></script>
 <script src="assets/js/favoris.js?v=564271dd7d"></script>
-<script src="assets/js/joueur-sync.js?v=c808cd3e43"></script>
+<script src="assets/js/joueur-sync.js?v=7871e25e43"></script>
 <script src="assets/js/journal.js?v=252b0f29c5"></script>
 <script src="assets/js/diagnostic.js?v=7701bc9541"></script>
 <script src="assets/js/mon-padel.js?v=4fd190996e"></script>
@@ -184,12 +186,12 @@
 <script src="assets/js/academie-questions.js?v=651fa7f292"></script>
 <script src="assets/js/academie-contenus.js?v=c6e0eecdc0"></script>
 <script src="assets/js/carnet-outils.js?v=7d8ce92702"></script>
-<script src="assets/js/espace.js?v=169baf987c"></script>
+<script src="assets/js/espace.js?v=c9031af09f"></script>
 <script src="assets/js/exercices.js?v=cb5733677f"></script>
 <script src="assets/js/defis.js?v=268125c535"></script>
 <script src="assets/js/academie-parcours.js?v=c74d7e953f"></script>
-<script src="assets/js/academie-sync.js?v=fad37188a6"></script>
-<script src="assets/js/progression.js?v=d34326e44a"></script>
+<script src="assets/js/academie-sync.js?v=4688e130e8"></script>
+<script src="assets/js/progression.js?v=96a5951335"></script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

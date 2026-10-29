@@ -83,16 +83,16 @@ const serveur=http.createServer((req,res)=>{
   await ajouter(page,{date:ilYa(3),type:'tournoi',partenaire:'Léo',adversaires:'Paul et Max',score:'6-4 6-3'});
   assert.match(await page.textContent('#esp-bloc-matchs .esp-msg'),/victoire ou une défaite/);
   await ajouter(page,{date:ilYa(3),type:'tournoi',partenaire:'Léo',adversaires:'Paul et Max',victoire:true,score:'6-4 abc'});
-  assert.match(await page.textContent('#esp-bloc-matchs .esp-msg'),/chiffres et des tirets/);
+  assert.match(await page.textContent('#esp-bloc-matchs .esp-msg'),/chiffres, tirets et espaces seulement/);
   await ajouter(page,{date:ilYa(3),type:'tournoi',partenaire:'Léo',adversaires:'Paul et Max',victoire:true,score:'6-4 6-3'});
   await ajouter(page,{date:ilYa(10),type:'amical',partenaire:'Léo',victoire:false,score:'4-6 6-7 (5-7)'});
   await ajouter(page,{date:ilYa(200),type:'amical',partenaire:'Hugo',victoire:true});
   ok('match saisi après coup : résultat obligatoire, score contrôlé, ajout au journal');
   // Période 3 mois : 2 matchs (1-1), Léo seul partenaire ; « Tout » : 3 matchs, Hugo apparaît
   let stats=await page.textContent('#esp-stats');
-  assert.match(stats,/2\s*matchs/);assert.match(stats,/1 – 1/);assert.match(stats,/50 %/);
+  assert.match(stats,/2\s*matchs/);assert.match(stats,/1 – 1/);assert.match(stats,/50\s%/);
   assert.equal(await page.locator('#esp-stats tbody tr').count(),1);
-  assert.match(stats,/Amical 1 match, 0 % de victoires · Tournoi 1 match, 100 % de victoires/);
+  assert.match(stats,/Amical 1 match, 0\s% de victoires · Tournoi 1 match, 100\s% de victoires/);
   await page.click('#esp-bloc-matchs label.tchip:has(input[value="tout"])');
   stats=await page.textContent('#esp-stats');
   assert.match(stats,/3\s*matchs/);assert.match(stats,/2 – 1/);
@@ -101,9 +101,36 @@ const serveur=http.createServer((req,res)=>{
   ok('statistiques : période, victoires/défaites, % par partenaire et par type');
   // Résumé « Mon padel » : pas de % de points pour un match saisi après coup
   assert.match(await page.textContent('#mp-matchs'),/–/);
-  // Suppression
-  await page.locator('#esp-journal li:not(.esp-bilan-panneau)').first().locator('button.x').click();
-  assert.equal(await page.locator('#esp-journal li:not(.esp-bilan-panneau)').count(),2);
+  // Suppression en deux temps (sans confirm()) : confirmation en ligne, annulation possible, annonce et focus
+  const lignes=()=>page.locator('#esp-journal li:not(.esp-bilan-panneau)');
+  await lignes().first().locator('button.x').click();
+  assert.equal(await lignes().count(),3,'rien n\'est supprimé avant la confirmation');
+  // Focus sur « Annuler » (pas sur le bouton destructeur) ; la question est reliée au bouton de confirmation
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Annuler');
+  assert.equal(await page.getAttribute('#esp-journal .esp-confirmer','aria-describedby'),'esp-conf-msg');
+  assert.match(await page.textContent('#esp-conf-msg'),/^Supprimer le match du .+ \?/);
+  assert.equal(await lignes().first().locator('button.x').getAttribute('aria-expanded'),'true');
+  await page.click('#esp-journal .esp-annuler');
+  assert.equal(await page.locator('#esp-journal .esp-confirmation').count(),0);
+  assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#esp-journal li button.x')),true,'focus rendu au bouton');
+  // Échap sur la confirmation : annulée, focus rendu au ✕
+  await lignes().first().locator('button.x').click();
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#esp-journal .esp-confirmation').count(),0,'Échap ferme la confirmation');
+  assert.equal(await lignes().count(),3,'Échap ne supprime rien');
+  assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#esp-journal li button.x')),true,'Échap : focus rendu au ✕');
+  ok('suppression d\'un match : focus sur « Annuler » à l\'ouverture, Échap annule et rend le focus au ✕');
+  await lignes().first().locator('button.x').click();
+  await page.click('#esp-journal .esp-confirmer');
+  assert.equal(await lignes().count(),2);
+  await page.waitForFunction(()=>/supprimé/.test(document.getElementById('esp-annonce').textContent));
+  assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#esp-journal li button.x')),true,'focus sur le match suivant');
+  ok('suppression d\'un match : confirmation en ligne (annulable), annoncée, focus sur le match suivant');
+  // Formulaire : erreur reliée aux boutons Victoire / Défaite
+  await page.click('#esp-form-match button[type=submit]');
+  assert.equal(await page.getAttribute('#esp-bloc-matchs-msg','role'),'alert');
+  assert.deepEqual(await page.$$eval('input[name="esp-m-resultat"]',l=>l.map(i=>i.getAttribute('aria-invalid')+':'+i.getAttribute('aria-describedby'))),['true:esp-bloc-matchs-msg','true:esp-bloc-matchs-msg']);
+  assert.equal(await page.evaluate(()=>document.activeElement.name),'esp-m-resultat');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   ok('suppression d\'un match ; résumé sans % de points inventé ; 390 px sans débordement');
   // 2. Compteur : partenaire et type
@@ -117,7 +144,7 @@ const serveur=http.createServer((req,res)=>{
   await page.goto(base+'/espace.html');
   await page.click('#esp-bloc-matchs label.tchip:has(input[value="30"])');
   assert.match(await page.textContent('#esp-journal'),/Avec Nina/);assert.match(await page.textContent('#esp-journal'),/Entraînement/);
-  assert.match(await page.textContent('#esp-stats'),/100 %\s*des points gagnés/);
+  assert.match(await page.textContent('#esp-stats'),/100\s%\s*des points gagnés/);
   ok('compteur : partenaire, type et identifiant enregistrés, match visible dans le journal');
   await ctx.close();
 
@@ -142,12 +169,15 @@ const serveur=http.createServer((req,res)=>{
   // Suppression d'un match du compte
   const iZoe=await page.locator('#esp-journal li:not(.esp-bilan-panneau)').evaluateAll(l=>l.findIndex(x=>/Zoé/.test(x.textContent)));
   await page.locator('#esp-journal li:not(.esp-bilan-panneau)').nth(iZoe).locator('button.x').click();
+  assert.match(await page.textContent('#esp-journal .esp-confirmation'),/et de ton compte/);
+  await page.click('#esp-journal .esp-confirmer');
   await page.waitForFunction(()=>window.__base.appels.includes('-autre-appareil-01'));
   ok('suppression d\'un match du compte depuis le journal');
   // Hors connexion : suppression mise en attente, envoyée au retour
   await page.evaluate(()=>{window.__base.panne=true;window.__garder&&0;sessionStorage.setItem('base',JSON.stringify(window.__base));});
   await page.locator('#esp-journal li:not(.esp-bilan-panneau)').first().locator('button.x').click();
-  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-journal-suppressions')).length),1);
+  await page.click('#esp-journal .esp-confirmer');
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-journal-suppressions')||'[]').length===1);
   await page.evaluate(()=>{const b=JSON.parse(sessionStorage.getItem('base'));b.panne=false;sessionStorage.setItem('base',JSON.stringify(b));});
   await page.reload();
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-journal-suppressions')||'[]').length===0);

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Mon compte | Apprendre Padel</title>
-<meta name="description" content="Ton compte Apprendre Padel : profil, résultats du quiz et progression du plan 8 semaines.">
+<meta name="description" content="Ton compte Apprendre Padel : profil, résultats du test de niveau et progression du plan 8 semaines.">
 <link rel="canonical" href="https://apprendre-padel.fr/compte.html">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -14,7 +14,7 @@
 <meta property="og:locale" content="fr_FR">
 <meta property="og:url" content="https://apprendre-padel.fr/compte.html">
 <meta property="og:title" content="Mon compte">
-<meta property="og:description" content="Ton compte Apprendre Padel : profil, résultats du quiz et progression du plan 8 semaines.">
+<meta property="og:description" content="Ton compte Apprendre Padel : profil, résultats du test de niveau et progression du plan 8 semaines.">
 <meta property="og:image" content="https://apprendre-padel.fr/assets/img/og-image.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -22,8 +22,9 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Mon compte", "item": "https://apprendre-padel.fr/compte.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=e71edbc04e">
+<link rel="stylesheet" href="assets/style.css?v=5044927434">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="assets/js/anti-cadre.js?v=4892f456eb"></script>
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
 <body>
@@ -39,21 +40,24 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">Mon espace · Facultatif</p><h1>Mon compte</h1></div>
-      <p>Ton tableau de bord « Mon padel » marche sans compte, avec ce qui est gardé sur cet appareil. Un compte te permet en plus de garder ton profil, tes résultats du quiz, ta progression et tes matchs d'un appareil à l'autre.</p>
+      <p>Ton espace joueur (Mon padel, objectifs, matchs, progression) demande un compte gratuit. Ton compte garde aussi ton profil, tes résultats du test de niveau et ta progression du plan, d'un appareil à l'autre.</p>
     </div>
     <div class="acc-card esp-lien-carte">
       <h2 class="mp-titre">Mon espace joueur</h2>
-      <p>Classement estimé, objectifs, résultats de tournois, progression et derniers matchs : tout est dans ton espace joueur.</p>
+      <p>Classement estimé, objectifs, résultats de tournois, progression et derniers matchs : tout est dans ton espace joueur.</p>
       <div class="btns"><a class="btn primary" href="espace.html">Ouvrir mon espace</a></div>
     </div>
     <p class="acc-msg" id="compte-msg" role="status">Chargement…</p>
     <div id="compte-profil" hidden>
       <div class="acc-card">
         <div class="acc-top"><h3>Mon profil</h3><button type="button" class="btn ghost" id="compte-deco">Me déconnecter</button></div>
-        <p class="acc-muted">Connecté avec : <b id="compte-adresse"></b></p>
+        <p class="acc-muted">Connecté avec : <b id="compte-adresse"></b></p>
+        <label class="cx-case"><input type="checkbox" id="compte-deco-effacer" aria-describedby="compte-deco-aide"><span>Effacer les données de cet appareil en me déconnectant</span></label>
+        <p class="acc-muted" id="compte-deco-aide">Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
         <form class="acc-form" id="compte-form-profil" novalidate>
           <label for="pf-pseudo">Pseudo</label>
-          <input type="text" id="pf-pseudo" maxlength="30" autocomplete="nickname">
+          <input type="text" id="pf-pseudo" maxlength="30" autocomplete="nickname" aria-describedby="pf-pseudo-aide">
+          <p class="acc-muted" id="pf-pseudo-aide">2 à 30 caractères : lettres, chiffres, espace, _ . ' -. Pas d'e-mail ni de numéro : le pseudo est visible des autres joueurs.</p>
           <label for="pf-niveau">Niveau déclaré</label>
           <select id="pf-niveau"></select>
           <label for="pf-classement">Classement P (facultatif)</label>
@@ -66,35 +70,37 @@
           <input type="text" id="pf-club" maxlength="80" autocomplete="off">
           <button type="submit" class="btn primary" id="pf-enregistrer">Enregistrer mon profil</button>
         </form>
-        <p class="acc-msg" id="pf-msg" role="status" hidden></p>
+        <p class="acc-msg" id="pf-msg" role="status"></p>
       </div>
       <div class="acc-card">
-        <h3>Historique du quiz</h3>
+        <h3>Historique du test de niveau</h3>
         <div id="compte-quiz"><p class="acc-muted">Chargement…</p></div>
         <div class="btns"><a class="btn ghost" href="niveau.html">Passer le test de niveau</a></div>
       </div>
       <div class="acc-card">
-        <h3>Plan 8 semaines</h3>
+        <h3>Plan d'entraînement 8 semaines</h3>
         <div id="compte-plan"><p class="acc-muted">Chargement…</p></div>
         <div class="btns"><a class="btn ghost" href="entrainement.html">Ouvrir le plan</a></div>
       </div>
       <div class="acc-card pt-large" id="mes-annonces">
         <h3>Mes annonces et réponses</h3>
-        <p class="acc-muted">Tes annonces « Trouver un partenaire », les réponses reçues et celles que tu as envoyées.</p>
+        <p class="acc-muted">Tes annonces « Trouver un partenaire », les réponses reçues et celles que tu as envoyées.</p>
         <div id="compte-partenaires"><p class="acc-muted">Chargement…</p></div>
         <div class="btns"><a class="btn ghost" href="partenaires.html">Trouver un partenaire</a></div>
       </div>
       <div class="acc-card" id="moderation-avis" hidden>
         <h3>Avis signalés (admin)</h3>
-        <p class="acc-muted">Avis de tournois masqués ou signalés. « Rétablir » efface les signalements.</p>
+        <p class="acc-muted">Avis de tournois masqués ou signalés. « Rétablir » efface les signalements.</p>
         <div id="moderation-avis-liste"></div>
       </div>
       <div class="acc-card acc-danger">
         <h3>Supprimer mon compte</h3>
-        <p>Cette action efface ton profil, tes résultats de quiz, ta progression, tes annonces, tes réponses et tes signalements. Elle est définitive. <a href="confidentialite.html">En savoir plus</a></p>
+        <p>Cette action efface définitivement de ton compte toutes tes données : profil, résultats du test de niveau, niveau et quiz de Mon académie, progression, objectifs, résultats de tournois, matchs, bilans après match et favoris. Elle efface aussi tes annonces, réponses, « J'y vais », avis et signalements. <a href="confidentialite.html">En savoir plus</a></p>
+        <label class="cx-case"><input type="checkbox" id="sup-effacer" aria-describedby="sup-effacer-aide"><span>Effacer aussi les données de cet appareil</span></label>
+        <p class="acc-muted" id="sup-effacer-aide">Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
         <div class="btns">
           <button type="button" class="btn ghost" id="sup-demander">Supprimer mon compte</button>
-          <button type="button" class="btn danger" id="sup-confirmer" hidden>Oui, supprimer définitivement</button>
+          <button type="button" class="btn danger" id="sup-confirmer" aria-describedby="sup-msg" hidden>Oui, supprimer définitivement</button>
           <button type="button" class="btn ghost" id="sup-annuler" hidden>Annuler</button>
         </div>
         <p class="acc-msg" id="sup-msg" role="status" hidden></p>
@@ -111,12 +117,12 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="assets/js/supabase-config.js?v=b8b45cefe2"></script>
-<script src="assets/js/compte.js?v=b59d3d49f1"></script>
+<script src="assets/js/compte.js?v=e010abe739"></script>
 <script src="assets/js/partenaires.js?v=51c3a48c93"></script>
-<script src="assets/js/compte-page.js?v=d60372d044"></script>
+<script src="assets/js/compte-page.js?v=3aacf3f222"></script>
 <script src="assets/js/bareme-donnees.js?v=4720c55275"></script>
 <script src="assets/js/favoris.js?v=564271dd7d"></script>
-<script src="assets/js/joueur-sync.js?v=c808cd3e43"></script>
+<script src="assets/js/joueur-sync.js?v=7871e25e43"></script>
 <script src="assets/js/communaute-tournoi.js?v=c53c75a2db"></script>
 <script src="assets/js/nav.js?v=6ec1140ce4"></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
