@@ -101,6 +101,6 @@ function asDemarrer(){
  if(!((window.PA_SUPABASE||{}).activees||[]).includes("academie"))return;
  if(window.PA_COMPTE){asDemarrer();return;}
  const charger=src=>new Promise((ok,ko)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);});
- charger("assets/vendor/supabase-2.45.4.js?v=8596965fe9").then(()=>charger("assets/js/compte.js?v=d6b799a998")).then(asDemarrer).catch(()=>{});
+ charger("assets/vendor/supabase-2.45.4.js?v=8596965fe9").then(()=>charger("assets/js/compte.js?v=4c78bab497")).then(asDemarrer).catch(()=>{});
 })();
 window.PA_ACADEMIE_SYNC_FUSION={niveaux:asFusionNiveaux,quiz:asFusionQuiz,seanceLocale:asSeanceLocale,ligneQuiz:asLigneQuiz};
