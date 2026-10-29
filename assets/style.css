@@ -317,6 +317,16 @@ a.card.link:hover h4{color:var(--turf)}
 .acc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .acc-muted{color:var(--muted)}
 .acc-muted b{color:#fff;overflow-wrap:anywhere}
+/* PRÉSENCE (« N joueurs sur le site en ce moment », presence.js) : petite ligne discrète sous les boutons du hero (accueil) et sous
+   le H1 de la carte. Place réservée avant l'arrivée du nombre (espace insécable + hauteur mini) : pas de saut (CLS).
+   Le point vert est toujours là en place (transparent), il s'allume et pulse quand la pastille est active ; pulsation coupée
+   sous prefers-reduced-motion. Texte --muted : 7,8:1 sur le bleu nuit. */
+p.presence-ligne{display:flex;flex-wrap:wrap;align-items:center;gap:4px var(--s-4);min-height:calc(1.5em + 2px);margin:var(--s-4) 0 0;font-size:var(--fs-s);line-height:1.5;color:var(--muted)}
+.presence{display:inline-flex;align-items:center;gap:var(--s-2)}
+.presence::before{content:"";flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:transparent}
+.presence.presence-active::before{background:var(--turf);box-shadow:0 0 0 0 rgba(var(--turf-rgb),.55);animation:presence-pouls 2.4s ease-out infinite}
+@keyframes presence-pouls{0%{box-shadow:0 0 0 0 rgba(var(--turf-rgb),.55)}70%,100%{box-shadow:0 0 0 7px rgba(var(--turf-rgb),0)}}
+@media (prefers-reduced-motion:reduce){.presence.presence-active::before{animation:none;box-shadow:none}}
 .acc-form{display:grid;gap:8px;margin-top:16px}
 .acc-form label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-top:8px}
 .acc-form input,.acc-form select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:12px 14px;font-family:var(--body);font-size:1rem}
