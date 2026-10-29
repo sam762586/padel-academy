@@ -10,8 +10,12 @@
    7) accessibilité (S3) : zones de message toujours présentes, erreur annoncée (role=alert) avec aria-invalid,
       aria-describedby et focus sur le champ ; onglets en boutons aria-pressed ; bouton « œil » au nom fixe ;
       liens-boutons ; focus sur la confirmation d'inscription ;
-   8) sécurité (S4) : error_description de l'adresse jamais affiché, ?mode=nouveau refusé sans PASSWORD_RECOVERY,
-      case « J'ai 15 ans ou plus » obligatoire (e-mail et Google) et enregistrée dans les métadonnées, anti-cadre.
+   8) sécurité (S4) : error_description de l'adresse jamais affiché, ?mode=nouveau refusé sans vrai retour de récupération,
+      case « J'ai 15 ans ou plus » obligatoire (e-mail et Google) et enregistrée dans les métadonnées, anti-cadre ;
+   9) flux PKCE (6.6) : client en flowType "pkce" ; inscription, lien magique, Google et mot de passe oublié reviennent
+      sur connexion.html ; ?code= échangé seulement avec le vérificateur de ce navigateur ; récupération seulement après
+      un code échangé avec le vérificateur « mot de passe oublié » ; autre navigateur, code refusé ou périmé : message
+      clair ; lien piégé #access_token=… : aucune session, adresse nettoyée, visiteur connecté pas déconnecté.
    Supabase est simulé (aucun appel réseau). Lancer depuis la racine du site : node scripts/verifier-connexion.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -22,30 +26,64 @@ let nb=0;
 function ok(nom){nb++;console.log('OK '+nom);}
 process.on('unhandledRejection',e=>{if(e&&e.name==='TargetClosedError')return;console.error(e);process.exitCode=1;});
 
-// Supabase simulé : session dans sessionStorage « session » ; mot de passe accepté : « bonmotdepasse »
+// Supabase simulé : session dans sessionStorage « session » ; mot de passe accepté : « bonmotdepasse ».
+// Imite supabase-js 2.45.4 : avec flowType "pkce", les demandes qui produisent un lien (signUp, signInWithOtp,
+// signInWithOAuth, resetPasswordForEmail) posent un vérificateur dans localStorage (« …/PASSWORD_RECOVERY » pour la
+// récupération) ; à l'initialisation, un ?code= n'est échangé que si ce vérificateur existe (code « bon » ou « neuf » :
+// session ouverte, code retiré de l'adresse, SIGNED_IN ; autre code : erreur bad_code_verifier, « perime » :
+// flow_state_expired) ; jamais d'événement PASSWORD_RECOVERY en PKCE. Un fragment #access_token= en PKCE : erreur et
+// session supprimée (comportement réel) ; en flux implicite, il ouvrirait la session (faille corrigée en 6.6).
 const SDK=`(function(){
- if(/access_token=/.test(location.hash))sessionStorage.setItem('session',/nouveau/.test(location.hash)?'nouveau':'1');
  const session=()=>{const s=sessionStorage.getItem('session');return s?{user:{id:'u1',email:'joueur@test.fr',created_at:s==='nouveau'?new Date().toISOString():'2026-01-01T00:00:00Z'}}:null;};
  const ecouteurs=[];
  // Appels notés dans sessionStorage « appels » (gardés d'une page à l'autre)
  const noter=(nom,args)=>{const l=JSON.parse(sessionStorage.getItem('appels')||'[]');l.push({nom,args});sessionStorage.setItem('appels',JSON.stringify(l));};
- // Retour d'un lien « mot de passe oublié » (flux PKCE) : ?code=recup ouvre une session de récupération
- const recup=/[?&]code=recup/.test(location.search);
- if(recup)sessionStorage.setItem('session','1');
+ const prevenir=(ev)=>setTimeout(()=>ecouteurs.forEach(f=>f(ev,session())),0);
  const requete=()=>{const q=new Proxy({},{get(_,k){
   if(k==='then')return (ok)=>ok({data:[],error:null});
   if(k==='maybeSingle'||k==='single')return ()=>Promise.resolve({data:null,error:null});
   return ()=>q;}});return q;};
- window.supabase={createClient(){return {
+ window.supabase={createClient(url,cleApi,options){
+  const auth=(options&&options.auth)||{};
+  window.__optionsAuth=auth;
+  const pkce=auth.flowType==='pkce';
+  const cleV='sb-'+new URL(url).hostname.split('.')[0]+'-auth-token-code-verifier';
+  const poserVerificateur=recup=>{if(pkce)localStorage.setItem(cleV,JSON.stringify('verif123'+(recup?'/PASSWORD_RECOVERY':'')));};
+  const supprimerSession=()=>{if(sessionStorage.getItem('session'))noter('sessionSupprimee',{});sessionStorage.removeItem('session');};
+  const init=(async()=>{
+   await new Promise(r=>setTimeout(r,0));
+   const u=new URL(location.href),p={};
+   new URLSearchParams(u.hash.slice(1)).forEach((v,k)=>p[k]=v);u.searchParams.forEach((v,k)=>p[k]=v);
+   if(p.access_token||p.refresh_token)noter('jetonVuParLeSdk',{});
+   const verif=localStorage.getItem(cleV);
+   if(pkce&&p.code&&verif){
+    localStorage.removeItem(cleV);
+    if(p.code!=='bon'&&p.code!=='neuf'){supprimerSession();
+     return {error:p.code==='perime'?{code:'flow_state_expired',message:'invalid flow state, flow state has expired'}:{code:'bad_code_verifier',message:'code challenge does not match previously saved code verifier'}};}
+    noter('echange',{code:p.code});
+    sessionStorage.setItem('session',p.code==='neuf'?'nouveau':'1');
+    u.searchParams.delete('code');history.replaceState(history.state,'',u.toString());
+    prevenir('SIGNED_IN');return {error:null};
+   }
+   if(auth.detectSessionInUrl&&(p.access_token||p.error_description)){
+    if(pkce){supprimerSession();return {error:{message:'Not a valid PKCE flow url.'}};}
+    if(p.access_token){sessionStorage.setItem('session','1');location.hash='';prevenir(p.type==='recovery'?'PASSWORD_RECOVERY':'SIGNED_IN');}
+   }
+   return {error:null};
+  })();
+  return {
   auth:{
-   getSession:async()=>{await new Promise(r=>setTimeout(r,0));if(recup)ecouteurs.forEach(f=>f('PASSWORD_RECOVERY',session()));return {data:{session:session()}};},
+   initialize:()=>init,
+   getSession:async()=>{await init;return {data:{session:session()}};},
    onAuthStateChange:f=>{ecouteurs.push(f);return {data:{subscription:{unsubscribe(){}}}};},
    signInWithPassword:async({password})=>{if(password!=='bonmotdepasse')return {data:{},error:{message:'Invalid login credentials'}};
     sessionStorage.setItem('session','1');ecouteurs.forEach(f=>f('SIGNED_IN',session()));return {data:{session:session()},error:null};},
-   signUp:async(o)=>{noter('signUp',{email:o.email,options:o.options});return {data:{user:{identities:[{}]},session:null},error:null};},
-   signInWithOAuth:async(o)=>{noter('signInWithOAuth',o);return {data:{},error:null};},
+   signUp:async(o)=>{poserVerificateur(false);noter('signUp',{email:o.email,options:o.options});return {data:{user:{identities:[{}]},session:null},error:null};},
+   signInWithOAuth:async(o)=>{poserVerificateur(false);noter('signInWithOAuth',o);return {data:{},error:null};},
    signOut:async()=>{sessionStorage.removeItem('session');ecouteurs.forEach(f=>f('SIGNED_OUT',null));return {error:null};},
-   signInWithOtp:async()=>({error:null}),resetPasswordForEmail:async()=>({error:null}),updateUser:async(o)=>{noter('updateUser',o);return {error:null};}},
+   signInWithOtp:async(o)=>{poserVerificateur(false);noter('signInWithOtp',o);return {error:null};},
+   resetPasswordForEmail:async(email,o)=>{poserVerificateur(true);noter('resetPasswordForEmail',{email,options:o});return {error:null};},
+   updateUser:async(o)=>{noter('updateUser',o);return {error:null};}},
   from:requete,rpc:async()=>({data:null,error:null}),functions:{invoke:async()=>({data:null,error:null})}
  };}};
 })();`;
@@ -119,7 +157,7 @@ const serveur=http.createServer((req,res)=>{
   assert.equal(await page.evaluate(()=>document.activeElement.id),'cx-email');
   ok('erreur de connexion : role=alert, aria-invalid et aria-describedby sur les champs, focus sur l\'e-mail');
   await page.fill('#cx-mdp','bonmotdepasse');await page.click('#cx-valider');
-  await page.waitForURL(/score\.html$/);
+  await page.waitForURL(/\/score\.html$/);
   assert.equal(await hrefEspace(page),'espace.html');
   // Connecté : l'espace s'affiche, sans redirection
   await page.goto(base+'/espace.html');await page.waitForSelector('#esp-bord .bord-bloc');
@@ -133,7 +171,7 @@ const serveur=http.createServer((req,res)=>{
   ok('adresse de retour externe refusée (espace.html), fiche tournoi acceptée');
   // Compte confirmé : bienvenue, profil en premier
   await page.goto(base+'/connexion.html?confirme=1&suite=compte.html');
-  await page.waitForURL(/compte\.html(\?bienvenue=1)?$/);
+  await page.waitForURL(/\/compte\.html(\?bienvenue=1)?$/);
   await page.waitForSelector('#compte-profil:not([hidden])');
   await page.waitForFunction(()=>!location.search);
   assert.match(await page.textContent('#compte-msg'),/Bienvenue/);
@@ -157,18 +195,19 @@ const serveur=http.createServer((req,res)=>{
   await page.goto(base+'/connexion.html?error=access_denied&error_code=access_denied&error_description=User+cancelled');
   await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
   assert.match(await page.textContent('#cx-msg'),/Connexion annulée/);
-  await page.goto(base+'/index.html#access_token=jeton&refresh_token=r&type=bearer');
-  await page.waitForURL(/espace\.html$/); // accueil → connexion.html (lit le jeton) → espace
-  ok('retour de Google : erreur affichée (création, annulation), adresse nettoyée ; jeton arrivé sur l\'accueil → connexion → espace');
-  await page.evaluate(()=>{sessionStorage.clear();sessionStorage.setItem('pa-age-15-google','2026-10-29T10:00:00.000Z');});
-  await page.goto(base+'/connexion.html#access_token=jeton&refresh_token=r&nouveau=1');
-  await page.waitForURL(/compte\.html(\?bienvenue=1)?$/);
+  ok('retour de Google : erreur affichée (création, annulation), adresse nettoyée');
+  // Google en PKCE : le vérificateur est posé au départ (même navigateur), le code est échangé au retour
+  await page.evaluate(()=>{sessionStorage.clear();sessionStorage.setItem('pa-age-15-google','2026-10-29T10:00:00.000Z');
+   localStorage.setItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier',JSON.stringify('verif123'));});
+  await page.goto(base+'/connexion.html?suite=espace.html&code=neuf');
+  await page.waitForURL(/\/compte\.html(\?bienvenue=1)?$/);
   await page.waitForSelector('#compte-profil:not([hidden])');
   assert.match(await page.textContent('#compte-msg'),/Bienvenue/);
   const majAge=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('appels')||'[]').filter(a=>a.nom==='updateUser'));
   assert.deepEqual(majAge.map(a=>a.args),[{data:{age_15_confirme:true,age_15_confirme_le:'2026-10-29T10:00:00.000Z'}}]);
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('pa-age-15-google')),null);
-  ok('compte créé à l\'instant avec Google : direction le profil (compte.html?bienvenue=1), 15 ans enregistrés dans les métadonnées');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier')),null,'vérificateur consommé');
+  ok('compte créé à l\'instant avec Google (?code= échangé) : direction le profil (compte.html?bienvenue=1), 15 ans enregistrés dans les métadonnées');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
 
@@ -257,12 +296,126 @@ const serveur=http.createServer((req,res)=>{
   assert.ok(await page.isHidden('#cx-nouveau'));assert.match(await page.textContent('#cx-msg'),/plus valable/);
   await page.evaluate(()=>sessionStorage.setItem('session','1'));
   await page.goto(base+'/connexion.html?mode=nouveau&suite=score.html');
-  await page.waitForURL(/score\.html$/);
+  await page.waitForURL(/\/score\.html$/);
   await page.evaluate(()=>sessionStorage.clear());
-  await page.goto(base+'/connexion.html?mode=nouveau&code=recup');
+  // Code échangé mais vérificateur d'une connexion ordinaire (pas « mot de passe oublié ») : pas de formulaire
+  await page.evaluate(()=>localStorage.setItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier',JSON.stringify('verif123')));
+  await page.goto(base+'/connexion.html?mode=nouveau&suite=score.html&code=bon');
+  await page.waitForURL(/\/score\.html$/);
+  await page.evaluate(()=>sessionStorage.clear());
+  ok('?mode=nouveau : pas de formulaire seul, ni pour une session déjà ouverte, ni pour un code d\'une connexion ordinaire');
+  await ctx.close();
+
+  // 9. Flux PKCE (revue de sécurité 6.6)
+  ({ctx,page}=await ouvrir());
+  await page.goto(base+'/connexion.html');
+  await page.waitForFunction(()=>window.PA_COMPTE&&window.PA_COMPTE.actif);
+  const optionsAuth=await page.evaluate(()=>window.__optionsAuth);
+  assert.deepEqual(optionsAuth,{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true});
+  ok('client Supabase en flux PKCE (persistSession, autoRefreshToken, detectSessionInUrl gardés)');
+  const appels=nom=>page.evaluate(n=>JSON.parse(sessionStorage.getItem('appels')||'[]').filter(a=>a.nom===n).map(a=>a.args),nom);
+  const verificateur=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier')));
+  const poserVerif=()=>page.evaluate(()=>localStorage.setItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier',JSON.stringify('verif123')));
+  const origine=base+'/connexion.html';
+  // Inscription : retour sur connexion.html?confirme=1&suite=compte.html
+  await page.click('.cx-onglet[data-cible="inscription"]');
+  await page.fill('#ins-email','nouveau@test.fr');await page.fill('#ins-mdp','motdepasse1');await page.fill('#ins-mdp2','motdepasse1');
+  await page.check('#ins-age');await page.check('#ins-charte');await page.click('#ins-valider');
+  await page.waitForFunction(()=>document.getElementById('cx-form-inscription').hidden);
+  assert.equal((await appels('signUp'))[0].options.emailRedirectTo,origine+'?confirme=1&suite=compte.html');
+  assert.equal(await verificateur(),'verif123');
+  // Lien magique : retour sur connexion.html avec la suite
+  await page.goto(base+'/connexion.html?suite=score.html');
+  await page.evaluate(()=>document.querySelector('.cx-lien-magique').open=true);
+  await page.fill('#lien-email','joueur@test.fr');await page.click('#lien-valider');
+  await page.waitForFunction(()=>/Lien envoyé/.test(document.getElementById('cx-lien-msg').textContent));
+  const otp=(await appels('signInWithOtp'))[0];
+  assert.equal(otp.options.emailRedirectTo,origine+'?suite=score.html');assert.equal(otp.options.shouldCreateUser,false);
+  // Google : retour sur connexion.html avec la suite
+  await page.check('#cx-age');await page.click('#cx-connexion .cx-google');
+  await page.waitForFunction(()=>(JSON.parse(sessionStorage.getItem('appels')||'[]')).some(a=>a.nom==='signInWithOAuth'));
+  assert.equal((await appels('signInWithOAuth'))[0].options.redirectTo,origine+'?suite=score.html');
+  // Mot de passe oublié : retour sur connexion.html?mode=nouveau, vérificateur marqué « récupération »
+  await page.click('#cx-connexion [data-aller="oubli"]');
+  await page.fill('#oubli-email','joueur@test.fr');await page.click('#oubli-valider');
+  await page.waitForFunction(()=>/Si un compte existe/.test(document.getElementById('cx-oubli-msg').textContent));
+  assert.equal((await appels('resetPasswordForEmail'))[0].options.redirectTo,origine+'?mode=nouveau');
+  assert.equal(await verificateur(),'verif123/PASSWORD_RECOVERY');
+  ok('inscription, lien magique, Google et mot de passe oublié reviennent sur connexion.html (suite gardée), vérificateur PKCE posé');
+  // Retour de récupération dans ce navigateur : code échangé, formulaire « nouveau mot de passe », adresse sans code
+  await page.goto(base+'/connexion.html?mode=nouveau&code=bon');
   await page.waitForSelector('#cx-nouveau:not([hidden])');
   assert.ok(await page.isHidden('#cx-connexion'));
-  ok('?mode=nouveau : formulaire seulement sur PASSWORD_RECOVERY (pas pour une session ouverte ni sans jeton)');
+  assert.ok(!/code=/.test(page.url()),'code retiré de l\'adresse');
+  await page.fill('#nv-mdp','nouveaumdp1');await page.fill('#nv-mdp2','nouveaumdp1');await page.click('#nv-valider');
+  await page.waitForFunction(()=>/Mot de passe enregistré/.test(document.getElementById('cx-nouveau-msg').textContent));
+  assert.deepEqual((await appels('updateUser')).pop(),{password:'nouveaumdp1'});
+  await page.waitForURL(/\/espace\.html$/);
+  ok('récupération : formulaire après un vrai retour (code échangé avec le vérificateur « mot de passe oublié »), mot de passe enregistré');
+  await page.evaluate(()=>sessionStorage.clear());
+  // Lien ouvert dans un autre navigateur (aucun vérificateur) : pas de session, message clair, adresse nettoyée
+  await page.evaluate(()=>localStorage.removeItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier'));
+  await page.goto(base+'/connexion.html?mode=nouveau&code=bon');
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.match(await page.textContent('#cx-msg'),/même navigateur que celui où tu as fait la demande, ou redemande un lien/);
+  assert.equal(await page.getAttribute('#cx-msg','role'),'alert');
+  assert.ok(await page.isHidden('#cx-nouveau'));
+  assert.equal(await page.evaluate(()=>location.search),'?suite=espace.html');
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),null);
+  // Code refusé (bad_code_verifier) et code périmé : messages clairs
+  await poserVerif();
+  await page.goto(base+'/connexion.html?code=piege');
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.match(await page.textContent('#cx-msg'),/même navigateur que celui où tu as fait la demande/);
+  assert.ok(!/code=/.test(page.url()));
+  await poserVerif();
+  await page.goto(base+'/connexion.html?code=perime');
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.match(await page.textContent('#cx-msg'),/expiré ou a déjà servi/);
+  // Confirmation d'inscription ouverte dans un autre navigateur : e-mail confirmé, invitation à se connecter
+  await page.goto(base+'/connexion.html?confirme=1&suite=compte.html&code=bon');
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.match(await page.textContent('#cx-msg'),/e-mail est confirmé/);
+  assert.equal(await page.getAttribute('#cx-msg','role'),'status');
+  ok('code non échangé (autre navigateur, code refusé ou périmé) : aucune session, message clair, adresse nettoyée');
+  // Retour du lien magique dans ce navigateur : session ouverte, direction la suite
+  await poserVerif();
+  await page.goto(base+'/connexion.html?suite=score.html&code=bon');
+  await page.waitForURL(/\/score\.html$/);
+  ok('retour ?code= valide dans le même navigateur : session ouverte, direction la page demandée');
+  await page.evaluate(()=>sessionStorage.clear());
+  // Lien piégé : jetons du flux implicite d'un autre compte (pages avec et sans compte.js)
+  for(const chemin of ['/academie.html','/index.html','/connexion.html','/tournois.html']){
+   await page.goto(base+chemin+'#access_token=jeton-autre&refresh_token=r-autre&expires_in=3600&token_type=bearer&type=recovery');
+   await page.waitForTimeout(400);
+   assert.ok(!/access_token|refresh_token/.test(page.url()),'jetons effacés de l\'adresse ('+chemin+')');
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),null,'aucune session ('+chemin+')');
+   assert.equal((await appels('jetonVuParLeSdk')).length,0,'le SDK ne voit jamais les jetons ('+chemin+')');
+  }
+  await page.goto(base+'/connexion.html#access_token=jeton-autre&refresh_token=r-autre&type=recovery');
+  await page.waitForTimeout(300);
+  assert.ok(await page.isHidden('#cx-nouveau'),'pas de formulaire de récupération');
+  ok('lien piégé #access_token=… (Mon académie, accueil, connexion, tournois) : aucune session, jetons effacés de l\'adresse');
+  // Visiteur déjà connecté : le lien piégé ne le déconnecte pas
+  await page.evaluate(()=>sessionStorage.setItem('session','1'));
+  await page.goto(base+'/score.html#access_token=jeton-autre&refresh_token=r-autre');
+  await page.waitForTimeout(400);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
+  assert.equal((await appels('sessionSupprimee')).length,0);
+  ok('lien piégé sur une page avec compte.js : la session du visiteur connecté reste intacte');
+  await page.evaluate(()=>sessionStorage.clear());
+  // ?code= et erreur arrivés sur l'accueil (adresse de retour non autorisée) : transmis à connexion.html
+  await poserVerif();
+  await page.goto(base+'/index.html?code=bon');
+  await page.waitForURL(/\/espace\.html$/);
+  assert.equal((await appels('echange')).length,1,'code échangé une seule fois');
+  await page.evaluate(()=>sessionStorage.clear());
+  await page.goto(base+'/index.html?error=access_denied&error_code=otp_expired&error_description=x');
+  await page.waitForURL(/connexion\.html/);
+  await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
+  assert.match(await page.textContent('#cx-msg'),/expiré ou a déjà servi/);
+  ok('?code= et erreurs arrivés sur l\'accueil : transmis à connexion.html (code échangé une seule fois)');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
 
   // Anti-cadre : connexion.html et compte.html masquées dans le cadre d'un autre site

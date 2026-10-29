@@ -3,13 +3,30 @@
    sans ce script, le CSS laisse tous les liens visibles (navigation possible même si ce fichier ne charge pas).
    Aussi : lien « Mon espace » selon la connexion, et zones qui défilent (tableaux .tbl, .acc-scroll) atteignables au clavier. */
 (function(){
-  // Retour de Google ou d'un lien reçu par e-mail arrivé sur une page qui ne gère pas la connexion (par exemple l'accueil,
-  // si Supabase renvoie vers l'adresse du site) : on le transmet à connexion.html, qui ouvre la session ou affiche l'erreur
-  var h=location.hash||'';
-  if(/[#&](access_token|error_code|error_description)=/.test(h)&&!/\/(connexion|compte)\.html$/.test(location.pathname)&&(!window.PA_COMPTE||/[#&]error/.test(h))){
+  // Jetons du flux implicite (#access_token=…&refresh_token=…) : le site est en flux PKCE (compte.js), ces jetons ne
+  // sont plus jamais acceptés. Un tel lien peut être un piège (jetons du compte d'un autre) : on l'efface de l'adresse
+  // sans ouvrir de session et sans le transmettre à connexion.html.
+  var h=location.hash||'', q=location.search||'';
+  if(/(^#|&)(access_token|refresh_token|provider_token)=/.test(h)){
+    try{history.replaceState(history.state,'',location.pathname+q);}catch(e){}
+    h='';
+  }
+  // Retour de Google ou d'un lien reçu par e-mail (?code=, ou erreur) arrivé sur une autre page que connexion.html (par
+  // exemple l'accueil, si Supabase renvoie vers l'adresse du site) : transmis à connexion.html, qui ouvre la session ou
+  // affiche l'erreur. Un ?code= reste ici si la page a compte.js et que ce navigateur garde un vérificateur PKCE :
+  // supabase-js l'échange déjà sur cette page (le transmettre en même temps le ferait servir deux fois).
+  var verificateurPkce=function(){
+    try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token-code-verifier$/.test(localStorage.key(i)||'')) return true;}}catch(e){}
+    return false;
+  };
+  var erreurRetour=/[?#&](error|error_code|error_description)=/.test(q+h);
+  var codeRetour=/[?&]code=/.test(q);
+  if((erreurRetour||(codeRetour&&(!window.PA_COMPTE||!verificateurPkce())))&&!/\/connexion\.html$/.test(location.pathname)){
     var lien=document.querySelector('#nav-menu a[data-espace]');
     var racine=lien?lien.getAttribute('href').replace(/(espace|connexion)\.html.*$/,''):'';
-    location.replace(racine+'connexion.html'+h);
+    // compte.js chargé à la demande (Mon académie) ne doit pas échanger le code sur cette page pendant le départ
+    window.PA_RELAIS_CONNEXION=true;
+    location.replace(racine+'connexion.html'+q+h);
     return;
   }
   document.documentElement.classList.add('nav-js');

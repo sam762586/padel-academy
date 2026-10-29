@@ -6,11 +6,36 @@ Tant que ces étapes ne sont pas faites, le site fonctionne normalement et la pa
 2. **Créer les tables** : menu *SQL Editor*, colle tout le contenu de `supabase/schema.sql`, puis *Run*. Tu peux le relancer sans risque.
 3. **Régler les URLs** : *Authentication > URL Configuration*.
    - Site URL : `https://apprendre-padel.fr/`
-   - Redirect URLs : ajoute `https://apprendre-padel.fr/compte.html` et, pour les essais locaux, `http://localhost:3000/compte.html`. Conserve aussi l’ancienne URL GitHub Pages si elle est encore utilisée.
+   - Redirect URLs : depuis le passage en flux PKCE (6.6), tous les liens reviennent sur `connexion.html` : voir la section « Connexion en flux PKCE » ci-dessous. Conserve aussi l’ancienne URL GitHub Pages si elle est encore utilisée.
 4. **Copier les clés** : *Project Settings > API*. Recopie « Project URL » et la clé `anon` (publique) dans `assets/js/supabase-config.js`. Ne copie JAMAIS la clé `service_role`.
 5. **Tester en local** : dans le dossier du site, lance `npx serve -l 3000`, puis ouvre http://localhost:3000/compte.html. En double-cliquant sur le fichier (file://), les comptes restent désactivés : c'est voulu.
 6. **SMTP avant l'ouverture au public** : le serveur d'e-mails par défaut de Supabase est limité à quelques e-mails par heure. Configure un SMTP (Brevo ou Resend) dans *Project Settings > Authentication > SMTP Settings*.
 7. **Pause du projet gratuit** : sans activité pendant environ 7 jours, le projet gratuit se met en pause. Le site continue de marcher, mais les comptes sont indisponibles jusqu'à ce que tu le relances depuis le tableau de bord Supabase.
+
+# Connexion en flux PKCE (sécurité, 6.6)
+
+Depuis la phase 6.6, `assets/js/compte.js` crée le client avec `flowType: "pkce"`. Une session ne s'ouvre plus qu'avec un `?code=` renvoyé par Supabase et échangé contre un secret (le « code_verifier ») gardé dans le navigateur qui a fait la demande. Un lien piégé `…#access_token=…&refresh_token=…` (jetons du compte d'un autre) n'ouvre plus rien : il est effacé de l'adresse. Contrepartie : **un lien reçu par e-mail ne marche que dans le navigateur où la demande a été faite** (sinon, message « Ouvre le lien dans le même navigateur que celui où tu as fait la demande, ou redemande un lien »).
+
+À vérifier dans le tableau de bord Supabase (rien n'est à changer dans le SQL) :
+
+1. *Authentication > URL Configuration* :
+   - Site URL : `https://apprendre-padel.fr/`
+   - Redirect URLs : `https://apprendre-padel.fr/connexion.html` **avec ses paramètres**. Le plus simple : `https://apprendre-padel.fr/connexion.html**` (le site ajoute `?suite=…`, `?confirme=1&suite=compte.html` ou `?mode=nouveau`). Ajoute aussi `https://www.apprendre-padel.fr/connexion.html**` si le domaine avec www sert le site, et pour les essais locaux `http://localhost:3000/connexion.html**`. L'ancienne entrée `…/compte.html` peut rester (inoffensive) ou être retirée.
+   - Si une adresse de retour n'est pas autorisée, Supabase renvoie vers la Site URL : l'accueil transmet alors le `?code=` à `connexion.html`, mais le mode « nouveau mot de passe » et la page de suite sont perdus. D'où l'intérêt d'autoriser `connexion.html**`.
+2. *Authentication > Email Templates* : chaque modèle (Confirm signup, Magic Link, Reset Password, Change Email Address, Invite user) doit utiliser `{{ .ConfirmationURL }}` pour le lien (c'est le cas des modèles d'origine). Un modèle personnalisé qui construit son lien avec `{{ .Token }}`, `{{ .TokenHash }}` ou `{{ .SiteURL }}#access_token…` ne marchera plus.
+3. *Authentication > Providers > Google* : rien à changer ; l'URL de rappel autorisée chez Google reste `https://bvhfizdfgccrkhdfqzkf.supabase.co/auth/v1/callback`.
+4. Les e-mails envoyés **avant** la publication (anciens liens vers `compte.html#access_token=…`) ne marchent plus : il suffit de redemander un lien.
+
+Test manuel à faire après publication (sur https://apprendre-padel.fr, fenêtre privée de préférence) :
+
+| Parcours | Même navigateur que la demande | Autre navigateur (ou autre appareil) |
+|---|---|---|
+| Inscription : créer un compte, cliquer le lien de confirmation | Connecté, arrivée sur `compte.html?bienvenue=1` | Message « Ton e-mail est confirmé. Connecte-toi… » ; la connexion par mot de passe marche |
+| Lien magique (« Recevoir un lien de connexion par e-mail » sous le formulaire de connexion) | Connecté, arrivée sur la page de suite (espace par défaut) | Message « Ouvre le lien dans le même navigateur… », pas de session |
+| Continuer avec Google | Connecté (compte neuf : `compte.html?bienvenue=1`) | Sans objet (tout se passe dans le même onglet) |
+| Mot de passe oublié : demander le lien, cliquer | Formulaire « Nouveau mot de passe », enregistrement, connecté | Message « Ouvre le lien dans le même navigateur… », pas de formulaire |
+
+Contrôles complémentaires : recliquer un lien déjà utilisé → message « Ce lien n'a pas pu ouvrir ta session (déjà utilisé, ou ouvert dans un autre navigateur)… » ; ouvrir `https://apprendre-padel.fr/connexion.html?mode=nouveau` à la main → pas de formulaire ; ouvrir `https://apprendre-padel.fr/academie.html#access_token=x&refresh_token=y` → l'adresse est nettoyée, aucune connexion. Dans l'outil réseau du navigateur, l'échange du code apparaît comme `POST …/auth/v1/token?grant_type=pkce`.
 
 # Activer « Trouver un partenaire » (phase 2)
 

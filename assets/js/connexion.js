@@ -5,8 +5,10 @@
    profiles est créée par le trigger handle_new_user à l'inscription.
    Paramètres d'URL : ?suite=espace.html (page à ouvrir après connexion, même site uniquement : page de la racine ou
    fiche tournoi/<id>.html) ; ?confirme=1 (retour du lien de confirmation : premier passage par compte.html?bienvenue=1) ;
-   ?mode=nouveau (retour du lien « mot de passe oublié » : le formulaire ne s'ouvre que sur l'événement Supabase
-   PASSWORD_RECOVERY ou avec un jeton de récupération dans le fragment, jamais pour une simple session ouverte).
+   ?mode=nouveau (retour du lien « mot de passe oublié » : le formulaire ne s'ouvre que si compte.js a constaté un vrai
+   retour de récupération, jamais pour ?mode=nouveau seul ni pour une simple session ouverte) ; ?code= (flux PKCE :
+   échangé par supabase-js contre le vérificateur gardé dans ce navigateur ; s'il reste dans l'adresse, l'échange a
+   échoué ou le lien a été ouvert dans un autre navigateur : message clair, adresse nettoyée).
    Accessibilité : les zones de message restent dans la page (vides quand il n'y a rien à dire) ; une erreur passe en
    role=alert, marque le champ en cause (aria-invalid + aria-describedby vers le message) et y place le focus.
    Âge : il faut avoir 15 ans ou plus pour créer un compte (décision du 29/10/2026, RGPD art. 8, loi Informatique
@@ -17,8 +19,8 @@
 const CX_MESSAGES_RETOUR={
  otp_expired:"Ce lien a expiré ou a déjà servi. Recommence la connexion.",
  flow_state_expired:"Ce lien a expiré ou a déjà servi. Recommence la connexion.",
- flow_state_not_found:"Ce lien n'est plus valable (ouvert dans un autre navigateur, ou trop tard). Recommence la connexion.",
- bad_code_verifier:"Ce lien n'est plus valable (ouvert dans un autre navigateur, ou trop tard). Recommence la connexion.",
+ flow_state_not_found:"Ce lien n'a pas pu ouvrir ta session (déjà utilisé, ou ouvert dans un autre navigateur). Ouvre le lien dans le même navigateur que celui où tu as fait la demande, ou redemande un lien.",
+ bad_code_verifier:"Ce lien n'a pas pu ouvrir ta session (déjà utilisé, ou ouvert dans un autre navigateur). Ouvre le lien dans le même navigateur que celui où tu as fait la demande, ou redemande un lien.",
  bad_oauth_state:"La connexion avec Google n'a pas abouti (page ouverte trop longtemps ou dans un autre navigateur). Recommence.",
  bad_oauth_callback:"La connexion avec Google n'a pas abouti (page ouverte trop longtemps ou dans un autre navigateur). Recommence.",
  access_denied:"Connexion annulée. Tu peux réessayer quand tu veux.",
@@ -35,6 +37,10 @@ const CX_MESSAGES_RETOUR={
  temporarily_unavailable:"Le service de connexion est momentanément indisponible. Réessaie dans quelques minutes."
 };
 const CX_MESSAGE_RETOUR_DEFAUT="La connexion n'a pas abouti. Réessaie.";
+// ?code= resté dans l'adresse sans vérificateur dans ce navigateur (lien ouvert ailleurs que là où la demande a été faite)
+const CX_MESSAGE_AUTRE_NAVIGATEUR="Ce lien n'a pas pu ouvrir ta session (déjà utilisé, ou ouvert dans un autre navigateur). Ouvre le lien dans le même navigateur que celui où tu as fait la demande, ou redemande un lien.";
+// Lien de confirmation d'inscription ouvert dans un autre navigateur : l'e-mail est confirmé, seule la session manque
+const CX_MESSAGE_CONFIRME_AILLEURS="Ton e-mail est confirmé. Connecte-toi avec ton e-mail et ton mot de passe (le lien a été ouvert dans un autre navigateur que celui de l'inscription).";
 const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des 15 ans donnée avant de partir chez Google
 
 (function(){
@@ -142,6 +148,7 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
    try{sessionStorage.setItem(CX_CLE_AGE_GOOGLE,new Date().toISOString());}catch(e){}
    occupe(b,true);
    const retour=new URL(ici.href); retour.searchParams.set("suite",suite);
+   // Flux PKCE : Google renvoie sur connexion.html?…&code=, échangé contre le vérificateur gardé dans ce navigateur
    const {error}=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:retour.href}});
    if(error){ occupe(b,false); erreur(msg,messageErreur(error,"Connexion Google impossible pour le moment.")); }
   });
@@ -157,9 +164,10 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
  }
 
  /* ---------- Récupération de mot de passe ---------- */
- // Le formulaire « nouveau mot de passe » s'ouvre sur l'événement PASSWORD_RECOVERY de Supabase, ou avec un jeton
- // de récupération dans le fragment (#…type=recovery). ?mode=nouveau seul ne suffit pas.
- let modeRecup=/(^|[#&])type=recovery(&|$)/.test(location.hash)||compte.recuperation===true;
+ // Le formulaire « nouveau mot de passe » s'ouvre seulement sur un vrai retour de récupération constaté par compte.js
+ // (code PKCE échangé ici avec le vérificateur posé par « mot de passe oublié » dans ce navigateur), ou sur l'événement
+ // PASSWORD_RECOVERY. ?mode=nouveau seul ne suffit pas ; un fragment #…type=recovery non plus (flux implicite abandonné).
+ let modeRecup=compte.recuperation===true;
  try{ client.auth.onAuthStateChange((ev)=>{ if(ev==="PASSWORD_RECOVERY"){ modeRecup=true; montrer("nouveau"); } }); }catch(e){}
 
  // Erreur renvoyée par Supabase au retour de Google ou d'un lien reçu par e-mail (dans ?… ou #…) :
@@ -171,7 +179,7 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
  // Déjà connecté (hors récupération) : on file vers la suite ; un compte tout neuf (e-mail confirmé, ou créé à l'instant
  // avec Google) passe d'abord par son profil
  compte.ready.then(async()=>{
-  if(compte.recuperation===true) modeRecup=true; // événement reçu par compte.js avant ce script
+  if(compte.recuperation===true) modeRecup=true; // retour de récupération constaté par compte.js (code échangé)
   if(compte.user&&!modeRecup){
    await enregistrerAgeGoogle();
    const cree=Date.parse(compte.user.created_at||"");
@@ -180,9 +188,18 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
   }
   if(modeRecup) montrer("nouveau");
   else if(params.get("onglet")==="inscription") montrer("inscription");
+  const nettoyer=()=>{try{history.replaceState(null,"",location.pathname+"?suite="+encodeURIComponent(suite));}catch(e){}};
   if(codeErreur){
    erreur(msgGlobal,messageRetour(codeErreur));
-   try{history.replaceState(null,"",location.pathname+"?suite="+encodeURIComponent(suite));}catch(e){}
+   nettoyer();
+  }
+  // ?code= encore là, pas de session : échange raté (code périmé ou déjà servi) ou lien ouvert dans un autre navigateur
+  else if(new URLSearchParams(location.search).has("code")){
+   const code=compte.erreurCode;
+   // (la confirmation de l'e-mail a eu lieu chez Supabase avant le retour : seule la session manque)
+   if(params.get("confirme")==="1") afficher(msgGlobal,CX_MESSAGE_CONFIRME_AILLEURS,"ok");
+   else erreur(msgGlobal,code&&Object.prototype.hasOwnProperty.call(CX_MESSAGES_RETOUR,code)?CX_MESSAGES_RETOUR[code]:CX_MESSAGE_AUTRE_NAVIGATEUR);
+   nettoyer();
   }
   else if(params.get("mode")==="nouveau"&&!modeRecup) erreur(msgGlobal,"Ce lien pour changer de mot de passe n'est plus valable (déjà utilisé ou expiré). Demande un nouveau lien depuis « Mot de passe oublié ».");
   else if(params.get("confirme")==="1") afficher(msgGlobal,"Ton e-mail est confirmé. Tu peux te connecter.","ok");
@@ -275,7 +292,7 @@ const CX_CLE_AGE_GOOGLE="pa-age-15-google"; // sessionStorage : confirmation des
   const champ=$("lien-email"), email=champ.value.trim(), btn=$("lien-valider"), msg=$("cx-lien-msg");
   if(!emailOk(email)) return erreur(msg,"Saisis une adresse e-mail valide.",champ);
   occupe(btn,true,"Envoi…"); afficher(msg,"");
-  const r=await compte.signIn(email);
+  const r=await compte.signIn(email,suite);
   occupe(btn,false,true);
   if(!r.ok) return erreur(msg,r.message);
   afficher(msg,"Lien envoyé : ouvre l'e-mail et clique dessus, tu seras connecté.","ok");

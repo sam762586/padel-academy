@@ -42,10 +42,37 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
  if(!configOk) raisonInactif="config";
  else if(!protocoleOk) raisonInactif="file";
  else if(!sdkOk) raisonInactif="cdn";
+ // Retour de connexion en cours de transmission à connexion.html (nav.js) : pas de client sur cette page, sinon le
+ // code serait échangé ici et là-bas
+ else if(window.PA_RELAIS_CONNEXION) raisonInactif="relais";
+
+ /* ---------- Retours de connexion (flux PKCE, revue de sécurité 6.6) ----------
+    Le client est en flux PKCE : une session ne s'ouvre qu'avec un ?code= échangé contre le « code_verifier » gardé
+    dans CE navigateur au moment de la demande (inscription, lien magique, Google, mot de passe oublié). Un lien piégé
+    (code d'un autre, ou jetons #access_token=… d'un autre compte) n'ouvre donc aucune session. */
+ // Jetons du flux implicite dans le fragment : plus jamais acceptés. Effacés de l'adresse AVANT la création du client
+ // (sinon supabase-js, en PKCE, rejette le fragment mais déconnecte au passage le visiteur déjà connecté).
+ if(/(^#|&)(access_token|refresh_token|provider_token)=/.test(location.hash||"")){
+  try{ history.replaceState(history.state,"",location.pathname+location.search); }catch(e){}
+ }
+ // Clé de stockage de supabase-js 2.45.4 : sb-<sous-domaine du projet>-auth-token ; le vérificateur PKCE est gardé sous
+ // « <clé>-code-verifier ». resetPasswordForEmail y ajoute « /PASSWORD_RECOVERY » : c'est la preuve, propre à ce
+ // navigateur, que le code reçu vient d'une demande de récupération du mot de passe faite ici.
+ let cleStockage="";
+ try{ cleStockage="sb-"+new URL(config.url).hostname.split(".")[0]+"-auth-token"; }catch(e){}
+ const codeArrive=()=>{ try{ return new URLSearchParams(location.search).has("code"); }catch(e){ return false; } };
+ const codeAuDepart=codeArrive();
+ let retourRecuperation=false;
+ if(codeAuDepart&&cleStockage){
+  let verificateur=null;
+  try{ verificateur=localStorage.getItem(cleStockage+"-code-verifier"); }catch(e){}
+  try{ verificateur=JSON.parse(verificateur); }catch(e){}
+  retourRecuperation=typeof verificateur==="string"&&/\/PASSWORD_RECOVERY$/.test(verificateur);
+ }
 
  let client=null;
  if(!raisonInactif){
-  try{ client=window.supabase.createClient(config.url,config.anonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }
+  try{ client=window.supabase.createClient(config.url,config.anonKey,{auth:{flowType:"pkce",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); }
   catch(e){ client=null; raisonInactif="cdn"; }
  }
 
@@ -150,27 +177,51 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
   return nouvelId!==ancienId;
  }
 
- // Session initiale (lit aussi le jeton présent dans l'URL après le clic sur le lien magique)
+ // Code d'erreur d'un échange PKCE raté (bad_code_verifier, flow_state_not_found, flow_state_expired…)
+ function codeErreurEchange(e){
+  if(!e) return "";
+  if(typeof e.code==="string"&&e.code) return e.code;
+  const brut=String(e.message||"").toLowerCase();
+  if(brut.includes("code verifier")) return "bad_code_verifier";
+  if(brut.includes("expired")) return "flow_state_expired";
+  if(brut.includes("flow state")) return "flow_state_not_found";
+  return "";
+ }
+ // Session initiale. Retour d'un lien ou de Google (?code=) : supabase-js fait l'échange pendant son initialisation
+ // (detectSessionInUrl), puis retire « code » de l'adresse s'il a réussi. Sans vérificateur dans ce navigateur, il
+ // n'y touche pas : le code reste dans l'adresse, connexion.js l'explique au visiteur.
+ compte.retourCode=codeAuDepart;  // l'adresse portait un ?code= à l'arrivée
+ compte.erreurCode="";            // échec de l'échange (vide : réussi, ou pas tenté faute de vérificateur)
  compte.ready=(async()=>{
   try{
+   if(typeof client.auth.initialize==="function"){
+    const init=await client.auth.initialize();
+    if(codeAuDepart&&init&&init.error) compte.erreurCode=codeErreurEchange(init.error)||"echec";
+   }
    const {data}=await client.auth.getSession();
    definirUtilisateur(data&&data.session);
+   // Récupération du mot de passe : seulement si le code a vraiment été échangé ici (plus dans l'adresse, session
+   // ouverte, aucune erreur) ET que le vérificateur avait été posé par « mot de passe oublié » dans ce navigateur.
+   // En PKCE, supabase-js 2.45.4 n'émet pas PASSWORD_RECOVERY au retour (seulement SIGNED_IN) : ce marqueur le remplace.
+   if(retourRecuperation&&compte.user&&!compte.erreurCode&&!codeArrive()) compte.recuperation=true;
    compte.verifierAppareil();
   }catch(e){ compte.user=null; }
  })();
  try{
   client.auth.onAuthStateChange((evenement,session)=>{
-   // Retour d'un lien « mot de passe oublié » : retenu ici, car l'événement peut arriver avant que connexion.js écoute
+   // Gardé pour une version future de supabase-js qui émettrait l'événement en PKCE (jamais émis en 2.45.4 en PKCE)
    if(evenement==="PASSWORD_RECOVERY") compte.recuperation=true;
    if(definirUtilisateur(session)){ compte.verifierAppareil(); prevenir(); }
   });
  }catch(e){}
 
- // Connexion par lien magique : emailRedirectTo = compte.html courante
- compte.signIn=async function(email){
+ // Connexion par lien magique : le lien revient sur connexion.html (qui échange le code), puis la page « suite »
+ // (chemin relatif du site, revérifié par connexion.js au retour)
+ compte.signIn=async function(email,suite){
   try{
-   const retour=new URL("compte.html",location.href);
+   const retour=new URL("connexion.html",location.href);
    retour.search="";retour.hash="";
+   if(typeof suite==="string"&&/^([a-z0-9_-]+|tournoi\/\d+)\.html(#[a-z0-9_-]+)?$/i.test(suite)) retour.searchParams.set("suite",suite);
    // Connexion seulement : le lien ne crée pas de compte (la création demande la case « J'ai 15 ans ou plus »).
    // Adresse inconnue : même réponse qu'une adresse connue (on ne révèle pas qui a un compte)
    const {error}=await client.auth.signInWithOtp({email:email,options:{emailRedirectTo:retour.href,shouldCreateUser:false}});
