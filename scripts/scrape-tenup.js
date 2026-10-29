@@ -184,6 +184,35 @@ function depuisCarte(c) {
   };
 }
 
+// ---------- nettoyage du texte libre : noms de juges-arbitres ----------
+// Le nom d'un juge-arbitre est une donnée personnelle : retiré à la collecte. Même logique que nettoyerCommentaire() de
+// generer-pages.js (qui nettoie aussi les commentaires déjà collectés) : à garder identiques.
+const MOT_NOM = String.raw`[A-ZÀ-ÝŒ][A-Za-zÀ-ÿŒœ'’-]*\.?`;
+const NOMS_PROPRES = new Set(["Padel", "Tenup", "Ten'Up", "Tennis", "Club", "Les", "Le", "La", "Il", "Elle", "Pour", "Si", "Inscription", "Inscriptions", "Tournoi", "Merci", "Bar", "Restauration", "Tarif", "Horaires", "Un", "Une", "Vous", "Nous", "On", "En", "Au", "Aux", "Sur", "Dans", "Par", "Ce", "Cette", "Pas", "Tous", "Toutes", "Tout", "Et", "Ou", "Mais", "Contact", "Contactez", "Mail", "Tel", "Téléphone", "Tenue", "Samedi", "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Remise", "Début", "Fin", "Pistes", "Balles", "Buvette", "Comité", "Renseignements", "Renseignement", "Contacts", "Adresse", "Parking", "Rendez-vous", "Attention", "Important"]);
+// Retire, dans une suite de mots, les noms propres de tête (jusqu'au premier mot courant) ; renvoie [nb de mots retirés, reste]
+function retirerNoms(noms) {
+  const mots = noms.match(/\S+/g) || [];
+  let k = 0;
+  while (k < mots.length && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, "")) && !/^(et|ou)$/i.test(mots[k])) k++;
+  // « Sonia DELMOND et Christophe CAPPELLAZZO » : on enchaîne les noms reliés par « et »
+  while (k + 1 < mots.length && /^et$/i.test(mots[k]) && !NOMS_PROPRES.has(mots[k + 1].replace(/[.,;:]+$/, ""))) { k += 2; while (k < mots.length && /^[A-ZÀ-ÝŒ]/.test(mots[k]) && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, ""))) k++; }
+  return [k, mots.slice(k).join(" ")];
+}
+const CLASSEMENT = /\b(interdit|top\s*,?\s*\d|classement|limitation|masculin|féminin)\b/i;
+function nettoyerCommentaire(texte) {
+  if (!texte) return texte;
+  let s = String(texte);
+  // « juge-arbitre : JC REYNAUD », « auprès du JA, Corentin, au … » (séparateur obligatoire : « JA Padel » reste intact)
+  s = s.replace(new RegExp(String.raw`\b([Jj]uges?[\s-]?[Aa]rbitres?|JA)(\s*(?::|;|,|–|—|-{1,2}|=)\s*)((?:(?:${MOT_NOM}|et)[\s,]*){1,8})`, "g"), (m, mot, sep, noms) => {
+    const [k, reste] = retirerNoms(noms);
+    return k === 0 ? m : mot + sep.trimEnd() + " " + reste + " ";
+  });
+  // « contacter Jean Dupont [téléphone sur Ten'Up] », « auprès de Corentin au [téléphone…] »
+  s = s.replace(new RegExp(String.raw`\b(auprès\s+(?:de|du|d['’])\s*|contacter\s+|joindre\s+|appeler\s+)((?:M\.|Mme|Monsieur|Madame)?\s*(?:${MOT_NOM}\s+){1,3}?)(?=(?:au\s+|:\s*)?\[(?:téléphone|e-mail))`, "g"), (m, deb, noms) =>
+    retirerNoms(noms)[0] === 0 ? m : deb.replace(/(?:de|du|d['’])\s*$/i, "de ") + "l'organisateur ");
+  return s.replace(/:\s*:/g, ":").replace(/\s{2,}/g, " ").trim();
+}
+
 // ---------- étape 2 : fiche tournoi ----------
 async function lireFiche(page, id) {
   await ouvrir(page, `${BASE}/tournoi/${id}`);
@@ -193,7 +222,8 @@ async function lireFiche(page, id) {
   const apres = lib => { const i = lignes.findIndex(l => l.toLowerCase() === lib.toLowerCase()); return i >= 0 ? lignes[i + 1] || null : null; };
 
   // Adresse : « 12 D Rue des terres Rouges76520 ST AUBIN » (rue et code postal collés)
-  const ligneAdresse = lignes.find(l => /\d{5}\s+\S/.test(l));
+  // Pas la ligne de classement (« Interdit au top 10000 masculin… ») : elle contient aussi cinq chiffres suivis d'un mot
+  const ligneAdresse = lignes.find(l => /\d{5}\s+\S/.test(l) && !CLASSEMENT.test(l));
   const adresse = ligneAdresse ? ligneAdresse.replace(/(\D)(\d{5}\s)/, "$1, $2").trim() : null;
   const mCp = ligneAdresse ? /(\d{5})\s+(.+)$/.exec(ligneAdresse) : null;
   const iEpreuves = lignes.findIndex(l => /^les épreuves$/i.test(l));
@@ -205,6 +235,7 @@ async function lireFiche(page, id) {
         .replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, "[e-mail sur Ten'Up]")
         .replace(/(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}/g, "[téléphone sur Ten'Up]")
     : null;
+  const commentairePropre = commentaire ? nettoyerCommentaire(commentaire) : commentaire;
 
   // Épreuves : chaque bloc commence par son code (DM, DD, DX…), libellés et valeurs sur des lignes séparées
   const blocs = [];
@@ -235,7 +266,7 @@ async function lireFiche(page, id) {
       adresse,
       horaires: horaires && !/non renseigné/i.test(horaires) ? horaires : null,
       balles: balles && !/non renseigné/i.test(balles) ? balles : null,
-      commentaire,
+      commentaire: commentairePropre,
       epreuves,
     },
   };

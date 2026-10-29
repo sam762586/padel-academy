@@ -102,10 +102,11 @@ function periodeCourte(debut, fin) {
   return "du " + d.getUTCDate() + " " + MOIS[d.getUTCMonth()] + " au " + f.getUTCDate() + " " + MOIS[f.getUTCMonth()] + " " + f.getUTCFullYear();
 }
 // Ville en casse lisible : « LE PETIT QUEVILLY » -> « Le Petit Quevilly »
+const periodeLongue = t => lireJour(t.date_fin) && ecartJours(t.date_debut, t.date_fin) > 60;
 const MOTS_MINUSCULES = new Set(["de", "du", "des", "la", "le", "les", "sur", "sous", "en", "et", "lès", "lez", "aux", "au", "d", "l"]);
 function casse(s) {
-  return String(s || "").toLowerCase().replace(/(^|[\s\-'’])([a-zàâäçéèêëîïôöùûüÿœ]+)/g, (m, sep, mot, i) =>
-    sep + (i > 0 && MOTS_MINUSCULES.has(mot) && sep !== "" ? mot : mot.charAt(0).toUpperCase() + mot.slice(1)));
+  return String(s || "").toLowerCase().replace(/(^|\s)(ste?)(?=\s)/g, (m, a, b) => a + (b === "st" ? "saint" : "sainte")).replace(/(^|[\s\-'’])([a-zàâäçéèêëîïôöùûüÿœ]+)/g, (m, sep, mot, i) =>
+    sep + (i > 0 && MOTS_MINUSCULES.has(mot) && sep !== "" ? mot : mot.charAt(0).toUpperCase() + mot.slice(1))).replace(/(^|\s)([dl]) (?=\S)/g, "$1$2'");
 }
 const nomDep = dep => DEPARTEMENTS.get(dep) || dep;
 const dansDep = dep => (PREP_DEP[dep] || "en ") + nomDep(dep);
@@ -311,9 +312,39 @@ function ecrire(chemin, html, { indexer = true } = {}) {
   ecrites.add(chemin);
 }
 
+/* ---------- Nettoyage du texte libre : noms de juges-arbitres ---------- */
+// Le nom d'un juge-arbitre est une donnée personnelle : on le retire (le robot le fait déjà à la collecte,
+// ce nettoyage couvre les commentaires collectés avant). Même logique que nettoyerCommentaire() de scrape-tenup.js.
+const MOT_NOM = String.raw`[A-ZÀ-ÝŒ][A-Za-zÀ-ÿŒœ'’-]*\.?`;
+const NOMS_PROPRES = new Set(["Padel", "Tenup", "Ten'Up", "Tennis", "Club", "Les", "Le", "La", "Il", "Elle", "Pour", "Si", "Inscription", "Inscriptions", "Tournoi", "Merci", "Bar", "Restauration", "Tarif", "Horaires", "Un", "Une", "Vous", "Nous", "On", "En", "Au", "Aux", "Sur", "Dans", "Par", "Ce", "Cette", "Pas", "Tous", "Toutes", "Tout", "Et", "Ou", "Mais", "Contact", "Contactez", "Mail", "Tel", "Téléphone", "Tenue", "Samedi", "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Remise", "Début", "Fin", "Pistes", "Balles", "Buvette", "Comité", "Renseignements", "Renseignement", "Contacts", "Adresse", "Parking", "Rendez-vous", "Attention", "Important"]);
+// Retire, dans une suite de mots, les noms propres de tête (jusqu'au premier mot courant) ; renvoie [nb de mots retirés, reste]
+function retirerNoms(noms) {
+  const mots = noms.match(/\S+/g) || [];
+  let k = 0;
+  while (k < mots.length && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, "")) && !/^(et|ou)$/i.test(mots[k])) k++;
+  // « Sonia DELMOND et Christophe CAPPELLAZZO » : on enchaîne les noms reliés par « et »
+  while (k + 1 < mots.length && /^et$/i.test(mots[k]) && !NOMS_PROPRES.has(mots[k + 1].replace(/[.,;:]+$/, ""))) { k += 2; while (k < mots.length && /^[A-ZÀ-ÝŒ]/.test(mots[k]) && !NOMS_PROPRES.has(mots[k].replace(/[.,;:]+$/, ""))) k++; }
+  return [k, mots.slice(k).join(" ")];
+}
+function nettoyerCommentaire(texte) {
+  if (!texte) return texte;
+  let s = String(texte);
+  // « juge-arbitre : JC REYNAUD », « auprès du JA, Corentin, au … » (séparateur obligatoire : « JA Padel » reste intact)
+  s = s.replace(new RegExp(String.raw`\b([Jj]uges?[\s-]?[Aa]rbitres?|JA)(\s*(?::|;|,|–|—|-{1,2}|=)\s*)((?:(?:${MOT_NOM}|et)[\s,]*){1,8})`, "g"), (m, mot, sep, noms) => {
+    const [k, reste] = retirerNoms(noms);
+    return k === 0 ? m : mot + sep.trimEnd() + " " + reste + " ";
+  });
+  // « contacter Jean Dupont [téléphone sur Ten'Up] », « auprès de Corentin au [téléphone…] »
+  s = s.replace(new RegExp(String.raw`\b(auprès\s+(?:de|du|d['’])\s*|contacter\s+|joindre\s+|appeler\s+)((?:M\.|Mme|Monsieur|Madame)?\s*(?:${MOT_NOM}\s+){1,3}?)(?=(?:au\s+|:\s*)?\[(?:téléphone|e-mail))`, "g"), (m, deb, noms) =>
+    retirerNoms(noms)[0] === 0 ? m : deb.replace(/(?:de|du|d['’])\s*$/i, "de ") + "l'organisateur ");
+  return s.replace(/:\s*:/g, ":").replace(/\s{2,}/g, " ").trim();
+}
+// Adresse : la ligne « Interdit au top 10000… » du classement ne doit jamais passer pour une adresse
+const adresseValide = a => !!a && !/\b(interdit|top\s*,?\s*\d|classement|limitation|masculin|féminin)\b/i.test(a);
+
 /* ---------- Pages des tournois ---------- */
 function carteTournoiHtml(t, pre) {
-  return `<li class="gen-item" data-cat="${echapper(t.categorie || "")}" data-sexes="${echapper(sexesDe(t).join(" "))}" data-debut="${t.date_debut}" data-fin="${t.date_fin || t.date_debut}"${typeof t.lat === "number" ? ` data-lat="${t.lat}" data-lng="${t.lng}"` : ""}>
+  return `<li class="gen-item" data-cat="${echapper(t.categorie || "")}" data-sexes="${echapper(sexesDe(t).join(" "))}" data-debut="${t.date_debut}" data-fin="${echapper(lireJour(t.date_fin) ? t.date_fin : t.date_debut)}"${typeof t.lat === "number" ? ` data-lat="${t.lat}" data-lng="${t.lng}"` : ""}>
 <a href="${pre}tournoi/${t.id}.html"><span class="cat-badge ${classeCat(t.categorie)}">${echapper(t.categorie || "?")}</span><span class="gen-item-texte"><b>${echapper(t.nom)}</b><span>${echapper(casse(t.club))} · ${echapper(casse(t.ville))}</span></span><span class="gen-item-date">${echapper(periode(t.date_debut, t.date_fin))}</span></a></li>`;
 }
 
@@ -342,28 +373,30 @@ for (const { t, fiche } of tous) {
   const description = [" : points selon le nombre de paires, épreuves, inscription sur Ten'Up et partenaires.", " : points, épreuves, inscription sur Ten'Up et partenaires.", " : points, épreuves et inscription."]
     .map(fin => debutDesc + fin).find(d => d.length <= 160) || debutDesc.slice(0, 159) + "…";
   const lienTenup = `https://tenup.fft.fr/tournoi/${t.id}`;
-  const adresse = fiche && fiche.adresse ? String(fiche.adresse) : `${club}, ${ville}`;
-  const itineraire = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(fiche && fiche.adresse ? fiche.adresse : `${t.club} ${t.cp || ""} ${t.ville}`);
+  const adresseFiche = fiche && adresseValide(fiche.adresse) ? String(fiche.adresse) : null;
+  const adresse = adresseFiche || `${club}, ${ville}`;
+  const itineraire = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(adresseFiche || `${t.club} ${t.cp || ""} ${t.ville}`);
   const sx = sexesDe(t).map(s => SEXES[s] || s);
   const jsonLd = [
     {
       "@context": "https://schema.org", "@type": "SportsEvent", name: t.nom + (t.categorie && !String(t.nom).includes(t.categorie) ? " (" + t.categorie + ")" : ""),
       sport: "Padel", startDate: t.date_debut, endDate: fin, eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-      location: { "@type": "Place", name: club, address: { "@type": "PostalAddress", streetAddress: fiche && fiche.adresse ? fiche.adresse : undefined, addressLocality: ville, postalCode: t.cp || undefined, addressCountry: "FR" }, ...(typeof t.lat === "number" ? { geo: { "@type": "GeoCoordinates", latitude: t.lat, longitude: t.lng } } : {}) },
+      location: { "@type": "Place", name: club, address: { "@type": "PostalAddress", streetAddress: adresseFiche || undefined, addressLocality: ville, postalCode: t.cp || undefined, addressCountry: "FR" }, ...(typeof t.lat === "number" ? { geo: { "@type": "GeoCoordinates", latitude: t.lat, longitude: t.lng } } : {}) },
       organizer: { "@type": "Organization", name: club }, url: SITE + chemin,
     },
     fil([["Accueil", ""], ["Tournois", "tournois.html"], [nomDep(t.dep), `tournois/${t.dep}.html`], [t.nom, chemin]]),
   ];
   const lignesEpreuves = epreuves.map(e => `<tr><td>${echapper(e.libelle ? majuscule(String(e.libelle).toLowerCase()) : e.code || "")}</td><td>${echapper(e.categorie || t.categorie || "")}</td><td>${echapper(e.cut ? String(e.cut).replace(/\s*Vainqueur\s*:.*$/i, "") : "–")}</td><td>${typeof e.tarif === "number" ? echapper(String(e.tarif).replace(".", ",")) + " €" : "–"}</td><td>${typeof e.tableau === "number" && e.tableau > 0 ? e.tableau : "–"}</td></tr>`).join("");
-  const commentaire = fiche && fiche.commentaire ? String(fiche.commentaire).trim() : "";
-  const donneesPage = { id: String(t.id), nom: t.nom, categorie: t.categorie, club: t.club, ville: t.ville, cp: t.cp, dep: t.dep, lat: t.lat, lng: t.lng, date_debut: t.date_debut, date_fin: t.date_fin, sexes: t.sexes, adresse: fiche && fiche.adresse ? fiche.adresse : null };
+  const commentaire = fiche && fiche.commentaire ? nettoyerCommentaire(String(fiche.commentaire).trim()) : "";
+  const donneesPage = { id: String(t.id), nom: t.nom, categorie: t.categorie, club: t.club, ville: t.ville, cp: t.cp, dep: t.dep, lat: t.lat, lng: t.lng, date_debut: t.date_debut, date_fin: t.date_fin, sexes: t.sexes, adresse: adresseFiche };
   const h1 = `${filHtml([["Accueil", "index.html"], ["Tournois", "tournois.html"], [nomDep(t.dep), `tournois/${t.dep}.html`], [t.nom, chemin]], pre)}
 <header class="gen-tete">
 ${termine ? `<p class="gen-termine" role="status">Terminé${indexer ? "" : " depuis plus de 2 mois"} : ce tournoi a eu lieu ${periodeCourte(t.date_debut, t.date_fin)}. <a href="${pre}tournois/${t.dep}.html">Voir les prochains tournois ${echapper(dansDep(t.dep))}</a>.</p>` : ""}
 <div class="gen-tete-ligne"><span class="cat-badge cat-badge-xl ${classeCat(t.categorie)}">${echapper(t.categorie || "?")}</span><h1>${echapper(t.nom)}</h1></div>
 <p class="gen-lieu">${echapper(club)} · ${echapper(ville)} (${t.dep})</p>
 <p class="gen-dates">${echapper(periode(t.date_debut, t.date_fin))}${sx.length ? " · " + echapper(sx.join(" / ")) : ""}</p>
-<p class="gen-distance" id="ft-distance" hidden></p>
+${periodeLongue(t) ? `<p class="note gen-periode-longue">Période longue indiquée par l'organisateur sur Ten'Up (${ecartJours(t.date_debut, fin)} jours) : consulte la fiche Ten'Up pour les dates de jeu.</p>
+` : ""}<p class="gen-distance" id="ft-distance" hidden></p>
 <div class="gen-actions">
 <a class="btn primary" href="${lienTenup}" target="_blank" rel="noopener">S'inscrire sur Ten'Up</a>
 <button type="button" class="btn ghost" id="ft-calendrier">Ajouter à mon calendrier</button>
