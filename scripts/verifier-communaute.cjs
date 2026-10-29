@@ -113,8 +113,15 @@ const serveur=http.createServer((req,res)=>{
  const erreurs=[];
  const nouveau=async(options={})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:FAUX}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:FAUX}));
   await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:CONFIG_ACTIVE}));
+  // Les fiches publiées ne chargent supabase-js que si « favoris » ou « communaute » est activé dans supabase-config.js
+  // (scripts/generer-pages.js) : on simule la page régénérée après activation
+  await ctx.route('**/tournoi/*.html',async r=>{
+   const rep=await r.fetch();
+   const html=(await rep.text()).replace(/(<script src="\.\.\/assets\/js\/supabase-config\.js)/,'<script src="../assets/vendor/supabase-2.45.4.js" defer></script>\n$1');
+   await r.fulfill({response:rep,body:html});
+  });
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page=await ctx.newPage();
   if(options.date)await page.clock.install({time:new Date(options.date)});

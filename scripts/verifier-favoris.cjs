@@ -88,7 +88,7 @@ const CONFIG_ACTIVE=fs.readFileSync(path.join(__dirname,'..','assets/js/supabase
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const erreurs=[];
  const routes=async(ctx,sdk)=>{
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:sdk||'/* comptes inactifs */'}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:sdk||'/* comptes inactifs */'}));
   await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:CONFIG_ACTIVE}));
   await ctx.route('**/*.supabase.co/**',r=>r.abort());
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));

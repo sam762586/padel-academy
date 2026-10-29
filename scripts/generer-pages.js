@@ -117,7 +117,17 @@ const SEXES = { messieurs: "Messieurs", dames: "Dames", mixte: "Mixte" };
 const majuscule = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- Gabarit : nav et footer communs (scripts/gabarit.js) ---------- */
-const { NOM_SITE, nav: navGabarit, footer: footerGabarit, versionner } = require("./gabarit");
+const { NOM_SITE, nav: navGabarit, footer: footerGabarit, versionner, SDK_SUPABASE } = require("./gabarit");
+/* supabase-js (110 Ko, hébergé sur le site) n'est chargé sur les fiches tournoi que si une fonction qui s'en sert est
+   activée dans assets/js/supabase-config.js (PA_SUPABASE.activees) : « favoris » (synchronisation des étoiles) ou
+   « communaute » (J'y vais, annonces, avis). Tant que la liste ne les contient pas, ces scripts ne font rien sans lui ;
+   la connexion se fait sur connexion.html, qui le charge. Activer une fonction puis relancer ce script suffit à le remettre. */
+const CONFIG_SUPABASE = (() => {
+  const w = {};
+  vm.runInNewContext(fs.readFileSync(path.join(RACINE, "assets/js/supabase-config.js"), "utf8"), { window: w });
+  return w.PA_SUPABASE || {};
+})();
+const SDK_SUR_FICHES = ["favoris", "communaute"].some(f => (CONFIG_SUPABASE.activees || []).includes(f));
 
 function page({ chemin, titre, description, h1, corps, jsonLd = [], noindex = false, scripts = [], navActif = "tournois.html" }) {
   const profondeur = chemin.split("/").length - 1;
@@ -429,7 +439,7 @@ ${commentaire ? `<li><b>Mot de l'organisateur :</b> ${echapper(commentaire.lengt
 <section class="gen-bloc" aria-labelledby="gb-autour"><h2 id="gb-autour">Autour de ce tournoi</h2>
 <ul class="gen-liens"><li><a href="${pre}tournois/${t.dep}.html">Tous les tournois ${echapper(dansDep(t.dep))}</a></li>${region && t.categorie && CATEGORIES_REGION.includes(t.categorie) ? `<li><a href="${pre}tournois/${region.slug}/${t.categorie.toLowerCase()}.html">Tournois ${t.categorie} ${echapper(region.prep)} ${echapper(region.nom)}</a></li>` : ""}<li><a href="${pre}tournois.html">Carte de tous les tournois de France</a></li></ul>
 </section>`;
-  ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd, noindex: !indexer, scripts: ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js", "assets/js/supabase-config.js", "assets/js/compte.js", "assets/data/pages-tournois.js", "assets/js/favoris.js", "assets/js/fiche-tournoi.js", "assets/js/communaute-tournoi.js"] }), { indexer });
+  ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd, noindex: !indexer, scripts: [...(SDK_SUR_FICHES ? [SDK_SUPABASE] : []), "assets/js/supabase-config.js", "assets/js/compte.js", "assets/data/pages-tournois.js", "assets/js/favoris.js", "assets/js/fiche-tournoi.js", "assets/js/communaute-tournoi.js"] }), { indexer });
 }
 
 /* ---------- Pages département ---------- */

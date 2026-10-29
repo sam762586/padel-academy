@@ -57,6 +57,7 @@ const serveur=http.createServer((req,res)=>{
  const ouvrir=async(vp,mobile)=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:vp,isMobile:mobile,hasTouch:mobile});
   await ctx.route(/^https:/,r=>r.fulfill({body:''}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''})); // comptes indisponibles : le SDK (sur le site) est bloqué aussi
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))erreurs.push(m.text());});
   await page.goto(base+'/index.html');

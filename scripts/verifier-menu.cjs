@@ -51,7 +51,7 @@ const serveur=http.createServer((req,res)=>{
 });
 async function contexte(browser,options,sansNav){
  const ctx=await browser.newContext({serviceWorkers:'block',...options});
- await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
+ await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));
  await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
  if(sansNav) await ctx.route('**/assets/js/nav.js*',r=>r.abort('failed'));
  return ctx;

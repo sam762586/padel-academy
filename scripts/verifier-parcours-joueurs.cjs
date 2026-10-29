@@ -47,8 +47,8 @@ async function dansLeNavigateur(base){
  const erreurs=[];
  async function ouvrir({quand='2026-10-29T10:00:00',etat=null,comptes='indisponibles',connecte=false}={}){
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true,storageState:etat||undefined});
-  if(comptes==='indisponibles')await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
-  else{await ctx.route(/^https:/,r=>r.fulfill({body:''}));await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));}
+  if(comptes==='indisponibles'){await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));} // le SDK (sur le site) est bloqué aussi
+  else{await ctx.route(/^https:/,r=>r.fulfill({body:''}));await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:SDK}));}
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))erreurs.push(m.text());});
   await page.clock.setFixedTime(new Date(quand));

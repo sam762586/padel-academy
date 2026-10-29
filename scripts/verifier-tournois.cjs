@@ -34,7 +34,7 @@ const serveur=http.createServer((req,res)=>{
  // reponse(n) : comportement du n-ième appel à tournois.json ; repli : comportement de la copie tournois.js
  const ouvrir=async({reponse,repli='echec',page:url='/tournois.html',mobile=true})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:mobile?{width:390,height:844}:{width:1280,height:800},isMobile:mobile,hasTouch:mobile});
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));
   await ctx.route(/^https:/,r=>r.fulfill({body:''}));
   let n=0;
   await ctx.route('**/assets/data/tournois.json*',async r=>{n++;await reponse(r,n);});
@@ -127,6 +127,7 @@ const serveur=http.createServer((req,res)=>{
   for(const cas of ['erreur','vide']){
    const c2=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true});
    await c2.route(/^https:/,r=>r.fulfill({body:''}));
+   await c2.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''})); // comptes indisponibles : le SDK (sur le site) est bloqué aussi
    let n=0;
    await c2.route('**/assets/data/prochains/76.json*',r=>{n++;
     if(cas==='erreur'&&n===1)return r.fulfill({status:503,body:''});

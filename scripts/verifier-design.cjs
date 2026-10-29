@@ -57,7 +57,7 @@ const serveur = http.createServer((req, res) => {
 });
 async function contexte(browser, viewport) {
   const ctx = await browser.newContext({ viewport, serviceWorkers: 'block' });
-  await ctx.route(/supabase-js@|gc\.zgo\.at|fonts\.(googleapis|gstatic)/, r => r.fulfill({ contentType: 'text/javascript', body: '' }));
+  await ctx.route(/assets\/vendor\/supabase-|gc\.zgo\.at|fonts\.(googleapis|gstatic)/, r => r.fulfill({ contentType: 'text/javascript', body: '' }));
   return ctx;
 }
 

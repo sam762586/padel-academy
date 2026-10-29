@@ -109,7 +109,7 @@ const erreurs = [];
 async function appareil(activees) {
   const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 390, height: 844 } });
   await ctx.route(/^https:/, r => r.fulfill({ body: '' }));
-  await ctx.route('**/supabase-js@*/**', r => r.fulfill({ contentType: 'text/javascript', body: SDK }));
+  await ctx.route('**/assets/vendor/supabase-*.js*', r => r.fulfill({ contentType: 'text/javascript', body: SDK }));
   await ctx.route('**/assets/js/supabase-config.js*', r => r.fulfill({ contentType: 'text/javascript', body: CONFIG(activees) }));
   const page = await ctx.newPage();
   page.on('pageerror', e => erreurs.push(e.message));

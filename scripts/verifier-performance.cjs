@@ -44,6 +44,19 @@ function horsNavigateur(){
  POLICES.forEach(p=>assert.match(css,new RegExp('@font-face\\{font-family:"[^"]+";src:url\\(fonts/'+p.replace('.','\\.')+'\\) format\\("woff2"\\)[^}]*font-display:swap')));
  assert.match(css,/--body:"Manrope","Manrope repli"/);assert.match(css,/--display:"Big Shoulders Display","Big Shoulders repli"/);
  assert.match(lire('scripts/generer-pages.js'),/rel="preload" href="\$\{pre\}assets\/fonts\/manrope-latin\.woff2"/,'générateur des pages tournois');
+ // Aucun script du site ne va chercher de fichier chez jsDelivr ni chez Google ; supabase-js est hébergé, intact et versionné
+ for(const f of fs.readdirSync(path.join(racine,'assets/js'),{recursive:true}).filter(f=>f.endsWith('.js')))
+  assert.ok(!/jsdelivr|fonts\.(googleapis|gstatic)/i.test(lire('assets/js/'+f.split(path.sep).join('/'))),'assets/js/'+f+' : appel à un service externe');
+ const sdk=fs.readFileSync(path.join(racine,'assets/vendor/supabase-2.45.4.js'));
+ assert.equal(sdk.length,110797);
+ assert.equal(require('node:crypto').createHash('sha256').update(sdk).digest('base64'),'hZaWX+kY5lZgChtWjToWj1wNPSKmAIhrtvRKZVXbAec=','supabase-js 2.45.4 modifié (empreinte jsDelivr attendue)');
+ assert.ok(fs.existsSync(path.join(racine,'assets/vendor/LICENSE-supabase-js.txt')),'licence de supabase-js');
+ for(const f of pages){const h=lire(f);
+  for(const m of h.matchAll(/<script src="((?!https?:)[^"]+)"([^>]*)><\/script>/g)){
+   if(/anti-cadre\.js/.test(m[1]))assert.ok(!/defer/.test(m[2]),f+' : anti-cadre.js ne doit pas être différé');
+   else assert.ok(/ defer/.test(m[2]),f+' : script sans defer : '+m[1]);
+   if(/assets\/vendor\//.test(m[1]))assert.match(m[1],/supabase-2\.45\.4\.js\?v=[0-9a-f]{10}$/,f+' : supabase-js non versionné');
+  }}
  // Bandeaux : 4 tailles, fichiers présents
  let n=0;
  for(const f of pages.filter(f=>!f.includes('/'))){
@@ -74,7 +87,8 @@ const serveur=http.createServer((req,res)=>{
 
 async function mesurer(browser,url){
  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,serviceWorkers:'block'});
- await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''}));
+ const externes=[];
+ await ctx.route(/^https:/,r=>{externes.push(r.request().url());return r.fulfill({status:200,body:''});});
  const page=await ctx.newPage();
  const cdp=await ctx.newCDPSession(page);
  await cdp.send('Network.enable');
@@ -90,6 +104,7 @@ async function mesurer(browser,url){
  await page.waitForTimeout(3000); // contenus arrivés après le chargement (listes, données)
  const r=await page.evaluate(()=>({lcp:Math.round(window.__lcp),cls:+window.__cls.toFixed(3)}));
  await ctx.close();
+ r.externes=externes;
  return r;
 }
 
@@ -101,6 +116,7 @@ async function dansLeNavigateur(base){
    let r=await mesurer(browser,base+'/'+p);
    if(r.lcp>=BUDGET.lcp||r.cls>=BUDGET.cls)r=await mesurer(browser,base+'/'+p); // seconde mesure avant de conclure
    lignes.push(p+' '+r.lcp+' ms / '+r.cls);
+   assert.ok(!r.externes.some(u=>/jsdelivr|fonts\.(googleapis|gstatic)/.test(u)),p+' : requête vers jsDelivr ou Google Fonts : '+r.externes.join(' '));
    assert.ok(r.lcp>0&&r.lcp<BUDGET.lcp,p+' : LCP '+r.lcp+' ms (budget '+BUDGET.lcp+')');
    assert.ok(r.cls<BUDGET.cls,p+' : CLS '+r.cls+' (budget '+BUDGET.cls+')');
   }

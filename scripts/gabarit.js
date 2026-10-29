@@ -78,8 +78,10 @@ const empreintes = {};
    reçoivent aussi « ?v=<empreinte> ». Sans cela le service worker (stale-while-revalidate) pourrait servir un ancien script
    chargé à la volée. L'empreinte d'un tel fichier est calculée sur son contenu déjà réécrit ; appliquer-gabarit.js l'écrit. */
 const SCRIPTS_DYNAMIQUES = ["assets/js/academie-sync.js"];
+// supabase-js, hébergé sur le site (licence MIT : assets/vendor/LICENSE-supabase-js.txt) ; la version est dans le nom du fichier
+const SDK_SUPABASE = "assets/vendor/supabase-2.45.4.js";
 function versionnerJs(source) {
-  return source.replace(/(["'])(assets\/js\/[\w-]+\.js)(?:\?v=[0-9a-f]+)?\1/g,
+  return source.replace(/(["'])(assets\/(?:js\/[\w-]+|vendor\/[\w.-]+)\.js)(?:\?v=[0-9a-f]+)?\1/g,
     (m, q, fichier) => `${q}${fichier}?v=${empreinte(fichier)}${q}`);
 }
 function empreinte(relatif) {
@@ -90,9 +92,16 @@ function empreinte(relatif) {
   }
   return empreintes[relatif];
 }
+/* Scripts du site : exécutés après l'analyse de la page (« defer »), dans l'ordre d'écriture, sans bloquer l'affichage.
+   Seuls les scripts locaux sont touchés (le compteur de visites externe garde son « async »). */
+// anti-cadre.js (protection contre l'affichage dans un cadre) doit s'exécuter avant le premier affichage : jamais différé
+const SANS_DEFER = /(?:^|\/)anti-cadre\.js(?:\?|$)/;
+function differer(html) {
+  return html.replace(/<script src="((?!https?:)[^"]+)"( defer)?><\/script>/g, (m, src) => `<script src="${src}"${SANS_DEFER.test(src) ? "" : " defer"}></script>`);
+}
 function versionner(html) {
-  return html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:[\w-]+\.css|js\/[\w-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
-    (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`)
+  return differer(html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:[\w-]+\.css|js\/[\w-]+\.js|vendor\/[\w.-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
+    (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`))
     .replace(/<script type="importmap">[\s\S]*?<\/script>/, () => `<script type="importmap">${carteModules()}</script>`);
 }
 // Carte d'import du simulateur 3D : Three.js (fichiers recopiés dans assets/3d/vendor) et modules assets/js/p3d/*.js
@@ -115,4 +124,4 @@ function poserMain(html) {
   if (!motif.test(html)) throw new Error("menu ou pied de page introuvable : <main> non posé");
   return html.replace(motif, (m, menu, corps) => `${menu}\n${MAIN_OUVERT}\n${corps}\n</main>\n<footer>`);
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, empreinte, carteModules, poserMain, MAIN_OUVERT };
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, SDK_SUPABASE, empreinte, carteModules, poserMain, MAIN_OUVERT };

@@ -246,6 +246,7 @@ const serveur=http.createServer((req,res)=>{
 async function contexte(browser,options={}){
  const ctx=await browser.newContext({serviceWorkers:'block',...options});
  await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''})); // aucun accès extérieur (polices, compteur)
+ await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''})); // comptes indisponibles : le SDK (sur le site) est bloqué aussi
  await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
  return ctx;
 }

@@ -77,7 +77,7 @@ const serveur=http.createServer((req,res)=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   // La dernière route déclarée est prioritaire : Supabase simulé après le filet « tout le reste »
   await ctx.route(/^https:/,r=>r.fulfill({body:''}));
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));
   page.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))erreurs.push(m.text());});
@@ -275,7 +275,7 @@ const serveur=http.createServer((req,res)=>{
   {
    const ctxCadre=await browser.newContext({serviceWorkers:'block'});
    await ctxCadre.route(/^https:/,r=>r.fulfill({body:''}));
-   await ctxCadre.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
+   await ctxCadre.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:SDK}));
    // Edge refuse un cadre en 127.0.0.1 dans une page publique : le site est servi sous une origine fictive
    // (site.example, relayée vers le serveur local) et le piège sous une autre (piege.example)
    const site='http://site.example',autre='http://piege.example';

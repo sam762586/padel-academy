@@ -65,6 +65,7 @@ async function compteUnitaires(){
  try{
   const ctx=await browser.newContext({viewport:{width:400,height:850},serviceWorkers:'block'});
   await ctx.route('**/*',route=>{
+   if(/\/assets\/vendor\/supabase-/.test(route.request().url()))return route.fulfill({status:200,body:'',contentType:'text/javascript'}); // comptes inactifs (le SDK est sur le site)
    if(route.request().url().startsWith(base))return route.continue();
    return route.fulfill({status:200,body:'',contentType:route.request().resourceType()==='stylesheet'?'text/css':'text/javascript'});
   });

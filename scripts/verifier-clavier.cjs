@@ -57,7 +57,7 @@ const sautsDeTitres=page=>page.evaluate(()=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:844}});
   // Hors ligne : toute requête https (SDK Supabase du CDN, mesure d'audience) reçoit une réponse vide, le site doit marcher sans
   await ctx.route(/^https:/,r=>r.fulfill({contentType:'text/javascript',body:''}));
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page=await ctx.newPage();
   page.on('pageerror',e=>erreurs.push(e.message));
   page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});

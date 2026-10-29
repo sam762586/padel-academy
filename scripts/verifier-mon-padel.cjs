@@ -74,7 +74,7 @@ function fauxSdk(matchCommun){
  try{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   // Sans compte : le CDN Supabase est remplacé par un script vide (comptes inactifs)
-  await ctx.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:'/* hors ligne */'}));
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:'/* hors ligne */'}));
   await ctx.route('**/*.supabase.co/**',r=>r.abort());
   await ctx.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page=await ctx.newPage();
@@ -122,7 +122,7 @@ function fauxSdk(matchCommun){
   // Connecté (faux client) : fusion des matchs du compte et de l'appareil, sans doublon
   const ctx2=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
   const commun={joue_le:historique[0].fin.replace('Z','+00:00').replace(/\.\d{3}/,''),nom_a:'Nous',nom_b:'Eux',format:{egalite:'decisif',dernierSet:'super',serveur:0},points:historique[0].points,score:historique[0].score,vainqueur:0,interrompu:false};
-  await ctx2.route('**/supabase-js@*/**',r=>r.fulfill({contentType:'text/javascript',body:fauxSdk(commun)}));
+  await ctx2.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:fauxSdk(commun)}));
   await ctx2.route('**/*.supabase.co/**',r=>r.abort());
   await ctx2.route('https://gc.zgo.at/**',r=>r.fulfill({contentType:'text/javascript',body:''}));
   const page2=await ctx2.newPage();

@@ -86,6 +86,7 @@ async function dansLeNavigateur(base){
   for(const [largeur,hauteur] of [[1280,900],[390,844],[320,700]]){
    const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:hauteur}});
    await ctx.route(/^https:/,r=>r.fulfill({status:200,body:''})); // comptes indisponibles : données de l'appareil
+   await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''})); // comptes indisponibles : le SDK (sur le site) est bloqué aussi
    const page=await ctx.newPage();
    page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
    await page.clock.setFixedTime(new Date('2026-10-29T10:00:00'));
