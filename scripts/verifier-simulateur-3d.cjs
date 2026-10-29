@@ -363,6 +363,9 @@ async function dansLeNavigateur(base){
   // Mode quiz : la scène se fige, on répond, l'explication s'affiche, la lecture reprend, score final
   await page.selectOption('#p3d-scenarios','smash-lob-court');
   await page.waitForFunction(()=>P3D.etat.scenario.id==='smash-lob-court');
+  // Vitesse normale : laissée à × 0,25 (contrôle de la vitesse plus haut), la lecture jusqu'à la fin du quiz dépend des
+  // images par seconde du rendu logiciel (pas de temps plafonné à 0,1 s) et dépasse les 20 s d'attente vers 5 images/s
+  await page.selectOption('#p3d-vitesse','1');
   await page.click('#p3d-mode button[data-mode="quiz"]');
   assert.equal(await page.isHidden('#p3d-etapes'),true,'quiz : étapes masquées (elles donnent les réponses)');
   assert.match(await page.textContent('#p3d-quiz-question'),/s'arrêtera 2 fois/);
