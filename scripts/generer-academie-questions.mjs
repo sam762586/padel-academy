@@ -97,7 +97,7 @@ export function construire() {
   }
   const samuel = JSON.parse(lire('scripts/donnees/academie-questions-samuel.json')).questions;
   for (const r of samuel) {
-    questions.push({ id: r.id, statut: r.statut, origine: 'samuel', source: 'Samuel (' + r.categorie + ')', theme: r.theme,
+    questions.push({ id: r.id, statut: r.statut, origine: 'samuel', source: 'Apprendre Padel (' + r.categorie + ')', theme: r.theme,
       niveauMin: r.niveaux[0], niveauMax: r.niveaux[1], difficulte: r.difficulte, situation: '',
       question: r.question, choix: r.choix, bonne: r.bonne, explication: r.explication,
       article: THEMES[r.theme].article, exercice: exercice(r.theme, ...r.niveaux),

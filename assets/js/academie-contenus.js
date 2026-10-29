@@ -1,5 +1,5 @@
 /* MON ACADÉMIE · Classement des contenus (phase 4), partagé par Mon académie et Mon espace
-   Proposition d'Apprendre Padel, à valider par Samuel : niveaux sur la grille FFT 1 à 10, thèmes de l'académie
+   Proposition d'Apprendre Padel, à valider par l'auteur : niveaux sur la grille FFT 1 à 10, thèmes de l'académie
    (ACADEMIE_THEMES), difficulté 1 à 3, prérequis. Rien n'est masqué ailleurs sur le site : ce classement ne sert qu'à
    recommander.
    - Articles : sections des pages du site (ACADEMIE_ARTICLES).

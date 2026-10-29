@@ -53,7 +53,7 @@ d'image inversée ou dans l'historique des commits d'ajout des photos).
 | `raq-1.webp`, `raq-2.webp`, `raq-3.webp`, `raq-4.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
 | `tact-1.webp`, `tact-2.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
 | `ent-1.webp`, `ent-2.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
-| `auteur.webp` | portrait de l'éditeur ? | à confirmer par Samuel | à confirmer par Samuel | origine à retrouver (ne pas supposer Pexels) |
+| `auteur.webp` | portrait de l'éditeur ? | à confirmer par l'éditeur | à confirmer par l'éditeur | origine à retrouver (ne pas supposer Pexels) |
 
 Les lignes « idem » ne sont pas vérifiées une à une : le crédit Pexels du site couvre « les photographies », mais le dépôt
 ne contient pas la trace de chaque téléchargement. Si une photo ne vient pas de Pexels, corriger sa ligne et le crédit de
