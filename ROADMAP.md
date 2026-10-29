@@ -218,6 +218,16 @@ Aucun push, déploiement ni migration sans accord ; aucune donnée effacée ; un
 ## Phase 6 — Stabilisation
 Parcours visiteur et connecté complets, clavier, contrastes, PWA, compatibilité (appareils réellement testés seulement).
 
+Bilan du 29/10/2026 (fait par erreur sur une ancienne branche, `feature/ux-parcours-joueur-v2`, puis reporté sur main dans `feature/stabilisation-main`) :
+- [x] **6.0 Outillage** ✅ 29/10/2026, 03043769, e799cf8b : équipe d'agents et `scripts/tout-verifier.cjs`, copie de travail en LF (`.gitattributes`), Playwright 1.64.1, `_config.yml`, blocage réseau des suites en expression régulière (21 suites appelaient réellement jsDelivr et GoatCounter).
+- [x] **6.1 Données personnelles des pages tournois** ✅ 29/10/2026, 3810fda2, c04b0962 : noms de juges-arbitres retirés (pages, fiches publiées, robot, exemples du code), adresses « Interdit au top… » écartées, villes (« Bagnoles de l'Orne »), `data-fin` échappé, note des périodes longues.
+- [x] **6.2 Connexion et appareil partagé** ✅ 29/10/2026, 6abb69fe, 97c10755, e3396c8d, d25bee08 : case « J'ai 15 ans ou plus », messages annoncés, `error_description` jamais affiché, récupération du mot de passe sur `PASSWORD_RECOVERY`, anti-cadre (connexion, compte, espace, partenaires), données d'un autre compte jamais envoyées sans choix, effacement de l'appareil confirmé, cache pa-v39 avec `compte.js` versionné.
+- [x] **6.3 Pages légales** ✅ 29/10/2026, 6822ef89 : confidentialité et mentions légales fidèles au site (académie, Google, jsDelivr, droits, CNIL, LCEN), opposition à GoatCounter, registre des photos.
+- [ ] **6.4 Accessibilité** : lien d'évitement et `<main>`, focus visible du menu, bordures 3:1 (à recalculer pour #101F35), mouvement réduit global, cibles 44 px, clavier du test de niveau et du tuto « la paire », annonces (tutos, placement).
+- [ ] **6.5 Textes** : tutoiement des exercices (`exercices-donnees.js`), « reviens », libellés.
+- [ ] **6.6 Vitesse et sécurité** : supabase-js hébergé sur le site (plus de jsDelivr), connexion en PKCE (lien piégé `#access_token`), `defer`, `srcset` des cartes.
+- [ ] **6.7 Communauté** : migrations s2-01 à s2-42, `tournois_ref`, JS de la communauté (reprenables de `feature/ux-parcours-joueur-v2`), puis contrôle `securite-sql` avec les migrations academie.
+
 ---
 
 ## Archive : feuille de route v2 (26/10/2026)
@@ -366,3 +376,9 @@ L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, co
 **Fait** : lots 2A à 2E (voir la phase 2 ci-dessus). Sources des règles : règlement FIP (révision du 28/11/2025) ; formats et temps de repos des tournois FFT d'après le résumé du Guide de la compétition 2026 publié par Padel Magazine (le guide officiel n'était pas accessible en ligne). Corrigé au passage : numéros de règles FIP cités, « point décisif systématique » (page Compétition), prix de cours non sourcé retiré, « P25 → P3000 ».
 **Choix pris** : une seule page créée (premier-tournoi.html, au menu Compétition) ; gaucher, partenaire de niveau différent et analyse de match traités en sections de pages existantes ; chaque encadré « Exercice » cite un exercice réel de l'espace joueur, mot pour mot ; cache pa-v21.
 **À relire par Samuel** : les passages d'expérience listés dans la phase 2.
+
+### 29/10/2026 — Phase 6, stabilisation (étapes 0 à 3)
+**Fait** : voir 6.0 à 6.3. Les 39 suites passent (lancées en trois groupes : le passage d'un seul tenant a été arrêté faute de mémoire sur le poste).
+**Erreur de méthode, corrigée** : le bilan et le lot S du matin ont été faits sur `feature/ux-parcours-joueur-v2`, partie du 27/10, sans les 79 commits de main (3D, académie, design v3). Rien de cette branche n'a été publié ; elle sert de référence pour les étapes 6.4 à 6.7.
+**À faire par Samuel** : lire les CGU de Ten'Up dans un navigateur (enquête : republication non tranchée, avis d'avocat conseillé) ; confirmer l'adresse de contact des pages légales et l'identité communiquée à GitHub (LCEN) ; vérifier que pg_cron purge bien les annonces (la page annonce 30 jours) ; Supabase : « Confirm email », CAPTCHA, adresses de redirection limitées à apprendre-padel.fr.
+**Choix pris** : noms de juges-arbitres retirés aussi des fichiers de données ; durées décidées (présences, avis 24 mois, comptes inactifs 3 ans) non affichées tant qu'elles ne sont pas codées ; case « 15 ans » déclarative ; cases « Effacer les données de cet appareil » décochées tant que tout n'est pas dans le compte ; réglage de qualité 3D conservé à la déconnexion.
