@@ -1,13 +1,15 @@
 /* Vérification de « Ma carte de joueur » (carte.html, assets/js/carte.js, carte-donnees.js, carte-rendu.js, assets/carte.css) :
-   1) moteur (sans navigateur) : les trois exemples de carte-donnees.js et les extrêmes donnent les notes attendues ;
-   2) navigateur (Edge, 390 px, toute adresse https bloquée) : repère lu dans pa-quiz-dernier (jamais écrit), parcours complet
-      au clavier jusqu'à la carte (focus sur la question suivante, compteur aria-live, groupe nommé), ajustement borné à ±5,
-      pseudo invalide refusé, photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas
-      l'encoder) aux bonnes dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console ;
+   1) moteur (sans navigateur) : les exemples de carte-donnees.js (encore utilisés pour convertir les cartes version 1) ;
+   2) navigateur (Edge, 390 px, toute adresse https bloquée) : intro sans questionnaire ; 6 curseurs 1 à 99 + champs numériques
+      (bornés au clavier, à la souris et à la saisie), globale recalculée, poste, rang suggéré puis choisi librement (Élite avec une
+      globale de 40 → rendu en rang elite, choix gardé quand la globale change) ; pa-carte au format 2 ; pseudo invalide refusé,
+      photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas l'encoder) aux bonnes
+      dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo » ;
       choix du modèle (4 boutons aria-pressed, miniatures, aperçu et export changés, modèle gardé, repli sans MODELES) ;
-      « Refaire mes réponses » (nom, photo et repère gardés) ; « Faire une nouvelle carte » (tout à zéro, repère ignoré par défaut,
-      ancienne carte gardée jusqu'à la fin du questionnaire, ancienne photo jamais reposée sur la nouvelle carte) ;
-      événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public affiché ou rien.
+      « Modifier mes notes » (tout gardé) ; « Faire une nouvelle carte » (notes à 60, poste et rang par défaut, sans photo ni nom,
+      ancienne carte gardée jusqu'à la validation des notes) ; migration d'une carte version 1 ; aucune lecture de pa-quiz-dernier
+      ni de pa-academie ; événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public
+      affiché ou rien ; aucun débordement à 390 et 320 px, 0 erreur console.
    Lancer depuis la racine du site : node scripts/verifier-carte.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),vm=require('node:vm'),os=require('node:os');
@@ -54,20 +56,11 @@ const serveur=http.createServer((req,res)=>{
 // Dimensions d'une image téléchargée (WebP ou JPEG), lues par le navigateur
 async function dimsImage(page,buf,type){return page.evaluate(([b,t])=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res([i.naturalWidth,i.naturalHeight]);i.onerror=()=>rej(new Error('image illisible'));i.src='data:'+t+';base64,'+b;}),[buf.toString('base64'),type]);}
 const EXT_ATTENDUE='webp',TYPE_ATTENDU='image/webp'; // Edge encode le WebP ; Safari tomberait sur ma-carte-padel.jpg
-// Répond à une question au clavier : le bouton voulu reçoit le focus, Entrée
-async function repondreClavier(page,reponses,debut=0,fin=12){
- for(let i=debut;i<fin;i++){
-  // Après chaque réponse, le focus est sur le titre de la question suivante (la première : vérifié après « Commencer »)
-  if(i)assert.equal(await page.evaluate(()=>document.activeElement&&document.activeElement.id),'cj-qtext','focus sur la question '+(i+1));
-  assert.match(await page.textContent('#cj-qnum'),new RegExp('Situation '+(i+1)+'\\ssur\\s12'));
-  const texte=await page.evaluate(i=>window.PA_CARTE.QUESTIONS[i].r[0].t,i); // on vérifie que les 4 réponses sont là, mélangées ou non
-  assert.equal(await page.locator('#cj-qopts .qopt').count(),4);
-  const voulu=await page.evaluate(([i,k])=>window.PA_CARTE.QUESTIONS[i].r[k].t,[i,reponses[i]]);
-  await page.locator('#cj-qopts .qopt',{hasText:voulu}).first().focus();
-  await page.keyboard.press('Enter');
-  void texte;
- }
-}
+// Pose une note par son champ numérique (saisie puis sortie du champ) : la valeur affichée est bornée de 1 à 99
+async function poserNote(page,cle,valeur){await page.fill('#cj-v-'+cle,String(valeur));await page.press('#cj-v-'+cle,'Tab');}
+async function poserNotes(page,notes){for(const [k,v] of Object.entries(notes))await poserNote(page,k,v);}
+const lireNotes=page=>page.evaluate(()=>Object.fromEntries(window.PA_CARTE.CLES.map(k=>[k,Number(document.getElementById('cj-n-'+k).value)])));
+const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.textContent));
 (async()=>{
  moteur();
  await new Promise(r=>serveur.listen(0,'127.0.0.1',r));
@@ -85,7 +78,11 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   page.on('pageerror',e=>erreurs.push(e.message));
   page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
   page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(base))erreurs.push(r.status()+' '+r.url());});
-  // Repères existants : palier 2 au test de niveau, niveau 7 dans Mon académie (le palier l'emporte) ; jamais modifiés
+  // Lectures du stockage faites par les scripts de la carte (carte.js, carte-*.js) : relevées dans la console (type debug)
+  await ctx.addInitScript(()=>{const g=Storage.prototype.getItem;Storage.prototype.getItem=function(k){try{if(/\/assets\/js\/carte(-[a-z]+)?\.js/.test(new Error().stack||''))console.debug('PA-LU '+k);}catch(e){}return g.call(this,k);};});
+  const lus=new Set();
+  page.on('console',m=>{const t=m.text();if(m.type()==='debug'&&t.startsWith('PA-LU '))lus.add(t.slice(6));});
+  // Données d'autres pages : test de niveau et Mon académie ; la carte ne les lit pas et ne les écrit jamais
   const quizAvant=JSON.stringify({date:'2026-10-01T10:00:00.000Z',version:2,palier:2,niveau:2,score:12,reponses:[]});
   const acadAvant=JSON.stringify({niveau:7,historique:[{niveau:7,date:'2026-10-01'}]});
   await page.goto(base+'/carte.html');
@@ -94,50 +91,111 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.equal(await page.locator('#cj-intro').isVisible(),true);
   assert.equal(await page.locator('#cj-apercu').isVisible(),false);
   assert.equal(await page.evaluate(()=>document.activeElement===document.body),true,'rien ne reçoit le focus au chargement');
-  ok('page : intro visible, aperçu caché, aucun focus déplacé au chargement');
-  // Commencer au clavier
+  assert.equal(await page.locator('#cj-quiz, #cj-qopts, #cj-sans-base, #cj-base, [id^="cj-refaire"]').count(),0,'plus de questionnaire ni de repère');
+  assert.deepEqual(await page.$$eval('#cj-pas li',l=>l.map(x=>x.dataset.pas)),['notes','photo','pseudo','final']);
+  assert.match(await page.textContent('#cj-intro'),/Choisis tes notes, ton rang, ta photo et ton modèle/);
+  assert.ok(!/situations|questionnaire/i.test(await page.textContent('#cj-intro')));
+  const desc=await page.getAttribute('meta[name="description"]','content');
+  assert.ok(desc.length<=160&&/1 à 99/.test(desc)&&/Bronze à Élite/.test(desc)&&!/situations/.test(desc),'meta description : '+desc);
+  ok('page : intro (notes, rang, photo, modèle), aucun questionnaire, fil en 4 étapes, meta description à jour, aucun focus déplacé');
+  // Commencer au clavier : 6 curseurs à 60, poste et rang suggérés
   await page.focus('#cj-commencer');await page.keyboard.press('Enter');
-  assert.equal(await page.locator('#cj-quiz').isVisible(),true);
-  assert.match(await page.textContent('#cj-base-txt'),/Tes notes partent de ton repère\s: P100 \(test de niveau\)/);
-  assert.equal(await page.getAttribute('#cj-qnum','aria-live'),'polite');
-  assert.equal(await page.getAttribute('#cj-qopts','role'),'group');
-  assert.equal(await page.getAttribute('#cj-qopts','aria-labelledby'),'cj-qtext');
-  assert.equal(await page.evaluate(()=>document.activeElement.id),'cj-qtext');
-  ok('questionnaire : repère P100 proposé (palier avant niveau), compteur aria-live, groupe nommé, focus sur la question');
-  // Parcours de Hugo (palier 2, droite) au clavier
-  await repondreClavier(page,[1,3,3,1,0,3,2,3,3,1,2,3]);
   assert.equal(await page.locator('#cj-notes').isVisible(),true);
   assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-notes');
-  assert.match(await page.textContent('#cj-suggestion'),/Poste suggéré.*Droite/);
-  assert.equal(await page.inputValue('#cj-n-VOL'),'64');assert.equal(await page.inputValue('#cj-n-AER'),'59');
-  assert.equal(await page.textContent('#cj-globale'),'63');assert.equal(await page.textContent('#cj-rang-tag'),'Argent');
-  assert.equal(await page.getAttribute('#cj-postes button:nth-child(1)','aria-pressed'),'true','suggestion droite pressée');
+  assert.equal(await page.getAttribute('#cj-pas li[data-pas="notes"]','aria-current'),'step');
+  const CLES=['VOL','AER','DEF','LOB','SER','TAC'];
+  for(const k of CLES){
+   const r=await page.$eval('#cj-n-'+k,i=>[i.type,i.min,i.max,i.step,i.value,i.labels[0]&&i.labels[0].textContent]);
+   assert.deepEqual(r.slice(0,5),['range','1','99','1','60'],k);
+   assert.ok(r[5].length>10,'curseur '+k+' étiqueté avec la description');
+   assert.deepEqual(await page.$eval('#cj-v-'+k,i=>[i.type,i.min,i.max,i.value]),['number','1','99','60']);
+   assert.match(await page.getAttribute('#cj-v-'+k,'aria-label'),/note de 1 à 99/);
+  }
+  assert.deepEqual(await page.$$eval('#cj-notes-liste .cj-note-libelle b',b=>b.map(x=>x.textContent)),await page.evaluate(()=>window.PA_CARTE.ATTRIBUTS.map(a=>a.libelle)));
+  assert.equal(await page.textContent('#cj-globale'),'60');assert.equal(await page.textContent('#cj-rang-tag'),'Argent');
+  assert.deepEqual(await presse(page,'#cj-postes'),['Polyvalent']);
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Argent']);
+  assert.deepEqual(await page.$$eval('#cj-rangs-choix button',b=>b.map(x=>x.textContent)),['Bronze','Argent','Or','Élite']);
+  assert.equal(await page.getAttribute('#cj-rangs-choix','role'),'group');
+  assert.match(await page.textContent('#cj-rang-suggere'),/^Suggéré : Argent/);
   assert.equal(await page.locator('#cj-apercu').isVisible(),true);
   assert.equal(await page.locator('#cj-apercu-canvas.rang-argent').count(),1);
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/: 63, Argent, poste droite\./);
-  ok('notes : Hugo → VOL 64, AER 59, globale 63 Argent, droite suggérée et pressée, aperçu canvas en rang argent et décrit');
-  // Poste : gauche change la globale
-  await page.click('#cj-postes button:nth-child(2)');
-  assert.equal(await page.getAttribute('#cj-postes button:nth-child(2)','aria-pressed'),'true');
-  const gGauche=Number(await page.textContent('#cj-globale'));assert.ok(gGauche<63,'globale plus basse à gauche (aérien faible)');
-  await page.click('#cj-postes button:nth-child(1)');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),null,'rien de gardé avant de valider les notes');
+  ok('notes : 6 curseurs 1 à 99 (pas 1) à 60 + champs numériques étiquetés, globale 60, Polyvalent et Argent suggérés et pressés, aperçu');
+  // Curseurs au clavier : bornés à 1 et 99
+  await page.focus('#cj-n-VOL');await page.keyboard.press('End');await page.keyboard.press('ArrowRight');
+  assert.equal(await page.inputValue('#cj-n-VOL'),'99');assert.equal(await page.inputValue('#cj-v-VOL'),'99');
+  assert.equal(await page.getAttribute('#cj-n-VOL','aria-valuetext'),'99 sur 99');
+  await page.keyboard.press('Home');await page.keyboard.press('ArrowLeft');
+  assert.equal(await page.inputValue('#cj-n-VOL'),'1');
+  for(let k=0;k<4;k++)await page.keyboard.press('ArrowRight');
+  assert.equal(await page.inputValue('#cj-v-VOL'),'5');
+  ok('curseur au clavier : Fin → 99, flèche au-delà sans effet, Début → 1, flèches pas à pas, champ numérique synchronisé');
+  // Curseur à la souris : bords gauche et droit
+  await page.locator('#cj-n-AER').scrollIntoViewIfNeeded();const boite=await page.locator('#cj-n-AER').boundingBox();
+  await page.mouse.click(boite.x+boite.width-1,boite.y+boite.height/2);
+  assert.equal(await page.inputValue('#cj-n-AER'),'99');assert.equal(await page.inputValue('#cj-v-AER'),'99');
+  await page.mouse.click(boite.x+1,boite.y+boite.height/2);
+  assert.equal(await page.inputValue('#cj-n-AER'),'1');
+  await page.evaluate(()=>{const i=document.getElementById('cj-n-AER');i.value='150';i.dispatchEvent(new Event('input',{bubbles:true}));});
+  assert.equal(await page.inputValue('#cj-v-AER'),'99');
+  ok('curseur à la souris : bord droit 99, bord gauche 1, valeur forcée à 150 ramenée à 99');
+  // Champ numérique : 150 → 99, 0 → 1, vide → note précédente, flèche haut à 99 sans effet
+  await poserNote(page,'DEF',150);assert.equal(await page.inputValue('#cj-v-DEF'),'99');assert.equal(await page.inputValue('#cj-n-DEF'),'99');
+  await poserNote(page,'DEF',0);assert.equal(await page.inputValue('#cj-v-DEF'),'1');
+  await poserNote(page,'DEF',72);await poserNote(page,'DEF','');assert.equal(await page.inputValue('#cj-v-DEF'),'72','champ vidé : note précédente');
+  await poserNote(page,'DEF',99);await page.focus('#cj-v-DEF');await page.keyboard.press('ArrowUp');
+  assert.equal(await page.inputValue('#cj-n-DEF'),'99');
+  ok('champ numérique : 150 → 99, 0 → 1, vide → note précédente, flèche haut bornée à 99');
+  // Globale recalculée en direct ; rang suggéré tant qu'aucun n'est choisi
+  await poserNotes(page,{VOL:40,AER:40,DEF:40,LOB:40,SER:40,TAC:40});
+  assert.equal(await page.textContent('#cj-globale'),'40');
+  assert.equal(await page.textContent('#cj-rang-tag'),'Bronze');
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Bronze'],'rang suggéré suivi tant que rien n\'est choisi');
+  await poserNotes(page,{VOL:45,AER:80});
+  const n1={VOL:45,AER:80,DEF:40,LOB:40,SER:40,TAC:40};
+  assert.equal(await page.evaluate(n=>window.PA_CARTE.calcul.posteSuggere(n,null),n1),'gauche');
+  assert.deepEqual(await presse(page,'#cj-postes'),['Gauche'],"poste suggéré d'après les notes (aérien fort)");
+  assert.match(await page.textContent('#cj-suggestion'),/Poste suggéré d'après tes notes\s: Gauche/);
+  assert.equal(Number(await page.textContent('#cj-globale')),await page.evaluate(n=>window.PA_CARTE.calcul.globale(n,'gauche'),n1));
+  ok('globale recalculée à chaque note (40 partout → 40 Bronze suggéré ; aérien à 80 → Gauche suggéré, globale de PA_CARTE)');
+  // Poste
+  for(const [i,cle,lib] of [[3,'polyvalent','Polyvalent'],[1,'droite','Droite']]){
+   await page.click('#cj-postes button:nth-child('+i+')');
+   assert.deepEqual(await presse(page,'#cj-postes'),[lib]);
+   assert.equal(Number(await page.textContent('#cj-globale')),await page.evaluate(([n,c])=>window.PA_CARTE.calcul.globale(n,c),[n1,cle]),'globale '+cle);
+  }
+  assert.ok(!/garde la suggestion/.test(await page.textContent('#cj-suggestion')));
+  ok('poste : Polyvalent puis Droite choisis (aria-pressed), globale recalculée avec les poids du poste');
+  // Rang choisi librement : Élite avec une globale de 40, gardé quand la globale change
+  await poserNotes(page,{VOL:40,AER:40});
+  assert.equal(await page.textContent('#cj-globale'),'40');
+  await page.focus('#cj-rangs-choix button:nth-child(4)');await page.keyboard.press('Enter');
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Élite']);
+  assert.equal(await page.textContent('#cj-rang-tag'),'Élite');
+  assert.match(await page.textContent('#cj-rang-suggere'),/^Suggéré : Bronze\. Tu as choisi Élite\./);
+  await page.waitForFunction(()=>document.getElementById('cj-apercu-canvas').classList.contains('rang-elite'));
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur\s: 40, Élite, poste droite\./);
+  // Le rang passé au dessin (CARTE_RENDU.animer, même dessin que l'export) est bien le rang choisi
+  await page.evaluate(()=>{const R=window.CARTE_RENDU,f=R.animer;window.__rangs=[];R.animer=function(c,d){window.__rangs.push(d.rang);return f.apply(this,arguments);};});
+  await poserNote(page,'VOL',95);
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Élite'],'choix gardé quand la globale change');
+  await page.waitForFunction(()=>window.__rangs.length>0);
+  assert.ok((await page.evaluate(()=>window.__rangs)).every(r=>r==='elite'),'données du rendu : rang elite');
+  await poserNote(page,'VOL',40);
+  ok('rang : Élite choisi avec une globale de 40 (suggéré Bronze) → aperçu en rang elite, décrit « 40, Élite », choix gardé si la globale change');
+  // Notes d'Hugo (droite), rang Argent choisi, puis on valide : carte gardée au format 2
+  await poserNotes(page,{VOL:64,AER:59,DEF:63,LOB:64,SER:63,TAC:63});
   assert.equal(await page.textContent('#cj-globale'),'63');
-  ok('poste : choix au bouton (aria-pressed), globale recalculée');
-  // Ajustement borné à ±5
-  assert.equal(await page.getAttribute('#cj-n-VOL','min'),'59');assert.equal(await page.getAttribute('#cj-n-VOL','max'),'69');
-  await page.evaluate(()=>{const i=document.getElementById('cj-n-VOL');i.value='99';i.dispatchEvent(new Event('input',{bubbles:true}));i.dispatchEvent(new Event('change',{bubbles:true}));});
-  assert.equal(await page.inputValue('#cj-n-VOL'),'69');
-  assert.equal(await page.evaluate(()=>document.querySelector('#cj-n-VOL+output').textContent),'69');
-  assert.match(await page.getAttribute('#cj-n-VOL','aria-valuetext'),/69\ssur\s99, valeur calculée 64/);
-  await page.focus('#cj-n-AER');for(let k=0;k<9;k++)await page.keyboard.press('ArrowLeft');
-  assert.equal(await page.inputValue('#cj-n-AER'),'54');
-  const gAj=Number(await page.textContent('#cj-globale'));
-  assert.equal(gAj,await page.evaluate(()=>window.PA_CARTE.calcul.globale({VOL:69,AER:54,DEF:63,LOB:64,SER:63,TAC:63},'droite')),'globale recalculée avec les notes ajustées');
-  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).ajustements.VOL),5);
-  ok('ajustements : bornés à +5 / −5 (curseur et clavier), globale recalculée, ajustement gardé dans pa-carte');
-  // Photo : fichier généré par un canvas, recadré, gardé
+  await page.click('#cj-rangs-choix button:nth-child(2)');
   await page.click('#cj-vers-photo');
   assert.equal(await page.evaluate(()=>document.activeElement.closest('.cj-etape').id),'cj-photo');
+  const v2=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
+  assert.equal(v2.version,2);assert.deepEqual(v2.notes,{VOL:64,AER:59,DEF:63,LOB:64,SER:63,TAC:63});
+  assert.equal(v2.poste,'droite');assert.equal(v2.rang,'argent');assert.equal(v2.rangChoisi,true);assert.equal(v2.pseudo,'');assert.equal(v2.modele,'neon');assert.equal(v2.photo,false);
+  assert.ok(!('reponses' in v2)&&!('base' in v2)&&!('sansBase' in v2));
+  ok('pa-carte au format 2 à la sortie de l\'étape notes : notes, poste droite, rang argent choisi, sans réponses ni repère');
+  // Photo : fichier généré par un canvas, recadré, gardé
   const png=Buffer.from((await page.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=1000;const x=c.getContext('2d');x.fillStyle='#2a6';x.fillRect(0,0,800,1000);x.fillStyle='#fc3';x.beginPath();x.arc(400,300,180,0,7);x.fill();return c.toDataURL('image/png');})).split(',')[1],'base64');
   await page.setInputFiles('#cj-fichier',{name:'moi.png',mimeType:'image/png',buffer:png});
   await page.waitForSelector('#cj-recadrage:not([hidden])');
@@ -167,7 +225,9 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   await page.fill('#cj-pseudo','Hugo D.');await page.keyboard.press('Enter');
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.equal(await page.evaluate(()=>document.activeElement.closest('.cj-etape').id),'cj-final');
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: \d+, Argent, poste droite\. Volée 69, Jeu aérien 54/);
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: 63, Argent, poste droite\. Volée 64, Jeu aérien 59/);
+  assert.equal((await page.textContent('#cj-modifier-notes')).trim(),'Modifier mes notes');
+  assert.equal(await page.locator('#cj-final button',{hasText:'Refaire'}).count(),0,'plus de « Refaire mes réponses »');
   assert.equal(await page.getAttribute('#cj-apercu-canvas','role'),'img');
   assert.equal(await page.getAttribute('#cj-canvas','aria-hidden'),'true',"canvas d'export masqué aux lecteurs d'écran (doublon)");
   // Le canvas d'export porte bien la photo en duotone : le disque jaune (clair) du fichier de test, au centre de la zone photo,
@@ -214,9 +274,9 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.match(await page.textContent('#cj-retrouvee'),/gardée sur cet appareil/);
   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(': '+gAj+', Argent.*Avec ta photo\.'));
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/: 63, Argent.*Avec ta photo\./);
   assert.equal(await page.evaluate(()=>document.activeElement===document.body),true);
-  ok('rechargement : carte, pseudo, ajustements et photo retrouvés, sans déplacer le focus');
+  ok('rechargement : carte, pseudo, notes, rang et photo retrouvés, sans déplacer le focus');
   // Choix du modèle : un bouton par modèle de CARTE_RENDU.MODELES, miniature dessinée, aperçu et export changés, choix gardé
   const MODELES=await page.evaluate(()=>window.CARTE_RENDU.MODELES);
   assert.ok(Array.isArray(MODELES)&&MODELES.length===4,'4 modèles dans CARTE_RENDU.MODELES');
@@ -226,7 +286,7 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.deepEqual(await page.$$eval('#cj-modeles .cj-modele',bs=>bs.map(b=>b.getAttribute('aria-pressed'))),['true','false','false','false'],'Néon par défaut');
   assert.deepEqual(await page.$$eval('#cj-modeles .cj-modele .cj-modele-nom',s=>s.map(x=>x.textContent)),MODELES.map(m=>m.nom));
   await page.waitForFunction(()=>[...document.querySelectorAll('#cj-modeles .cj-modele canvas')].every(c=>{const d=c.getContext('2d').getImageData(c.width/2,c.height/2,1,1).data;return d[3]>0;}),null,{timeout:15000});
-  const reponsesAvant=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).reponses);
+  const notesAvant=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).notes);
   const apercuAvant=await page.evaluate(()=>document.getElementById('cj-apercu-canvas').toDataURL());
   const exportAvant=await page.evaluate(()=>document.getElementById('cj-canvas').toDataURL('image/jpeg',.5));
   const deuxieme=MODELES[1];
@@ -236,8 +296,8 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   await page.waitForFunction(a=>document.getElementById('cj-canvas').toDataURL('image/jpeg',.5)!==a,exportAvant,{timeout:15000});
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(' Modèle '+deuxieme.nom+'\\.$'));
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).modele),deuxieme.cle);
-  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).reponses),reponsesAvant,'réponses inchangées');
-  assert.equal(await page.locator('#cj-final').isVisible(),true,'toujours à l\'étape carte : pas de questionnaire refait');
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).notes),notesAvant,'notes inchangées');
+  assert.equal(await page.locator('#cj-final').isVisible(),true,'toujours à l\'étape carte');
   [dl]=await Promise.all([page.waitForEvent('download'),page.click('#cj-telecharger')]);
   assert.equal(dl.suggestedFilename(),'ma-carte-padel.'+EXT_ATTENDUE);
   await page.goto(base+'/carte.html');
@@ -246,7 +306,7 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp(' Modèle '+deuxieme.nom+'\\.$'));
   await page.click('#cj-modeles .cj-modele:nth-child(1)');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).modele),'neon');
-  ok('modèles : 4 boutons (groupe nommé, aria-pressed, miniatures dessinées) ; '+deuxieme.nom+' change aperçu et export, aria-label, gardé dans pa-carte et au rechargement, sans refaire le questionnaire');
+  ok('modèles : 4 boutons (groupe nommé, aria-pressed, miniatures dessinées) ; '+deuxieme.nom+' change aperçu et export, aria-label, gardé dans pa-carte et au rechargement, sans toucher aux notes');
   // Repli : carte-rendu.js sans MODELES (ancienne version en cache) → un seul modèle, groupe masqué, rien ne casse
   {
    const p2=await ctx.newPage();p2.on('pageerror',e=>erreurs.push(e.message));
@@ -279,39 +339,28 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),null);
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/Sans photo, initiales HD\./);
   ok('« Retirer la photo » : pa-carte-photo effacée, initiales HD sur la carte');
-  // Repère ignoré : notes sans repère (plage 16 à 90)
-  await page.click('#cj-retour-notes');await page.click('#cj-refaire-1');
-  await page.check('#cj-sans-base');
-  await repondreClavier(page,[1,3,3,1,0,3,2,3,3,1,2,3]);
-  const sansBase=Number(await page.inputValue('#cj-n-VOL'));assert.ok(sansBase>69,'sans repère, la volée de Hugo dépasse la plage P100 ('+sansBase+')');
-  ok('« Ne pas en tenir compte » : notes calculées sans repère');
-  // « Refaire mes réponses » : même joueur, le nom, la photo et le choix du repère sont gardés
-  const HUGO=[1,3,3,1,0,3,2,3,3,1,2,3];
-  assert.equal((await page.textContent('#cj-refaire-1')).trim(),'Refaire mes réponses');
-  assert.equal((await page.textContent('#cj-refaire-2')).trim(),'Refaire mes réponses');
-  await page.click('#cj-refaire-1');
-  assert.equal(await page.isChecked('#cj-sans-base'),true,'choix « sans repère » gardé');
-  assert.match(await page.textContent('#cj-base-txt'),/Repère de ton niveau ignoré\s: décoche la case/);
-  await page.uncheck('#cj-sans-base');
-  assert.match(await page.textContent('#cj-base-txt'),/Tes notes partent de ton repère\s: P100/);
-  await repondreClavier(page,HUGO);
-  assert.equal(await page.inputValue('#cj-n-VOL'),'64','repère P100 de nouveau appliqué');
+  // « Modifier mes notes » : retour à l'étape notes, tout est gardé (notes, poste, rang choisi, nom), changement enregistré
+  await page.click('#cj-retour-notes');
+  assert.equal(await page.locator('#cj-notes').isVisible(),true);
+  assert.deepEqual(await lireNotes(page),{VOL:64,AER:59,DEF:63,LOB:64,SER:63,TAC:63});
+  assert.deepEqual(await presse(page,'#cj-postes'),['Droite']);assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Argent']);
+  await poserNote(page,'VOL',90);
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).notes.VOL),90,'note modifiée gardée');
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Argent'],'rang choisi gardé');
   await page.click('#cj-vers-photo');
   await page.setInputFiles('#cj-fichier',{name:'moi.png',mimeType:'image/png',buffer:png});
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).photo===true&&!!localStorage.getItem('pa-carte-photo'));
   await page.click('#cj-vers-pseudo');
   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
   await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
-  assert.equal(await page.locator('#cj-final').isVisible(),true);
-  await page.click('#cj-refaire-2');
-  await repondreClavier(page,HUGO);
-  await page.click('#cj-vers-photo');
-  assert.equal(await page.locator('#cj-depot-apercu').isVisible(),true,'photo gardée');
-  await page.click('#cj-vers-pseudo');
-  assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.','nom gardé');
-  await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: 63, Argent.*Avec ta photo\./);
-  ok('« Refaire mes réponses » (étapes notes et carte) : nom, photo et choix du repère gardés');
+  await page.focus('#cj-modifier-notes');await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-notes');
+  assert.equal(await page.inputValue('#cj-n-VOL'),'90');
+  await page.click('#cj-vers-photo');assert.equal(await page.locator('#cj-depot-apercu').isVisible(),true,'photo gardée');
+  await page.click('#cj-vers-pseudo');await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
+  const gHugo=await page.evaluate(()=>window.PA_CARTE.calcul.globale({VOL:90,AER:59,DEF:63,LOB:64,SER:63,TAC:63},'droite'));
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp('^Carte de joueur de Hugo D\\.\\s: '+gHugo+', Argent, poste droite\\. Volée 90.*Avec ta photo\\.'));
+  ok('« Modifier mes notes » (étapes photo et carte) : notes, poste, rang choisi, nom et photo gardés, note modifiée enregistrée');
   // « Faire une nouvelle carte » (pour un ami) depuis l'étape carte, au clavier
   await page.click('#cj-modeles .cj-modele:nth-child(3)');
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).modele!=='neon');
@@ -322,36 +371,33 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.equal(await page.textContent('#cj-nouvelle-aide-2'),"Pour toi ou pour quelqu'un d'autre : tout repart de zéro.");
   assert.equal(await page.getAttribute('#cj-nouvelle-2','aria-describedby'),'cj-nouvelle-aide-2');
   await page.focus('#cj-nouvelle-2');await page.keyboard.press('Enter');
-  assert.equal(await page.locator('#cj-quiz').isVisible(),true);
-  assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-quiz','focus sur le titre du questionnaire');
+  assert.equal(await page.locator('#cj-notes').isVisible(),true);
+  assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-notes','focus sur le titre des notes');
   await page.waitForFunction(()=>document.getElementById('cj-annonce').textContent==='Nouvelle carte : tout repart de zéro.');
   assert.equal(await page.getAttribute('#cj-annonce','aria-live'),'polite');
-  assert.match(await page.textContent('#cj-qnum'),/Situation 1\ssur\s12/);
-  assert.equal(await page.evaluate(()=>document.getElementById('cj-qbar').style.width),'0%');
-  assert.equal(await page.locator('#cj-apercu').isVisible(),false,"aucune réponse : pas d'aperçu");
-  assert.equal(await page.isChecked('#cj-sans-base'),true,'repère non appliqué par défaut');
-  assert.equal(await page.textContent('#cj-base-txt'),"Repère de ton niveau ignoré : décoche la case pour l'utiliser si la carte est pour toi. Ton repère : P100 (test de niveau).");
+  assert.deepEqual(await lireNotes(page),{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:60},'notes remises à 60');
+  for(const k of CLES)assert.equal(await page.inputValue('#cj-v-'+k),'60');
+  assert.deepEqual(await presse(page,'#cj-postes'),['Polyvalent']);
+  assert.deepEqual(await presse(page,'#cj-rangs-choix'),['Argent'],'rang suggéré, plus le rang choisi');
+  assert.match(await page.textContent('#cj-rang-suggere'),/garde la suggestion/);
   assert.equal(await page.locator('#cj-retrouvee').isVisible(),false);
-  assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true,'carte gardée : bouton du haut proposé pendant le questionnaire');
+  assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true,'carte gardée : bouton du haut proposé pendant les notes');
   assert.equal(await page.inputValue('#cj-pseudo'),'','pseudo vide');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur\s: 60, Argent, poste polyvalent\..*Sans photo\./);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte gardée au clic');
+  await poserNote(page,'TAC',80);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte gardée tant que les notes ne sont pas validées');
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'ancienne photo gardée au clic');
-  ok('« Faire une nouvelle carte » : questionnaire à zéro, focus sur son titre, annonce aria-live, repère ignoré par défaut (texte clair), pseudo vide, ancienne carte et photo gardées');
-  // Réponses « moyennes » : notes sans repère, différentes de la plage P100
-  const MOY=Array(12).fill(1);
-  const attendu=await page.evaluate(m=>({sans:window.PA_CARTE.calcul.carte(m).notes,avec:window.PA_CARTE.calcul.carte(m,{base:{palier:2}}).notes}),MOY);
-  assert.notDeepEqual(attendu.sans,attendu.avec,'jeu de réponses discriminant');
-  await repondreClavier(page,MOY,0,11);
-  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte toujours là avant la fin du questionnaire');
-  await repondreClavier(page,MOY,11,12);
-  assert.equal(await page.locator('#cj-notes').isVisible(),true);
-  for(const k of Object.keys(attendu.sans))assert.equal(Number(await page.inputValue('#cj-n-'+k)),attendu.sans[k],k+' sans repère');
+  ok('« Faire une nouvelle carte » : notes à 60, Polyvalent et rang suggéré, focus sur le titre, annonce aria-live, pseudo vide, sans photo, ancienne carte et photo gardées');
+  await page.click('#cj-vers-photo');
   const nouvelle=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
-  assert.deepEqual(nouvelle.reponses,MOY,'ancienne carte remplacée à la fin du questionnaire');
-  assert.equal(nouvelle.pseudo,'');assert.equal(nouvelle.sansBase,true);assert.equal(nouvelle.base,null);assert.equal(nouvelle.modele,'neon');assert.equal(nouvelle.photo,false);assert.equal(nouvelle.poste,null);
+  assert.deepEqual(nouvelle.notes,{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80});
+  assert.equal(nouvelle.version,2);assert.equal(nouvelle.pseudo,'');assert.equal(nouvelle.modele,'neon');assert.equal(nouvelle.photo,false);
+  assert.equal(nouvelle.poste,'polyvalent');assert.equal(nouvelle.posteChoisi,false);assert.equal(nouvelle.rangChoisi,false);
+  assert.equal(nouvelle.rang,await page.evaluate(n=>window.PA_CARTE.calcul.rang(window.PA_CARTE.calcul.globale(n,'polyvalent')),nouvelle.notes));
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'photo jamais effacée par la nouvelle carte');
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur\s: .*Sans photo\./);
-  ok('nouvelle carte : notes sans repère (≠ plage P100), pa-carte remplacée seulement à la fin, poste, nom et modèle remis à zéro, pas de photo');
+  assert.equal(await page.locator('#cj-depot-apercu').isVisible(),false);
+  ok('nouvelle carte : pa-carte remplacée seulement en validant les notes (format 2, rang non choisi, nom et modèle remis à zéro, pas de photo)');
   // Rechargement en cours de route : la nouvelle carte (sans nom) est reprise à l'étape nom, sans l'ancienne photo
   await page.goto(base+'/carte.html');
   assert.equal(await page.locator('#cj-pseudo-etape').isVisible(),true);
@@ -367,9 +413,46 @@ async function repondreClavier(page,reponses,debut=0,fin=12){
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Nina R\.\s: .*Sans photo, initiales NR\./);
   await page.waitForSelector('#cj-modeles .cj-modele');
   assert.equal(await page.getAttribute('#cj-modeles .cj-modele:nth-child(1)','aria-pressed'),'true','modèle Néon par défaut');
+  ok("nouvelle carte après rechargement : reprise à l'étape nom sans l'ancienne photo, « Nina R. » en Néon");
+  // Migration d'une carte version 1 (ancien questionnaire) : mêmes notes, poste, nom, modèle et photo ; rang = rang calculé
+  const MODELE3=MODELES[2].cle;
+  const v1={version:1,date:'2026-10-20T10:00:00.000Z',reponses:[1,3,3,1,0,3,2,3,3,1,2,3],ajustements:{VOL:5,AER:-5,DEF:0,LOB:0,SER:0,TAC:0},
+   poste:'droite',pseudo:'Hugo D.',sansBase:false,base:{palier:2},modele:MODELE3,photo:true};
+  await page.evaluate(([c,ph])=>{localStorage.setItem('pa-carte',JSON.stringify(c));localStorage.setItem('pa-carte-photo',ph);},[v1,photoAncienne]);
+  await page.goto(base+'/carte.html');
+  assert.equal(await page.locator('#cj-final').isVisible(),true);
+  const attenduV1={VOL:69,AER:54,DEF:63,LOB:64,SER:63,TAC:63};
+  const gV1=await page.evaluate(n=>window.PA_CARTE.calcul.globale(n,'droite'),attenduV1),rV1=await page.evaluate(g=>window.PA_CARTE.calcul.rang(g),gV1);
+  const migree=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
+  assert.equal(migree.version,2);assert.deepEqual(migree.notes,attenduV1);
+  assert.equal(migree.poste,'droite');assert.equal(migree.rang,rV1);assert.equal(migree.rangChoisi,false);
+  assert.equal(migree.pseudo,'Hugo D.');assert.equal(migree.modele,MODELE3);assert.equal(migree.photo,true);
+  assert.ok(!('reponses' in migree));
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp('^Carte de joueur de Hugo D\\.\\s: '+gV1+', .*poste droite\\. Volée 69, Jeu aérien 54.*Avec ta photo\\.'));
+  await page.click('#cj-modifier-notes');
+  assert.deepEqual(await lireNotes(page),attenduV1);
+  // Carte version 1 sans poste ni repère : poste suggéré par le calcul d'origine
+  const v1b={version:1,date:'2026-10-20T10:00:00.000Z',reponses:[2,1,1,0,1,0,1,0,2,3,1,2],ajustements:{},poste:null,pseudo:'Léa',sansBase:true,base:null,modele:'neon',photo:false};
+  await page.evaluate(c=>localStorage.setItem('pa-carte',JSON.stringify(c)),v1b);
+  await page.goto(base+'/carte.html');
+  const migreeB=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
+  assert.deepEqual(migreeB.notes,{VOL:16,AER:16,DEF:20,LOB:16,SER:28,TAC:26});assert.equal(migreeB.poste,'polyvalent');assert.equal(migreeB.rang,'bronze');assert.equal(migreeB.photo,false);
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Léa\s: 20, Bronze, poste polyvalent\..*Sans photo/);
+  // Carte illisible : page d'accueil, et rien n'est écrasé
+  const cassee=JSON.stringify({version:2,notes:{VOL:'x'}});
+  await page.evaluate(c=>localStorage.setItem('pa-carte',c),cassee);
+  await page.goto(base+'/carte.html');
+  assert.equal(await page.locator('#cj-intro').isVisible(),true);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),cassee,'carte illisible laissée telle quelle');
+  ok('migration v1 → v2 : Hugo (69 / 54 / 63…, droite, modèle '+MODELE3+', photo) et Léa (poste suggéré, 20 Bronze) repris au format 2 ; carte illisible jamais écrasée');
+  // Aucune lecture ni écriture des données d'autres pages
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-academie')),acadAvant);
-  ok("nouvelle carte après rechargement : reprise à l'étape nom sans l'ancienne photo, « Nina R. » en Néon ; pa-quiz-dernier et pa-academie intacts");
+  assert.ok(lus.has('pa-carte'),'relevé des lectures actif');
+  assert.ok(!lus.has('pa-quiz-dernier')&&!lus.has('pa-academie'),'lectures de la carte : '+[...lus].join(', '));
+  ok('pa-quiz-dernier et pa-academie ni lus ni écrits par la carte (lectures : '+[...lus].sort().join(', ')+')');
+  // Carte de Nina remise pour la suite
+  await page.evaluate(()=>localStorage.setItem('pa-carte',JSON.stringify({version:2,notes:{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80},poste:'polyvalent',posteChoisi:false,rang:'argent',rangChoisi:false,pseudo:'Nina R.',modele:'neon',photo:false})));
   // Débordement : 390 puis 320 px, à chaque étape
   for(const w of [390,320]){
    await page.setViewportSize({width:w,height:844});

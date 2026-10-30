@@ -146,3 +146,12 @@
 /* ---- Compteur « N cartes créées » (#cj-compteur), sur la même ligne que la pastille de présence (p.presence-ligne, style.css).
    Il passe toujours à la ligne et garde sa hauteur même vide : quand le nombre arrive, rien ne bouge (390 et 320 px compris). ---- */
 #cj-compteur{flex:1 0 100%;min-height:1.5em}
+
+/* ---- Notes libres (30/10/2026, dev-front) : un curseur 1 à 99 + un champ numérique par attribut, sous-titres Poste et Rang.
+   Le champ garde sa largeur fixe (2 chiffres) ; le curseur prend le reste, à 320 px compris. ---- */
+.cj-sous-titre{font-size:1.1rem;margin-top:var(--s-4)}
+.cj-note .range{gap:var(--s-3)}
+.cj-note .range input[type=number]{flex:0 0 4.6rem;width:4.6rem;min-height:48px;padding:8px 6px;text-align:center;
+  background:rgba(0,0,0,.25);border:1px solid var(--field-line);border-radius:var(--r-s);color:var(--sand);
+  font-family:var(--display);font-weight:900;font-size:1.5rem;font-variant-numeric:tabular-nums;color-scheme:dark}
+.cj-note .range input[type=number]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}

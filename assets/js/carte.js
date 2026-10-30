@@ -1,13 +1,17 @@
 /* MA CARTE DE JOUEUR · logique de la page carte.html.
-   Données et moteur : carte-donnees.js (window.PA_CARTE) ; rendu image : carte-rendu.js (window.CARTE_RENDU) ;
-   styles : assets/carte.css. Tout se passe sur l'appareil :
-   - pa-carte : réponses, ajustements, poste, pseudo, choix du repère, modèle de carte, présence d'une photo (JSON, version 1) ;
-   - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée ;
-   - pa-quiz-dernier (palier du test de niveau) et pa-academie (niveau Mon académie) : LUS pour proposer un point de départ,
-     jamais écrits, jamais convertis l'un en l'autre.
-   Parcours : intro → questionnaire (12 situations, une par une) → notes et poste → photo → nom → carte (image à télécharger
-   ou partager). « Refaire mes réponses » garde le joueur (poste, nom, photo, repère) ; « Faire une nouvelle carte » repart
-   de zéro (pour soi ou pour un ami), repère ignoré par défaut, et ne remplace la carte gardée qu'à la fin du questionnaire.
+   Données et moteur : carte-donnees.js (window.PA_CARTE : attributs, postes, rangs, calcul de la globale) ;
+   rendu image : carte-rendu.js (window.CARTE_RENDU) ; styles : assets/carte.css. Tout se passe sur l'appareil :
+   - pa-carte : la carte (JSON, version 2) : {version:2, date, notes:{VOL,AER,DEF,LOB,SER,TAC} de 1 à 99, poste,
+     posteChoisi, rang (bronze, argent, or, elite), rangChoisi, pseudo, modele, photo (présence d'une photo)} ;
+     une carte version 1 (faite avec l'ancien questionnaire) est convertie sans rien perdre au premier chargement :
+     notes calculées + ajustements, poste, pseudo, modèle, photo ; rang = rang calculé (non choisi) ;
+   - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée.
+   La page ne lit aucune autre donnée du joueur (ni le test de niveau, ni Mon académie).
+   Parcours : intro → notes (6 curseurs de 1 à 99, poste, rang choisi librement) → photo → nom → carte (image à
+   télécharger ou partager). Le rang suit la suggestion (CARTE_CALCUL.rang de la note globale) tant que le joueur n'en a
+   pas choisi un ; ensuite son choix est gardé, même si la globale change. « Modifier mes notes » revient à l'étape notes en
+   gardant tout ; « Faire une nouvelle carte » remet les notes à 60, poste et rang par défaut, sans photo ni nom, et ne
+   remplace la carte gardée qu'au passage à l'étape photo (« Continuer : ma photo »).
    Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
    Mesure : un téléchargement ou un partage réussi envoie à GoatCounter l'événement « carte-generee », sans aucune donnée
    de la carte (rien si le visiteur a refusé la mesure : clé skipgc). Le total public n'est lu que si COMPTEUR.actif. */
@@ -15,10 +19,9 @@
  "use strict";
  const page=document.getElementById("cj-page"),D=window.PA_CARTE;
  if(!page||!D)return;
- const CALC=D.calcul,CLES=D.CLES,NB=D.QUESTIONS.length;
+ const CALC=D.calcul,CLES=D.CLES;
  const CLE_CARTE="pa-carte",CLE_PHOTO="pa-carte-photo";
- // Libellés des paliers du test de niveau (0 à 5) : affichage seulement, jamais convertis en niveau 1 à 10
- const PALIERS=["Découverte","P25","P100","P250","P500","P1000 et +"];
+ const NOTE_DEFAUT=60; // note de départ de chaque attribut (nouvelle carte)
  const PHOTO_L=600,PHOTO_H=480; // zone photo de la carte (600 × 480 sur une base de 600 × 900), même rapport que le recadrage
  const el=(b,c,t)=>{const x=document.createElement(b);if(c)x.className=c;if(t!==undefined)x.textContent=t;return x;};
  const $=id=>document.getElementById(id);
@@ -26,10 +29,14 @@
  const lireJ=(cle,defaut)=>{try{const v=JSON.parse(localStorage.getItem(cle)||"null");return v===null?defaut:v;}catch(e){return defaut;}};
  const ecrire=(cle,v)=>{try{localStorage.setItem(cle,typeof v==="string"?v:JSON.stringify(v));return true;}catch(e){return false;}};
  const retirer=cle=>{try{localStorage.removeItem(cle);}catch(e){}};
+ const notesDefaut=()=>CLES.reduce((o,k)=>{o[k]=NOTE_DEFAUT;return o;},{});
+ const posteValide=cle=>D.POSTES.some(p=>p.cle===cle);
+ const rangValide=cle=>D.RANGS.some(r=>r.cle===cle);
 
- /* ---- État ---- */
- const etat={reponses:Array(NB).fill(null),ajustements:{},poste:null,pseudo:"",sansBase:false,photo:null,imgPhoto:null,etape:"intro",modele:"neon"};
- let iQuestion=0;
+ /* ---- État ----
+    poste : null = suivre le poste suggéré ; rang : null = suivre le rang suggéré (rangChoisi false).
+    enregistrable : false pour une carte neuve tant que l'étape notes n'est pas validée (l'ancienne carte reste gardée). */
+ const etat={notes:notesDefaut(),poste:null,rang:null,rangChoisi:false,pseudo:"",photo:null,imgPhoto:null,etape:"intro",modele:"neon",enregistrable:false};
 
  /* ---- Modèles de carte (dessinés par carte-rendu.js) : repli sur le seul modèle Néon si la liste n'existe pas ---- */
  const MODELE_DEFAUT={cle:"neon",nom:"Néon",description:""};
@@ -41,53 +48,64 @@
  const modeleValide=cle=>modeles().some(m=>m.cle===cle);
  const modeleCourant=()=>modeles().find(m=>m.cle===etat.modele)||modeles()[0];
 
- /* ---- Repère de départ (lecture seule) : palier du test, sinon niveau Mon académie ---- */
- function lireRepere(){
-  const q=lireJ("pa-quiz-dernier",null);
-  if(q&&Number.isInteger(q.palier)&&q.palier>=0&&q.palier<=5)return {palier:q.palier,libelle:PALIERS[q.palier]+" (test de niveau)",carte:PALIERS[q.palier]+" · test de niveau"};
-  const a=lireJ("pa-academie",null);
-  if(a&&Number.isInteger(a.niveau)&&a.niveau>=1&&a.niveau<=10)return {niveau:a.niveau,libelle:"niveau "+a.niveau+" sur 10 (Mon académie)",carte:"Niveau "+a.niveau+" sur 10 · Mon académie"};
-  return null;
- }
- const repere=lireRepere();
- const baseCalcul=()=>repere&&!etat.sansBase?(Number.isInteger(repere.palier)?{palier:repere.palier}:{niveau:repere.niveau}):null;
-
- /* ---- Calcul : notes brutes + ajustements bornés, globale, rang ---- */
- function ajustement(cle){const a=Number(etat.ajustements[cle])||0;return Math.max(-5,Math.min(5,Math.round(a)));}
+ /* ---- Calcul : globale d'après les notes et le poste, rang suggéré, rang retenu ---- */
  function calculer(){
-  const c=CALC.carte(etat.reponses,{base:baseCalcul(),poste:etat.poste});
-  const notes={};CLES.forEach(k=>{notes[k]=borne(c.notes[k]+ajustement(k));});
-  const poste=etat.poste||c.posteSuggere,globale=CALC.globale(notes,poste);
-  return {brutes:c.notes,notes,poste,posteSuggere:c.posteSuggere,globale,rang:CALC.rang(globale)};
+  const notes={};CLES.forEach(k=>{notes[k]=borne(Number(etat.notes[k])||NOTE_DEFAUT);});
+  const posteSuggere=CALC.posteSuggere(notes,null),poste=etat.poste||posteSuggere;
+  const globale=CALC.globale(notes,poste),rangSuggere=CALC.rang(globale);
+  const rang=etat.rangChoisi&&rangValide(etat.rang)?etat.rang:rangSuggere;
+  return {notes,poste,posteSuggere,globale,rangSuggere,rang};
  }
- const complet=()=>etat.reponses.every((r,i)=>Number.isInteger(r)&&r>=0&&r<D.QUESTIONS[i].r.length);
  const libPoste=cle=>(D.POSTES.find(p=>p.cle===cle)||{}).libelle||"";
  const libRang=cle=>(D.RANGS.find(r=>r.cle===cle)||{}).libelle||"";
  const libAttr=cle=>(D.ATTRIBUTS.find(a=>a.cle===cle)||{}).libelle||cle;
 
+ /* ---- Lecture de la carte gardée : version 2, ou version 1 convertie (sans écrire : voir restaurer) ---- */
+ function lireCarte(){
+  const s=lireJ(CLE_CARTE,null);
+  if(!s||typeof s!=="object")return null;
+  const commun={date:typeof s.date==="string"?s.date:"",pseudo:typeof s.pseudo==="string"?s.pseudo:"",
+   modele:typeof s.modele==="string"?s.modele:"",photo:s.photo};
+  if(s.version===2&&s.notes&&typeof s.notes==="object"){
+   const notes={};
+   for(const k of CLES){const v=Number(s.notes[k]);if(!Number.isFinite(v))return null;notes[k]=borne(v);}
+   const rangChoisi=s.rangChoisi===true&&rangValide(s.rang);
+   const poste=posteValide(s.poste)&&s.posteChoisi!==false?s.poste:null;
+   return {...commun,notes,poste,rang:rangChoisi?s.rang:null,rangChoisi,migree:false};
+  }
+  // Version 1 (questionnaire) : notes = calcul des réponses avec le repère enregistré dans la carte + ajustements (±5)
+  if(s.version===1&&Array.isArray(s.reponses)&&D.QUESTIONS&&s.reponses.length===D.QUESTIONS.length){
+   const ok=s.reponses.every((r,i)=>Number.isInteger(r)&&r>=0&&r<D.QUESTIONS[i].r.length);
+   if(!ok)return null;
+   const base=s.base&&(Number.isInteger(s.base.palier)||Number.isInteger(s.base.niveau))?s.base:null;
+   const brutes=CALC.notes(s.reponses,base),notes={};
+   CLES.forEach(k=>{const a=Math.max(-5,Math.min(5,Math.round(Number(s.ajustements&&s.ajustements[k])||0)));notes[k]=borne(brutes[k]+a);});
+   const poste=posteValide(s.poste)?s.poste:CALC.posteSuggere(notes,base);
+   return {...commun,notes,poste,rang:null,rangChoisi:false,migree:true};
+  }
+  return null;
+ }
+
  /* ---- Sauvegarde de la carte (sans la photo, gardée à part) ---- */
  function sauver(){
-  if(!complet())return;
-  ecrire(CLE_CARTE,{version:1,date:new Date().toISOString(),reponses:etat.reponses.slice(),ajustements:CLES.reduce((o,k)=>{o[k]=ajustement(k);return o;},{}),
-   poste:etat.poste,pseudo:etat.pseudo,sansBase:etat.sansBase,base:baseCalcul(),modele:modeleCourant().cle,
+  if(!etat.enregistrable)return;
+  const r=calculer();
+  ecrire(CLE_CARTE,{version:2,date:new Date().toISOString(),notes:r.notes,poste:r.poste,posteChoisi:!!etat.poste,
+   rang:r.rang,rangChoisi:etat.rangChoisi,pseudo:etat.pseudo,modele:modeleCourant().cle,
    photo:!!etat.photo}); // photo:false : la photo encore gardée dans pa-carte-photo appartient à une carte précédente
  }
  function restaurer(){
-  const s=lireJ(CLE_CARTE,null);
-  if(!s||s.version!==1||!Array.isArray(s.reponses)||s.reponses.length!==NB)return false;
-  etat.reponses=s.reponses.map((r,i)=>Number.isInteger(r)&&r>=0&&r<D.QUESTIONS[i].r.length?r:null);
-  if(!complet()){etat.reponses=Array(NB).fill(null);return false;}
-  etat.ajustements={};CLES.forEach(k=>{etat.ajustements[k]=Math.max(-5,Math.min(5,Number(s.ajustements&&s.ajustements[k])||0));});
-  etat.poste=D.POSTES.some(p=>p.cle===s.poste)?s.poste:null;
-  etat.pseudo=typeof s.pseudo==="string"?s.pseudo:"";
-  etat.sansBase=!!s.sansBase;
-  if(typeof s.modele==="string"&&modeleValide(s.modele))etat.modele=s.modele; // modèle inconnu (retiré depuis) : premier de la liste
+  const s=lireCarte();
+  if(!s)return false;
+  etat.notes=s.notes;etat.poste=s.poste;etat.rang=s.rang;etat.rangChoisi=s.rangChoisi;etat.pseudo=s.pseudo;
+  if(s.modele&&modeleValide(s.modele))etat.modele=s.modele; // modèle inconnu (retiré depuis) : premier de la liste
+  etat.enregistrable=true;
   return s;
  }
 
  /* ---- Étapes ---- */
- const ETAPES=["intro","quiz","notes","photo","pseudo","final"];
- const carteGardee=()=>{const s=lireJ(CLE_CARTE,null);return !!(s&&s.version===1&&Array.isArray(s.reponses)&&s.reponses.length===NB);};
+ const ETAPES=["intro","notes","photo","pseudo","final"];
+ const carteGardee=()=>!!lireCarte();
  function allerA(nom,focus){
   etat.etape=nom;
   page.querySelectorAll(".cj-etape").forEach(z=>{z.hidden=z.dataset.etape!==nom;});
@@ -104,56 +122,18 @@
   const haut=$("cj-nouvelle-haut");
   if(haut)haut.hidden=nom==="final"||!carteGardee();
   const apercu=$("cj-apercu");
-  if(apercu){apercu.hidden=!complet()||nom==="quiz"||nom==="intro";if(!apercu.hidden)rendreApercu();else if(arretApercu){arretApercu();arretApercu=null;}}
+  if(apercu){apercu.hidden=nom==="intro";if(!apercu.hidden)rendreApercu();else if(arretApercu){arretApercu();arretApercu=null;}}
   if(focus){
    const z=page.querySelector('.cj-etape[data-etape="'+nom+'"] h2');
    if(z){z.scrollIntoView({block:"nearest"});z.focus({preventScroll:true});}
   }
  }
 
- /* ---- Questionnaire ---- */
- function melanger(n){const a=[...Array(n).keys()];for(let k=n-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;}
- function montrerRepere(){
-  const bloc=$("cj-base"),txt=$("cj-base-txt"),case_=$("cj-sans-base");
-  if(!bloc||!txt||!case_)return;
-  if(!repere){bloc.hidden=true;return;}
-  bloc.hidden=false;
-  // Le texte suit la case : repère appliqué, ou ignoré (cas par défaut d'une nouvelle carte, peut-être pour quelqu'un d'autre)
-  const texte=()=>{txt.textContent=etat.sansBase
-   ?"Repère de ton niveau ignoré : décoche la case pour l'utiliser si la carte est pour toi. Ton repère : "+repere.libelle+"."
-   :"Tes notes partent de ton repère : "+repere.libelle+". Elles resteront dans une plage cohérente avec ce repère.";};
-  case_.checked=etat.sansBase;texte();
-  case_.onchange=()=>{etat.sansBase=case_.checked;texte();if(complet()){rendreNotes();sauver();}};
- }
- function rendreQuestion(focus){
-  const q=D.QUESTIONS[iQuestion],titre=$("cj-qtext"),opts=$("cj-qopts");
-  $("cj-qnum").textContent="Situation "+(iQuestion+1)+" sur "+NB;
-  $("cj-qbar").style.width=(iQuestion/NB*100)+"%";
-  titre.textContent=q.q;
-  opts.textContent="";
-  melanger(q.r.length).forEach(k=>{
-   const b=el("button","qopt",q.r[k].t);b.type="button";
-   b.addEventListener("click",()=>{
-    etat.reponses[iQuestion]=k;
-    iQuestion++;
-    if(iQuestion<NB){rendreQuestion(true);return;}
-    // Questionnaire terminé : ajustements remis à zéro, poste à choisir
-    etat.ajustements={};
-    sauver();rendreNotes();allerA("notes",true);
-   });
-   opts.appendChild(b);
-  });
-  if(focus)titre.focus();
- }
- function demarrerQuestionnaire(focus){
-  iQuestion=0;etat.reponses=Array(NB).fill(null);etat.ajustements={};
-  montrerRepere();allerA("quiz",false);rendreQuestion(focus);
- }
- /* Nouvelle carte (pour soi ou pour un ami) : tout repart de zéro, repère ignoré par défaut. Rien n'est effacé ici :
-    pa-carte n'est remplacée qu'à la fin du questionnaire (sauver), pa-carte-photo seulement au choix d'une nouvelle photo. */
+ /* Nouvelle carte (pour soi ou pour un ami) : notes à 60, poste et rang suggérés, sans photo ni nom. Rien n'est effacé ici :
+    pa-carte n'est remplacée qu'en quittant l'étape notes, pa-carte-photo seulement au choix d'une nouvelle photo. */
  function nouvelleCarte(){
-  etat.reponses=Array(NB).fill(null);etat.ajustements={};etat.poste=null;etat.pseudo="";
-  etat.modele=MODELE_DEFAUT.cle;etat.sansBase=true;
+  etat.notes=notesDefaut();etat.poste=null;etat.rang=null;etat.rangChoisi=false;etat.pseudo="";
+  etat.modele=MODELE_DEFAUT.cle;etat.enregistrable=false;
   // Photo en mémoire seulement (le fichier gardé reste sur l'appareil tant qu'aucune nouvelle photo n'est choisie)
   clearTimeout(minuteurPhoto);rec.img=null;rec.z=1;rec.drag=null;
   const recad=$("cj-recadrage");if(recad)recad.hidden=true;
@@ -164,10 +144,8 @@
   majBoutonsModeles();messageFinal("");
   const fmt=page.querySelector('input[name="cj-format"][value="carte"]');if(fmt)fmt.checked=true;
   const m=$("cj-retrouvee");if(m){m.hidden=true;m.textContent="";} // le message parlait de la carte précédente
-  demarrerQuestionnaire(false);
+  rendreNotes();allerA("notes",true);
   annoncer("Nouvelle carte : tout repart de zéro.");
-  const t=page.querySelector('.cj-etape[data-etape="quiz"] h2');
-  if(t){t.scrollIntoView({block:"nearest"});t.focus({preventScroll:true});}
  }
  // Annonce aux lecteurs d'écran (vidée puis posée : une même phrase est relue)
  function annoncer(txt){
@@ -175,42 +153,66 @@
   z.textContent="";requestAnimationFrame(()=>{z.textContent=txt;});
  }
 
- /* ---- Notes et poste ---- */
- function rendreNotes(){
-  const r=calculer();
-  $("cj-globale").textContent=r.globale;
-  const tag=$("cj-rang-tag");tag.textContent=libRang(r.rang);tag.className="tag rang-"+r.rang;
-  $("cj-suggestion").textContent="Poste suggéré d'après tes réponses : "+libPoste(r.posteSuggere)+"."+(etat.poste?"":" Choisis ton poste, ou garde la suggestion.");
-  const postes=$("cj-postes");postes.textContent="";
-  D.POSTES.forEach(p=>{
-   const b=el("button","",p.libelle);b.type="button";b.setAttribute("aria-pressed",String(r.poste===p.cle));b.title=p.desc;
-   b.addEventListener("click",()=>{etat.poste=p.cle;rendreNotes();sauver();});
+ /* ---- Notes, poste et rang : les contrôles sont construits une fois (le focus reste en place), puis mis à jour ---- */
+ const champs={}; // cle → {range, nombre}
+ function construireNotes(){
+  const liste=$("cj-notes-liste");
+  if(liste&&!liste.childElementCount)D.ATTRIBUTS.forEach(a=>{
+   const li=el("li","cj-note");
+   const lab=el("label","cj-note-libelle");lab.htmlFor="cj-n-"+a.cle;lab.id="cj-l-"+a.cle;
+   lab.append(el("b","",a.libelle)," ",el("small","",a.desc));
+   const range=el("div","range");
+   const inp=document.createElement("input");inp.type="range";inp.id="cj-n-"+a.cle;inp.min="1";inp.max="99";inp.step="1";
+   const nb=document.createElement("input");nb.type="number";nb.id="cj-v-"+a.cle;nb.min="1";nb.max="99";nb.step="1";nb.inputMode="numeric";
+   nb.setAttribute("aria-label",a.libelle+", note de 1 à 99");
+   // Curseur : souris, doigt ou flèches du clavier (le navigateur borne déjà de 1 à 99)
+   inp.addEventListener("input",()=>reglerNote(a.cle,inp.value,false));
+   inp.addEventListener("change",()=>reglerNote(a.cle,inp.value,true));
+   // Champ numérique : appliqué dès qu'il contient un nombre, borné et nettoyé en sortie de champ
+   nb.addEventListener("input",()=>{if(nb.value!==""&&Number.isFinite(Number(nb.value)))reglerNote(a.cle,nb.value,false,true);});
+   nb.addEventListener("change",()=>reglerNote(a.cle,nb.value,true));
+   range.append(inp,nb);li.append(lab,range);liste.appendChild(li);
+   champs[a.cle]={range:inp,nombre:nb};
+  });
+  const postes=$("cj-postes");
+  if(postes&&!postes.childElementCount)D.POSTES.forEach(p=>{
+   const b=el("button","",p.libelle);b.type="button";b.dataset.poste=p.cle;b.title=p.desc;
+   b.addEventListener("click",()=>{etat.poste=p.cle;majNotes();sauver();});
    postes.appendChild(b);
   });
-  const liste=$("cj-notes-liste");liste.textContent="";
-  D.ATTRIBUTS.forEach(a=>{
-   const li=el("li","cj-note");
-   const lab=el("label","cj-note-libelle");lab.htmlFor="cj-n-"+a.cle;lab.append(el("b","",a.libelle)," ",el("small","",a.desc));
-   const range=el("div","range");
-   const inp=document.createElement("input");inp.type="range";inp.id="cj-n-"+a.cle;inp.step="1";
-   const brute=r.brutes[a.cle];inp.min=String(Math.max(1,brute-5));inp.max=String(Math.min(99,brute+5));inp.value=String(r.notes[a.cle]);
-   inp.setAttribute("aria-valuetext",r.notes[a.cle]+" sur 99, valeur calculée "+brute);
-   const out=el("output","",String(r.notes[a.cle]));out.htmlFor=inp.id;
-   inp.addEventListener("input",()=>{
-    const v=Math.max(Number(inp.min),Math.min(Number(inp.max),Math.round(Number(inp.value)||brute)));
-    etat.ajustements[a.cle]=v-brute;
-    const rr=calculer();
-    out.textContent=rr.notes[a.cle];inp.setAttribute("aria-valuetext",rr.notes[a.cle]+" sur 99, valeur calculée "+brute);
-    $("cj-globale").textContent=rr.globale;tag.textContent=libRang(rr.rang);tag.className="tag rang-"+rr.rang;
-    rendreApercu();
-   });
-   inp.addEventListener("change",sauver);
-   range.append(inp,out);
-   li.append(lab,range);
-   liste.appendChild(li);
+  const rangs=$("cj-rangs-choix");
+  if(rangs&&!rangs.childElementCount)D.RANGS.forEach(x=>{
+   const b=el("button","",x.libelle);b.type="button";b.dataset.rang=x.cle;
+   b.addEventListener("click",()=>{etat.rang=x.cle;etat.rangChoisi=true;majNotes();sauver();});
+   rangs.appendChild(b);
   });
+ }
+ // Nouvelle valeur d'une note : bornée de 1 à 99 ; un champ vide ou illisible reprend la note précédente.
+ // pendantSaisie : le champ numérique n'est pas réécrit (on ne coupe pas la frappe de « 7 » avant « 75 »).
+ function reglerNote(cle,valeur,enregistrer,pendantSaisie){
+  const v=Number(valeur);
+  if(valeur!==""&&Number.isFinite(v))etat.notes[cle]=borne(v);
+  majNotes(pendantSaisie?cle:null);
+  if(enregistrer)sauver();
+ }
+ function majNotes(saisie){
+  const r=calculer();
+  CLES.forEach(k=>{
+   const c=champs[k];if(!c)return;
+   c.range.value=String(r.notes[k]);c.range.setAttribute("aria-valuetext",r.notes[k]+" sur 99");
+   if(k!==saisie)c.nombre.value=String(r.notes[k]);
+  });
+  const g=$("cj-globale");if(g)g.textContent=r.globale;
+  const tag=$("cj-rang-tag");if(tag){tag.textContent=libRang(r.rang);tag.className="tag rang-"+r.rang;}
+  const sug=$("cj-suggestion");
+  if(sug)sug.textContent="Poste suggéré d'après tes notes : "+libPoste(r.posteSuggere)+"."+(etat.poste?"":" Choisis ton poste, ou garde la suggestion.");
+  page.querySelectorAll("#cj-postes button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.poste===r.poste)));
+  const rs=$("cj-rang-suggere");
+  if(rs)rs.textContent="Suggéré : "+libRang(r.rangSuggere)+(etat.rangChoisi?". Tu as choisi "+libRang(r.rang)+".":", d'après ta note globale. Choisis ton rang, ou garde la suggestion.");
+  page.querySelectorAll("#cj-rangs-choix button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.rang===r.rang)));
   rendreApercu();
  }
+ function rendreNotes(){construireNotes();majNotes();}
 
  /* ---- Photo : choix, recadrage (zoom + déplacement), résultat gardé en 600 × 480 ---- */
  const cadre=$("cj-cadre"),zoom=$("cj-zoom"),zoomVal=$("cj-zoom-val");
@@ -368,14 +370,14 @@
  }
  function donneesRendu(r){
   return {pseudo:etat.pseudo||"Joueur",poste:libPoste(r.poste),globale:r.globale,rang:r.rang,attributs:CLES.map(k=>({cle:k,note:r.notes[k]})),
-   photo:etat.imgPhoto,niveau:repere&&!etat.sansBase?repere.carte:""};
+   photo:etat.imgPhoto,niveau:""};
  }
  // Le dessin (coûteux) est regroupé par image d'écran ; la description et le rang sont posés tout de suite.
  // Élite : la bordure est animée par CARTE_RENDU.animer, qui renvoie une fonction d'arrêt (appelée avant tout nouveau dessin).
  let arretApercu=null,apercuPrevu=0;
  function rendreApercu(){
   const canvas=$("cj-apercu-canvas"),R=window.CARTE_RENDU;
-  if(!canvas||!R||!complet())return;
+  if(!canvas||!R)return;
   const r=calculer();
   canvas.setAttribute("aria-label",description(r));
   canvas.className="cj-apercu-canvas rang-"+r.rang;
@@ -410,7 +412,7 @@
   const cle=modeleCourant().cle;
   groupeModeles.querySelectorAll(".cj-modele").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.modele===cle)));
  }
- // Nouveau modèle : aperçu, image d'export et sauvegarde ; le questionnaire n'est pas refait
+ // Nouveau modèle : aperçu, image d'export et sauvegarde ; les notes ne changent pas
  function choisirModele(cle){
   if(!modeleValide(cle)||cle===etat.modele)return;
   etat.modele=cle;majBoutonsModeles();sauver();rendreApercu();
@@ -423,7 +425,7 @@
  }
  async function dessinerMiniatures(){
   const R=window.CARTE_RENDU;
-  if(!R||!complet())return;
+  if(!R)return;
   const gen=++generationMiniatures,donnees=donneesRendu(calculer());
   for(const b of groupeModeles.querySelectorAll(".cj-modele")){
    if(gen!==generationMiniatures)return; // un dessin plus récent a été demandé
@@ -510,12 +512,11 @@
 
  /* ---- Navigation entre étapes ---- */
  const sur=(id,fn)=>{const b=$(id);if(b)b.addEventListener("click",fn);};
- sur("cj-commencer",()=>demarrerQuestionnaire(true));
- sur("cj-refaire-1",()=>demarrerQuestionnaire(true));
- sur("cj-refaire-2",()=>demarrerQuestionnaire(true));
+ sur("cj-commencer",()=>{rendreNotes();allerA("notes",true);});
  sur("cj-nouvelle-1",nouvelleCarte);
  sur("cj-nouvelle-2",nouvelleCarte);
- sur("cj-vers-photo",()=>allerA("photo",true));
+ // Quitter l'étape notes valide la carte : elle est gardée (et remplace, pour une nouvelle carte, celle d'avant)
+ sur("cj-vers-photo",()=>{etat.enregistrable=true;sauver();allerA("photo",true);});
  sur("cj-retour-notes",()=>{rendreNotes();allerA("notes",true);});
  sur("cj-vers-pseudo",()=>{if(champPseudo&&!champPseudo.value&&etat.pseudo)champPseudo.value=etat.pseudo;allerA("pseudo",true);});
  sur("cj-retour-photo",()=>allerA("photo",true));
@@ -531,10 +532,12 @@
  proposerPseudoDuProfil();
  afficherCompteur();
  if(sauvee){
-  montrerRepere();rendreNotes();
+  // Carte version 1 (ancien questionnaire) : réécrite au format 2 avec les mêmes notes, poste, nom, modèle et photo
+  if(sauvee.migree)sauver();
+  rendreNotes();
   if(champPseudo)champPseudo.value=etat.pseudo;
-  const quand=(()=>{try{return new Date(sauvee.date).toLocaleDateString("fr-FR",{day:"numeric",month:"long"});}catch(e){return "";}})();
-  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous, et tu peux la modifier, refaire tes réponses ou faire une nouvelle carte.";}
+  const quand=(()=>{try{const d=new Date(sauvee.date);return isNaN(d)?"":d.toLocaleDateString("fr-FR",{day:"numeric",month:"long"});}catch(e){return "";}})();
+  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous. Tu peux modifier tes notes, ta photo ou ton nom, ou faire une nouvelle carte.";}
   if(etat.pseudo){rendreFinal();allerA("final",false);}
   else allerA("pseudo",false);
  }else allerA("intro",false);
