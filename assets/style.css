@@ -214,6 +214,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer .pied-logo{display:block;flex:none;width:min(240px,100%);height:auto;margin:0 calc(100% - min(240px,100%)) var(--s-2) 0}
 footer b{color:#fff;font-family:var(--display);font-size:1.2rem;text-transform:uppercase;letter-spacing:.03em}
 footer a{color:var(--turf);display:inline-flex;align-items:center;vertical-align:middle;min-height:44px} /* cible tactile 44 px */
+/* « Installer l'appli » (assets/js/pwa.js) : caché tant que le navigateur ne permet pas l'installation, seul sur sa ligne */
+footer .pied-installer{flex-basis:100%;display:flex;flex-direction:column;align-items:flex-start;gap:var(--s-2)}
+footer .pied-installer[hidden]{display:none}
+footer .pied-installer .btn{min-height:44px}
 
 @media (max-width:860px){
   .hero .wrap,.court-wrap,.sel-grid,.sec-head{grid-template-columns:1fr}

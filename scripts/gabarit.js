@@ -60,6 +60,7 @@ function footer(prefixe = "") {
     <div><b>${NOM_SITE}</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par un ${AUTEUR.presentation}.</div>
     <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel<span class="sr-only"> (nouvel onglet)</span></a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)<span class="sr-only"> (nouvel onglet)</span></a></div>
     <div><a href="${prefixe}confidentialite.html">Confidentialité</a> · <a href="${prefixe}mentions-legales.html">Mentions légales</a></div>
+    <div class="pied-installer" id="pa-installer" hidden><button type="button" class="btn ghost petit" id="pa-installer-bouton" hidden>Installer l'appli</button><div id="pa-installer-aide" role="status"></div></div>
   </div>
 </footer>`;
 }
