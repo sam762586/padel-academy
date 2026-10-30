@@ -506,6 +506,27 @@ if (!partiel) {
     if (!fs.existsSync(f) || fs.readFileSync(f, "utf8") !== contenu) fs.writeFileSync(f, contenu);
   }
   fs.readdirSync(dossierProchains).filter(f => !attendus.has(f)).forEach(f => fs.unlinkSync(path.join(dossierProchains, f)));
+
+  /* ---------- Chiffres réels pour l'accueil : assets/data/stats.json ----------
+     À venir = date de fin (sinon de début) >= aujourd'hui. Semaine = à venir ET commence au plus tard dans 7 jours
+     (aujourd'hui inclus). Départements = ceux qui ont au moins un tournoi à venir. Coups et questions sont lus
+     dans assets/js. « maj » = jour de génération, conservé tant que les chiffres ne changent pas. */
+  const venir = donnees.tournois.filter(valide).filter(aVenir);
+  const limite = versIso(new Date(lireJour(aujourdhui).getTime() + 7 * 86400000));
+  const coupsTab = new Function(fs.readFileSync(path.join(RACINE, "assets/js/coups.js"), "utf8").split("function cardCoup")[0] + ";return COUPS;")();
+  const questionsTab = new Function(fs.readFileSync(path.join(RACINE, "assets/js/academie-questions.js"), "utf8") + ";return ACADEMIE_QUESTIONS;")();
+  const chiffres = {
+    tournoisAVenir: venir.length,
+    tournoisSemaine: venir.filter(t => t.date_debut <= limite).length,
+    departements: new Set(venir.map(t => t.dep)).size,
+    coups: Object.values(coupsTab).flat().length,
+    questions: questionsTab.filter(q => q.statut === "validee").length,
+  };
+  const fStats = path.join(RACINE, "assets/data/stats.json");
+  const ancien = lireJson(fStats, null);
+  const memes = ancien && Object.keys(chiffres).every(k => ancien[k] === chiffres[k]);
+  if (!memes) fs.writeFileSync(fStats, JSON.stringify({ maj: aujourdhui, ...chiffres }, null, 2) + "\n");
+  console.log(`stats.json : ${JSON.stringify(chiffres)}${memes ? " (inchangé)" : ""}`);
 }
 
 /* ---------- Pages devenues inutiles (tournois supprimés de l'archive, hors périmètre) ---------- */
