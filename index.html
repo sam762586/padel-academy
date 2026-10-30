@@ -21,11 +21,16 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://apprendre-padel.fr/#site", "url": "https://apprendre-padel.fr/", "name": "Apprendre Padel", "alternateName": "Apprendre le padel", "inLanguage": "fr-FR", "description": "Apprendre le padel : coups, tactique, tutos interactifs, test de niveau, plan d'entraînement et sélecteur de raquette.", "author": {"@id": "https://apprendre-padel.fr/#org"}, "publisher": {"@id": "https://apprendre-padel.fr/#org"}}, {"@type": "Organization", "@id": "https://apprendre-padel.fr/#org", "name": "Apprendre Padel", "url": "https://apprendre-padel.fr/", "logo": "https://apprendre-padel.fr/assets/img/icon-512.png"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=d50202e4c6">
+<link rel="stylesheet" href="assets/style.css?v=33b09b7bb3">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
-<body>
+<body class="accueil-vitre">
+<!-- Scène de l'accueil « Vitre » : le terrain du simulateur 3D, fixe derrière la page, voilé (style.css, bloc ACCUEIL VITRE).
+     Téléphone et écran en hauteur : cadrage portrait (ciel vide en haut, sous le titre) ; ordinateur : 1280 ou 1920 px.
+     Pour changer l'image : remplacer les chemins ci-dessous (garder width/height du fichier). -->
+<div class="vitre-scene" aria-hidden="true"><picture><source media="(orientation:portrait)" srcset="assets/img/photos/fond-vitre-mobile-900.webp" width="900" height="1600"><img src="assets/img/photos/fond-vitre-1280.webp" srcset="assets/img/photos/fond-vitre-1280.webp 1280w, assets/img/photos/fond-vitre-1920.webp 1920w" sizes="100vw" width="1920" height="1080" alt="" fetchpriority="high" decoding="async"></picture></div>
+<div class="vitre-balle" aria-hidden="true"><i></i></div>
 <a class="evitement" href="#contenu">Aller au contenu</a>
 <nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
@@ -35,54 +40,65 @@
   </div>
 </nav>
 <main id="contenu" tabindex="-1">
-<header class="hero photo" id="top">
+<header class="hero vitre-hero" id="top">
   <div class="wrap">
-    <div>
-      <p class="eyebrow">Apprendre · S'entraîner · Jouer en tournoi</p>
-      <h1 style="margin-top:18px"><span class="ln">Progresse au padel,</span> <span class="ln hl">point après point.</span></h1>
-      <p class="lead">Apprends les bons gestes, comprends les placements et développe ton jeu grâce à des exercices et outils interactifs.</p>
-      <div class="btns">
-        <a class="btn primary" href="#parcours">Commencer à apprendre</a>
-        <a class="btn ghost" href="simulateur-3d.html">Explorer le simulateur 3D</a>
-        <a class="btn ghost" href="niveau.html">Passer le test de niveau</a>
-      </div>
-      <p class="acc-muted presence-ligne"><span class="presence" id="pa-presence"><span data-presence-texte aria-hidden="true">&nbsp;</span><span class="sr-only" data-presence-annonce aria-live="polite"></span></span></p>
-      <div class="hero-facts">
-        <div><b>20×10 m</b><small>Terrain</small></div>
-        <div><b>88 cm</b><small>Filet au centre</small></div>
-        <div><b>45,5 cm</b><small>Raquette max.</small></div>
-        <div><b>2 vs 2</b><small>Toujours en double</small></div>
-      </div>
+    <p class="eyebrow">Apprendre · S'entraîner · Jouer en tournoi</p>
+    <div class="vitre-padel" aria-hidden="true"><span class="vp-contour">Padel</span><span class="vp-plein">Padel</span></div>
+    <h1><span class="ln">Progresse au padel,</span> <span class="ln hl">point après point.</span></h1>
+    <p class="lead">Apprends les bons gestes, comprends les placements et développe ton jeu grâce à des exercices et outils interactifs.</p>
+    <div class="btns">
+      <a class="btn primary" href="#parcours">Commencer à apprendre</a>
+      <a class="btn ghost" href="simulateur-3d.html">Explorer le simulateur 3D</a>
+      <a class="btn ghost" href="niveau.html">Passer le test de niveau</a>
     </div>
-    <figure class="hero-photo"><img src="assets/img/photos/index.webp" width="1000" height="1250" alt="Joueur de padel en pleine volée sur un terrain indoor" fetchpriority="high"><figcaption><b>P25 → P3000</b><span>Du premier tournoi<small>au classement FFT</small></span></figcaption></figure>
+    <dl class="vitre-score" aria-label="Le site en chiffres">
+      <div class="vs-tournois"><dt>Tournois à venir</dt><dd><span data-vitre-stat="tournoisAVenir">—</span></dd></div>
+      <div class="vs-coups"><dt>Coups expliqués</dt><dd><span data-vitre-stat="coups">—</span></dd></div>
+      <div class="vs-questions"><dt>Questions de l'académie</dt><dd><span data-vitre-stat="questions">—</span></dd></div>
+      <div class="vs-joueurs"><dt>Joueurs en ce moment</dt><dd><p class="acc-muted presence-ligne"><span class="presence" id="pa-presence"><span data-presence-texte aria-hidden="true">&nbsp;</span><span class="sr-only" data-presence-annonce aria-live="polite"></span></span></p><span data-vitre-joueurs>—</span></dd></div>
+    </dl>
   </div>
 </header>
-<section class="parcours" id="parcours" aria-labelledby="parcours-titre">
+
+<div class="vitre-ligne" aria-hidden="true"><span>Ligne de service · ton parcours</span></div>
+
+<section class="parcours vitre-parcours" id="parcours" aria-labelledby="parcours-titre">
   <div class="wrap">
-    <div class="sec-head"><div><p class="eyebrow">Ton parcours</p><h2 id="parcours-titre">Où en es-tu ?</h2></div><p>Choisis ce qui te ressemble : chaque parcours enchaîne les pages et les outils du site dans le bon ordre.</p></div>
-    <p class="ac-accueil"><a class="btn primary" href="academie.html#niveaux">Choisir mon niveau de 1 à 10</a> <span>D'après la grille des niveaux de padel de la FFT, en quelques secondes et sans compte.</span></p>
-    <div class="profils">
-      <article class="profil profil-debutant" aria-labelledby="profil-debutant">
+    <div class="sec-head"><div><p class="eyebrow">Ton parcours</p><h2 id="parcours-titre">Où en es-tu ?</h2></div><p>Choisis ce qui te ressemble : chaque parcours enchaîne les pages et les outils du site dans le bon ordre.</p></div>
+    <!-- Sans JavaScript : trois liens vers les trois parcours, tous affichés. Avec accueil-vitre.js : onglets (un parcours à la fois). -->
+    <div class="vitre-choix">
+      <a class="vitre-carte" href="#v-panneau-debutant" data-profil="debutant" id="v-carte-debutant"><span class="vc-img"><canvas width="300" height="450" aria-hidden="true"></canvas></span><span class="vc-nom">Débutant</span><span class="vc-sous">Je découvre le padel</span><span class="vc-etat" aria-hidden="true"></span></a>
+      <a class="vitre-carte" href="#v-panneau-intermediaire" data-profil="intermediaire" id="v-carte-intermediaire"><span class="vc-img"><canvas width="300" height="450" aria-hidden="true"></canvas></span><span class="vc-nom">Je progresse</span><span class="vc-sous">Intermédiaire, je joue régulièrement</span><span class="vc-etat" aria-hidden="true"></span></a>
+      <a class="vitre-carte" href="#v-panneau-competiteur" data-profil="competiteur" id="v-carte-competiteur"><span class="vc-img"><canvas width="300" height="450" aria-hidden="true"></canvas></span><span class="vc-nom">Compétiteur</span><span class="vc-sous">Je joue des tournois</span><span class="vc-etat" aria-hidden="true"></span></a>
+    </div>
+    <!-- Dessin des cartes (carte-rendu.js) : chargé par accueil-vitre.js quand la section approche, jamais au premier affichage -->
+    <template id="vitre-rendu"><script src="assets/js/carte-rendu.js?v=229d731a43" defer></script></template>
+    <div class="profils vitre-panneaux">
+      <article class="profil profil-debutant" id="v-panneau-debutant" aria-labelledby="profil-debutant">
         <p class="profil-tag">Débutant</p>
         <h3 id="profil-debutant">« Je découvre le padel et je veux apprendre les bases. »</h3>
         <ol class="profil-etapes"><li><a href="regles.html">Les règles essentielles</a></li><li><a href="technique.html">Les coups de base</a></li><li><a href="conseils.html">Les 20 erreurs du débutant</a></li><li><a href="niveau.html">Le test de niveau</a></li><li><a href="espace.html#esp-bloc-exercices">Tes premiers exercices</a></li></ol>
         <a class="btn primary" href="regles.html">Commencer à apprendre</a>
       </article>
-      <article class="profil profil-intermediaire" aria-labelledby="profil-intermediaire">
+      <article class="profil profil-intermediaire" id="v-panneau-intermediaire" aria-labelledby="profil-intermediaire">
         <p class="profil-tag">Intermédiaire</p>
         <h3 id="profil-intermediaire">« Je joue régulièrement et je veux progresser. »</h3>
         <ol class="profil-etapes"><li><a href="niveau.html">Le test de niveau</a></li><li><a href="tutos.html">Les décisions qui font gagner</a></li><li><a href="technique.html">Les fiches techniques</a></li><li><a href="entrainement.html">Le plan d'entraînement 8 semaines</a></li><li><a href="espace.html">Ton suivi de progression</a></li></ol>
         <a class="btn primary" href="niveau.html">Passer le test de niveau</a>
       </article>
-      <article class="profil profil-competiteur" aria-labelledby="profil-competiteur">
+      <article class="profil profil-competiteur" id="v-panneau-competiteur" aria-labelledby="profil-competiteur">
         <p class="profil-tag">Compétiteur</p>
         <h3 id="profil-competiteur">« Je joue des tournois et je veux améliorer mes résultats. »</h3>
         <ol class="profil-etapes"><li><a href="tournois.html">Les tournois près de chez toi</a></li><li><a href="bareme.html">Le barème et ton classement</a></li><li><a href="score.html#analyser">Analyser tes matchs</a></li><li><a href="tactique.html#adversaire">S'adapter à l'adversaire</a></li><li><a href="partenaires.html">Un partenaire pour ton tournoi</a></li></ol>
         <a class="btn primary" href="tournois.html">Préparer mes compétitions</a>
       </article>
     </div>
+    <p class="ac-accueil"><a class="btn primary" href="academie.html#niveaux">Choisir mon niveau de 1 à 10</a> <span>D'après la grille des niveaux de padel de la FFT, en quelques secondes et sans compte.</span></p>
   </div>
 </section>
+
+<div class="vitre-ligne" aria-hidden="true"><span>Zone de transition</span></div>
+
 <section class="vitrine-3d" aria-labelledby="vitrine-3d-titre">
   <div class="wrap">
     <figure class="vitrine-3d-image"><a href="simulateur-3d.html" tabindex="-1"><img src="assets/img/simulateur-3d.webp" srcset="assets/img/simulateur-3d-640.webp 640w, assets/img/simulateur-3d.webp 1120w" sizes="(max-width:860px) 100vw, 560px" width="1120" height="630" alt="Le simulateur 3D : quatre joueurs sur un terrain de padel, la trajectoire d'un lob et la bandeja de « Toi »" loading="lazy"></a></figure>
@@ -99,12 +115,16 @@
     </div>
   </div>
 </section>
+<div class="vitre-filet" aria-hidden="true"><span>Filet · place au match</span></div>
+
 <section class="pdt" id="pres-de-chez-toi" aria-labelledby="pdt-titre">
   <div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">Tournois · Près de chez toi</p><h2 id="pdt-titre">Cette semaine près de chez toi</h2></div><p>Les prochains tournois de ton département, mis à jour chaque semaine depuis Ten'Up : catégorie, ville, date et ce que ça rapporte.</p></div>
     <div id="pdt-contenu"><p class="acc-muted">Chargement…</p></div>
   </div>
 </section>
+<div class="vitre-ligne haut" aria-hidden="true"><span>L'autre camp</span></div>
+
 <section class="outils-sec" aria-labelledby="outils-titre">
   <div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">Gratuit, sans compte</p><h2 id="outils-titre">Les outils du joueur</h2></div><p>Tous ces outils marchent sans inscription. Ton espace joueur, lui, demande un compte gratuit : il rassemble ton niveau, tes matchs et ton programme sur tous tes appareils.</p></div>
@@ -130,6 +150,8 @@
     </div>
   </div>
 </section>
+<div class="vitre-ligne haut" aria-hidden="true"><span>Ligne de service</span></div>
+
 <section aria-labelledby="contenus-titre">
   <div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">Apprendre</p><h2 id="contenus-titre">Tous les contenus</h2></div><p>Débutant : Règles → Technique → Conseils → Matériel. Déjà joueur : Test de niveau → Tutos → Plan 8 semaines.</p></div>
@@ -168,6 +190,7 @@
 <script src="assets/js/accueil-tournois.js?v=f4d98e9e40" defer></script>
 <script src="assets/js/nav.js?v=31b69caab2" defer></script>
 <script src="assets/js/presence.js?v=d4f54033b9" defer></script>
+<script src="assets/js/accueil-vitre.js?v=29979db0a4" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

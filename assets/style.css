@@ -1563,6 +1563,195 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .esp-confirmation p+.btns{margin-top:0}
 :is(.acc-msg,.esp-confirmation) .btns .btn{min-height:44px;max-width:100%;justify-content:center;text-align:center}
 
+/* ===== VIEW TRANSITIONS (tout le site) =====
+   Noms partagés : la marque et le titre principal (un nom = un seul élément par page : une seule marque, dans le menu ;
+   un seul h1 par page). Servent au changement de parcours de l'accueil (document.startViewTransition, accueil-vitre.js).
+   Transition ENTRE pages : en attente. Activée, la règle ci-dessous produit dans Edge (oct. 2026), au hasard des retours
+   et avances (historique), une erreur non interceptable « Transition was aborted because of invalid state. ViewTransition
+   opt-in disabled » : verifier-menu et verifier-profils échouent (0 erreur console exigée). À réactiver quand c'est réglé :
+   @media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}} */
+.brand{view-transition-name:marque}
+main h1{view-transition-name:titre-page}
+::view-transition-group(root){animation-duration:.25s}
+
+/* ===== ACCUEIL VITRE (index.html, <body class="accueil-vitre">, assets/js/accueil-vitre.js) =====
+   Le terrain vu à travers la vitre : la scène du simulateur 3D fixe derrière la page (.vitre-scene, voile bleu nuit),
+   deux vitres latérales, les lignes du terrain et le filet entre les sections, « PADEL » géant décoratif (aria-hidden)
+   qui se remplit au défilement, une balle qui rebondit de vitre en vitre, des blocs en verre dépoli.
+   - Image de fond : chemins dans index.html (<picture> de .vitre-scene : portrait / paysage) ; flou léger sur ordinateur seulement.
+   - Verre (backdrop-filter) : à partir de 601 px seulement. Fond opaque (--bg-2) sous 600 px, si prefers-reduced-transparency,
+     ou sur un appareil modeste (classe .vitre-sobre sur <html>, posée par accueil-vitre.js).
+   - Défilement : animations CSS natives (animation-timeline). Sans prise en charge : état final fixe, balle masquée, aucun
+     calcul en JavaScript. Rien n'est animé sous prefers-reduced-motion.
+   - Contraste, calculé sur le pixel le plus clair des trois images (voile et halo compris, sans compter le flou) :
+     voile 86 % en haut → --fg 9,3:1, --muted 4,7:1 ; 92 % ensuite → --muted 5,6:1, --sky 5,1:1. Les blocs de texte longs
+     sont sur --bg-2 (--muted 7,1:1) ou sur verre à 72 % de bleu nuit (--muted 7,2:1). Liens : seulement dans les blocs. */
+.accueil-vitre{--vitre-voile:.86;--vitre-bord:color-mix(in srgb,var(--fg) 16%,transparent)}
+.vitre-scene{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg)}
+.vitre-scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.vitre-scene::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(var(--bg-rgb),var(--vitre-voile)) 0%,rgba(var(--bg-rgb),.92) 55%,rgba(var(--bg-rgb),.94) 100%),
+  radial-gradient(80% 60% at 50% 30%,rgba(var(--terrain-rgb),.12),transparent 70%)}
+.accueil-vitre main,.accueil-vitre footer{position:relative;z-index:1}
+.accueil-vitre main{--vitre-x:max(6px,calc(50% - var(--maxw) / 2 - 14px))}
+.accueil-vitre :is(.hero,.vitrine-3d,.pdt,section){background:transparent;border:0}
+.accueil-vitre footer{background:var(--bg)}
+/* Les deux vitres latérales, sur toute la hauteur du contenu */
+.accueil-vitre main::before,.accueil-vitre main::after{content:"";position:absolute;top:0;bottom:0;width:2px;border-radius:2px;pointer-events:none;z-index:-1;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--fg) 40%,transparent),color-mix(in srgb,var(--fg) 12%,transparent) 30%,color-mix(in srgb,var(--fg) 12%,transparent) 70%,color-mix(in srgb,var(--fg) 40%,transparent))}
+.accueil-vitre main::before{left:var(--vitre-x)}
+.accueil-vitre main::after{right:var(--vitre-x)}
+/* Lignes du terrain entre les sections : ligne de service + ligne centrale (un « T », vers le bas ou, .haut, vers le haut) */
+.vitre-ligne{position:relative;height:72px;margin-inline:calc(var(--vitre-x) + 1px)}
+.vitre-ligne::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:color-mix(in srgb,var(--fg) 50%,transparent)}
+.vitre-ligne::after{content:"";position:absolute;left:calc(50% - 1px);width:2px;top:50%;height:50%;background:color-mix(in srgb,var(--fg) 50%,transparent);transform-origin:top}
+.vitre-ligne.haut::after{top:0;transform-origin:bottom}
+.vitre-ligne span,.vitre-filet span{position:absolute;font:800 var(--fs-xs)/1 var(--body);letter-spacing:.2em;text-transform:uppercase}
+.vitre-ligne span{left:var(--s-3);top:calc(50% - 22px);color:var(--muted)}
+/* Le filet : maillage entre deux poteaux, étiquette corail au centre */
+.vitre-filet{position:relative;height:56px;margin:var(--s-5) calc(var(--vitre-x) - 6px)}
+.vitre-filet::before{content:"";position:absolute;left:6px;right:6px;top:14px;height:26px;border-top:4px solid var(--fg);
+  background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--fg) 26%,transparent) 0 1px,transparent 1px 9px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--fg) 26%,transparent) 0 1px,transparent 1px 9px)}
+.vitre-filet::after{content:"";position:absolute;inset:6px 0 8px;border-inline:8px solid var(--bg-3);border-radius:3px}
+.vitre-filet span{left:50%;top:16px;translate:-50% 0;white-space:nowrap;padding:5px 12px;border-radius:var(--r-pill);background:var(--coral);color:var(--cat-fg)}
+
+/* Le verre : fond opaque par défaut (téléphone), verre dépoli à partir de 601 px */
+.vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil){
+  background:var(--bg-2);border:1px solid var(--vitre-bord);border-radius:var(--r);box-shadow:inset 0 1px 0 var(--vitre-bord),var(--shadow)}
+.accueil-vitre :is(.vitre-panneaux .profil){border-top:4px solid var(--turf)}
+.accueil-vitre .vitre-panneaux .profil-intermediaire{border-top-color:var(--sand)}
+.accueil-vitre .vitre-panneaux .profil-competiteur{border-top-color:var(--coral)}
+.accueil-vitre :is(.outil,.home-grid .card,.nouveau){background:var(--bg-2);border-color:var(--vitre-bord)}
+@media (min-width:601px){
+  .vitre-scene img{filter:blur(4px) saturate(1.1);transform:scale(1.04)}
+  .vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil){
+    background:rgba(var(--bg-rgb),.72);-webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2)}
+  .accueil-vitre :is(.outil,.home-grid .card,.nouveau){background:rgba(var(--bg-rgb),.8)}
+}
+@media (prefers-reduced-transparency:reduce){
+  .accueil-vitre{--vitre-voile:.94}
+  .vitre-scene img{filter:none}
+  .vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil,.outil,.home-grid .card,.nouveau){background:var(--bg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+.vitre-sobre .vitre-scene img{filter:none}
+.vitre-sobre :is(.vitre-score,.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil,.outil,.home-grid .card,.nouveau){background:var(--bg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+.accueil-vitre .vitrine-3d .wrap>div{padding:var(--s-5) var(--s-4)}
+.accueil-vitre .pdt .wrap{margin-inline:16px;padding:var(--s-5) var(--s-4)}
+.accueil-vitre .pdt .eyebrow{color:var(--coral)}
+.accueil-vitre .pdt .eyebrow::before{background:var(--coral)}
+
+/* ---------- Haut de page : « PADEL » géant, titre, accès, tableau de score ---------- */
+.hero.vitre-hero{padding-block:var(--s-5) var(--s-6)}
+.vitre-hero .wrap{display:grid;gap:0;grid-template-columns:minmax(0,1fr);grid-template-areas:"surtitre" "padel" "titre" "lead" "btns" "score";align-items:end}
+.vitre-hero .eyebrow{grid-area:surtitre}
+.vitre-hero h1{grid-area:titre;font-size:clamp(2.1rem,4.6vw,3.6rem)}
+.vitre-hero .lead{grid-area:lead;margin-top:var(--s-4);font-size:var(--fs-l);color:var(--muted);max-width:34em}
+.vitre-hero .btns{grid-area:btns;margin-top:var(--s-5)}
+.vitre-padel{grid-area:padel;display:grid;margin:var(--s-3) 0 var(--s-4);font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:min(36vw,34vh,29.5rem);line-height:.78;letter-spacing:-.01em;user-select:none}
+.vitre-padel>span{grid-area:1/1;white-space:nowrap}
+.vp-contour{color:transparent;-webkit-text-stroke:2px var(--turf)}
+.vp-plein{color:var(--turf);clip-path:inset(0)}
+/* Tableau de score : quatre chiffres réels (stats.json, pastille de présence), un filet de couleur par sujet */
+.vitre-score{grid-area:score;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:var(--s-6) 0 0;overflow:hidden}
+.vitre-score>div{--c:var(--turf);display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:var(--s-1);min-width:0;padding:var(--s-4);border-top:1px solid var(--line-2);box-shadow:inset 0 3px 0 var(--c)}
+.vitre-score>div:nth-child(-n+2){border-top:0}
+.vitre-score>div:nth-child(even){border-left:1px solid var(--line-2)}
+.vitre-score .vs-tournois{--c:var(--coral)}
+.vitre-score .vs-questions{--c:var(--sand)}
+.vitre-score .vs-joueurs{--c:var(--sky)}
+.vitre-score dt{font-size:var(--fs-xs);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.3}
+.vitre-score dd{margin:0;display:flex;align-items:center;gap:var(--s-2);font-family:var(--display);font-weight:900;font-size:clamp(2rem,9vw,2.8rem);line-height:1;color:var(--fg);font-variant-numeric:tabular-nums}
+/* La pastille de présence (presence.js) devient le point devant le nombre ; sa phrase reste lue par l'annonce aria-live */
+.vitre-score p.presence-ligne{margin:0;min-height:0;font:inherit;line-height:1}
+.vitre-score [data-presence-texte]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.vitre-score .presence{gap:0}
+.vitre-score .presence::before{flex-basis:12px;width:12px;height:12px;border:2px solid var(--line-2)}
+.vitre-score .presence.presence-active::before{border-color:var(--turf)}
+
+/* ---------- Choix du parcours : trois cartes de joueur, un panneau à la fois (sans JS : liens et trois panneaux) ---------- */
+.vitre-choix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2.5vw,28px);max-width:880px;margin:0 auto var(--s-5);perspective:1100px}
+.vitre-carte{--c:var(--turf);display:grid;align-content:start;gap:var(--s-2);justify-items:center;min-width:0;min-height:44px;padding:var(--s-2) 0 var(--s-3);border-radius:var(--r);text-align:center;text-decoration:none;color:var(--fg)}
+.vitre-carte[data-profil="intermediaire"]{--c:var(--sand)}
+.vitre-carte[data-profil="competiteur"]{--c:var(--coral)}
+.vc-img{position:relative;display:block;width:100%;aspect-ratio:2/3;border-radius:5%/3.3%;box-shadow:var(--shadow);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 30%,var(--bg-3)),var(--bg-2) 70%);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .3s,filter .3s}
+.vc-img canvas{display:block;width:100%;height:100%;border-radius:inherit}
+.vc-img::after{content:"";position:absolute;inset:-5px;border-radius:7%/4.6%;border:3px solid transparent;transition:border-color .2s}
+.vc-nom{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(1.1rem,3.6vw,2rem);line-height:1}
+.vc-sous{font-size:clamp(.75rem,2vw,.9rem);color:var(--muted);line-height:1.3}
+.vc-etat{min-height:1em;font:800 var(--fs-xs)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.vitre-carte[aria-selected="false"] .vc-img{opacity:.7;filter:saturate(.55)}
+.vitre-carte[aria-selected="true"] .vc-img{transform:translateY(-10px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.vitre-carte[aria-selected="true"] .vc-img::after{border-color:var(--c)}
+.vitre-carte:hover .vc-img{opacity:1;filter:none}
+.vitre-carte:focus-visible{outline:3px solid var(--focus);outline-offset:6px}
+.accueil-vitre .vitre-panneaux{grid-template-columns:minmax(0,1fr);gap:var(--s-4);max-width:880px;margin:0 auto var(--s-6);view-transition-name:panneau-parcours}
+.vitre-panneaux .profil[hidden]{display:none}
+.vitre-panneaux .profil-etapes{grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:var(--s-1) var(--s-6)}
+.vitre-parcours .ac-accueil{max-width:880px;margin:0 auto}
+::view-transition-group(panneau-parcours){animation-duration:.3s}
+
+/* ---------- La balle qui accompagne le défilement, de vitre en vitre (navigateurs compatibles, mouvement autorisé) ---------- */
+.vitre-balle{display:none;position:fixed;left:0;top:0;width:14px;height:14px;z-index:0;pointer-events:none;
+  --g:max(10px,calc(50vw - var(--maxw) / 2 - 10px));--d:min(calc(100vw - 24px),calc(50vw + var(--maxw) / 2 - 10px))}
+.vitre-balle i{display:block;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--turf-hover),var(--turf) 45%,var(--turf-deep));box-shadow:0 0 22px rgba(var(--turf-rgb),.6)}
+@keyframes vitre-balle{
+  0%{translate:var(--d) 22vh;rotate:0deg}6%{translate:calc((var(--g) + var(--d)) / 2) 12vh;scale:1.7}12.5%{translate:var(--g) 40vh;scale:1}
+  18%{translate:calc((var(--g) + var(--d)) / 2) 26vh;scale:1.6}25%{translate:var(--d) 60vh;scale:1}31%{translate:calc((var(--g) + var(--d)) / 2) 36vh;scale:1.7}
+  37.5%{translate:var(--g) 70vh;scale:1}44%{translate:calc((var(--g) + var(--d)) / 2) 30vh;scale:1.8}50%{translate:var(--d) 50vh;scale:1}
+  56%{translate:calc((var(--g) + var(--d)) / 2) 22vh;scale:1.6}62.5%{translate:var(--g) 45vh;scale:1}69%{translate:calc((var(--g) + var(--d)) / 2) 28vh;scale:1.7}
+  75%{translate:var(--d) 66vh;scale:1}81%{translate:calc((var(--g) + var(--d)) / 2) 38vh;scale:1.6}87.5%{translate:var(--g) 58vh;scale:1}
+  94%{translate:calc((var(--g) + var(--d)) / 2) 40vh;scale:1.5}100%{translate:calc((var(--g) + var(--d)) / 2) 78vh;scale:1;rotate:1600deg}}
+@keyframes vitre-remplir{from{clip-path:inset(82% 0 0 0)}to{clip-path:inset(0)}}
+@keyframes vitre-trait-x{from{transform:scaleX(0)}}
+@keyframes vitre-trait-y{from{transform:scaleY(0)}}
+@supports (animation-timeline:scroll()){
+  @media (prefers-reduced-motion:no-preference){
+    .vitre-balle{display:block;animation:vitre-balle linear both;animation-timeline:scroll(root)}
+    .vp-plein{animation:vitre-remplir linear both;animation-timeline:scroll(root);animation-range:0 70vh}
+    .vitre-ligne::before{animation:vitre-trait-x linear both;animation-timeline:view();animation-range:entry 30% cover 50%}
+    .vitre-ligne::after{animation:vitre-trait-y linear both;animation-timeline:view();animation-range:cover 40% cover 60%}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .vitre-balle{display:none}
+  .vp-plein,.vitre-ligne::before,.vitre-ligne::after{animation:none}
+  .vc-img,.vc-img::after{transition:none}
+  .vitre-carte[aria-selected="true"] .vc-img{transform:none}
+}
+
+/* ---------- Tablette et ordinateur ---------- */
+@media (min-width:601px){
+  .vitre-score{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .vitre-score>div:nth-child(n){border-top:0;border-left:0}
+  .vitre-score>div+div{border-left:1px solid var(--line-2)}
+  .vitre-balle{width:18px;height:18px}
+  .vitre-ligne span{left:var(--s-5)}
+}
+@media (min-width:861px){
+  .hero.vitre-hero{padding-block:var(--s-6) var(--s-7)}
+  .vitre-hero .wrap{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"surtitre surtitre" "padel padel" "titre score" "lead score" "btns btns";column-gap:var(--s-7)}
+  .vitre-score{grid-template-columns:repeat(2,minmax(0,1fr));margin:0;align-self:end}
+  .vitre-score>div{padding:var(--s-5)}
+  .vitre-score>div:nth-child(n){border-left:0;border-top:1px solid var(--line-2)}
+  .vitre-score>div:nth-child(-n+2){border-top:0}
+  .vitre-score>div:nth-child(even){border-left:1px solid var(--line-2)}
+  .accueil-vitre .vitrine-3d .wrap>div{padding:var(--s-6)}
+  .accueil-vitre .pdt .wrap{max-width:calc(var(--maxw) - 32px);margin-inline:auto;padding:var(--s-6)}
+}
+@media (max-width:600px){
+  .vitre-ligne{height:48px}
+  .vitre-ligne span{top:calc(50% - 20px)}
+  .vitre-filet{margin-block:var(--s-3)}
+  .accueil-vitre .pdt,.accueil-vitre .vitrine-3d{padding-block:var(--s-5)}
+  .vitre-score{margin-top:var(--s-5)}
+}
+@media (max-width:480px){
+  .vitre-hero .btns .btn{width:100%;justify-content:center}
+}
+
 /* MOUVEMENT RÉDUIT (réglage du système) : défilement instantané, plus de transitions ni d'animations décoratives.
    Durées quasi nulles plutôt que « none » : les états finaux restent appliqués et les événements de fin de transition
    partent toujours (menu, accordéons). Les indicateurs de chargement sont déjà figés plus haut ; le simulateur 3D
