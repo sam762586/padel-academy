@@ -18,7 +18,7 @@
  if(!zone)return;
  const visible=zone.querySelector("[data-presence-texte]"),annonce=zone.querySelector("[data-presence-annonce]");
  const CANAL="presence-site",DELAI_ANNONCE=30000,VIDE=" "; // espace insécable : la ligne garde sa hauteur
- const SDK="assets/vendor/supabase-2.45.4.js?v=8596965fe9",CONFIG="assets/js/supabase-config.js?v=522fe35184";
+ const SDK="assets/vendor/supabase-2.45.4.js?v=8596965fe9",CONFIG="assets/js/supabase-config.js?v=b683a23f68";
  let client=null,canal=null,demarre=false,derniereAnnonce=0,minuteurAnnonce=0;
 
  /* ---- Affichage ---- */

@@ -1,7 +1,7 @@
 /* Vérification du test de niveau v2 (niveau.html, assets/js/quiz-niveau.js) :
    1) moteur : profils de joueurs types -> palier attendu (classement, résultats, plafonds d'ancienneté, trous techniques) ;
    2) navigateur : parcours complet sans classement, parcours avec un rang déjà saisi dans l'espace, résultat gardé
-      sur l'appareil au format v2, pas de bouton d'enregistrement sans "quiz2", options mélangées, aucun débordement.
+      sur l'appareil au format v2, bouton « Enregistrer dans mon profil » avec "quiz2" (compte simulé), aucun sans "quiz2", options mélangées, aucun débordement.
    Lancer depuis la racine du site : node scripts/verifier-niveau.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),vm=require('node:vm');
@@ -113,7 +113,7 @@ async function repondre(page,choix){
   const q=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-quiz-dernier')));
   assert.equal(q.version,2);assert.equal(q.palier,2);assert.equal(q.niveau,2);assert.equal(q.reponses.length,10);
   assert.equal(q.score,q.reponses.reduce((s,x)=>s+x.pts,0));
-  ok('parcours sans classement : P100 plafonné par l\'ancienneté, résultat v2 gardé sur l\'appareil, pas de bouton sans "quiz2"');
+  ok('parcours sans classement : P100 plafonné par l\'ancienneté, résultat v2 gardé sur l\'appareil, pas de bouton sans compte actif');
   // Options mélangées : sur plusieurs affichages, l'ordre de la première situation change
   const ordres=new Set();
   for(let k=0;k<6;k++){
@@ -141,6 +141,43 @@ async function repondre(page,choix){
   await page.click('text=Refaire le test');
   assert.match(await page.textContent('#qnum'),/1 \/ 14/);
   ok('« Refaire le test » repart de la première étape');
+  // Enregistrement dans le profil : "quiz2" activé dans la configuration (SQL quiz-01 à 05 appliqué le 30/10/2026).
+  // Compte simulé (le SDK est neutralisé) : on vérifie le bouton, ce qu'il envoie à saveQuiz et ses états.
+  const enreg=await page.evaluate(async()=>{
+   const actives=[...(window.PA_SUPABASE.activees||[])];
+   const dernier=JSON.parse(localStorage.getItem('pa-quiz-dernier'));
+   const resume={version:2,score:dernier.score,niveau:dernier.niveau,palier:dernier.palier,reponses:dernier.reponses};
+   const envois=[];let liberer;
+   const attente=new Promise(r=>{liberer=r;});
+   const zone=document.createElement('div');zone.hidden=true;document.body.appendChild(zone);
+   const vrai=window.PA_COMPTE;
+   window.PA_COMPTE={actif:true,user:{id:'u1'},ready:Promise.resolve(),saveQuiz:async r=>{envois.push(r);await attente;return {ok:true};}};
+   qCompte(zone,resume);await new Promise(r=>setTimeout(r,20));
+   const bouton=zone.querySelector('button');
+   const libelle=bouton&&bouton.textContent,visible=!zone.hidden;
+   bouton.click();await new Promise(r=>setTimeout(r,0));
+   const pendant={desactive:bouton.disabled,texte:zone.textContent};
+   liberer();await new Promise(r=>setTimeout(r,20));
+   const apres=zone.textContent;
+   // Sans "quiz2" : pas de bouton, pas de promesse « bientôt »
+   window.PA_SUPABASE.activees=actives.filter(n=>n!=='quiz2');
+   const zone2=document.createElement('div');document.body.appendChild(zone2);
+   qCompte(zone2,resume);await new Promise(r=>setTimeout(r,20));
+   const sans={bouton:!!zone2.querySelector('button'),texte:zone2.textContent};
+   window.PA_SUPABASE.activees=actives;window.PA_COMPTE=vrai;zone.remove();zone2.remove();
+   return {actives,libelle,visible,pendant,apres,envois,sans};
+  });
+  assert.ok(enreg.actives.includes('quiz2'),'quiz2 doit être dans PA_SUPABASE.activees');
+  assert.equal(enreg.visible,true);assert.equal(enreg.libelle,'Enregistrer dans mon profil');
+  assert.equal(enreg.pendant.desactive,true);assert.match(enreg.pendant.texte,/Enregistrement…/);
+  assert.match(enreg.apres,/Résultat enregistré dans ton profil\./);
+  assert.equal(enreg.envois.length,1);
+  const env=enreg.envois[0];
+  assert.equal(env.palier,4);assert.equal(env.niveau,4);assert.equal(env.reponses.length,10);
+  env.reponses.forEach(x=>assert.ok(Number.isInteger(x.palier)&&Number.isInteger(x.pts)&&typeof x.theme==='string'));
+  assert.equal(env.score,env.reponses.reduce((s,x)=>s+x.pts,0));
+  assert.equal(enreg.sans.bouton,false);assert.doesNotMatch(enreg.sans.texte,/bientôt/);
+  ok('"quiz2" actif : bouton « Enregistrer dans mon profil », chargement puis confirmation, résultat v2 envoyé (palier, 10 thèmes) ; sans "quiz2", pas de bouton');
   assert.deepEqual(erreurs,[]);
   ok('aucune erreur console ni ressource manquante');
   console.log('TOTAL '+nb+' contrôles réussis.');

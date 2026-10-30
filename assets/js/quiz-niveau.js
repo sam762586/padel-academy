@@ -275,7 +275,7 @@ function qCompte(zone,resultat){
   }
   if(!enregistrable){
    const p=document.createElement("p");p.className="acc-muted";
-   p.textContent="Ton résultat est gardé sur cet appareil et apparaît dans ton espace joueur. L'enregistrement dans ton compte arrive bientôt.";
+   p.textContent="Ton résultat est gardé sur cet appareil et apparaît dans ton espace joueur.";
    zone.appendChild(p);return;
   }
   const bouton=document.createElement("button");bouton.type="button";bouton.className="btn solid";bouton.textContent="Enregistrer dans mon profil";

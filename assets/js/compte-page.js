@@ -112,7 +112,7 @@ const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-
    const aide=aidesEffacement[c.id];if(!aide)return;
    aide.textContent=dansLeCompte
     ?"Tout est sauvegardé dans ton compte : tu retrouveras tes données en te reconnectant. Sur un appareil partagé, garde la case cochée."
-    :"Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.";
+    :"Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau non enregistré dans ton profil, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.";
   });
  }
  [caseEffacerDeco,caseEffacerSup].forEach(c=>{if(c)c.addEventListener("change",()=>{c.dataset.touchee="1";});});
