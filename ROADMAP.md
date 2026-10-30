@@ -398,3 +398,4 @@ L'étape 5 (coach IA : page, fonction Supabase, quota, base de connaissances, co
 **À faire par Samuel** : GoatCounter : tableau de bord visible par « N'importe qui » (à restreindre si non voulu) et conservation des données à 0 jour = illimitée (CNIL : 25 mois max).
 **Publié le 30/10/2026 (9e publication).**
 **Publié le 30/10/2026 (10e publication)** : bouton « Faire une nouvelle carte » (pour soi ou un ami, repère de niveau ignoré par défaut), « Refaire mes réponses » ; demande de Samuel (« ça me garde l'ancienne, toujours Élite »).
+**Publié le 30/10/2026 (11e publication)** : carte de joueur libre (demande de Samuel) : plus de questionnaire, 6 notes de 1 à 99 au curseur, rang Bronze à Élite choisi librement, cartes v1 reprises. Lot V+ : étude des concurrents faite, maquettes d'accueil « Nocturne » et « Vitre » dans scripts/debug/ ; choix de Samuel en attente.
