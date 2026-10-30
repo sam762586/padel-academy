@@ -5,6 +5,8 @@
       pseudo invalide refusé, photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas
       l'encoder) aux bonnes dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo », aucun débordement à 390 et 320 px, 0 erreur console ;
       choix du modèle (4 boutons aria-pressed, miniatures, aperçu et export changés, modèle gardé, repli sans MODELES) ;
+      « Refaire mes réponses » (nom, photo et repère gardés) ; « Faire une nouvelle carte » (tout à zéro, repère ignoré par défaut,
+      ancienne carte gardée jusqu'à la fin du questionnaire, ancienne photo jamais reposée sur la nouvelle carte) ;
       événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public affiché ou rien.
    Lancer depuis la racine du site : node scripts/verifier-carte.cjs */
 const assert=require('node:assert/strict');
@@ -53,8 +55,8 @@ const serveur=http.createServer((req,res)=>{
 async function dimsImage(page,buf,type){return page.evaluate(([b,t])=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res([i.naturalWidth,i.naturalHeight]);i.onerror=()=>rej(new Error('image illisible'));i.src='data:'+t+';base64,'+b;}),[buf.toString('base64'),type]);}
 const EXT_ATTENDUE='webp',TYPE_ATTENDU='image/webp'; // Edge encode le WebP ; Safari tomberait sur ma-carte-padel.jpg
 // Répond à une question au clavier : le bouton voulu reçoit le focus, Entrée
-async function repondreClavier(page,reponses){
- for(let i=0;i<12;i++){
+async function repondreClavier(page,reponses,debut=0,fin=12){
+ for(let i=debut;i<fin;i++){
   // Après chaque réponse, le focus est sur le titre de la question suivante (la première : vérifié après « Commencer »)
   if(i)assert.equal(await page.evaluate(()=>document.activeElement&&document.activeElement.id),'cj-qtext','focus sur la question '+(i+1));
   assert.match(await page.textContent('#cj-qnum'),new RegExp('Situation '+(i+1)+'\\ssur\\s12'));
@@ -283,6 +285,91 @@ async function repondreClavier(page,reponses){
   await repondreClavier(page,[1,3,3,1,0,3,2,3,3,1,2,3]);
   const sansBase=Number(await page.inputValue('#cj-n-VOL'));assert.ok(sansBase>69,'sans repère, la volée de Hugo dépasse la plage P100 ('+sansBase+')');
   ok('« Ne pas en tenir compte » : notes calculées sans repère');
+  // « Refaire mes réponses » : même joueur, le nom, la photo et le choix du repère sont gardés
+  const HUGO=[1,3,3,1,0,3,2,3,3,1,2,3];
+  assert.equal((await page.textContent('#cj-refaire-1')).trim(),'Refaire mes réponses');
+  assert.equal((await page.textContent('#cj-refaire-2')).trim(),'Refaire mes réponses');
+  await page.click('#cj-refaire-1');
+  assert.equal(await page.isChecked('#cj-sans-base'),true,'choix « sans repère » gardé');
+  assert.match(await page.textContent('#cj-base-txt'),/Repère de ton niveau ignoré\s: décoche la case/);
+  await page.uncheck('#cj-sans-base');
+  assert.match(await page.textContent('#cj-base-txt'),/Tes notes partent de ton repère\s: P100/);
+  await repondreClavier(page,HUGO);
+  assert.equal(await page.inputValue('#cj-n-VOL'),'64','repère P100 de nouveau appliqué');
+  await page.click('#cj-vers-photo');
+  await page.setInputFiles('#cj-fichier',{name:'moi.png',mimeType:'image/png',buffer:png});
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).photo===true&&!!localStorage.getItem('pa-carte-photo'));
+  await page.click('#cj-vers-pseudo');
+  assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
+  await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#cj-final').isVisible(),true);
+  await page.click('#cj-refaire-2');
+  await repondreClavier(page,HUGO);
+  await page.click('#cj-vers-photo');
+  assert.equal(await page.locator('#cj-depot-apercu').isVisible(),true,'photo gardée');
+  await page.click('#cj-vers-pseudo');
+  assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.','nom gardé');
+  await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: 63, Argent.*Avec ta photo\./);
+  ok('« Refaire mes réponses » (étapes notes et carte) : nom, photo et choix du repère gardés');
+  // « Faire une nouvelle carte » (pour un ami) depuis l'étape carte, au clavier
+  await page.click('#cj-modeles .cj-modele:nth-child(3)');
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).modele!=='neon');
+  const ancienne=await page.evaluate(()=>localStorage.getItem('pa-carte'));
+  const photoAncienne=await page.evaluate(()=>localStorage.getItem('pa-carte-photo'));
+  assert.equal(await page.locator('#cj-nouvelle-haut').isHidden(),true,'étape carte : un seul bouton « Faire une nouvelle carte »');
+  assert.equal((await page.textContent('#cj-nouvelle-2')).trim(),'Faire une nouvelle carte');
+  assert.equal(await page.textContent('#cj-nouvelle-aide-2'),"Pour toi ou pour quelqu'un d'autre : tout repart de zéro.");
+  assert.equal(await page.getAttribute('#cj-nouvelle-2','aria-describedby'),'cj-nouvelle-aide-2');
+  await page.focus('#cj-nouvelle-2');await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#cj-quiz').isVisible(),true);
+  assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-quiz','focus sur le titre du questionnaire');
+  await page.waitForFunction(()=>document.getElementById('cj-annonce').textContent==='Nouvelle carte : tout repart de zéro.');
+  assert.equal(await page.getAttribute('#cj-annonce','aria-live'),'polite');
+  assert.match(await page.textContent('#cj-qnum'),/Situation 1\ssur\s12/);
+  assert.equal(await page.evaluate(()=>document.getElementById('cj-qbar').style.width),'0%');
+  assert.equal(await page.locator('#cj-apercu').isVisible(),false,"aucune réponse : pas d'aperçu");
+  assert.equal(await page.isChecked('#cj-sans-base'),true,'repère non appliqué par défaut');
+  assert.equal(await page.textContent('#cj-base-txt'),"Repère de ton niveau ignoré : décoche la case pour l'utiliser si la carte est pour toi. Ton repère : P100 (test de niveau).");
+  assert.equal(await page.locator('#cj-retrouvee').isVisible(),false);
+  assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true,'carte gardée : bouton du haut proposé pendant le questionnaire');
+  assert.equal(await page.inputValue('#cj-pseudo'),'','pseudo vide');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte gardée au clic');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'ancienne photo gardée au clic');
+  ok('« Faire une nouvelle carte » : questionnaire à zéro, focus sur son titre, annonce aria-live, repère ignoré par défaut (texte clair), pseudo vide, ancienne carte et photo gardées');
+  // Réponses « moyennes » : notes sans repère, différentes de la plage P100
+  const MOY=Array(12).fill(1);
+  const attendu=await page.evaluate(m=>({sans:window.PA_CARTE.calcul.carte(m).notes,avec:window.PA_CARTE.calcul.carte(m,{base:{palier:2}}).notes}),MOY);
+  assert.notDeepEqual(attendu.sans,attendu.avec,'jeu de réponses discriminant');
+  await repondreClavier(page,MOY,0,11);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte toujours là avant la fin du questionnaire');
+  await repondreClavier(page,MOY,11,12);
+  assert.equal(await page.locator('#cj-notes').isVisible(),true);
+  for(const k of Object.keys(attendu.sans))assert.equal(Number(await page.inputValue('#cj-n-'+k)),attendu.sans[k],k+' sans repère');
+  const nouvelle=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
+  assert.deepEqual(nouvelle.reponses,MOY,'ancienne carte remplacée à la fin du questionnaire');
+  assert.equal(nouvelle.pseudo,'');assert.equal(nouvelle.sansBase,true);assert.equal(nouvelle.base,null);assert.equal(nouvelle.modele,'neon');assert.equal(nouvelle.photo,false);assert.equal(nouvelle.poste,null);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'photo jamais effacée par la nouvelle carte');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur\s: .*Sans photo\./);
+  ok('nouvelle carte : notes sans repère (≠ plage P100), pa-carte remplacée seulement à la fin, poste, nom et modèle remis à zéro, pas de photo');
+  // Rechargement en cours de route : la nouvelle carte (sans nom) est reprise à l'étape nom, sans l'ancienne photo
+  await page.goto(base+'/carte.html');
+  assert.equal(await page.locator('#cj-pseudo-etape').isVisible(),true);
+  assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true);
+  assert.equal(await page.inputValue('#cj-pseudo'),'');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/Sans photo\./,'ancienne photo pas reposée');
+  await page.click('#cj-retour-photo');
+  assert.equal(await page.locator('#cj-depot-apercu').isVisible(),false);
+  assert.equal(await page.locator('#cj-retirer-photo').isVisible(),false);
+  await page.click('#cj-vers-pseudo');await page.fill('#cj-pseudo','Nina R.');await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#cj-final').isVisible(),true);
+  assert.equal(await page.locator('#cj-nouvelle-haut').isHidden(),true);
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Nina R\.\s: .*Sans photo, initiales NR\./);
+  await page.waitForSelector('#cj-modeles .cj-modele');
+  assert.equal(await page.getAttribute('#cj-modeles .cj-modele:nth-child(1)','aria-pressed'),'true','modèle Néon par défaut');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-academie')),acadAvant);
+  ok("nouvelle carte après rechargement : reprise à l'étape nom sans l'ancienne photo, « Nina R. » en Néon ; pa-quiz-dernier et pa-academie intacts");
   // Débordement : 390 puis 320 px, à chaque étape
   for(const w of [390,320]){
    await page.setViewportSize({width:w,height:844});

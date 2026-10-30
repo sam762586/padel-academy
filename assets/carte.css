@@ -72,6 +72,11 @@
 .cj-etape h2:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:4px}
 .cj-etape .btns{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-4)}
 .cj-etape .btn{min-height:48px}
+/* « Faire une nouvelle carte » : en haut de l'atelier (carte retrouvée) et à l'étape Carte, aide juste sous le bouton */
+.cj-nouvelle[hidden]{display:none}
+.cj-nouvelle .btns{display:flex;flex-wrap:wrap;gap:var(--s-3)}
+.cj-nouvelle .btn{min-height:48px}
+.cj-nouvelle .champ-aide{margin-top:var(--s-2)}
 .cj-etape .msg{margin-top:var(--s-4)}
 .cj-etape .msg a{color:var(--turf)}
 .cj-pas{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s-2);counter-reset:pas}

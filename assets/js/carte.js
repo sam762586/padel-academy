@@ -1,12 +1,14 @@
 /* MA CARTE DE JOUEUR · logique de la page carte.html.
    Données et moteur : carte-donnees.js (window.PA_CARTE) ; rendu image : carte-rendu.js (window.CARTE_RENDU) ;
    styles : assets/carte.css. Tout se passe sur l'appareil :
-   - pa-carte : réponses, ajustements, poste, pseudo, choix du repère, modèle de carte (JSON, version 1) ;
+   - pa-carte : réponses, ajustements, poste, pseudo, choix du repère, modèle de carte, présence d'une photo (JSON, version 1) ;
    - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée ;
    - pa-quiz-dernier (palier du test de niveau) et pa-academie (niveau Mon académie) : LUS pour proposer un point de départ,
      jamais écrits, jamais convertis l'un en l'autre.
    Parcours : intro → questionnaire (12 situations, une par une) → notes et poste → photo → nom → carte (image à télécharger
-   ou partager). Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
+   ou partager). « Refaire mes réponses » garde le joueur (poste, nom, photo, repère) ; « Faire une nouvelle carte » repart
+   de zéro (pour soi ou pour un ami), repère ignoré par défaut, et ne remplace la carte gardée qu'à la fin du questionnaire.
+   Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
    Mesure : un téléchargement ou un partage réussi envoie à GoatCounter l'événement « carte-generee », sans aucune donnée
    de la carte (rien si le visiteur a refusé la mesure : clé skipgc). Le total public n'est lu que si COMPTEUR.actif. */
 (function(){
@@ -67,7 +69,8 @@
  function sauver(){
   if(!complet())return;
   ecrire(CLE_CARTE,{version:1,date:new Date().toISOString(),reponses:etat.reponses.slice(),ajustements:CLES.reduce((o,k)=>{o[k]=ajustement(k);return o;},{}),
-   poste:etat.poste,pseudo:etat.pseudo,sansBase:etat.sansBase,base:baseCalcul(),modele:modeleCourant().cle});
+   poste:etat.poste,pseudo:etat.pseudo,sansBase:etat.sansBase,base:baseCalcul(),modele:modeleCourant().cle,
+   photo:!!etat.photo}); // photo:false : la photo encore gardée dans pa-carte-photo appartient à une carte précédente
  }
  function restaurer(){
   const s=lireJ(CLE_CARTE,null);
@@ -84,6 +87,7 @@
 
  /* ---- Étapes ---- */
  const ETAPES=["intro","quiz","notes","photo","pseudo","final"];
+ const carteGardee=()=>{const s=lireJ(CLE_CARTE,null);return !!(s&&s.version===1&&Array.isArray(s.reponses)&&s.reponses.length===NB);};
  function allerA(nom,focus){
   etat.etape=nom;
   page.querySelectorAll(".cj-etape").forEach(z=>{z.hidden=z.dataset.etape!==nom;});
@@ -96,6 +100,9 @@
     li.classList.toggle("cj-pas-fait",j<k);
    });
   }
+  // « Faire une nouvelle carte » en haut : seulement si une carte est gardée, et hors étape Carte (qui a son propre bouton)
+  const haut=$("cj-nouvelle-haut");
+  if(haut)haut.hidden=nom==="final"||!carteGardee();
   const apercu=$("cj-apercu");
   if(apercu){apercu.hidden=!complet()||nom==="quiz"||nom==="intro";if(!apercu.hidden)rendreApercu();else if(arretApercu){arretApercu();arretApercu=null;}}
   if(focus){
@@ -111,9 +118,12 @@
   if(!bloc||!txt||!case_)return;
   if(!repere){bloc.hidden=true;return;}
   bloc.hidden=false;
-  txt.textContent="Tes notes partent de ton repère : "+repere.libelle+". Elles resteront dans une plage cohérente avec ce repère.";
-  case_.checked=etat.sansBase;
-  case_.onchange=()=>{etat.sansBase=case_.checked;if(complet()){rendreNotes();sauver();}};
+  // Le texte suit la case : repère appliqué, ou ignoré (cas par défaut d'une nouvelle carte, peut-être pour quelqu'un d'autre)
+  const texte=()=>{txt.textContent=etat.sansBase
+   ?"Repère de ton niveau ignoré : décoche la case pour l'utiliser si la carte est pour toi. Ton repère : "+repere.libelle+"."
+   :"Tes notes partent de ton repère : "+repere.libelle+". Elles resteront dans une plage cohérente avec ce repère.";};
+  case_.checked=etat.sansBase;texte();
+  case_.onchange=()=>{etat.sansBase=case_.checked;texte();if(complet()){rendreNotes();sauver();}};
  }
  function rendreQuestion(focus){
   const q=D.QUESTIONS[iQuestion],titre=$("cj-qtext"),opts=$("cj-qopts");
@@ -138,6 +148,31 @@
  function demarrerQuestionnaire(focus){
   iQuestion=0;etat.reponses=Array(NB).fill(null);etat.ajustements={};
   montrerRepere();allerA("quiz",false);rendreQuestion(focus);
+ }
+ /* Nouvelle carte (pour soi ou pour un ami) : tout repart de zéro, repère ignoré par défaut. Rien n'est effacé ici :
+    pa-carte n'est remplacée qu'à la fin du questionnaire (sauver), pa-carte-photo seulement au choix d'une nouvelle photo. */
+ function nouvelleCarte(){
+  etat.reponses=Array(NB).fill(null);etat.ajustements={};etat.poste=null;etat.pseudo="";
+  etat.modele=MODELE_DEFAUT.cle;etat.sansBase=true;
+  // Photo en mémoire seulement (le fichier gardé reste sur l'appareil tant qu'aucune nouvelle photo n'est choisie)
+  clearTimeout(minuteurPhoto);rec.img=null;rec.z=1;rec.drag=null;
+  const recad=$("cj-recadrage");if(recad)recad.hidden=true;
+  if(zoom){zoom.value="1";if(zoomVal)zoomVal.textContent="×1,0";}
+  poserPhoto(null,false);messagePhoto("");
+  if(champPseudo){champPseudo.value="";champPseudo.removeAttribute("aria-invalid");const c=champPseudo.closest(".champ");if(c)c.classList.remove("invalide");}
+  if(errPseudo)errPseudo.textContent="";
+  majBoutonsModeles();messageFinal("");
+  const fmt=page.querySelector('input[name="cj-format"][value="carte"]');if(fmt)fmt.checked=true;
+  const m=$("cj-retrouvee");if(m){m.hidden=true;m.textContent="";} // le message parlait de la carte précédente
+  demarrerQuestionnaire(false);
+  annoncer("Nouvelle carte : tout repart de zéro.");
+  const t=page.querySelector('.cj-etape[data-etape="quiz"] h2');
+  if(t){t.scrollIntoView({block:"nearest"});t.focus({preventScroll:true});}
+ }
+ // Annonce aux lecteurs d'écran (vidée puis posée : une même phrase est relue)
+ function annoncer(txt){
+  const z=$("cj-annonce");if(!z)return;
+  z.textContent="";requestAnimationFrame(()=>{z.textContent=txt;});
  }
 
  /* ---- Notes et poste ---- */
@@ -221,6 +256,7 @@
   if(sauvegarder){
    if(url){if(!ecrire(CLE_PHOTO,url))messagePhoto("La photo est gardée pour cette visite seulement : ton navigateur manque de place pour la conserver.","msg-alerte");}
    else retirer(CLE_PHOTO);
+   sauver(); // présence de la photo notée dans pa-carte (rien si la carte n'est pas terminée)
   }
   if(!url){etat.imgPhoto=null;rendreApercu();return;}
   const img=new Image();
@@ -477,6 +513,8 @@
  sur("cj-commencer",()=>demarrerQuestionnaire(true));
  sur("cj-refaire-1",()=>demarrerQuestionnaire(true));
  sur("cj-refaire-2",()=>demarrerQuestionnaire(true));
+ sur("cj-nouvelle-1",nouvelleCarte);
+ sur("cj-nouvelle-2",nouvelleCarte);
  sur("cj-vers-photo",()=>allerA("photo",true));
  sur("cj-retour-notes",()=>{rendreNotes();allerA("notes",true);});
  sur("cj-vers-pseudo",()=>{if(champPseudo&&!champPseudo.value&&etat.pseudo)champPseudo.value=etat.pseudo;allerA("pseudo",true);});
@@ -487,15 +525,16 @@
 
  /* ---- Démarrage : carte retrouvée ou intro ---- */
  const photoGardee=(()=>{try{const v=localStorage.getItem(CLE_PHOTO);return v&&/^data:image\//.test(v)&&v.length<1500000?v:null;}catch(e){return null;}})();
- if(photoGardee)poserPhoto(photoGardee,false);
  const sauvee=restaurer();
+ // Photo gardée posée, sauf si la carte gardée a été faite sans photo (photo:false : c'est celle d'une carte précédente)
+ if(photoGardee&&!(sauvee&&sauvee.photo===false))poserPhoto(photoGardee,false);
  proposerPseudoDuProfil();
  afficherCompteur();
  if(sauvee){
   montrerRepere();rendreNotes();
   if(champPseudo)champPseudo.value=etat.pseudo;
   const quand=(()=>{try{return new Date(sauvee.date).toLocaleDateString("fr-FR",{day:"numeric",month:"long"});}catch(e){return "";}})();
-  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous, et tu peux la modifier ou refaire le questionnaire.";}
+  const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous, et tu peux la modifier, refaire tes réponses ou faire une nouvelle carte.";}
   if(etat.pseudo){rendreFinal();allerA("final",false);}
   else allerA("pseudo",false);
  }else allerA("intro",false);

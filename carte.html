@@ -22,7 +22,7 @@
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css?v=d50202e4c6">
-<link rel="stylesheet" href="assets/carte.css?v=f24f8787c0">
+<link rel="stylesheet" href="assets/carte.css?v=f045327c48">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=a63caa1792" defer></script>
 </head>
@@ -47,6 +47,12 @@
     <div id="cj-page" class="cj-atelier">
       <div class="cj-etapes">
         <p id="cj-retrouvee" class="msg msg-info" role="status" hidden></p>
+        <!-- Carte déjà gardée sur l'appareil : nouvelle carte possible à toute étape (l'étape Carte a son propre bouton) -->
+        <div class="cj-nouvelle" id="cj-nouvelle-haut" hidden>
+          <div class="btns"><button type="button" class="btn ghost" id="cj-nouvelle-1" aria-describedby="cj-nouvelle-aide-1">Faire une nouvelle carte</button></div>
+          <p class="champ-aide" id="cj-nouvelle-aide-1">Pour toi ou pour quelqu'un d'autre : tout repart de zéro.</p>
+        </div>
+        <p class="sr-only" id="cj-annonce" aria-live="polite"></p>
         <ol class="cj-pas" id="cj-pas" aria-label="Étapes">
           <li data-pas="quiz">Questionnaire</li>
           <li data-pas="notes">Notes et poste</li>
@@ -83,7 +89,7 @@
           <div class="phases" role="group" aria-label="Ton poste" id="cj-postes"></div>
           <p class="champ-aide">Tu peux ajuster chaque note de 5 points au plus, dans un sens ou dans l'autre, par rapport au calcul.</p>
           <ul class="cj-notes-liste" id="cj-notes-liste"></ul>
-          <div class="btns"><button type="button" class="btn primary" id="cj-vers-photo">Continuer : ma photo</button><button type="button" class="btn ghost" id="cj-refaire-1">Refaire le questionnaire</button></div>
+          <div class="btns"><button type="button" class="btn primary" id="cj-vers-photo">Continuer : ma photo</button><button type="button" class="btn ghost" id="cj-refaire-1">Refaire mes réponses</button></div>
         </div>
 
         <!-- 4. Photo -->
@@ -146,7 +152,11 @@
             <button type="button" class="btn ghost" id="cj-modifier-notes">Modifier mes notes</button>
             <button type="button" class="btn ghost" id="cj-modifier-photo">Changer la photo</button>
             <button type="button" class="btn ghost" id="cj-modifier-pseudo">Changer le nom</button>
-            <button type="button" class="btn ghost" id="cj-refaire-2">Refaire le questionnaire</button>
+            <button type="button" class="btn ghost" id="cj-refaire-2">Refaire mes réponses</button>
+          </div>
+          <div class="cj-nouvelle">
+            <div class="btns"><button type="button" class="btn ghost" id="cj-nouvelle-2" aria-describedby="cj-nouvelle-aide-2">Faire une nouvelle carte</button></div>
+            <p class="champ-aide" id="cj-nouvelle-aide-2">Pour toi ou pour quelqu'un d'autre : tout repart de zéro.</p>
           </div>
           <p class="msg" role="note"><b>Ta photo n'est envoyée à aucun serveur du site.</b> L'image est fabriquée dans ton navigateur ; « Partager » ouvre le menu de partage de ton appareil, ou télécharge l'image si celui-ci ne le permet pas. Rien ne passe par nos serveurs. Voir <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
         </div>
@@ -189,7 +199,7 @@
 <script src="assets/js/compte.js?v=4c78bab497" defer></script>
 <script src="assets/js/carte-donnees.js?v=9231b920ed" defer></script>
 <script src="assets/js/carte-rendu.js?v=229d731a43" defer></script>
-<script src="assets/js/carte.js?v=f81fe1dd2b" defer></script>
+<script src="assets/js/carte.js?v=c29bb0d30c" defer></script>
 <script src="assets/js/nav.js?v=31b69caab2" defer></script>
 <script src="assets/js/presence.js?v=d4f54033b9" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
