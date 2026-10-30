@@ -140,7 +140,8 @@ const serveur=http.createServer((req,res)=>{
    // Accueil v3 : la vitrine du simulateur 3D ajoute une section (environ 600 px sur mobile)
    // Cartes de joueur : carte-rendu.js pas chargé au premier affichage (haut de page), seulement à l'approche de la section
    if(largeur===390){await page.waitForTimeout(1500);assert.equal(await page.evaluate(()=>performance.getEntriesByType('resource').some(r=>/carte-rendu\.js/.test(r.name))),false,'carte-rendu.js chargé au premier affichage');}
-   if(largeur===390)assert.ok(hauteur<9000,'accueil sans rallongement imprévu ('+hauteur+' px)');
+   // 10 500 px depuis la question du jour (30/10/2026, place réservée de 33rem sur téléphone)
+   if(largeur===390)assert.ok(hauteur<10500,'accueil sans rallongement imprévu ('+hauteur+' px)');
    await ctx.close();
   }
   ok('mobile 390 et 320 px : aucun débordement, « PADEL » décoratif masqué aux lecteurs d’écran, cartes compactes, bloc tournois présent, hauteur maîtrisée');

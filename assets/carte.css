@@ -158,3 +158,64 @@
 
 /* ---- Étape « Ton nom » (30/10/2026, dev-front) : champ facultatif « Mon club » sous le pseudo, avec ses suggestions (datalist). ---- */
 #cj-pseudo-form .champ+.champ{margin-top:var(--s-5)}
+
+/* ---- Duel de cartes (30/10/2026, dev-front) : bandeau du défi reçu (#cj-defi), écran du duel (#cj-duel), bloc « Défier un ami »
+   de l'étape Carte. Gagnant de chaque ligne écrit en toutes lettres (« Toi », pseudo, « Égalité ») avec une flèche décorative :
+   la couleur n'est qu'un renfort. Cartes côte à côte, empilées sous 600 px. Révélation douce des cartes, coupée si
+   prefers-reduced-motion. ---- */
+.cj-defi[hidden],.cj-duel[hidden],.cj-atelier[hidden]{display:none}
+.cj-defi{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:var(--s-5);align-items:center;margin-bottom:var(--s-5);border-color:rgba(var(--turf-rgb),.5)}
+.cj-defi:hover,.cj-duel:hover{transform:none}
+.cj-defi canvas{display:block;width:100%;height:auto;aspect-ratio:2/3;border-radius:calc(26 / 600 * 100%) / calc(26 / 900 * 100%)}
+.cj-defi-texte{display:grid;gap:var(--s-3);min-width:0}
+.cj-defi-texte h2,.cj-defi-texte p{margin:0;overflow-wrap:anywhere}
+.cj-defi h2:focus,.cj-duel h3:focus{outline:none}
+.cj-defi h2:focus-visible,.cj-duel h3:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:4px}
+.cj-defi .btns,.cj-defier .btns{display:flex;flex-wrap:wrap;gap:var(--s-3)}
+.cj-defi .btn,.cj-duel .btn,.cj-defier .btn{min-height:48px}
+.cj-duel{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s-5);margin-bottom:var(--s-5)}
+.cj-duel h2{margin:0}
+.cj-duel-cartes{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:var(--s-4);align-items:center}
+.cj-duel-cartes figure{margin:0;display:grid;gap:var(--s-2);justify-items:center;min-width:0;animation:cj-revele .5s ease-out both}
+.cj-duel-cartes figure:last-child{animation-delay:.15s}
+.cj-duel-cartes canvas{display:block;width:100%;max-width:340px;height:auto;aspect-ratio:2/3;border-radius:calc(26 / 600 * 100%) / calc(26 / 900 * 100%);box-shadow:var(--shadow)}
+.cj-duel-cartes figcaption{font-weight:800;color:var(--fg);text-align:center;overflow-wrap:anywhere}
+.cj-duel .cj-duel-vs{margin:0;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--turf);color:var(--accent-fg);font-family:var(--display);font-weight:900;font-size:1.6rem}
+.cj-duel-resultat{display:grid;gap:var(--s-2);justify-items:center;text-align:center}
+.cj-duel-resultat p{margin:0}
+.cj-duel .cj-duel-score{font-family:var(--display);font-weight:900;font-size:clamp(3rem,12vw,5rem);line-height:1;color:var(--fg);font-variant-numeric:tabular-nums}
+.cj-duel-resultat h3{margin:0;font-size:clamp(1.5rem,5vw,2.2rem);overflow-wrap:anywhere}
+.cj-duel-verdict-moi{color:var(--turf)}
+.cj-duel-table-bloc{min-width:0}
+.cj-duel-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.cj-duel-table caption{text-align:left;font-weight:800;color:var(--fg);margin-bottom:var(--s-2)}
+.cj-duel-table th,.cj-duel-table td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:center;overflow-wrap:anywhere;vertical-align:middle}
+.cj-duel-table thead th{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cj-duel-table thead th:first-child{width:32%}
+.cj-duel-table thead th:last-child{width:30%}
+.cj-duel-table th[scope="row"]{text-align:left;font-weight:700;color:var(--fg)}
+.cj-duel-table td{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--muted)}
+.cj-duel-table td.cj-duel-mieux{color:var(--turf);font-weight:900}
+.cj-duel-table td.cj-duel-gagnant{font-family:var(--body);font-size:var(--fs-s);font-weight:700;color:var(--fg)}
+.cj-duel-icone{color:var(--turf)}
+.cj-duel-egal .cj-duel-icone{color:var(--muted)}
+.cj-duel-globale th,.cj-duel-globale td{border-top:2px solid var(--line-2)}
+.cj-lien[hidden]{display:none}
+.cj-lien input{width:100%}
+.cj-defier{display:grid;gap:var(--s-2);margin-top:var(--s-5);padding-top:var(--s-4);border-top:1px solid var(--line)}
+.cj-defier h3{font-size:1.1rem;margin:0}
+.cj-defier .btns{margin-top:0}
+@keyframes cj-revele{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@media (max-width:600px){
+  .cj-defi{grid-template-columns:1fr}
+  .cj-defi-carte{width:100%;max-width:220px;margin:0 auto}
+  .cj-duel-cartes{grid-template-columns:1fr}
+  .cj-duel-cartes canvas{max-width:260px}
+  .cj-duel-vs{justify-self:center}
+}
+@media (prefers-reduced-motion:reduce){.cj-duel-cartes figure{animation:none}}
+/* Bandeau et duel : pas de défilement interne (.card coupe ce qui déborde : le focus déplacé ferait défiler le contenu de la carte),
+   ni de halo décoratif ; titres focalisés posés sous le menu fixe */
+.cj-defi,.cj-duel{overflow:visible}
+.cj-defi::after,.cj-duel::after{display:none}
+#cj-defi-titre,#cj-duel-verdict{scroll-margin-top:96px}

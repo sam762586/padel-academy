@@ -1786,6 +1786,31 @@ main h1{view-transition-name:titre-page}
    Durées quasi nulles plutôt que « none » : les états finaux restent appliqués et les événements de fin de transition
    partent toujours (menu, accordéons). Les indicateurs de chargement sont déjà figés plus haut ; le simulateur 3D
    (WebGL, piloté en JavaScript, lancé et arrêté par le visiteur) n'est pas concerné par ces règles. */
+/* ---------- Question du jour (accueil et Mon espace, assets/js/question-jour.js) ----------
+   La question arrive après le chargement de la banque : sa place est réservée (.qj-zone) pour ne rien décaler. */
+.qj-sec{padding-block:var(--s-7)}
+.qj-carte{max-width:820px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-5) var(--s-4)}
+.accueil-vitre .qj-carte{border-color:var(--vitre-bord)}
+.accueil-vitre .qj-sec .wrap{margin-inline:16px}
+.qj-intro{color:var(--muted);margin:var(--s-2) 0 var(--s-4)}
+/* Hauteurs mesurées sur la question la plus longue de la banque (320, 390, 700 px) : à revoir si la banque change beaucoup */
+.qj-zone{min-height:33rem;display:grid;align-content:start;gap:var(--s-3)}
+.qj-zone p{margin:0}
+.qj-zone .msg{color:var(--fg)}
+.qj-meta{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.14em;font-weight:700;color:var(--sand)}
+.qj-zone .qj-situation{color:var(--muted)}
+.qj-choix{border:0;margin:0;padding:0;min-width:0;display:grid;gap:var(--s-2)}
+.qj-question{width:100%;padding:0;margin-bottom:var(--s-3);font-family:var(--body);font-weight:800;font-size:var(--fs-l);line-height:1.35;text-transform:none;letter-spacing:0;color:var(--fg)}
+.qj-resultat .msg b:first-child{margin-right:0}
+.qj-choix .qt-reponse{width:100%;min-width:0}
+.qj-resultat{display:grid;gap:var(--s-2);border-radius:var(--r-s)}
+.qj-resultat:empty{display:none}
+.qj-zone .qj-explication{color:var(--fg)}
+.qj-lien{justify-self:start;display:inline-flex;align-items:center;min-height:44px;color:var(--sky);font-weight:700}
+.qj-zone .qj-demain{color:var(--muted)}
+.qj-zone .qj-serie{font-weight:700;color:var(--fg)}
+@media (max-width:359px){.qj-zone{min-height:41rem}}
+@media (min-width:700px){.qj-carte{padding:var(--s-6)}.qj-zone{min-height:23rem}.qj-choix{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;animation-delay:0s !important;transition-duration:.01ms !important;transition-delay:0s !important;scroll-behavior:auto !important}

@@ -23,6 +23,9 @@
    inactif (SDK absent, hors connexion), session Supabase gardée dans le navigateur (sb-…-auth-token, même règle que nav.js).
    Le moindre doute (lecture impossible) compte comme « non connecté ».
    Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
+   Duel de cartes : « Défier un ami » (étape Carte) produit https://apprendre-padel.fr/carte.html#duel=<code> avec les notes de
+   la carte (jamais la photo) ; à l'ouverture d'un tel lien, bandeau « <pseudo> te défie ! », puis écran du duel (voir plus bas).
+   La carte de l'ami n'est jamais gardée sur l'appareil : elle vit dans le fragment de l'adresse et en mémoire.
    Mesure : un téléchargement ou un partage réussi envoie à GoatCounter l'événement « carte-generee », sans aucune donnée
    de la carte (rien si le visiteur a refusé la mesure : clé skipgc). Le total public n'est lu que si COMPTEUR.actif. */
 (function(){
@@ -55,7 +58,8 @@
  /* ---- État ----
     poste : null = suivre le poste suggéré ; rang : null = suivre le rang suggéré (rangChoisi false).
     enregistrable : false pour une carte neuve tant que l'étape notes n'est pas validée (l'ancienne carte reste gardée). */
- const etat={notes:notesDefaut(),poste:null,rang:null,rangChoisi:false,pseudo:"",club:"",photo:null,imgPhoto:null,etape:"intro",modele:"neon",enregistrable:false};
+ const etat={notes:notesDefaut(),poste:null,rang:null,rangChoisi:false,pseudo:"",club:"",photo:null,imgPhoto:null,etape:"intro",modele:"neon",enregistrable:false,
+  duel:null}; // duel : {code, ami} tant qu'un défi reçu est ouvert (en mémoire seulement)
 
  /* ---- Modèles de carte (dessinés par carte-rendu.js) : repli sur le seul modèle Néon si la liste n'existe pas ---- */
  const MODELE_DEFAUT={cle:"neon",nom:"Néon",description:""};
@@ -408,6 +412,7 @@
   etat.pseudo=v;
   if(champClub){etat.club=nettoyerClub(champClub.value);champClub.value=etat.club;}
   sauver();rendreFinal();allerA("final",true);
+  if(etat.duel)afficherDuel(true); // défi reçu : la carte est prête, le duel s'affiche
  });
  /* ---- Club : suggestions chargées une seule fois, à la première prise de focus (options créées en DOM, jamais innerHTML) ---- */
  const champClub=$("cj-club"),listeClubs=$("cj-clubs");
@@ -535,9 +540,9 @@
  const enBlob=(canvas,q)=>new Promise((res,rej)=>{try{canvas.toBlob(b=>b?res(b):rej(new Error("image vide")),EXPORT.type,q);}catch(e){rej(e);}});
  // Objectif : 500 Ko au plus (WebP ≈ 300 Ko ; JPEG ≈ 480 Ko, ré-encodé à 0,82 si une photo très détaillée dépasse)
  const versBlob=async canvas=>{const b=await enBlob(canvas,0.9);return b.size>512000?enBlob(canvas,0.82):b;};
- function telechargerBlob(blob){
+ function telechargerBlob(blob,nom){
   const url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url;a.download=NOM_FICHIER;document.body.appendChild(a);a.click();a.remove();
+  a.href=url;a.download=nom||NOM_FICHIER;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),10000);
  }
  // Un bouton pendant son travail : désactivé, libellé « … », puis rendu tel quel
@@ -611,6 +616,225 @@
  sur("cj-modifier-photo",()=>allerA("photo",true));
  sur("cj-modifier-pseudo",()=>{if(champPseudo)champPseudo.value=etat.pseudo;if(champClub)champClub.value=etat.club;allerA("pseudo",true);});
 
+ /* ---- Duel de cartes ----
+    Lien : https://apprendre-padel.fr/carte.html#duel=<code>. Le code est le JSON
+    [version, VOL, AER, DEF, LOB, SER, TAC, poste, rang, modèle, pseudo, club] (version 1) en UTF-8, encodé en base64url sans « = ».
+    Jamais la photo ; la note globale n'est pas transmise : elle est recalculée (notes + poste), comme pour sa propre carte.
+    Le fragment (#…) n'est envoyé à aucun serveur. Lecture stricte : version 1, 12 valeurs, notes entières de 1 à 99, poste, rang
+    et modèle pris dans leurs listes, pseudo accepté par la même règle que la saisie (pseudoValide), club déjà nettoyé
+    (nettoyerClub) et sans adresse ni numéro ; sinon « Ce lien de duel n'est pas valide. » et la page reste normale.
+    Parcours : bandeau « <pseudo> te défie ! » (carte de l'ami sans photo : initiales) ; « Faire ma carte pour le duel »
+    (pas de carte) ou « Comparer avec ma carte » (carte gardée : jamais de deuxième carte) ; après « Voir ma carte », écran du
+    duel : cartes côte à côte, tableau note par note, score sur les 6 notes (la globale départage une égalité), verdict.
+    L'adresse devient #duel=<code>&ecran=duel : recharger réaffiche le duel ; « Retour à ma carte » retire le fragment.
+    La carte de l'ami n'est jamais écrite dans le stockage ; ses textes passent par textContent ou le canvas. */
+ const DUEL_VERSION=1,DUEL_CODE_MAX=800,DUEL_LIEN="https://apprendre-padel.fr/carte.html#duel=";
+ const DUEL_TEXTE="Je te défie : fais ta carte de padel et compare-la à la mienne";
+ const MSG_DUEL_INVALIDE="Ce lien de duel n'est pas valide.";
+ const NOM_DUEL="duel-carte-padel."+EXPORT.ext;
+ function versB64u(texte){
+  let b="";new TextEncoder().encode(texte).forEach(o=>{b+=String.fromCharCode(o);});
+  return btoa(b).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+ }
+ function depuisB64u(code){
+  let t=code.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";
+  const b=atob(t),o=new Uint8Array(b.length);for(let i=0;i<b.length;i++)o[i]=b.charCodeAt(i);
+  return new TextDecoder("utf-8",{fatal:true}).decode(o); // octets UTF-8 invalides : erreur
+ }
+ // Ma carte telle qu'elle part dans le lien (ni photo, ni date)
+ function maCarteDuel(){
+  const r=calculer();
+  return {notes:r.notes,poste:r.poste,rang:r.rang,modele:modeleCourant().cle,pseudo:etat.pseudo,club:etat.club,globale:r.globale};
+ }
+ function encoderDuel(c){
+  return versB64u(JSON.stringify([DUEL_VERSION,...CLES.map(k=>borne(c.notes[k])),c.poste,c.rang,c.modele,c.pseudo,c.club||""]));
+ }
+ // Club reçu : pas d'adresse e-mail, de lien ni de numéro (le champ de saisie ne les produit pas, un lien fabriqué si)
+ const clubAcceptable=c=>!/@|https?:|www\.|\.(fr|com|net|org|eu|io|be|ch|me|gg|ly|co|app|info|link)(?![\p{L}\p{N}])/iu.test(c)&&!/[0-9]{9,}/.test(c.replace(/[^\p{L}\p{N}]/gu,""));
+ function decoderDuel(code){
+  try{
+   if(typeof code!=="string"||!code||code.length>DUEL_CODE_MAX||!/^[A-Za-z0-9_-]+$/.test(code))return null;
+   const v=JSON.parse(depuisB64u(code)),n=CLES.length;
+   if(!Array.isArray(v)||v.length!==n+6||v[0]!==DUEL_VERSION)return null;
+   const notes={};
+   for(let i=0;i<n;i++){const x=v[1+i];if(!Number.isInteger(x)||x<1||x>99)return null;notes[CLES[i]]=x;}
+   const [poste,rang,modele,pseudo,club]=v.slice(n+1);
+   if(typeof poste!=="string"||!posteValide(poste)||typeof rang!=="string"||!rangValide(rang))return null;
+   if(typeof modele!=="string"||!modeleValide(modele))return null;
+   if(typeof pseudo!=="string"||pseudo!==pseudo.trim()||!pseudoValide(pseudo))return null;
+   if(typeof club!=="string"||club.length>CLUB_MAX*2)return null;
+   const propre=nettoyerClub(club);
+   if(propre!==club||(propre&&!clubAcceptable(propre)))return null;
+   return {notes,poste,rang,modele,pseudo,club:propre,globale:CALC.globale(notes,poste)};
+  }catch(e){return null;}
+ }
+ // Comparaison note par note : la plus haute gagne la ligne ; score sur les 6 notes ; égalité de score → la globale départage
+ function comparerDuel(moi,ami){
+  const qui=(a,b)=>a>b?"moi":a<b?"ami":"egal";
+  const lignes=CLES.map(k=>({cle:k,moi:moi.notes[k],ami:ami.notes[k],gagnant:qui(moi.notes[k],ami.notes[k])}));
+  const score={moi:lignes.filter(l=>l.gagnant==="moi").length,ami:lignes.filter(l=>l.gagnant==="ami").length};
+  const globale={moi:moi.globale,ami:ami.globale,gagnant:qui(moi.globale,ami.globale)};
+  let vainqueur=qui(score.moi,score.ami),departage=false;
+  if(vainqueur==="egal"&&globale.gagnant!=="egal"){vainqueur=globale.gagnant;departage=true;}
+  return {lignes,globale,score,vainqueur,departage};
+ }
+ window.PA_DUEL={encoder:encoderDuel,decoder:decoderDuel,comparer:comparerDuel,lien:c=>DUEL_LIEN+encoderDuel(c)}; // pour les tests
+ function donneesAmi(a){
+  return {pseudo:a.pseudo,poste:libPoste(a.poste),globale:a.globale,rang:a.rang,attributs:CLES.map(k=>({cle:k,note:a.notes[k]})),photo:null,niveau:"",club:a.club};
+ }
+ function descriptionAmi(a){
+  return "Carte de joueur de "+a.pseudo+" : "+a.globale+", "+libRang(a.rang)+", poste "+libPoste(a.poste).toLowerCase()+". "+
+   CLES.map(k=>libAttr(k)+" "+a.notes[k]).join(", ")+". Initiales "+initiales(a.pseudo)+"."+(a.club?" Club : "+a.club+".":"");
+ }
+ // Fragment de l'adresse : #duel=<code>&ecran=duel → {duel, ecran} (objet sans prototype)
+ function lireFragment(){
+  const f=Object.create(null),h=String(location.hash||"").replace(/^#/,"");
+  h.split("&").forEach(x=>{const i=x.indexOf("=");if(i>0)f[x.slice(0,i)]=x.slice(i+1);});
+  return f;
+ }
+ function poserFragment(h){try{history.replaceState(history.state,"",location.pathname+location.search+(h?"#"+h:""));}catch(e){}}
+ const carteComplete=()=>carteGardee()&&!!etat.pseudo;
+ const sections=()=>({defi:$("cj-defi"),duel:$("cj-duel"),erreur:$("cj-duel-erreur")});
+ function arreterApercu(){if(arretApercu){arretApercu();arretApercu=null;}}
+ function focusSur(z){if(!z)return;z.scrollIntoView({block:"start"});z.focus({preventScroll:true});}
+ function duelDepuisFragment(){
+  const f=lireFragment(),S=sections();
+  if(!("duel" in f))return;
+  const ami=decoderDuel(f.duel);
+  if(!ami){
+   etat.duel=null;
+   if(S.defi)S.defi.hidden=true;
+   if(S.duel&&!S.duel.hidden){S.duel.hidden=true;page.hidden=false;}
+   poserFragment("");
+   if(S.erreur){S.erreur.hidden=false;S.erreur.textContent=MSG_DUEL_INVALIDE;}
+   return;
+  }
+  if(S.erreur){S.erreur.hidden=true;S.erreur.textContent="";}
+  etat.duel={code:f.duel,ami};
+  if(f.ecran==="duel"&&carteComplete())afficherDuel(true);
+  else ouvrirDefi(true);
+ }
+ // Bandeau du défi : carte de l'ami (sans photo), bouton selon que le visiteur a déjà sa carte ou non
+ function ouvrirDefi(focus){
+  const S=sections(),a=etat.duel&&etat.duel.ami;
+  if(!S.defi||!a)return;
+  if(S.duel)S.duel.hidden=true;
+  page.hidden=false;S.defi.hidden=false;
+  $("cj-defi-titre").textContent=a.pseudo+" te défie !";
+  $("cj-defi-resume").textContent=a.pseudo+" a une carte à "+a.globale+" en "+libRang(a.rang)+", poste "+libPoste(a.poste).toLowerCase()+
+   (a.club?", au club "+a.club:"")+". Fais ta carte, puis comparez vos notes une à une.";
+  majBoutonDefi();
+  const c=$("cj-defi-canvas"),R=window.CARTE_RENDU;
+  if(c){c.setAttribute("aria-label",descriptionAmi(a));if(R)R.dessiner(c,donneesAmi(a),{format:"carte",modele:a.modele,largeur:420}).catch(()=>{});}
+  if(focus)focusSur($("cj-defi-titre"));
+ }
+ function majBoutonDefi(){
+  const b=$("cj-defi-go"),aide=$("cj-defi-aide");if(!b)return;
+  b.hidden=false;
+  if(carteComplete()){b.textContent="Comparer avec ma carte";if(aide)aide.textContent="Ta carte gardée sur cet appareil est comparée à la sienne. Rien n'est envoyé.";}
+  else{b.textContent="Faire ma carte pour le duel";if(aide)aide.textContent="Notes, poste, rang et nom : le duel s'affiche dès que ta carte est prête. Rien n'est envoyé.";}
+ }
+ function lancerDefi(){
+  if(!etat.duel)return;
+  if(carteComplete()){afficherDuel(true);return;}
+  const b=$("cj-defi-go"),aide=$("cj-defi-aide");
+  if(b)b.hidden=true;
+  if(aide)aide.textContent="Fais ta carte ci-dessous : le duel s'affiche quand tu cliques sur « Voir ma carte ».";
+  if(carteGardee()){allerA("pseudo",true);return;} // carte gardée sans nom : seulement le nom à donner, pas de nouvelle carte
+  rendreNotes();allerA("notes",true);
+ }
+ const NOM_LIGNE={VOL:"Volée",AER:"Jeu aérien",DEF:"Défense",LOB:"Lob et montée",SER:"Service et retour",TAC:"Tactique"};
+ function libelleGagnant(g,a){return g==="moi"?"Toi":g==="ami"?a.pseudo:"Égalité";}
+ function celluleGagnant(g,a){
+  const td=el("td","cj-duel-gagnant cj-duel-"+g);
+  const icone=el("span","cj-duel-icone",g==="moi"?"◀":g==="ami"?"▶":"=");icone.setAttribute("aria-hidden","true");
+  td.append(icone," ",libelleGagnant(g,a));
+  return td;
+ }
+ function ligneDuel(th,vMoi,vAmi,g,a,classe){
+  const tr=el("tr",classe||"");
+  const t=el("th","",th);t.scope="row";
+  const cm=el("td",g==="moi"?"cj-duel-mieux":"",String(vMoi)),ca=el("td",g==="ami"?"cj-duel-mieux":"",String(vAmi));
+  tr.append(t,cm,ca,celluleGagnant(g,a));
+  return tr;
+ }
+ function verdictDuel(res,a){return res.vainqueur==="moi"?"Tu gagnes le duel !":res.vainqueur==="ami"?a.pseudo+" gagne le duel":"Égalité";}
+ function afficherDuel(focus){
+  const S=sections(),a=etat.duel&&etat.duel.ami,R=window.CARTE_RENDU;
+  if(!S.duel||!a)return;
+  const moi=maCarteDuel(),res=comparerDuel(moi,a);
+  arreterApercu();
+  page.hidden=true;if(S.defi)S.defi.hidden=true;S.duel.hidden=false;
+  messageDuel("");const lb=$("cj-duel-lien-bloc");if(lb)lb.hidden=true;
+  $("cj-duel-nom-moi").textContent="Toi : "+moi.pseudo;$("cj-duel-nom-ami").textContent=a.pseudo;
+  $("cj-duel-th-ami").textContent=a.pseudo;
+  $("cj-duel-score").textContent=res.score.moi+" – "+res.score.ami;
+  $("cj-duel-score-texte").textContent="Score : "+res.score.moi+" note"+(res.score.moi>1?"s":"")+" pour toi, "+res.score.ami+" pour "+a.pseudo+".";
+  const v=$("cj-duel-verdict");v.textContent=verdictDuel(res,a);v.className="cj-duel-verdict-"+res.vainqueur;
+  $("cj-duel-detail").textContent=res.departage?"Égalité sur les notes, départagée à la note globale : "+moi.globale+" contre "+a.globale+".":
+   "Note globale : "+moi.globale+" pour toi, "+a.globale+" pour "+a.pseudo+".";
+  const corps=$("cj-duel-lignes");
+  corps.replaceChildren(...res.lignes.map(l=>ligneDuel(NOM_LIGNE[l.cle]||libAttr(l.cle),l.moi,l.ami,l.gagnant,a)),
+   ligneDuel("Note globale",res.globale.moi,res.globale.ami,res.globale.gagnant,a,"cj-duel-globale"));
+  const cm=$("cj-duel-moi"),ca=$("cj-duel-ami");
+  cm.setAttribute("aria-label",description(calculer()));ca.setAttribute("aria-label",descriptionAmi(a));
+  if(R){
+   const l=Math.min(1200,Math.round(360*Math.max(1,window.devicePixelRatio||1)));
+   R.dessiner(cm,donneesRendu(calculer()),{format:"carte",modele:moi.modele,largeur:l}).catch(()=>{});
+   R.dessiner(ca,donneesAmi(a),{format:"carte",modele:a.modele,largeur:l}).catch(()=>{});
+  }
+  const t=$("cj-duel-telecharger");if(t)t.disabled=!(R&&typeof R.dessinerDuel==="function");
+  poserFragment("duel="+etat.duel.code+"&ecran=duel"); // recharger la page réaffiche le duel
+  if(focus)focusSur(v);
+ }
+ function fermerDuel(){
+  const S=sections();
+  etat.duel=null;
+  if(S.duel)S.duel.hidden=true;if(S.defi)S.defi.hidden=true;
+  page.hidden=false;poserFragment("");
+  if(carteComplete()){rendreFinal();allerA("final",true);}else allerA(etat.etape,true);
+ }
+ function messageDuel(txt,classe){const m=$("cj-duel-msg");if(!m)return;m.hidden=!txt;m.textContent=txt||"";m.className="msg "+(classe||"msg-ok");}
+ function messageDefier(txt,classe){const m=$("cj-defier-msg");if(!m)return;m.hidden=!txt;m.textContent=txt||"";m.className="msg "+(classe||"msg-ok");}
+ /* Envoyer le défi (ma carte) : menu de partage de l'appareil, sinon presse-papiers (« Lien copié »), sinon champ à copier */
+ async function envoyerDefi(btn,dire,blocId,champId){
+  const lien=DUEL_LIEN+encoderDuel(maCarteDuel()),bloc=$(blocId),champ=$(champId);
+  if(bloc)bloc.hidden=true;dire("");
+  await avecAttente(btn,"Préparation…",async()=>{
+   if(navigator.share){
+    try{await navigator.share({title:"Duel de cartes de padel",text:DUEL_TEXTE,url:lien});dire("Défi envoyé. Quand ton ami aura fait sa carte, vous verrez qui gagne.","msg-ok");return;}
+    catch(e){if(e&&e.name==="AbortError")return;} // autre échec : on passe à la copie
+   }
+   try{
+    if(!navigator.clipboard||typeof navigator.clipboard.writeText!=="function")throw new Error("presse-papiers absent");
+    await navigator.clipboard.writeText(lien);
+    dire("Lien copié. Colle-le dans un message à ton ami.","msg-ok");return;
+   }catch(e){}
+   if(champ){champ.value=lien;if(bloc)bloc.hidden=false;}
+   dire("Copie ce lien et envoie-le à ton ami.","msg-info");
+  });
+  // Champ de repli : sélectionné après la remise en état du bouton (le focus n'est pas repris par avecAttente)
+  if(bloc&&!bloc.hidden&&champ){champ.focus();champ.select();}
+ }
+ sur("cj-defi-go",lancerDefi);
+ sur("cj-duel-retour",fermerDuel);
+ sur("cj-defier",ev=>envoyerDefi(ev.currentTarget,messageDefier,"cj-defier-lien-bloc","cj-defier-lien"));
+ sur("cj-duel-renvoyer",ev=>envoyerDefi(ev.currentTarget,messageDuel,"cj-duel-lien-bloc","cj-duel-lien"));
+ sur("cj-duel-telecharger",ev=>{
+  const btn=ev.currentTarget,a=etat.duel&&etat.duel.ami,R=window.CARTE_RENDU;
+  if(!a||!R||typeof R.dessinerDuel!=="function")return;
+  avecAttente(btn,"Préparation…",async()=>{
+   try{
+    const moi=maCarteDuel(),res=comparerDuel(moi,a),c=document.createElement("canvas");
+    const verdict=res.vainqueur==="moi"?moi.pseudo+" gagne le duel":res.vainqueur==="ami"?a.pseudo+" gagne le duel":"Égalité";
+    await R.dessinerDuel(c,{gauche:{donnees:donneesRendu(calculer()),modele:moi.modele},droite:{donnees:donneesAmi(a),modele:a.modele},
+     score:[res.score.moi,res.score.ami],verdict});
+    telechargerBlob(await versBlob(c),NOM_DUEL);
+    messageDuel("Image prête : "+NOM_DUEL+" (1200 × 1200).","msg-ok");
+   }catch(e){messageDuel("Impossible de fabriquer l'image. Réessaie, ou change de navigateur.","msg-erreur");}
+  });
+ });
+
  /* ---- Démarrage : carte retrouvée ou intro ---- */
  const photoGardee=(()=>{try{const v=localStorage.getItem(CLE_PHOTO);return v&&/^data:image\//.test(v)&&v.length<1500000?v:null;}catch(e){return null;}})();
  const sauvee=restaurer();
@@ -635,4 +859,6 @@
   if(etat.pseudo){rendreFinal();allerA("final",false);}
   else allerA("pseudo",false);
  }else allerA("intro",false);
+ duelDepuisFragment(); // lien carte.html#duel=… : bandeau du défi, ou duel déjà affiché (rechargement)
+ window.addEventListener("hashchange",duelDepuisFragment);
 })();

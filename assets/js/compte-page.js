@@ -14,7 +14,7 @@ const NB_SEMAINES_PLAN=8;
 const EFFACEMENT_DRAPEAUX=["espace","journal","favoris","progression","diagnostic","academie"];
 const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-en-cours","pa-score-historique","pa-journal-manuels",
  "pa-journal-suppressions","pa-tournois-favoris-attente","pa-weeks","pa-weeks-v2:invite",
- "pa-defis","pa-tableaux-tactiques","pa-quiz-tactique","pa-diagnostic-paire","pa-academie-priorites"];
+ "pa-defis","pa-question-jour","pa-tableaux-tactiques","pa-quiz-tactique","pa-diagnostic-paire","pa-academie-priorites"];
 
 (function(){
  const zoneMessage=document.getElementById("compte-msg");

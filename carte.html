@@ -21,8 +21,8 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Ma carte de joueur", "item": "https://apprendre-padel.fr/carte.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=df811069b2">
-<link rel="stylesheet" href="assets/carte.css?v=52b832ba3d">
+<link rel="stylesheet" href="assets/style.css?v=bcafaf8656">
+<link rel="stylesheet" href="assets/carte.css?v=0bf06ce0e0">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=55bff9a73b" defer></script>
 </head>
@@ -43,6 +43,53 @@
         <p class="acc-muted presence-ligne"><span class="presence" id="pa-presence"><span data-presence-texte aria-hidden="true">&nbsp;</span><span class="sr-only" data-presence-annonce aria-live="polite"></span></span> <span id="cj-compteur"></span></p></div>
       <p>Comme les cartes de joueurs des jeux de football, mais avec des notes de padel : volée, jeu aérien, défense, lob, service et tactique. Tu te donnes tes notes de 1 à 99, tu choisis ton rang de Bronze à Élite, ton poste et ta photo, et tu obtiens une image à partager. C'est un jeu : ta carte ne remplace ni le <a href="niveau.html">test de niveau</a>, ni ton classement.</p>
     </div>
+
+    <!-- Duel de cartes (carte.js) : lien carte.html#duel=<code> reçu d'un ami. Tout vient du fragment (#), rien n'est gardé sur l'appareil. -->
+    <p id="cj-duel-erreur" class="msg msg-alerte" role="status" hidden></p>
+    <section class="cj-defi card" id="cj-defi" aria-labelledby="cj-defi-titre" hidden>
+      <div class="cj-defi-carte"><canvas id="cj-defi-canvas" width="420" height="630" role="img" aria-label="Carte de ton ami"></canvas></div>
+      <div class="cj-defi-texte">
+        <p class="eyebrow">Duel de cartes</p>
+        <h2 id="cj-defi-titre" tabindex="-1">Un ami te défie !</h2>
+        <p id="cj-defi-resume"></p>
+        <p class="champ-aide" id="cj-defi-aide"></p>
+        <div class="btns"><button type="button" class="btn primary" id="cj-defi-go" aria-describedby="cj-defi-aide">Faire ma carte pour le duel</button></div>
+      </div>
+    </section>
+    <section class="cj-duel card" id="cj-duel" aria-labelledby="cj-duel-titre" hidden>
+      <p class="eyebrow">Duel de cartes</p>
+      <h2 id="cj-duel-titre">Le duel</h2>
+      <div class="cj-duel-cartes">
+        <figure><canvas id="cj-duel-moi" width="600" height="900" role="img" aria-label="Ta carte"></canvas><figcaption id="cj-duel-nom-moi">Toi</figcaption></figure>
+        <p class="cj-duel-vs" aria-hidden="true">VS</p>
+        <figure><canvas id="cj-duel-ami" width="600" height="900" role="img" aria-label="Carte de ton ami"></canvas><figcaption id="cj-duel-nom-ami">Ton ami</figcaption></figure>
+      </div>
+      <div class="cj-duel-resultat">
+        <p class="cj-duel-score"><span aria-hidden="true" id="cj-duel-score"></span><span class="sr-only" id="cj-duel-score-texte"></span></p>
+        <h3 id="cj-duel-verdict" tabindex="-1"></h3>
+        <p id="cj-duel-detail" class="champ-aide"></p>
+      </div>
+      <div class="cj-duel-table-bloc">
+        <table class="cj-duel-table">
+          <caption>Note par note</caption>
+          <thead><tr><th scope="col">Note</th><th scope="col">Toi</th><th scope="col" id="cj-duel-th-ami">Ton ami</th><th scope="col">Gagnant</th></tr></thead>
+          <tbody id="cj-duel-lignes"></tbody>
+        </table>
+      </div>
+      <p class="champ-aide">Le score compte les 6 notes. En cas d'égalité, la note globale départage.</p>
+      <div class="cj-actions">
+        <button type="button" class="btn primary" id="cj-duel-renvoyer">Renvoyer le défi</button>
+        <button type="button" class="btn ghost" id="cj-duel-telecharger">Télécharger l'image du duel</button>
+        <button type="button" class="btn ghost" id="cj-duel-retour">Retour à ma carte</button>
+      </div>
+      <p id="cj-duel-msg" class="msg msg-ok" role="status" hidden></p>
+      <div class="champ cj-lien" id="cj-duel-lien-bloc" hidden>
+        <label for="cj-duel-lien">Lien du défi</label>
+        <input type="text" id="cj-duel-lien" readonly aria-describedby="cj-duel-lien-aide">
+        <p class="champ-aide" id="cj-duel-lien-aide">Copie ce lien et envoie-le à ton ami.</p>
+      </div>
+      <p class="msg" role="note">Les notes de ton ami viennent du lien : elles ne sont gardées ni sur ton appareil ni sur nos serveurs. Aucune photo ne passe dans un lien de duel.</p>
+    </section>
 
     <div id="cj-page" class="cj-atelier">
       <div class="cj-etapes">
@@ -146,6 +193,18 @@
             <button type="button" class="btn ghost" id="cj-partager">Partager</button>
           </div>
           <p id="cj-final-msg" class="msg msg-ok" role="status" hidden></p>
+          <!-- Duel de cartes : lien vers carte.html#duel=<code> avec les notes de cette carte (jamais la photo) -->
+          <div class="cj-defier">
+            <h3>Duel de cartes</h3>
+            <p class="champ-aide" id="cj-defier-aide">Envoie un lien à un ami : il fait sa carte, puis vous comparez vos notes une à une. Le lien contient tes notes, ton poste, ton rang, ton nom, ton club et ton modèle, jamais ta photo.</p>
+            <div class="btns"><button type="button" class="btn ghost" id="cj-defier" aria-describedby="cj-defier-aide">Défier un ami</button></div>
+            <p id="cj-defier-msg" class="msg msg-ok" role="status" hidden></p>
+            <div class="champ cj-lien" id="cj-defier-lien-bloc" hidden>
+              <label for="cj-defier-lien">Lien du défi</label>
+              <input type="text" id="cj-defier-lien" readonly aria-describedby="cj-defier-lien-aide">
+              <p class="champ-aide" id="cj-defier-lien-aide">Copie ce lien et envoie-le à ton ami.</p>
+            </div>
+          </div>
           <div class="btns">
             <button type="button" class="btn ghost" id="cj-modifier-notes">Modifier mes notes</button>
             <button type="button" class="btn ghost" id="cj-modifier-photo">Changer la photo</button>
@@ -198,8 +257,8 @@
 <script src="assets/js/supabase-config.js?v=b683a23f68" defer></script>
 <script src="assets/js/compte.js?v=fe3b6362ba" defer></script>
 <script src="assets/js/carte-donnees.js?v=9231b920ed" defer></script>
-<script src="assets/js/carte-rendu.js?v=1e61a3d765" defer></script>
-<script src="assets/js/carte.js?v=5aa741ef29" defer></script>
+<script src="assets/js/carte-rendu.js?v=9427888fcf" defer></script>
+<script src="assets/js/carte.js?v=e5db071d15" defer></script>
 <script src="assets/js/nav.js?v=f98405ac9f" defer></script>
 <script src="assets/js/presence.js?v=6dfa426815" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

@@ -21,7 +21,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://apprendre-padel.fr/#site", "url": "https://apprendre-padel.fr/", "name": "Apprendre Padel", "alternateName": "Apprendre le padel", "inLanguage": "fr-FR", "description": "Apprendre le padel : coups, tactique, tutos interactifs, test de niveau, plan d'entraînement et sélecteur de raquette.", "author": {"@id": "https://apprendre-padel.fr/#org"}, "publisher": {"@id": "https://apprendre-padel.fr/#org"}}, {"@type": "Organization", "@id": "https://apprendre-padel.fr/#org", "name": "Apprendre Padel", "url": "https://apprendre-padel.fr/", "logo": "https://apprendre-padel.fr/assets/img/icon-512.png"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=df811069b2">
+<link rel="stylesheet" href="assets/style.css?v=bcafaf8656">
 <link rel="preload" as="image" href="assets/img/logo/logo-sombre-sans-signature-300.webp" imagesrcset="assets/img/logo/logo-sombre-sans-signature-300.webp 300w, assets/img/logo/logo-sombre-sans-signature-600.webp 600w, assets/img/logo/logo-sombre-sans-signature.webp 1200w" imagesizes="(min-width:861px) 240px, 150px" fetchpriority="high">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=55bff9a73b" defer></script>
@@ -74,7 +74,7 @@
       <a class="vitre-carte" href="#v-panneau-competiteur" data-profil="competiteur" id="v-carte-competiteur"><span class="vc-img"><canvas width="300" height="450" aria-hidden="true"></canvas></span><span class="vc-nom">Compétiteur</span><span class="vc-sous">Je joue des tournois</span><span class="vc-etat" aria-hidden="true"></span></a>
     </div>
     <!-- Dessin des cartes (carte-rendu.js) : chargé par accueil-vitre.js quand la section approche, jamais au premier affichage -->
-    <template id="vitre-rendu"><script src="assets/js/carte-rendu.js?v=1e61a3d765" defer></script></template>
+    <template id="vitre-rendu"><script src="assets/js/carte-rendu.js?v=9427888fcf" defer></script></template>
     <div class="profils vitre-panneaux">
       <article class="profil profil-debutant" id="v-panneau-debutant" aria-labelledby="profil-debutant">
         <p class="profil-tag">Débutant</p>
@@ -114,6 +114,16 @@
         <li><b>Sur mobile aussi</b><span>Et une version 2D du placement pour les appareils sans 3D.</span></li>
       </ul>
       <div class="btns"><a class="btn primary" href="simulateur-3d.html">Explorer le simulateur 3D</a><a class="btn ghost" href="simulateur-3d.html#tous-les-coups">Voir tous les coups</a></div>
+    </div>
+  </div>
+</section>
+<section class="qj-sec" id="question-du-jour" aria-labelledby="qj-titre">
+  <div class="wrap">
+    <div class="qj-carte" data-question-jour>
+      <p class="eyebrow">Une question par jour</p>
+      <h2 id="qj-titre">La question du jour</h2>
+      <p class="qj-intro">La même pour tous les joueurs du site, tirée des quiz de <a href="academie.html#quiz">Mon académie</a>. Une seule réponse par jour : reviens demain pour allonger ta série.</p>
+      <div class="qj-zone"><p class="note">La question du jour a besoin de JavaScript.</p></div>
     </div>
   </div>
 </section>
@@ -194,6 +204,7 @@
 <script src="assets/js/accueil-tournois.js?v=f4d98e9e40" defer></script>
 <script src="assets/js/nav.js?v=f98405ac9f" defer></script>
 <script src="assets/js/presence.js?v=6dfa426815" defer></script>
+<script src="assets/js/question-jour.js?v=31e480a0bf" defer></script>
 <script src="assets/js/accueil-vitre.js?v=29979db0a4" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

@@ -22,7 +22,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://apprendre-padel.fr/"}, {"@type": "ListItem", "position": 2, "name": "Mon espace joueur", "item": "https://apprendre-padel.fr/espace.html"}]}</script>
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/style.css?v=df811069b2">
+<link rel="stylesheet" href="assets/style.css?v=bcafaf8656">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/anti-cadre.js?v=4892f456eb"></script>
 <script src="assets/js/pwa.js?v=55bff9a73b" defer></script>
@@ -46,7 +46,7 @@
     </div>
     <div id="esp-statut" class="esp-statut"></div>
     <p class="sr-only" id="esp-annonce" role="status" aria-live="polite"></p>
-    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bloc-semaine">Ta semaine</a><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#mon-padel">Mon padel</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
+    <nav class="esp-sommaire" aria-label="Sections de l'espace joueur"><a href="#esp-bloc-semaine">Ta semaine</a><a href="#esp-bord">Tableau de bord</a><a href="#esp-bloc-defi">Défi de la semaine</a><a href="#esp-bloc-question">Question du jour</a><a href="#mon-padel">Mon padel</a><a href="#esp-bloc-objectifs">Objectifs</a><a href="#esp-bloc-exercices">Exercices</a><a href="#esp-bloc-matchs">Matchs</a><a href="#esp-bloc-resultats">Résultats</a><a href="#esp-bloc-progression">Progression</a><a href="compte.html">Mon compte</a></nav>
     <div class="acc-card esp-carte ac-semaine-carte" id="esp-bloc-semaine" data-semaine-bloc>
       <h2 class="esp-titre">Ta semaine</h2>
       <div id="ac-semaine"><p class="note">Ta semaine a besoin de JavaScript.</p></div>
@@ -59,6 +59,11 @@
       <h2 class="esp-titre">Défi de la semaine</h2>
       <div id="esp-defi"></div>
       <p class="note">Un thème par semaine, le même pour tous les joueurs du site ; l'exercice suit ton niveau déclaré dans <a href="academie.html">Mon académie</a> (sinon ton dernier <a href="niveau.html">test de niveau</a>). Tu valides toi-même ton exercice : ne le compte que si tu as tenu l'objectif. Ton parcours complet (quiz, compétences, articles, scènes 3D) : <a href="academie.html#parcours">Mon académie</a>.</p>
+    </div>
+    <div class="acc-card esp-carte qj-espace" id="esp-bloc-question" data-question-jour>
+      <h2 class="esp-titre">Question du jour</h2>
+      <div class="qj-zone"><p class="note">La question du jour a besoin de JavaScript.</p></div>
+      <p class="note">La même question pour tous les joueurs du site, une seule réponse par jour. Ta série reste sur cet appareil. Plus de questions : le <a href="academie.html#quiz">quiz de Mon académie</a>.</p>
     </div>
     <div class="acc-card mp" id="mon-padel">
       <h2 class="mp-titre">Mon padel</h2>
@@ -193,6 +198,7 @@
 <script src="assets/js/carnet-outils.js?v=7d8ce92702" defer></script>
 <script src="assets/js/espace.js?v=fd12044ef1" defer></script>
 <script src="assets/js/exercices.js?v=ba52fb982a" defer></script>
+<script src="assets/js/question-jour.js?v=31e480a0bf" defer></script>
 <script src="assets/js/defis.js?v=268125c535" defer></script>
 <script src="assets/js/academie-parcours.js?v=c74d7e953f" defer></script>
 <script src="assets/js/academie-sync.js?v=8f4d860b90" defer></script>

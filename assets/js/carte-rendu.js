@@ -12,6 +12,7 @@
    window.CARTE_RENDU.animer(canvas, donnees, options) : même dessin à l'écran ; seul Néon Élite est animé (bordure qui tourne : fond
    statique mis en cache hors écran, seule la bordure est redessinée), sauf prefers-reduced-motion ou story. Renvoie une fonction d'arrêt
    (vide pour les modèles sans animation).
+   window.CARTE_RENDU.dessinerDuel(canvas, duel) : image 1200 × 1200 du duel de cartes (deux cartes, score, verdict ; voir la fonction).
    Polices (Big Shoulders Display, Manrope) chargées via document.fonts avant le dessin ; si une police manque, la pile de repli
    (Arial Narrow / Impact, Arial) prend le relais : le dessin reste lisible. Cotes en unités sur une base de 600 × 900.
 
@@ -1033,5 +1034,46 @@
     return () => { actif = false; if (raf) cancelAnimationFrame(raf); };
   }
 
-  window.CARTE_RENDU = { dessiner, animer, chargerPolices, codePoste, libellePoste, initiales, nettoyerClub, RANGS, FOND, MODELES };
+  /* Image du duel de cartes (carte.html#duel=…), 1200 × 1200 : les deux cartes côte à côte (chacune dans son modèle, dessinée par
+     dessiner), « VS » au centre, score et verdict dessous. duel = { gauche: {donnees, modele}, droite: {donnees, modele},
+     score: [n, n] (gauche, droite), verdict: texte déjà rédigé (« LÉA GAGNE LE DUEL », « ÉGALITÉ »…) }. Rend une promesse du canvas.
+     Texte blanc froid et vert énergie sur le fond de la carte (#0A1320) : 17,3 et 14,3:1 ; --muted 8,8 ; --dim 6,6. */
+  async function dessinerDuel(canvas, duel, options) {
+    const o = Object.assign({ export: true }, options || {}), d = duel || {}, T = 1200, LC = 480, HC = 720, Y = 172;
+    await chargerPolices();
+    canvas.width = T; canvas.height = T;
+    const ctx = canvas.getContext('2d');
+    // Fond : bleu nuit de la carte, halo bleu terrain au centre, grain léger
+    ctx.fillStyle = FOND; ctx.fillRect(0, 0, T, T);
+    const halo = ctx.createRadialGradient(600, 540, 40, 600, 540, 760);
+    halo.addColorStop(0, rgba(C.terrain, .38)); halo.addColorStop(1, rgba(C.terrain, 0));
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, T, T);
+    texte(ctx, 'APPRENDRE PADEL', 600, 66, { poids: 800, taille: 22, espacement: .34, couleur: C.turf, align: 'center' });
+    texte(ctx, 'DUEL DE CARTES', 600, 140, { poids: 900, taille: 76, famille: DISPLAY, align: 'center', couleur: C.fg, lueur: { couleur: rgba(C.turf, .45), flou: 18 } });
+    // Les deux cartes, dessinées à part puis posées (ombre portée)
+    const poser = async (cote, x) => {
+      if (!cote) return;
+      const c = document.createElement('canvas');
+      await dessiner(c, cote.donnees || {}, { format: 'carte', modele: cote.modele, largeur: LC, export: !!o.export });
+      ctx.save(); ctx.shadowColor = rgba(NOIR, .55); ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
+      ctx.drawImage(c, x, Y, LC, HC); ctx.restore();
+    };
+    await poser(d.gauche, 90); await poser(d.droite, 630);
+    // « VS » dans une pastille vert énergie (texte bleu nuit 12,7:1)
+    ctx.save(); ctx.beginPath(); ctx.arc(600, Y + HC / 2, 52, 0, Math.PI * 2); ctx.fillStyle = C.turf;
+    ctx.shadowColor = rgba(C.turf, .6); ctx.shadowBlur = 30; ctx.fill(); ctx.restore();
+    texte(ctx, 'VS', 600, Y + HC / 2 + 17, { poids: 900, taille: 48, famille: DISPLAY, align: 'center', couleur: C.navy });
+    // Score et verdict
+    const s = Array.isArray(d.score) ? d.score : [0, 0];
+    texte(ctx, borner(s[0]) + ' – ' + borner(s[1]), 600, 1010, { poids: 900, taille: 104, famille: DISPLAY, align: 'center', couleur: C.fg });
+    const verdict = String(d.verdict || '').toUpperCase();
+    const tv = ajuster(ctx, verdict, 900, 46, DISPLAY, 1040, .04);
+    texte(ctx, verdict, 600, 1076, { poids: 900, taille: tv, famille: DISPLAY, espacement: .04, align: 'center', couleur: C.turf });
+    grain(ctx, T, T, .03, 21, o.export ? 2 : 1);
+    texte(ctx, 'apprendre-padel.fr', 600, 1140, { poids: 700, taille: 26, espacement: .08, couleur: C.muted, align: 'center' });
+    texte(ctx, 'FAIS TA CARTE ET DÉFIE TES AMIS', 600, 1176, { poids: 700, taille: 18, espacement: .2, couleur: C.dim, align: 'center' });
+    return canvas;
+  }
+
+  window.CARTE_RENDU = { dessiner, animer, dessinerDuel, chargerPolices, codePoste, libellePoste, initiales, nettoyerClub, RANGS, FOND, MODELES };
 })();
