@@ -57,7 +57,7 @@ const MP_NB_MATCHS=5;
  }
  function rendreRang(){
   const zone=$("mp-palier"),r=lireRang();zone.textContent="";
-  if(!r){zone.append(el("p","acc-muted","Saisis ton classement FFT (visible sur Ten'Up) pour savoir quelles catégories te sont ouvertes et à combien de places tu es du prochain cut."));return;}
+  if(!r){zone.append(el("p","acc-muted","Saisis ton classement FFT (visible sur Ten'Up) pour savoir quelles catégories te sont ouvertes et à combien de places tu es du prochain seuil de catégorie."));return;}
   formRang.elements["mp-rang"].value=String(r.rang);
   formRang.querySelector(`input[name="mp-sexe"][value="${r.sexe}"]`).checked=true;
   // Un cut ferme la catégorie aux joueurs classés à ce rang ou mieux

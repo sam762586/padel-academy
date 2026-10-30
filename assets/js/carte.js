@@ -8,7 +8,7 @@
      notes calculées + ajustements, poste, pseudo, modèle, photo ; rang = rang calculé (non choisi) ;
    - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée.
    La page ne lit aucune autre donnée du joueur (ni le test de niveau, ni Mon académie).
-   Club : champ libre de l'étape nom (30 caractères), suggestions tirées de assets/data/clubs.json (généré par
+   Club : champ libre de l'étape nom (40 caractères), suggestions tirées de assets/data/clubs.json (généré par
    scripts/generer-pages.js) chargées à la première prise de focus ; échec silencieux (hors connexion, fichier ouvert en local) :
    le champ reste libre. Texte nettoyé (caractères de contrôle retirés, espaces réduits), dessiné par carte-rendu.js.
    Parcours : intro → notes (6 curseurs de 1 à 99, poste, rang choisi librement) → photo → nom → carte (image à
@@ -42,9 +42,9 @@
  const notesDefaut=()=>CLES.reduce((o,k)=>{o[k]=NOTE_DEFAUT;return o;},{});
  const posteValide=cle=>D.POSTES.some(p=>p.cle===cle);
  const rangValide=cle=>D.RANGS.some(r=>r.cle===cle);
- /* Club : caractères de contrôle et marques de direction retirés, espaces réduits, 30 caractères au plus (sans couper un emoji).
+ /* Club : caractères de contrôle et marques de direction retirés, espaces réduits, 40 caractères au plus (sans couper un emoji).
     Même règle que CARTE_RENDU.nettoyerClub (repli local si carte-rendu.js est absent). */
- const CLUB_MAX=30;
+ const CLUB_MAX=40;
  function nettoyerClub(s){
   const R=window.CARTE_RENDU;
   if(R&&typeof R.nettoyerClub==="function")return R.nettoyerClub(s);
@@ -165,7 +165,7 @@
  }
  // Nouvelle carte refusée : visiteur sans compte qui a déjà sa carte sur l'appareil
  const nouvelleLimitee=()=>!estConnecte()&&carteGardee();
- const AIDE_NOUVELLE_LIMITEE="Sans compte : une seule carte par appareil. Ta carte reste modifiable.";
+ const AIDE_NOUVELLE_LIMITEE="Sans compte : une seule carte par appareil. Ta carte reste modifiable.";
  const aidesNouvelle={}; // id → texte d'origine de l'aide sous le bouton (écrit dans carte.html)
  function majAidesNouvelle(){
   ["cj-nouvelle-aide-1","cj-nouvelle-aide-2"].forEach(id=>{
@@ -181,8 +181,8 @@
   let m=bloc.querySelector(".cj-limite");
   if(!m){
    m=el("p","msg msg-info cj-limite");m.setAttribute("role","status");m.tabIndex=-1;
-   const lien=el("a","","Crée un compte gratuit (ou connecte-toi)");lien.href="connexion.html?suite=carte.html";
-   m.append("Sans compte, tu peux créer une seule carte. ",lien," pour en faire d'autres, par exemple pour tes amis. Ta carte actuelle reste modifiable.");
+   const lien=el("a","","Crée un compte gratuit ou connecte-toi");lien.href="connexion.html?suite=carte.html";
+   m.append("Sans compte, une seule carte par appareil. ",lien," pour en faire d'autres, par exemple pour tes amis. Ta carte actuelle reste modifiable.");
    bloc.appendChild(m);
   }
   m.hidden=false;

@@ -19,7 +19,7 @@
 .p3d-quiz-explication{margin:12px 0 0;color:var(--fg)}
 #p3d-quiz-suite{margin-top:12px}
 .p3d-scene{position:relative;width:100%;aspect-ratio:16/9;max-height:78vh;min-height:260px;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#0b1019;touch-action:none;outline:none}
-.p3d-scene:focus-visible{box-shadow:0 0 0 3px var(--turf)}
+.p3d-scene:focus-visible{outline:3px solid var(--turf);outline-offset:2px}
 .p3d-scene canvas{display:block;width:100%;height:100%}
 .p3d-chargement{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:700;letter-spacing:.04em}
 .p3d-etiquettes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -32,6 +32,8 @@
 .p3d-commandes .btn{padding:10px 16px;font-size:.8rem}
 .p3d-commandes .btn.primary{min-width:7.5em;justify-content:center}
 .p3d-temps{flex:1 1 180px;min-width:140px;accent-color:var(--turf)}
+/* Curseurs : zone de frappe d'au moins 24 px de haut (WCAG 2.5.8), la piste dessinée reste fine */
+.p3d-temps,.labo-curseur input[type=range]{min-height:24px;margin-block:0;cursor:pointer}
 .p3d-chrono{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700;min-width:4.2em;text-align:right}
 .p3d-commandes select{background:var(--bg);color:var(--fg);border:1px solid var(--field-line);border-radius:999px;padding:9px 12px;font:inherit;font-weight:700}
 .p3d-vues{margin-top:12px}
@@ -50,6 +52,7 @@
 /* Pages d'un scénario : image de la scène, la 3D démarre au clic */
 .p3d-affiche{position:absolute;inset:0;display:grid;place-items:center;padding:0;border:0;background:#0b1019;cursor:pointer}
 .p3d-affiche img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .2s}
+@media (prefers-reduced-motion:reduce){.p3d-affiche img{transition:none}}
 .p3d-affiche .btn{position:relative}
 .p3d-affiche:hover img,.p3d-affiche:focus-visible img{opacity:1}
 .p3d-affiche:focus-visible{outline:3px solid var(--turf);outline-offset:-3px}

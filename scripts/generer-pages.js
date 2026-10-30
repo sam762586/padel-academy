@@ -531,8 +531,8 @@ if (!partiel) {
   /* ---------- Noms de clubs pour le champ « Mon club » de la carte de joueur : assets/data/clubs.json ----------
      Tableau de chaînes trié (fr), tiré du champ « club » de tous les tournois. Deux graphies qui ne diffèrent que par la
      casse ou les espaces = un seul club, écrit avec la graphie la plus fréquente. Un même nom présent dans plusieurs villes
-     (franchises : Padel Shot…) est proposé une fois par ville, « Nom (Ville) », si chaque variante tient en 30 caractères
-     (longueur maximale du champ) ; sinon le nom seul, une fois. Un nom de plus de 30 caractères n'est pas proposé (le joueur l'écrit en plus court). Écrit seulement si le contenu change. */
+     (franchises : Padel Shot…) est proposé une fois par ville, « Nom (Ville) », si chaque variante tient en 40 caractères
+     (longueur maximale du champ) ; sinon le nom seul, une fois. Un nom de plus de 40 caractères n'est pas proposé (le joueur l'écrit en plus court). Écrit seulement si le contenu change. */
   const sansControle = s => String(s || "").replace(/[\p{Cc}\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/gu, "").replace(/\s+/g, " ").trim();
   const cleTexte = s => sansControle(s).toLowerCase();
   const cleVille = s => sansControle(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").replace(/\bst\b/g, "saint").trim();
@@ -552,8 +552,8 @@ if (!partiel) {
     // Graphie la plus fréquente ; à égalité, la première rencontrée
     const graphie = [...e.graphies].reduce((a, b) => (b[1] > a[1] ? b : a))[0];
     const avecVilles = [...e.villes.values()].map(ville => graphie + " (" + ville + ")");
-    if (avecVilles.length > 1 && avecVilles.every(n => n.length <= 30)) avecVilles.forEach(n => nomsClubs.add(n));
-    else if (graphie.length <= 30) nomsClubs.add(graphie); // plus long que le champ : pas proposé (il serait coupé)
+    if (avecVilles.length > 1 && avecVilles.every(n => n.length <= 40)) avecVilles.forEach(n => nomsClubs.add(n));
+    else if (graphie.length <= 40) nomsClubs.add(graphie); // plus long que le champ : pas proposé (il serait coupé)
   }
   const listeClubs = [...nomsClubs].sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }) || a.localeCompare(b, "fr"));
   const fClubs = path.join(RACINE, "assets/data/clubs.json"), contenuClubs = JSON.stringify(listeClubs) + "\n";

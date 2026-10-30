@@ -3,7 +3,7 @@
      donnees : { pseudo, poste ("Droite" | "Gauche" | "Polyvalent" | code de 3 lettres), globale (1-99), rang ("bronze" | "argent" | "or" | "elite"),
                 attributs: [{cle: "VOL", note: 82}, … ×6], photo: HTMLImageElement | HTMLCanvasElement | null, niveau: texte facultatif,
                 detoure: true si la photo est un PNG détouré (alpha respecté, pas de duotone),
-                club: texte facultatif (30 caractères, nettoyé par nettoyerClub) dessiné en capitales sous le pseudo sur les 4 modèles,
+                club: texte facultatif (40 caractères, nettoyé par nettoyerClub) dessiné en capitales sous le pseudo sur les 4 modèles,
                 taille réduite s'il est long ; rien si vide (le dessin est alors identique à celui d'avant le club) }
      options : { modele: "neon" (défaut) | "blason" | "stade" | "vignette", format: "carte" (2:3, 1200×1800 par défaut) | "story" (1080×1920),
                  largeur: largeur de sortie du format carte (120 px mini : aperçus du sélecteur), phase: 0..1 position du reflet de la bordure
@@ -132,9 +132,9 @@
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
     return w;
   }
-  /* Club du joueur (facultatif, 30 caractères) : caractères de contrôle et marques de direction retirés, espaces réduits.
+  /* Club du joueur (facultatif, 40 caractères) : caractères de contrôle et marques de direction retirés, espaces réduits.
      Aussi utilisé par carte.js (window.CARTE_RENDU.nettoyerClub) : une seule règle pour la saisie et le dessin. */
-  const CLUB_MAX = 30;
+  const CLUB_MAX = 40;
   function nettoyerClub(s) {
     const t = String(typeof s === 'string' ? s : '').replace(/\p{Cc}/gu, ' ').replace(/[\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
     return Array.from(t).slice(0, CLUB_MAX).join('').trim();

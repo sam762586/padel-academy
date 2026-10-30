@@ -42,7 +42,7 @@
   <div class="wrap">
     <div class="sec-head">
       <div><p class="eyebrow">Mon espace · Facultatif</p><h1>Mon compte</h1></div>
-      <p>Ton espace joueur (Mon padel, objectifs, matchs, progression) demande un compte gratuit. Ton compte garde aussi ton profil, tes résultats du test de niveau et ta progression du plan, d'un appareil à l'autre.</p>
+      <p>Ton espace joueur (Mon padel, objectifs, matchs, progression) demande un compte gratuit. Ton compte garde ton profil, ton niveau et tes quiz de Mon académie, les matchs terminés au compteur et les semaines cochées du plan 8 semaines, pour que tu les retrouves sur tes autres appareils. Le reste (test de niveau, résultats de tournois, objectifs, favoris, exercices…) reste sur cet appareil pour l'instant.</p>
     </div>
     <div class="acc-card esp-lien-carte">
       <h2 class="mp-titre">Mon espace joueur</h2>
@@ -55,7 +55,7 @@
         <div class="acc-top"><h3>Mon profil</h3><button type="button" class="btn ghost" id="compte-deco">Me déconnecter</button></div>
         <p class="acc-muted">Connecté avec : <b id="compte-adresse"></b></p>
         <label class="cx-case"><input type="checkbox" id="compte-deco-effacer" aria-describedby="compte-deco-aide"><span>Effacer les données de cet appareil en me déconnectant</span></label>
-        <p class="acc-muted" id="compte-deco-aide">Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
+        <p class="acc-muted" id="compte-deco-aide">Attention : une partie de ces données (test de niveau, résultats de tournois, objectifs, rang FFT, matchs saisis à la main, bilans après match, favoris, exercices, défis, tableaux tactiques) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
         <form class="acc-form" id="compte-form-profil" novalidate>
           <label for="pf-pseudo">Pseudo</label>
           <input type="text" id="pf-pseudo" maxlength="30" autocomplete="nickname" aria-describedby="pf-pseudo-aide">
@@ -99,7 +99,7 @@
         <h3>Supprimer mon compte</h3>
         <p>Cette action supprime ton compte et toutes les données qui y sont enregistrées (liste dans la <a href="confidentialite.html">politique de confidentialité</a>). Elle est définitive. Les données gardées sur cet appareil ne sont effacées que si tu coches la case ci-dessous.</p>
         <label class="cx-case"><input type="checkbox" id="sup-effacer" aria-describedby="sup-effacer-aide"><span>Effacer aussi les données de cet appareil</span></label>
-        <p class="acc-muted" id="sup-effacer-aide">Attention : une partie de ces données (résultats, objectifs, matchs, favoris, test de niveau, exercices, défis, tableaux tactiques, plan) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
+        <p class="acc-muted" id="sup-effacer-aide">Attention : une partie de ces données (test de niveau, résultats de tournois, objectifs, rang FFT, matchs saisis à la main, bilans après match, favoris, exercices, défis, tableaux tactiques) n'est que sur cet appareil, pas dans ton compte. Cocher la case les supprime définitivement.</p>
         <div class="btns">
           <button type="button" class="btn ghost" id="sup-demander">Supprimer mon compte</button>
           <button type="button" class="btn danger" id="sup-confirmer" aria-describedby="sup-msg" hidden>Oui, supprimer définitivement</button>

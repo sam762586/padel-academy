@@ -1,6 +1,7 @@
 /* SIMULATEUR 3D · Caméras
    Six vues : aérienne, tactique, derrière toi (A1), latérale, libre (orbite à la souris ou au doigt), suivi de balle.
-   Les vues fixes et suivies glissent en douceur vers leur cible ; la vue libre rend la main à OrbitControls. */
+   Les vues fixes et suivies glissent en douceur vers leur cible ; la vue libre rend la main à OrbitControls.
+   Mouvement réduit (prefers-reduced-motion) : pas de glissement ni d'inertie, la caméra se place directement. */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons';
 
@@ -21,7 +22,7 @@ export function creerCameras(camera, element) {
   controles.enabled = false;
   let vue = 'tactique';
   const pos = new THREE.Vector3(), cible = new THREE.Vector3(), regard = new THREE.Vector3(0, 0.5, 0);
-  let premiere = true;
+  let premiere = true, reduit = false;
 
   // Position et point visé de chaque vue, selon l'état de la scène (joueur suivi, balle)
   function viser(etat) {
@@ -49,6 +50,8 @@ export function creerCameras(camera, element) {
   return {
     controles,
     get vue() { return vue; },
+    // Mouvement réduit : caméra posée sans glissement, orbite libre sans inertie
+    reduireMouvement(oui) { reduit = !!oui; controles.enableDamping = !reduit; },
     choisir(id) {
       if (!VUES.some(v => v.id === id)) return;
       vue = id;
@@ -59,7 +62,7 @@ export function creerCameras(camera, element) {
     mettreAJour(dt, etat) {
       if (vue === 'libre') { controles.update(); return; }
       viser(etat);
-      const k = premiere ? 1 : 1 - Math.exp(-dt * (vue === 'balle' ? 4 : 3));
+      const k = premiere || reduit ? 1 : 1 - Math.exp(-dt * (vue === 'balle' ? 4 : 3));
       camera.position.lerp(pos, k);
       regard.lerp(cible, k);
       camera.lookAt(regard);

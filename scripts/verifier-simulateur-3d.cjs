@@ -325,7 +325,15 @@ async function dansLeNavigateur(base){
   await page.keyboard.press('Space');
   assert.equal(await page.evaluate(()=>P3D.etat.lecture),true);
   await page.keyboard.press('Space');
-  ok('vitesse réduite (× 0,25) et commandes au clavier');
+  // Scène focalisable (tabindex 0) et focus visible au clavier (contour vert)
+  assert.equal(await page.getAttribute('#p3d-scene','tabindex'),'0');
+  assert.ok(await page.$eval('#p3d-scene',e=>e.matches(':focus-visible')&&getComputedStyle(e).outlineStyle==='solid'&&parseFloat(getComputedStyle(e).outlineWidth)>=2),'focus visible sur la scène');
+  ok('vitesse réduite (× 0,25) et commandes au clavier (scène focalisable, focus visible)');
+  // Cibles d'au moins 24 px de haut (WCAG 2.5.8) : curseur du temps et curseurs du labo
+  const curseurs=await page.$$eval('#p3d-temps, .labo-curseur input[type=range]',l=>l.map(e=>({id:e.id,h:e.offsetParent?e.getBoundingClientRect().height:parseFloat(getComputedStyle(e).minHeight)})));
+  assert.ok(curseurs.length>=7,'curseurs trouvés : '+curseurs.length);
+  curseurs.forEach(c=>assert.ok(c.h>=24,c.id+' : '+c.h+' px de haut'));
+  ok('curseurs (temps et labo, '+curseurs.length+') : zone de frappe d’au moins 24 px de haut');
 
   const vues=await page.$$eval('#p3d-vues button',l=>l.map(b=>b.dataset.vue));
   assert.deepEqual([...vues].sort(),['aerienne','balle','joueur','laterale','libre','tactique']);
@@ -466,6 +474,30 @@ async function dansLeNavigateur(base){
   await page.evaluate(()=>{location.hash='gancho';});
   await page.waitForFunction(()=>P3D.etat.scenario.id==='gancho');
   ok('page Technique : les '+liens.length+' coups ouvrent la page de leur scénario (image, 3D au clic, niveau du coup et de la scène) ; autre scénario = autre page ; ancre suivie sur la page principale');
+  await ctx.close();
+
+  // Mouvement réduit (prefers-reduced-motion) : la scène attend à l'étape 0, même au clic sur l'image ; Lecture la lance
+  ctx=await contexte(browser,{viewport:{width:1280,height:800},reducedMotion:'reduce'});
+  page=await ctx.newPage();suivre(page,erreurs);
+  await page.goto(base+'/simulateur-3d.html');await pret(page);
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(()=>P3D.etat.lecture),false,'page principale : pas de lecture automatique');
+  assert.equal(await page.evaluate(()=>P3D.etat.t),0);
+  assert.equal(await page.evaluate(()=>P3D.etat.mouvementReduit),true);
+  await page.goto(base+'/simulateur-3d-vibora.html');
+  await page.click('#p3d-affiche');await pret(page);
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(()=>P3D.etat.lecture),false,'clic sur l’image : la scène s’affiche en pause');
+  assert.equal(await page.evaluate(()=>P3D.etat.t),0);
+  assert.match(await page.textContent('#p3d-etape-num'),/^Étape 1 sur/);
+  assert.equal(await page.textContent('#p3d-lecture'),'Lecture');
+  await page.click('#p3d-lecture');
+  await page.waitForFunction(()=>P3D.etat.t>0.2);
+  await page.click('#p3d-lecture');
+  // Préférence changée pendant la visite : suivie
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.waitForFunction(()=>P3D.etat.mouvementReduit===false);
+  ok('mouvement réduit : démarre en pause à l’étape 0 (page principale et clic sur l’image), Lecture au choix, préférence suivie');
   await ctx.close();
 
   // Sans WebGL : message, lien vers le 2D, étapes lisibles

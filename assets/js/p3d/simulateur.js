@@ -41,12 +41,20 @@ const GROUPES = ['Fond de court et défense', 'Transition et coups spéciaux', '
 const VITESSES = [0.25, 0.5, 1];
 const $ = id => document.getElementById(id);
 
-const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false, mode: 'regarder', trajectoire: false, placements: false };
+const etat = { scenario: null, calcul: null, t: 0, lecture: false, vitesse: 1, pret3d: false, mode: 'regarder', trajectoire: false, placements: false, mouvementReduit: false };
 
 /* Qualité d'affichage, choisie par le visiteur (mémorisée sur l'appareil) ; par défaut économique sur mobile, élevée
    sur ordinateur. Le lissage des bords se règle à la création du rendu : changer de qualité recharge la scène. */
 const CLE_QUALITE = 'pa-p3d-qualite';
 const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
+/* Mouvement réduit (préférence du système) : la scène attend à l'étape 0 qu'on clique sur Lecture (jamais de lecture
+   lancée seule, même au clic sur l'image), caméra sans glissement ni inertie, rebonds sans halo qui grandit.
+   La préférence est suivie si elle change pendant la visite. */
+const MOUVEMENT_REDUIT = matchMedia('(prefers-reduced-motion: reduce)');
+const reglagesReduits = [];
+function mouvementReduit() { return MOUVEMENT_REDUIT.matches; }
+function suivreMouvementReduit(fn) { reglagesReduits.push(fn); fn(mouvementReduit()); }
+try { MOUVEMENT_REDUIT.addEventListener('change', () => reglagesReduits.forEach(fn => fn(mouvementReduit()))); } catch (e) { /* ancien navigateur : préférence lue au chargement */ }
 function qualiteChoisie() {
   let nom = null;
   try { nom = localStorage.getItem(CLE_QUALITE); } catch (e) { /* stockage indisponible */ }
@@ -286,6 +294,7 @@ function brancherCommandes() {
   vit.addEventListener('change', () => { etat.vitesse = VITESSES.includes(Number(vit.value)) ? Number(vit.value) : 1; });
   // Clavier : espace (lecture/pause), flèches (étapes) quand la scène a le focus
   $('p3d-scene').addEventListener('keydown', ev => {
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return; // raccourcis du navigateur et du lecteur d'écran
     if (ev.key === ' ') { ev.preventDefault(); $('p3d-lecture').click(); }
     else if (ev.key === 'ArrowRight') { ev.preventDefault(); $('p3d-suiv').click(); }
     else if (ev.key === 'ArrowLeft') { ev.preventDefault(); $('p3d-prec').click(); }
@@ -352,6 +361,7 @@ async function demarrer3d() {
   const zones = creerZones(); scene.add(zones);
   creerLumieres(scene, qualite);
   const cameras = creerCameras(camera, canvas);
+  suivreMouvementReduit(oui => { etat.mouvementReduit = oui; cameras.reduireMouvement(oui); });
   window.P3D.vue3d = { camera, cameras }; // gros plans des tests et des captures de gestes
 
   // Balle et son ombre (disque au sol, utile même sans ombres portées)
@@ -468,7 +478,7 @@ async function demarrer3d() {
     anneaux.forEach(a => {
       const age = t - a.t, marque = etat.trajectoire && a.t >= seg.t && a.t <= finSeg;
       a.mesh.material.opacity = age >= 0 && age < 0.7 ? 0.9 * (1 - age / 0.7) : marque ? 0.55 : 0;
-      a.mesh.scale.setScalar(age >= 0 && age < 0.7 ? 1 + age * 2.5 : 1);
+      a.mesh.scale.setScalar(age >= 0 && age < 0.7 && !etat.mouvementReduit ? 1 + age * 2.5 : 1);
     });
     zones.visible = etat.placements;
     // Joueurs : position, allure (vitesse estimée sur ±0,05 s), geste
@@ -551,7 +561,8 @@ async function demarrer() {
     scene3d = await demarrer3d();
     if (etat.scenario) scene3d.nouveauScenario(etat.scenario);
     if (quizDemande || clic?.matches('a[href="#mode-quiz"]')) choisirMode('quiz');
-    else if (clic && clic === affiche && !etat.lecture) $('p3d-lecture').click();
+    // Clic sur l'image : la lecture part, sauf en mouvement réduit (scène affichée à l'étape 0, Lecture au choix)
+    else if (clic && clic === affiche && !etat.lecture && !mouvementReduit()) $('p3d-lecture').click();
   } catch (e) {
     console.error(e);
     sans3d('La scène 3D n\'a pas pu démarrer sur cet appareil.');
