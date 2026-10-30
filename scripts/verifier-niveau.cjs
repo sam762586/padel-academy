@@ -25,8 +25,8 @@ function moteur(){
  ok('données : 9 situations, paliers 0 à 4 couverts, une option par palier');
  // Classement FFT : il fait foi
  assert.equal(N.palierDuRang(150,'messieurs'),5);assert.equal(N.palierDuRang(800,'messieurs'),4);assert.equal(N.palierDuRang(3500,'messieurs'),3);
- assert.equal(N.palierDuRang(12000,'messieurs'),2);assert.equal(N.palierDuRang(40000,'messieurs'),1);
- assert.equal(N.palierDuRang(80,'dames'),4);assert.equal(N.palierDuRang(350,'dames'),3);assert.equal(N.palierDuRang(2500,'dames'),1);
+ assert.equal(N.palierDuRang(12000,'messieurs'),2);assert.equal(N.palierDuRang(20000,'messieurs'),2);assert.equal(N.palierDuRang(30000,'messieurs'),2);assert.equal(N.palierDuRang(30001,'messieurs'),1);assert.equal(N.palierDuRang(40000,'messieurs'),1);
+ assert.equal(N.palierDuRang(80,'dames'),4);assert.equal(N.palierDuRang(350,'dames'),3);assert.equal(N.palierDuRang(2500,'dames'),2);assert.equal(N.palierDuRang(3001,'dames'),1);
  ok('classement -> palier (messieurs et dames, repères alignés sur les cuts)');
  const base={resultats:null,anciennete:3,frequence:2,raquette:0};
  // Le « théoricien » : 4 mois de padel, coche les meilleures réponses -> P25, pas P500
@@ -51,7 +51,7 @@ function moteur(){
  ok('résultats en tournoi : plancher et plafond, coup clé manquant en tête des priorités');
  // Classement : fait foi, +1 seulement si le jeu décrit est nettement au-dessus
  assert.equal(nom({...base,rang:3500,sexe:'messieurs',resultats:3,technique:tech(2)}),'P250');
- r=N.estimer({...base,rang:20000,sexe:'messieurs',resultats:1,technique:tech(4)}); // rang P25, jeu décrit P500 : P100 au plus
+ r=N.estimer({...base,rang:40000,sexe:'messieurs',resultats:1,technique:tech(4)}); // rang P25, jeu décrit P500 : P100 au plus
  assert.equal(N.PALIERS[r.palier].nom,'P100');assert.match(r.notes.join(' '),/au-dessus de ton classement/);
  r=N.estimer({...base,rang:600,sexe:'messieurs',resultats:4,technique:tech(1)});
  assert.equal(N.PALIERS[r.palier].nom,'P500');assert.match(r.notes.join(' '),/sous-estimes/);

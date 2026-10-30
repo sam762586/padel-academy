@@ -11,7 +11,7 @@
 const PN_PALIERS=[
  {nom:"Découverte",cls:"go",txt:"Tu apprends les bases : laisser la balle sortir de la vitre, tenir l'échange en fond de court, passer ton service à chaque fois. Le premier tournoi viendra quand tu tiendras 10 échanges de suite. Joue deux fois par semaine et prends quelques cours collectifs : c'est le palier où l'on progresse le plus vite."},
  {nom:"P25",cls:"go",txt:"Tu peux t'inscrire en P25 : tu y joueras des paires de ton niveau. Ici, la paire qui gagne est celle qui fait le moins de fautes : défense patiente, lobs hauts et profonds, service qui passe toujours. Ta bandeja n'a pas besoin d'être belle, elle doit te laisser au filet."},
- {nom:"P100",cls:"go",txt:"Tu es à ta place en P50 et P100. Pour gagner des matchs en P250 : une bandeja qui te garde au filet 7 fois sur 10, des sorties de vitre (double vitre comprise) sans balle facile pour l'adversaire, et monter à deux derrière chaque lob qui les fait reculer."},
+ {nom:"P100",cls:"go",txt:"Tu es à ta place en P100, et en P50 si tu es classé au-delà du top 10 000 (dames : 1 000). Pour gagner des matchs en P250 : une bandeja qui te garde au filet 7 fois sur 10, des sorties de vitre (double vitre comprise) sans balle facile pour l'adversaire, et monter à deux derrière chaque lob qui les fait reculer."},
  {nom:"P250",cls:"maybe",txt:"Tu es un bon joueur de club, à ta place en P250. Ce qui sépare du P500 : la vitesse de balle adverse, une víbora qui fait mal, les balles basses au milieu du court (chiquita, volée basse) et la régularité sur trois sets. Dans le classement FFT, ce palier correspond environ aux places 1 000 à 5 000 chez les messieurs (100 à 500 chez les dames)."},
  {nom:"P500",cls:"stop",txt:"Tu fais partie des meilleurs joueurs de ta région. En P500, les points se gagnent sur la décision : le choix du coup selon la paire adverse, le déplacement sans la balle, le smash par 3 quand la balle le permet. Le cap P1000 demande un entraînement encadré (coach, physique, vidéo) plus que du volume de matchs."},
  {nom:"P1000 et +",cls:"stop",txt:"Tu joues au niveau national. Ton classement en dit plus que ce test : travaille avec un coach sur des points précis, filme tes matchs et soigne la récupération entre les tours."},
@@ -104,11 +104,16 @@ const PN_SITUATIONS=[
   ["On a un plan de jeu et on l'adapte aux adversaires pendant le match",4]]},
 ];
 
-// Palier d'après le classement FFT (repères indicatifs, cohérents avec les cuts des tournois)
+/* Palier d'après le classement FFT. Les seuils suivent les cuts des épreuves seniors
+   (CUTS et CUTS_NUM de assets/js/bareme-donnees.js, relevés sur Ten'Up le 26/10/2026) :
+   on ne conseille jamais une catégorie fermée au joueur (P25 fermé au top 30 000, P100 au top 5 000, P250 au top 1 000).
+   bareme-donnees.js n'est pas chargé sur niveau.html : copie ci-dessous, à tenir à jour avec CUTS_NUM.
+   Le seuil P1000 (top 200) est un repère : P500 et au-dessus sont ouverts à tous. */
+const PN_CUTS={P25:{messieurs:30000,dames:3000},P100:{messieurs:5000,dames:500},P250:{messieurs:1000,dames:100},P1000:{messieurs:200,dames:20}};
 function pnPalierDuRang(rang,sexe){
  if(!Number.isInteger(rang)||rang<1)return null;
- const r=sexe==="dames"?rang*10:rang;
- return r<=200?5:r<=1000?4:r<=5000?3:r<=15000?2:1;
+ const s=sexe==="dames"?"dames":"messieurs";
+ return rang<=PN_CUTS.P1000[s]?5:rang<=PN_CUTS.P250[s]?4:rang<=PN_CUTS.P100[s]?3:rang<=PN_CUTS.P25[s]?2:1;
 }
 /* Moteur. e = { rang, sexe, resultats (null ou 1 à 5), anciennete et frequence (0 à 3), raquette (bonus 0 à 2), technique : { theme: palier } }
    Renvoie { palier, source, moyenne, notes, themes : [{theme, palier, pts}], priorites : [theme] } */
