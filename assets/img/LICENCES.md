@@ -53,6 +53,7 @@ d'image inversée ou dans l'historique des commits d'ajout des photos).
 | `raq-1.webp`, `raq-2.webp`, `raq-3.webp`, `raq-4.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
 | `tact-1.webp`, `tact-2.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
 | `ent-1.webp`, `ent-2.webp` | idem | à retrouver | Licence Pexels | origine à retrouver |
+| `fond-vitre-1920.webp` (+ `fond-vitre-1280.webp`, `fond-vitre-mobile-900.webp` en cadrage portrait) | Rendu maison du simulateur 3D, `scripts/generer-fond-accueil.cjs` (détail dans `assets/3d/LICENCES-3D.md`) | Apprendre Padel | Celle du site (modèle des joueurs CC0, three.js MIT) | documenté |
 | `auteur.webp` | portrait de l'éditeur ? | à confirmer par l'éditeur | à confirmer par l'éditeur | origine à retrouver (ne pas supposer Pexels) |
 
 Les lignes « idem » ne sont pas vérifiées une à une : le crédit Pexels du site couvre « les photographies », mais le dépôt
@@ -71,6 +72,13 @@ ne contient pas la trace de chaque téléchargement. Si une photo ne vient pas d
 |---|---|---|---|---|
 | `og-image.png` (image de partage 1200 × 630) | origine à retrouver (probablement créée pour le site) | à confirmer | à confirmer | origine à retrouver |
 | `icon-512.png`, `icons/icon-192.png`, `icons/icon-512.png`, `icons/icon-maskable-512.png`, `icons/icon.svg`, `icons/icon-maskable.svg` | origine à retrouver (probablement créées pour le site) | à confirmer | à confirmer | origine à retrouver |
+
+## Logo (`assets/img/logo/`)
+
+| Fichier | Source | Auteur | Licence | État |
+|---|---|---|---|---|
+| `logo-sombre*`, `logo-clair*`, `monogramme-sombre*`, `favicon-32.png` | logo d'Apprendre Padel, nettoyé et décliné le 30/10/2026 | Samuel, éditeur du site | création de Samuel, éditeur du site, 30/10/2026, droits réservés | documenté |
+| `og-image.png`, `icon-512.png`, `icons/icon-192.png`, `icons/icon-512.png`, `icons/icon-maskable-512.png`, `favicon.png` et `apple-touch-icon.png` (racine) | régénérés le 30/10/2026 depuis le monogramme du logo (`scripts/build-icones.js`) ; remplacent les anciennes icônes (balle seule) | Samuel, éditeur du site | création de Samuel, éditeur du site, 30/10/2026, droits réservés | documenté |
 
 ## Rappel des autres registres
 
