@@ -22,7 +22,7 @@
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css?v=1288e18d33">
-<link rel="stylesheet" href="assets/carte.css?v=76f67b9951">
+<link rel="stylesheet" href="assets/carte.css?v=52b832ba3d">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="assets/js/pwa.js?v=55bff9a73b" defer></script>
 </head>
@@ -64,7 +64,7 @@
         <div class="cj-etape card" id="cj-intro" data-etape="intro">
           <h2 tabindex="-1">Quelques minutes pour faire ta carte</h2>
           <p>Choisis tes notes, ton rang, ta photo et ton modèle. Tu te donnes six notes de 1 à 99, librement, et tu choisis ton poste et ton rang, de Bronze à Élite. Tu ajoutes ta photo et ton nom, puis la carte se télécharge en image, au format carte ou story.</p>
-          <p class="msg" role="note"><b>Ta photo n'est envoyée à aucun serveur du site.</b> Notes, photo et nom sont gardés dans ton navigateur, rien n'est envoyé à un serveur. Détails sur la page <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
+          <p class="msg" role="note"><b>Ta photo n'est envoyée à aucun serveur du site.</b> Notes, photo, nom et club sont gardés dans ton navigateur, rien n'est envoyé à un serveur. Détails sur la page <a href="confidentialite.html#appareil">Confidentialité</a>.</p>
           <div class="btns"><button type="button" class="btn primary" id="cj-commencer">Commencer</button></div>
         </div>
 
@@ -115,6 +115,13 @@
               <input type="text" id="cj-pseudo" maxlength="30" autocomplete="nickname" aria-describedby="cj-pseudo-aide cj-pseudo-err">
               <p class="champ-aide" id="cj-pseudo-aide">2 à 30 caractères : lettres, chiffres, espaces, tirets bas, points, apostrophes ou tirets. Pas d'e-mail, de numéro ni de lien.</p>
               <p class="champ-erreur" id="cj-pseudo-err" role="status"></p>
+            </div>
+            <!-- Club facultatif : suggestions (assets/data/clubs.json) chargées par carte.js à la première prise de focus -->
+            <div class="champ">
+              <label for="cj-club">Mon club</label>
+              <input type="text" id="cj-club" maxlength="30" autocomplete="off" list="cj-clubs" aria-describedby="cj-club-aide">
+              <datalist id="cj-clubs"></datalist>
+              <p class="champ-aide" id="cj-club-aide">Facultatif. Tape les premières lettres pour retrouver ton club, ou écris-le.</p>
             </div>
             <div class="btns"><button type="submit" class="btn primary">Voir ma carte</button><button type="button" class="btn ghost" id="cj-retour-photo">Retour à la photo</button></div>
           </form>
@@ -191,8 +198,8 @@
 <script src="assets/js/supabase-config.js?v=522fe35184" defer></script>
 <script src="assets/js/compte.js?v=4c78bab497" defer></script>
 <script src="assets/js/carte-donnees.js?v=9231b920ed" defer></script>
-<script src="assets/js/carte-rendu.js?v=229d731a43" defer></script>
-<script src="assets/js/carte.js?v=37af390d5f" defer></script>
+<script src="assets/js/carte-rendu.js?v=9c7e4c9242" defer></script>
+<script src="assets/js/carte.js?v=5a4d72667d" defer></script>
 <script src="assets/js/nav.js?v=f98405ac9f" defer></script>
 <script src="assets/js/presence.js?v=249cbf7aa0" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

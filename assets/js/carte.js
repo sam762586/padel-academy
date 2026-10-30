@@ -2,11 +2,15 @@
    Données et moteur : carte-donnees.js (window.PA_CARTE : attributs, postes, rangs, calcul de la globale) ;
    rendu image : carte-rendu.js (window.CARTE_RENDU) ; styles : assets/carte.css. Tout se passe sur l'appareil :
    - pa-carte : la carte (JSON, version 2) : {version:2, date, notes:{VOL,AER,DEF,LOB,SER,TAC} de 1 à 99, poste,
-     posteChoisi, rang (bronze, argent, or, elite), rangChoisi, pseudo, modele, photo (présence d'une photo)} ;
+     posteChoisi, rang (bronze, argent, or, elite), rangChoisi, pseudo, club (facultatif, "" par défaut ; une carte gardée
+     avant l'ajout du club se lit sans, rien à convertir), modele, photo (présence d'une photo)} ;
      une carte version 1 (faite avec l'ancien questionnaire) est convertie sans rien perdre au premier chargement :
      notes calculées + ajustements, poste, pseudo, modèle, photo ; rang = rang calculé (non choisi) ;
    - pa-carte-photo : photo recadrée en 600 × 480 (dataURL JPEG, bien en dessous de 1 Mo), jamais envoyée.
    La page ne lit aucune autre donnée du joueur (ni le test de niveau, ni Mon académie).
+   Club : champ libre de l'étape nom (30 caractères), suggestions tirées de assets/data/clubs.json (généré par
+   scripts/generer-pages.js) chargées à la première prise de focus ; échec silencieux (hors connexion, fichier ouvert en local) :
+   le champ reste libre. Texte nettoyé (caractères de contrôle retirés, espaces réduits), dessiné par carte-rendu.js.
    Parcours : intro → notes (6 curseurs de 1 à 99, poste, rang choisi librement) → photo → nom → carte (image à
    télécharger ou partager). Le rang suit la suggestion (CARTE_CALCUL.rang de la note globale) tant que le joueur n'en a
    pas choisi un ; ensuite son choix est gardé, même si la globale change. « Modifier mes notes » revient à l'étape notes en
@@ -38,11 +42,20 @@
  const notesDefaut=()=>CLES.reduce((o,k)=>{o[k]=NOTE_DEFAUT;return o;},{});
  const posteValide=cle=>D.POSTES.some(p=>p.cle===cle);
  const rangValide=cle=>D.RANGS.some(r=>r.cle===cle);
+ /* Club : caractères de contrôle et marques de direction retirés, espaces réduits, 30 caractères au plus (sans couper un emoji).
+    Même règle que CARTE_RENDU.nettoyerClub (repli local si carte-rendu.js est absent). */
+ const CLUB_MAX=30;
+ function nettoyerClub(s){
+  const R=window.CARTE_RENDU;
+  if(R&&typeof R.nettoyerClub==="function")return R.nettoyerClub(s);
+  const t=String(typeof s==="string"?s:"").replace(/\p{Cc}/gu," ").replace(/[\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g,"").replace(/\s+/g," ").trim();
+  return Array.from(t).slice(0,CLUB_MAX).join("").trim();
+ }
 
  /* ---- État ----
     poste : null = suivre le poste suggéré ; rang : null = suivre le rang suggéré (rangChoisi false).
     enregistrable : false pour une carte neuve tant que l'étape notes n'est pas validée (l'ancienne carte reste gardée). */
- const etat={notes:notesDefaut(),poste:null,rang:null,rangChoisi:false,pseudo:"",photo:null,imgPhoto:null,etape:"intro",modele:"neon",enregistrable:false};
+ const etat={notes:notesDefaut(),poste:null,rang:null,rangChoisi:false,pseudo:"",club:"",photo:null,imgPhoto:null,etape:"intro",modele:"neon",enregistrable:false};
 
  /* ---- Modèles de carte (dessinés par carte-rendu.js) : repli sur le seul modèle Néon si la liste n'existe pas ---- */
  const MODELE_DEFAUT={cle:"neon",nom:"Néon",description:""};
@@ -70,7 +83,7 @@
  function lireCarte(){
   const s=lireJ(CLE_CARTE,null);
   if(!s||typeof s!=="object")return null;
-  const commun={date:typeof s.date==="string"?s.date:"",pseudo:typeof s.pseudo==="string"?s.pseudo:"",
+  const commun={date:typeof s.date==="string"?s.date:"",pseudo:typeof s.pseudo==="string"?s.pseudo:"",club:nettoyerClub(s.club),
    modele:typeof s.modele==="string"?s.modele:"",photo:s.photo};
   if(s.version===2&&s.notes&&typeof s.notes==="object"){
    const notes={};
@@ -97,13 +110,13 @@
   if(!etat.enregistrable)return;
   const r=calculer();
   ecrire(CLE_CARTE,{version:2,date:new Date().toISOString(),notes:r.notes,poste:r.poste,posteChoisi:!!etat.poste,
-   rang:r.rang,rangChoisi:etat.rangChoisi,pseudo:etat.pseudo,modele:modeleCourant().cle,
+   rang:r.rang,rangChoisi:etat.rangChoisi,pseudo:etat.pseudo,club:etat.club,modele:modeleCourant().cle,
    photo:!!etat.photo}); // photo:false : la photo encore gardée dans pa-carte-photo appartient à une carte précédente
  }
  function restaurer(){
   const s=lireCarte();
   if(!s)return false;
-  etat.notes=s.notes;etat.poste=s.poste;etat.rang=s.rang;etat.rangChoisi=s.rangChoisi;etat.pseudo=s.pseudo;
+  etat.notes=s.notes;etat.poste=s.poste;etat.rang=s.rang;etat.rangChoisi=s.rangChoisi;etat.pseudo=s.pseudo;etat.club=s.club;
   if(s.modele&&modeleValide(s.modele))etat.modele=s.modele; // modèle inconnu (retiré depuis) : premier de la liste
   etat.enregistrable=true;
   return s;
@@ -180,10 +193,10 @@
   masquerLimite();nouvelleCarte();
  }
 
- /* Nouvelle carte (pour soi ou pour un ami) : notes à 60, poste et rang suggérés, sans photo ni nom. Rien n'est effacé ici :
+ /* Nouvelle carte (pour soi ou pour un ami) : notes à 60, poste et rang suggérés, sans photo, ni nom, ni club. Rien n'est effacé ici :
     pa-carte n'est remplacée qu'en quittant l'étape notes, pa-carte-photo seulement au choix d'une nouvelle photo. */
  function nouvelleCarte(){
-  etat.notes=notesDefaut();etat.poste=null;etat.rang=null;etat.rangChoisi=false;etat.pseudo="";
+  etat.notes=notesDefaut();etat.poste=null;etat.rang=null;etat.rangChoisi=false;etat.pseudo="";etat.club="";
   etat.modele=MODELE_DEFAUT.cle;etat.enregistrable=false;
   // Photo en mémoire seulement (le fichier gardé reste sur l'appareil tant qu'aucune nouvelle photo n'est choisie)
   clearTimeout(minuteurPhoto);rec.img=null;rec.z=1;rec.drag=null;
@@ -192,6 +205,7 @@
   poserPhoto(null,false);messagePhoto("");
   if(champPseudo){champPseudo.value="";champPseudo.removeAttribute("aria-invalid");const c=champPseudo.closest(".champ");if(c)c.classList.remove("invalide");}
   if(errPseudo)errPseudo.textContent="";
+  if(champClub)champClub.value="";
   majBoutonsModeles();messageFinal("");
   const fmt=page.querySelector('input[name="cj-format"][value="carte"]');if(fmt)fmt.checked=true;
   const m=$("cj-retrouvee");if(m){m.hidden=true;m.textContent="";} // le message parlait de la carte précédente
@@ -391,8 +405,29 @@
    champPseudo.setAttribute("aria-invalid","true");champPseudo.closest(".champ").classList.add("invalide");champPseudo.focus();return;
   }
   errPseudo.textContent="";champPseudo.removeAttribute("aria-invalid");champPseudo.closest(".champ").classList.remove("invalide");
-  etat.pseudo=v;sauver();rendreFinal();allerA("final",true);
+  etat.pseudo=v;
+  if(champClub){etat.club=nettoyerClub(champClub.value);champClub.value=etat.club;}
+  sauver();rendreFinal();allerA("final",true);
  });
+ /* ---- Club : suggestions chargées une seule fois, à la première prise de focus (options créées en DOM, jamais innerHTML) ---- */
+ const champClub=$("cj-club"),listeClubs=$("cj-clubs");
+ let clubsDemandes=false;
+ function chargerClubs(){
+  if(clubsDemandes||!listeClubs||typeof fetch!=="function")return;
+  clubsDemandes=true;
+  try{
+   fetch("assets/data/clubs.json")
+    .then(r=>r.ok?r.json():null)
+    .then(l=>{
+     if(!Array.isArray(l)||listeClubs.childElementCount)return;
+     const frag=document.createDocumentFragment();
+     l.forEach(nom=>{const v=typeof nom==="string"?nettoyerClub(nom):"";if(!v)return;const o=document.createElement("option");o.value=v;frag.appendChild(o);});
+     listeClubs.appendChild(frag);
+    })
+    .catch(()=>{}); // hors connexion ou fichier local : le champ reste libre
+  }catch(e){}
+ }
+ if(champClub)champClub.addEventListener("focus",chargerClubs);
  if(champPseudo)champPseudo.addEventListener("input",()=>{champPseudo.removeAttribute("aria-invalid");errPseudo.textContent="";champPseudo.closest(".champ").classList.remove("invalide");});
  // Pseudo du profil, si le joueur est connecté et si la table des profils est activée (sinon aucun appel)
  function proposerPseudoDuProfil(){
@@ -417,11 +452,12 @@
   const nom=etat.pseudo?" de "+etat.pseudo:"",ini=initiales(etat.pseudo);
   return "Carte de joueur"+nom+" : "+r.globale+", "+libRang(r.rang)+", poste "+libPoste(r.poste).toLowerCase()+". "+
    CLES.map(k=>libAttr(k)+" "+r.notes[k]).join(", ")+". "+(etat.photo?"Avec ta photo.":"Sans photo"+(ini?", initiales "+ini:"")+".")+
+   (etat.club?" Club : "+etat.club+".":"")+
    (choixPossible()?" Modèle "+modeleCourant().nom+".":"");
  }
  function donneesRendu(r){
   return {pseudo:etat.pseudo||"Joueur",poste:libPoste(r.poste),globale:r.globale,rang:r.rang,attributs:CLES.map(k=>({cle:k,note:r.notes[k]})),
-   photo:etat.imgPhoto,niveau:""};
+   photo:etat.imgPhoto,niveau:"",club:etat.club};
  }
  // Le dessin (coûteux) est regroupé par image d'écran ; la description et le rang sont posés tout de suite.
  // Élite : la bordure est animée par CARTE_RENDU.animer, qui renvoie une fonction d'arrêt (appelée avant tout nouveau dessin).
@@ -569,11 +605,11 @@
  // Quitter l'étape notes valide la carte : elle est gardée (et remplace, pour une nouvelle carte, celle d'avant)
  sur("cj-vers-photo",()=>{etat.enregistrable=true;sauver();allerA("photo",true);});
  sur("cj-retour-notes",()=>{rendreNotes();allerA("notes",true);});
- sur("cj-vers-pseudo",()=>{if(champPseudo&&!champPseudo.value&&etat.pseudo)champPseudo.value=etat.pseudo;allerA("pseudo",true);});
+ sur("cj-vers-pseudo",()=>{if(champPseudo&&!champPseudo.value&&etat.pseudo)champPseudo.value=etat.pseudo;if(champClub&&!champClub.value&&etat.club)champClub.value=etat.club;allerA("pseudo",true);});
  sur("cj-retour-photo",()=>allerA("photo",true));
  sur("cj-modifier-notes",()=>{rendreNotes();allerA("notes",true);});
  sur("cj-modifier-photo",()=>allerA("photo",true));
- sur("cj-modifier-pseudo",()=>{if(champPseudo)champPseudo.value=etat.pseudo;allerA("pseudo",true);});
+ sur("cj-modifier-pseudo",()=>{if(champPseudo)champPseudo.value=etat.pseudo;if(champClub)champClub.value=etat.club;allerA("pseudo",true);});
 
  /* ---- Démarrage : carte retrouvée ou intro ---- */
  const photoGardee=(()=>{try{const v=localStorage.getItem(CLE_PHOTO);return v&&/^data:image\//.test(v)&&v.length<1500000?v:null;}catch(e){return null;}})();
@@ -593,6 +629,7 @@
   if(sauvee.migree)sauver();
   rendreNotes();
   if(champPseudo)champPseudo.value=etat.pseudo;
+  if(champClub)champClub.value=etat.club;
   const quand=(()=>{try{const d=new Date(sauvee.date);return isNaN(d)?"":d.toLocaleDateString("fr-FR",{day:"numeric",month:"long"});}catch(e){return "";}})();
   const m=$("cj-retrouvee");if(m){m.hidden=false;m.textContent="Ta carte"+(quand?" du "+quand:"")+" est gardée sur cet appareil : tu la retrouves ci-dessous. Tu peux modifier tes notes, ta photo ou ton nom, ou faire une nouvelle carte.";}
   if(etat.pseudo){rendreFinal();allerA("final",false);}

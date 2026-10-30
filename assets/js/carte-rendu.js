@@ -2,7 +2,9 @@
    Usage : await window.CARTE_RENDU.dessiner(canvas, donnees, options)
      donnees : { pseudo, poste ("Droite" | "Gauche" | "Polyvalent" | code de 3 lettres), globale (1-99), rang ("bronze" | "argent" | "or" | "elite"),
                 attributs: [{cle: "VOL", note: 82}, … ×6], photo: HTMLImageElement | HTMLCanvasElement | null, niveau: texte facultatif,
-                detoure: true si la photo est un PNG détouré (alpha respecté, pas de duotone) }
+                detoure: true si la photo est un PNG détouré (alpha respecté, pas de duotone),
+                club: texte facultatif (30 caractères, nettoyé par nettoyerClub) dessiné en capitales sous le pseudo sur les 4 modèles,
+                taille réduite s'il est long ; rien si vide (le dessin est alors identique à celui d'avant le club) }
      options : { modele: "neon" (défaut) | "blason" | "stade" | "vignette", format: "carte" (2:3, 1200×1800 par défaut) | "story" (1080×1920),
                  largeur: largeur de sortie du format carte (120 px mini : aperçus du sélecteur), phase: 0..1 position du reflet de la bordure
                  Élite (Néon), export: true pour l'image téléchargée (grain réduit à 2 px) }
@@ -129,6 +131,34 @@
     ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
     return w;
+  }
+  /* Club du joueur (facultatif, 30 caractères) : caractères de contrôle et marques de direction retirés, espaces réduits.
+     Aussi utilisé par carte.js (window.CARTE_RENDU.nettoyerClub) : une seule règle pour la saisie et le dessin. */
+  const CLUB_MAX = 30;
+  function nettoyerClub(s) {
+    const t = String(typeof s === 'string' ? s : '').replace(/\p{Cc}/gu, ' ').replace(/[\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
+    return Array.from(t).slice(0, CLUB_MAX).join('').trim();
+  }
+  /* Ligne du club, en capitales, sous le pseudo : taille réduite (measureText, via ajuster) jusqu'à tenir dans maxW, de o.taille
+     à o.mini ; si le texte déborde encore à la taille mini, il est coupé avec des points de suspension. Rien si le club est vide.
+     Renvoie la largeur dessinée (0 si rien). */
+  function ligneClub(ctx, club, x, y, maxW, o) {
+    let s = nettoyerClub(club).toUpperCase();
+    if (!s) return 0;
+    const poids = o.poids || 800, esp = o.espacement || 0, mini = o.mini || 10;
+    let t = o.taille;
+    for (let i = 0; i < 40; i++) {
+      police(ctx, poids, t, o.famille, esp);
+      if (ctx.measureText(s).width <= maxW || t <= mini) break;
+      t = Math.max(mini, t - 1);
+    }
+    if (ctx.measureText(s).width > maxW) {
+      const lettres = Array.from(s);
+      while (lettres.length > 1 && ctx.measureText(lettres.join('').trimEnd() + '…').width > maxW) lettres.pop();
+      s = lettres.join('').trimEnd() + '…';
+    }
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    return texte(ctx, s, x, y, Object.assign({}, o, { taille: t }));
   }
   // Photo en cover, ancrée au-dessus du centre (visage en haut) ; alpha respecté
   function photoCover(ctx, img, x, y, w, h, ancre) {
@@ -334,15 +364,17 @@
       texte(ctx, niv, 236, 548, { poids: 700, taille: tl, espacement: .16, couleur: C.muted, ombre: 8 });
     }
 
-    // Pseudo néon : blanc, contour du rang, double lueur ; trait néon vert dessous
-    const nom = String(d.pseudo || 'Joueur').toUpperCase();
-    const tn = ajuster(ctx, nom, 900, 92, DISPLAY, 520, .05);
-    texte(ctx, nom, 300, 632, {
+    // Pseudo néon : blanc, contour du rang, double lueur ; trait néon vert dessous. Avec un club : pseudo un peu plus haut
+    // et un peu plus petit, trait remonté, club en capitales entre le trait et les anneaux des attributs.
+    const nom = String(d.pseudo || 'Joueur').toUpperCase(), club = nettoyerClub(d.club);
+    const tn = ajuster(ctx, nom, 900, club ? 84 : 92, DISPLAY, 520, .05), yNom = club ? 620 : 632, yTrait = club ? 639 : 652;
+    texte(ctx, nom, 300, yNom, {
       poids: 900, taille: tn, famille: DISPLAY, espacement: .05, couleur: C.fg, align: 'center',
       lueur: { couleur: rgba(R.couleur, .95), flou: 34, passes: 2 }, contour: { couleur: R.couleur, largeur: 2.5 }
     });
     ctx.save(); g = ctx.createLinearGradient(60, 0, 540, 0); g.addColorStop(0, rgba(C.turf, 0)); g.addColorStop(.5, C.turf); g.addColorStop(1, rgba(C.turf, 0));
-    ctx.strokeStyle = g; ctx.lineWidth = 2; ctx.shadowColor = rgba(C.turf, .9); ctx.shadowBlur = 12; ctx.beginPath(); ctx.moveTo(60, 652); ctx.lineTo(540, 652); ctx.stroke(); ctx.restore();
+    ctx.strokeStyle = g; ctx.lineWidth = 2; ctx.shadowColor = rgba(C.turf, .9); ctx.shadowBlur = 12; ctx.beginPath(); ctx.moveTo(60, yTrait); ctx.lineTo(540, yTrait); ctx.stroke(); ctx.restore();
+    if (club) ligneClub(ctx, club, 300, 661, 420, { poids: 800, taille: 17, mini: 12, espacement: .14, couleur: C.fg, align: 'center', ombre: 8 });
 
     // 6 attributs en anneaux : 3 colonnes × 2 lignes, chiffre et étiquette dans l'anneau
     const attrs = (d.attributs || []).slice(0, 6);
@@ -550,11 +582,13 @@
     if (d.detoure && d.photo) ctx.drawImage(d.photo, 40, 20, 520, 520); // détouré : le joueur passe devant la bande
 
     // Pseudo massif, puis 6 attributs en 2 colonnes : étiquette, chiffre, jauge segmentée
-    const nom = String(d.pseudo || 'Joueur').toUpperCase(), tn = ajuster(ctx, nom, 900, 92, DISPLAY, 536, .03);
-    texte(ctx, nom, 300, 708, {
+    // Avec un club : pseudo remonté et un peu plus petit, club en capitales dessous, au-dessus des attributs
+    const nom = String(d.pseudo || 'Joueur').toUpperCase(), club = nettoyerClub(d.club), tn = ajuster(ctx, nom, 900, club ? 80 : 92, DISPLAY, 536, .03);
+    texte(ctx, nom, 300, club ? 690 : 708, {
       poids: 900, taille: tn, famille: DISPLAY, espacement: .03, couleur: C.fg, align: 'center',
       relief: { couleur: rgba(C.navy, .9), dx: 0, dy: 6 }, lueur: { couleur: rgba(R.couleur, .8), flou: 30 }, contour: { couleur: R.couleur, largeur: 3 }
     });
+    if (club) ligneClub(ctx, club, 300, 717, 420, { poids: 800, taille: 16, mini: 12, espacement: .16, couleur: C.fg, align: 'center', ombre: 10 });
     (d.attributs || []).slice(0, 6).forEach((a, i) => {
       const col = Math.floor(i / 3), row = i % 3, x0 = col ? 318 : 30, cw = 252, y0 = 726 + row * 46, n = borner(a.note);
       texte(ctx, String(a.cle || '').toUpperCase().slice(0, 3), x0, y0 + 28, { poids: 800, taille: 15, espacement: .32, couleur: C.fg });
@@ -723,9 +757,11 @@
     balle(ctx, cx - 30, 334, 9, elite ? C.fg : ENCRE, elite ? C.turf : R.clair);
     texte(ctx, R.nom.toUpperCase(), cx, 382, { poids: 800, taille: 15, espacement: .24, couleur: P.encre, align: 'center' });
 
-    // Pseudo, niveau facultatif, filet orné d'une balle
-    const nom = String(d.pseudo || 'Joueur').toUpperCase(), tn = ajuster(ctx, nom, 900, 76, DISPLAY, 480, .03);
-    const yNom = d.niveau ? 562 : 574;
+    // Pseudo, club et niveau facultatifs (une ligne chacun, sous le pseudo), filet orné d'une balle
+    const nom = String(d.pseudo || 'Joueur').toUpperCase(), club = nettoyerClub(d.club);
+    const tn = ajuster(ctx, nom, 900, club && d.niveau ? 64 : 76, DISPLAY, 480, .03);
+    const yNom = club && d.niveau ? 546 : (club || d.niveau) ? 562 : 574;
+    if (club) ligneClub(ctx, club, 300, d.niveau ? 570 : 591, 420, { poids: 800, taille: 16, mini: 12, espacement: .16, couleur: P.encre, align: 'center' });
     texte(ctx, nom, 300, yNom, { poids: 900, taille: tn, famille: DISPLAY, espacement: .03, couleur: P.encre, align: 'center',
       relief: elite ? null : { couleur: rgba(C.fg, .5), dx: 0, dy: 2 }, lueur: elite ? { couleur: rgba(C.turf, .45), flou: 20 } : null });
     if (d.niveau) {
@@ -857,7 +893,10 @@
     }
     // Ligne d'infos : poste en toutes lettres et niveau facultatif
     const infos = [libellePoste(d.poste) && ('Poste ' + libellePoste(d.poste).toLowerCase()), d.niveau].filter(Boolean).join('  ·  ').toUpperCase();
-    if (infos) texte(ctx, infos, 300, 646, { poids: 800, taille: ajuster(ctx, infos, 800, 13, BODY, 480, .16), espacement: .16, couleur: ENCRE_DOUCE, align: 'center' });
+    // Club facultatif : sous le ruban du nom, au-dessus de la ligne d'infos (qui descend un peu)
+    const club = nettoyerClub(d.club);
+    if (club) ligneClub(ctx, club, 300, 639, 470, { poids: 800, taille: 16, mini: 12, espacement: .14, couleur: C.navy, align: 'center' });
+    if (infos) texte(ctx, infos, 300, club ? 658 : 646, { poids: 800, taille: ajuster(ctx, infos, 800, 13, BODY, 480, .16), espacement: .16, couleur: ENCRE_DOUCE, align: 'center' });
 
     // Attributs : 6 cases crème (2 × 3), trait de la couleur du rang à gauche, petit chiffre et étiquette
     (d.attributs || []).slice(0, 6).forEach((a, i) => {
@@ -952,7 +991,7 @@
     M.carte(ctx, d, Object.assign({}, o, { sansBordure: false, sansEcrin: true })); ctx.restore();
     grain(ctx, 1080, 1920, .04, 13, o.export ? 2 : 1);
     texte(ctx, 'apprendre-padel.fr', 540, 1812, { poids: 700, taille: 30, espacement: .08, couleur: clair ? C.navy : C.muted, align: 'center' });
-    texte(ctx, 'FAIS TA CARTE · QUESTIONNAIRE GRATUIT', 540, 1858, { poids: 700, taille: 20, espacement: .2, couleur: clair ? ENCRE_DOUCE : C.dim, align: 'center' });
+    texte(ctx, 'FAIS TA CARTE GRATUITEMENT', 540, 1858, { poids: 700, taille: 20, espacement: .2, couleur: clair ? ENCRE_DOUCE : C.dim, align: 'center' });
   }
 
   async function dessiner(canvas, donnees, options) {
@@ -994,5 +1033,5 @@
     return () => { actif = false; if (raf) cancelAnimationFrame(raf); };
   }
 
-  window.CARTE_RENDU = { dessiner, animer, chargerPolices, codePoste, libellePoste, initiales, RANGS, FOND, MODELES };
+  window.CARTE_RENDU = { dessiner, animer, chargerPolices, codePoste, libellePoste, initiales, nettoyerClub, RANGS, FOND, MODELES };
 })();

@@ -155,3 +155,6 @@
   background:rgba(0,0,0,.25);border:1px solid var(--field-line);border-radius:var(--r-s);color:var(--sand);
   font-family:var(--display);font-weight:900;font-size:1.5rem;font-variant-numeric:tabular-nums;color-scheme:dark}
 .cj-note .range input[type=number]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ---- Étape « Ton nom » (30/10/2026, dev-front) : champ facultatif « Mon club » sous le pseudo, avec ses suggestions (datalist). ---- */
+#cj-pseudo-form .champ+.champ{margin-top:var(--s-5)}

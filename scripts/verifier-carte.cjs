@@ -8,7 +8,8 @@
       choix du modèle (4 boutons aria-pressed, miniatures, aperçu et export changés, modèle gardé, repli sans MODELES) ;
       « Modifier mes notes » (tout gardé) ; sans compte, une seule carte (nouvelle carte refusée avec message et lien vers
       connexion.html, carte toujours modifiable ; connecté ou session gardée : illimité) ; « Faire une nouvelle carte » (notes à 60, poste et rang par défaut, sans photo ni nom,
-      ancienne carte gardée jusqu'à la validation des notes) ; migration d'une carte version 1 ; aucune lecture de pa-quiz-dernier
+      ancienne carte gardée jusqu'à la validation des notes) ; « Mon club » (champ facultatif, suggestions de clubs.json au premier
+      focus, nettoyage, pa-carte.club, dessin sur les 4 modèles et en story, texte long réduit, carte sans club inchangée) ; migration d'une carte version 1 ; aucune lecture de pa-quiz-dernier
       ni de pa-academie ; événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public
       affiché ou rien ; aucun débordement à 390 et 320 px, 0 erreur console.
    Lancer depuis la racine du site : node scripts/verifier-carte.cjs */
@@ -85,6 +86,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:SDK_SIMULE}));
   // Faux GoatCounter : count.js est bloqué, window.goatcounter.count enregistre les événements envoyés
   await ctx.addInitScript(()=>{window.__gc=[];window.goatcounter={count:o=>{window.__gc.push(JSON.parse(JSON.stringify(o)));}};});
+  const demandesClubs=[];ctx.on('request',r=>{if(/\/assets\/data\/clubs\.json/.test(r.url()))demandesClubs.push(r.url());});
   const demandesCompteur=[];ctx.on('request',r=>{if(/goatcounter\.com\/counter\//.test(r.url()))demandesCompteur.push(r.url());});
   const gc=p=>p.evaluate(()=>window.__gc);
   const page=await ctx.newPage();
@@ -237,7 +239,31 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
    assert.ok((await page.textContent('#cj-pseudo-err')).length>5);
    assert.equal(await page.locator('#cj-final').isVisible(),false);
   }
+  // Champ « Mon club » : libellé lié, facultatif, 30 caractères, sans saisie automatique du navigateur, aide, suggestions au focus
+  {
+   const champ=await page.$eval('#cj-club',i=>({label:i.labels[0]&&i.labels[0].textContent,max:i.maxLength,auto:i.getAttribute('autocomplete'),list:i.getAttribute('list'),aide:i.getAttribute('aria-describedby'),dansChamp:!!i.closest('.champ'),dansForm:i.form&&i.form.id}));
+   assert.deepEqual(champ,{label:'Mon club',max:30,auto:'off',list:'cj-clubs',aide:'cj-club-aide',dansChamp:true,dansForm:'cj-pseudo-form'});
+   assert.equal(await page.textContent('#cj-club-aide'),'Facultatif. Tape les premières lettres pour retrouver ton club, ou écris-le.');
+   assert.equal(await page.$eval('#cj-clubs',d=>d.tagName+'|'+d.childElementCount),'DATALIST|0','suggestions vides avant le focus');
+   assert.deepEqual(demandesClubs,[],'clubs.json pas chargé avant le focus');
+   const clubsJson=JSON.parse(fs.readFileSync(path.join(racine,'assets/data/clubs.json'),'utf8'));
+   assert.ok(Array.isArray(clubsJson)&&clubsJson.length>500&&clubsJson.every(c=>typeof c==='string'&&c.length>0&&c.length<=30),'clubs.json : tableau de noms (30 caractères au plus)');
+   await page.focus('#cj-club');
+   await page.waitForFunction(n=>document.getElementById('cj-clubs').childElementCount===n,clubsJson.length);
+   assert.deepEqual(await page.$$eval('#cj-clubs option',o=>o.slice(0,3).map(x=>x.value)),clubsJson.slice(0,3));
+   await page.focus('#cj-pseudo');await page.focus('#cj-club');
+   assert.equal(demandesClubs.length,1,'clubs.json chargé une seule fois');
+   // Saisie libre nettoyée : tabulation et retour à la ligne (caractères de contrôle) et marque de direction retirés, espaces réduits
+   await page.$eval('#cj-club',i=>{i.value='  Padel'+String.fromCharCode(9)+'Club'+String.fromCharCode(10)+'  Lyon '+String.fromCharCode(8238);});
+  }
+  // Espion sur fillText : textes dessinés sur l'aperçu et sur le canvas d'export
+  await page.evaluate(()=>{window.__textes=[];const f=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(t){try{window.__textes.push({id:this.canvas.id||'',t:String(t)});}catch(e){}return f.apply(this,arguments);};});
   await page.fill('#cj-pseudo','Hugo D.');await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).club),'Padel Club Lyon','club nettoyé et gardé dans pa-carte');
+  assert.equal(await page.inputValue('#cj-club'),'Padel Club Lyon');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/ Club\s: Padel Club Lyon\./);
+  await page.waitForFunction(()=>['cj-apercu-canvas','cj-canvas'].every(id=>window.__textes.some(x=>x.id===id&&x.t==='PADEL CLUB LYON')),null,{timeout:15000});
+  ok("club : champ « Mon club » (label, maxlength 30, autocomplete off, aide), datalist remplie au premier focus (une requête), saisie nettoyée, gardée dans pa-carte, dessinée sur l'aperçu et l'export, décrite");
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.equal(await page.evaluate(()=>document.activeElement.closest('.cj-etape').id),'cj-final');
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Hugo D\.\s: 63, Argent, poste droite\. Volée 64, Jeu aérien 59/);
@@ -289,7 +315,8 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   assert.equal(await page.locator('#cj-final').isVisible(),true);
   assert.match(await page.textContent('#cj-retrouvee'),/gardée sur cet appareil/);
   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
-  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/: 63, Argent.*Avec ta photo\./);
+  assert.equal(await page.inputValue('#cj-club'),'Padel Club Lyon','club retrouvé');
+  assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/: 63, Argent.*Avec ta photo\. Club\s: Padel Club Lyon\./);
   assert.equal(await page.evaluate(()=>document.activeElement===document.body),true);
   ok('rechargement : carte, pseudo, notes, rang et photo retrouvés, sans déplacer le focus');
   // Choix du modèle : un bouton par modèle de CARTE_RENDU.MODELES, miniature dessinée, aperçu et export changés, choix gardé
@@ -367,6 +394,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).photo===true&&!!localStorage.getItem('pa-carte-photo'));
   await page.click('#cj-vers-pseudo');
   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.');
+  assert.equal(await page.inputValue('#cj-club'),'Padel Club Lyon','club gardé en modifiant la carte');
   await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
   await page.focus('#cj-modifier-notes');await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(()=>document.activeElement.tagName+'|'+document.activeElement.closest('.cj-etape').id),'H2|cj-notes');
@@ -409,6 +437,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
    await page.click('#cj-vers-photo');await page.click('#cj-vers-pseudo');await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
    assert.equal(await page.locator('#cj-final').isVisible(),true);
    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).pseudo),'Hugo D.');
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).club),'Padel Club Lyon','club gardé après « Modifier mes notes »');
   }
   ok('sans compte, une carte gardée : « Faire une nouvelle carte » (haut et bas) refusée, message role=status focalisé avec lien connexion.html?suite=carte.html, carte et photo intactes, notes toujours modifiables');
   // Connecté (session simulée) : nouvelles cartes illimitées
@@ -438,6 +467,8 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   assert.equal(await page.locator('#cj-retrouvee').isVisible(),false);
   assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true,'carte gardée : bouton du haut proposé pendant les notes');
   assert.equal(await page.inputValue('#cj-pseudo'),'','pseudo vide');
+  assert.equal(await page.inputValue('#cj-club'),'','club vide');
+  assert.ok(!/Club/.test(await page.getAttribute('#cj-apercu-canvas','aria-label')),'aperçu sans club');
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur\s: 60, Argent, poste polyvalent\..*Sans photo\./);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte gardée au clic');
   await poserNote(page,'TAC',80);
@@ -448,7 +479,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   await page.click('#cj-vers-photo');
   const nouvelle=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
   assert.deepEqual(nouvelle.notes,{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80});
-  assert.equal(nouvelle.version,2);assert.equal(nouvelle.pseudo,'');assert.equal(nouvelle.modele,'neon');assert.equal(nouvelle.photo,false);
+  assert.equal(nouvelle.version,2);assert.equal(nouvelle.pseudo,'');assert.equal(nouvelle.club,'','nouvelle carte : club vide');assert.equal(nouvelle.modele,'neon');assert.equal(nouvelle.photo,false);
   assert.equal(nouvelle.poste,'polyvalent');assert.equal(nouvelle.posteChoisi,false);assert.equal(nouvelle.rangChoisi,false);
   assert.equal(nouvelle.rang,await page.evaluate(n=>window.PA_CARTE.calcul.rang(window.PA_CARTE.calcul.globale(n,'polyvalent')),nouvelle.notes));
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'photo jamais effacée par la nouvelle carte');
@@ -540,6 +571,62 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
    await ctx2.close();
   }
   ok('sans le SDK : première carte créée sans compte, deuxième refusée ; session gardée (sb-…-auth-token) → nouvelle carte ; session illisible → refus ; aucun appel à Supabase');
+  // Carte gardée avant l'ajout du club (format 2 sans « club ») : affichée comme avant, rien n'est réécrit
+  {
+   const sansClub=JSON.stringify({version:2,date:'2026-10-25T10:00:00.000Z',notes:{VOL:70,AER:70,DEF:70,LOB:70,SER:70,TAC:70},poste:'gauche',posteChoisi:true,rang:'or',rangChoisi:true,pseudo:'Ana',modele:'stade',photo:false});
+   await page.evaluate(c=>localStorage.setItem('pa-carte',c),sansClub);
+   await page.goto(base+'/carte.html');
+   assert.equal(await page.locator('#cj-final').isVisible(),true);
+   assert.equal(await page.inputValue('#cj-club'),'');
+   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),/^Carte de joueur de Ana\s: 70, Or, poste gauche\..*Sans photo, initiales AN\. Modèle Stade\.$/);
+   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),sansClub,'ancienne carte non réécrite au chargement');
+   // Club ajouté par « Changer le nom » : le reste de la carte est gardé
+   await page.click('#cj-modifier-pseudo');await page.fill('#cj-club','TC Ana');await page.click('#cj-pseudo-form button[type="submit"]');
+   const c=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
+   assert.equal(c.club,'TC Ana');assert.equal(c.pseudo,'Ana');assert.equal(c.modele,'stade');assert.equal(c.rang,'or');assert.deepEqual(c.notes,{VOL:70,AER:70,DEF:70,LOB:70,SER:70,TAC:70});
+  }
+  ok('carte gardée sans club : affichée comme avant (champ vide, rien sur la carte), non réécrite ; club ajouté ensuite sans rien perdre');
+  // Texte long : police réduite (measureText) pour tenir, sans erreur, sur les 4 modèles en carte et en story ; club vide : rien dessiné
+  {
+   const r=await page.evaluate(async()=>{
+    const R=window.CARTE_RENDU,res=[];
+    const d=club=>({pseudo:'Maximilien-Alexandre',poste:'Droite',globale:75,rang:'or',attributs:window.PA_CARTE.CLES.map(k=>({cle:k,note:70})),photo:null,niveau:'',club});
+    const f=CanvasRenderingContext2D.prototype.fillText;
+    for(const m of R.MODELES)for(const format of ['carte','story'])for(const club of ['Le Club','W'.repeat(30),'']){
+     const vus=[];
+     CanvasRenderingContext2D.prototype.fillText=function(t){vus.push({t:String(t),taille:parseFloat((this.font.match(/([\d.]+)px/)||[])[1]),l:this.measureText(String(t)).width});return f.apply(this,arguments);};
+     const c=document.createElement('canvas');
+     try{await R.dessiner(c,d(club),{format,modele:m.cle,largeur:1200});}finally{CanvasRenderingContext2D.prototype.fillText=f;}
+     const cible=club.toUpperCase(),ligne=vus.find(v=>club&&(v.t===cible||(v.t.endsWith('…')&&cible.startsWith(v.t.slice(0,-1)))));
+     res.push({m:m.cle,format,club,ligne,nb:vus.filter(v=>/^W{5,}/.test(v.t)||v.t==='LE CLUB').length});
+    }
+    return {res,net:R.nettoyerClub(' a'+String.fromCharCode(7)+'b '+String.fromCharCode(8238)+' c '+'x'.repeat(40)),nonTexte:R.nettoyerClub(null)};
+   });
+   assert.equal(r.res.length,24);
+   for(const x of r.res){
+    if(!x.club){assert.equal(x.nb,0,x.m+' '+x.format+' : rien dessiné sans club');continue;}
+    assert.ok(x.ligne,x.m+' '+x.format+' : club dessiné');
+    assert.ok(x.ligne.l<=470,x.m+' '+x.format+' : club dans sa largeur ('+x.ligne.l+')');
+    assert.ok(x.ligne.taille>=12,x.m+' : taille mini 12');
+   }
+   const taille=(m,club)=>r.res.find(x=>x.m===m&&x.format==='carte'&&x.club===club).ligne.taille;
+   for(const m of ['neon','stade','blason','vignette'])assert.ok(taille(m,'W'.repeat(30))<taille(m,'Le Club'),m+' : texte long réduit');
+   assert.equal(r.net,'a b c '+'x'.repeat(24),'nettoyage : contrôles retirés, espaces réduits, 30 caractères');
+   assert.equal(r.nonTexte,'');
+  }
+  ok('club long (30 « W ») : police réduite par measureText dans la largeur prévue sur les 4 modèles (carte et story), rien si vide ; nettoyage');
+  // Suggestions indisponibles (hors connexion, fichier ouvert en local) : le champ reste libre, aucune exception
+  {
+   const p5=await ctx.newPage();const exc=[];p5.on('pageerror',e=>exc.push(e.message));
+   await p5.route(/\/assets\/data\/clubs\.json/,r=>r.abort('failed'));
+   await p5.goto(base+'/carte.html');await p5.click('#cj-modifier-pseudo');
+   await p5.focus('#cj-club');await p5.waitForTimeout(300);
+   assert.equal(await p5.$eval('#cj-clubs',d=>d.childElementCount),0);
+   await p5.fill('#cj-club','Mon petit club');await p5.click('#cj-pseudo-form button[type="submit"]');
+   assert.equal(await p5.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).club),'Mon petit club');
+   assert.deepEqual(exc,[]);await p5.close();
+  }
+  ok('clubs.json indisponible : échec silencieux, saisie libre enregistrée');
   // Carte de Nina remise pour la suite
   await page.evaluate(()=>localStorage.setItem('pa-carte',JSON.stringify({version:2,notes:{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80},poste:'polyvalent',posteChoisi:false,rang:'argent',rangChoisi:false,pseudo:'Nina R.',modele:'neon',photo:false})));
   // Débordement : 390 puis 320 px, à chaque étape
@@ -552,7 +639,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
    await page.goto(base+'/carte.html');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),w,'carte à '+w);
   }
-  ok('aucun débordement à 390 et 320 px (notes, photo, nom, carte)');
+  ok('aucun débordement à 390 et 320 px (notes, photo, nom et club, carte)');
   assert.deepEqual(erreurs,[]);
   ok('aucune erreur console ni ressource manquante');
   console.log('TOTAL '+nb+' contrôles réussis.');

@@ -1,6 +1,7 @@
 /* SERVICE WORKER de Apprendre Padel.
    - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation, servi en « stale-while-revalidate ».
-   - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) et « près de chez toi » (assets/data/prochains/*.json) : « network-first »
+   - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) et « près de chez toi » (assets/data/prochains/*.json),
+     chiffres de l'accueil (stats.json) et noms de clubs de la carte de joueur (clubs.json, précaché) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Simulateur 3D (assets/3d/ : moteur, modèle, scénarios, environ 1,5 Mo) : jamais précaché, « network-first »
      à la demande ; la page simulateur-3d.html elle-même n'est pas dans le shell.
@@ -12,7 +13,7 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v46-installer";
+const CACHE = "pa-v47-club";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -27,7 +28,7 @@ const SHELL = [
   "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/quiz-tactique-donnees.js", "assets/js/quiz-tactique.js", "assets/js/tableau-tactique.js", "assets/js/diagnostic-paire.js", "assets/js/defis.js", "assets/js/academie.js", "assets/js/academie-questions.js", "assets/js/academie-quiz.js", "assets/js/academie-contenus.js", "assets/js/academie-parcours.js", "assets/js/academie-sync.js", "assets/js/carnet-outils.js", "assets/js/plan.js", "assets/js/mon-plan.js", "assets/js/pwa.js",
   "assets/js/quiz-niveau.js", "assets/js/carte-donnees.js", "assets/js/carte-rendu.js", "assets/js/carte.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
-  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/data/pages-tournois.js", "assets/data/stats.json",
+  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/data/pages-tournois.js", "assets/data/stats.json", "assets/data/clubs.json",
   "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png",
   "assets/img/logo/monogramme-sombre-256.webp" // monogramme du menu (toutes les pages)
 ];
@@ -51,7 +52,7 @@ self.addEventListener("activate", event => {
 });
 
 // Données : index des tournois, chiffres de l'accueil (stats.json), fiches détaillées et tournois proches par département
-const estDonnee = chemin => chemin.endsWith("/assets/data/tournois.json") || chemin.endsWith("/assets/data/stats.json") || /\/assets\/data\/(fiches|prochains)\/[0-9AB]{2,3}\.json$/.test(chemin);
+const estDonnee = chemin => chemin.endsWith("/assets/data/tournois.json") || chemin.endsWith("/assets/data/stats.json") || chemin.endsWith("/assets/data/clubs.json") || /\/assets\/data\/(fiches|prochains)\/[0-9AB]{2,3}\.json$/.test(chemin);
 
 // Réponse du cache, marquée pour que la page sache qu'elle est hors connexion
 function marquerDepuisCache(reponse) {
