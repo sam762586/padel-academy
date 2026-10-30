@@ -341,3 +341,26 @@ Les deux : filtre de coordonnées v3, à recopier exactement depuis `filtreJs` d
 - Limites connues du filtre (traitées par les signalements) : nombres écrits en lettres, numéro découpé en vraies dates de 2024 à 2029. Les années acceptées comme dates (2024 à 2029, ou 24 à 29) sont à élargir en 2029, dans le SQL et dans le JavaScript en même temps.
 - Relancer un ancien fichier remplacé rouvrirait la faille : `s2-02`, `s2-03`, `s2-06`, `s2-12`, `s2-13`, `s2-22`, `t4-11` et `schema-partenaires.sql` portent un avertissement « ATTENTION (S2 bis) » ou « ATTENTION (S2) » qui indique quoi relancer ensuite.
 - Données personnelles : rien de nouveau n'est collecté. La date de création du compte et la confirmation de l'e-mail (déjà stockées par Supabase) servent désormais aussi à accepter un avis et à compter un signalement ; les sessions et les dates d'ajout des lignes de Mon académie (déjà stockées) servent à dater la dernière activité avant la purge.
+
+# Mise à jour automatique de tournois_ref (30/10/2026)
+
+Plus besoin de coller chaque semaine les fichiers `tournois-ref-NN.sql` : la base lit elle-même le `tournois.json` publié (https://apprendre-padel.fr/assets/data/tournois.json) chaque **mardi à 5 h UTC** (6 h ou 7 h à Paris), avec exactement les règles de `scripts/generer-tournois-ref.js` (identifiant, club, dates, nom/ville/catégorie à null si trop longs ou avec des coordonnées, département). Aucune clé secrète, aucun ordinateur allumé. Rien n'est jamais supprimé de `tournois_ref`. Si le fichier est inaccessible (statut autre que 200, redirection comprise), n'est pas du JSON, dépasse 20 Mo ou ne contient aucun tournoi valide : erreur claire, et la table reste telle quelle.
+
+Le même lot planifie aussi la **purge quotidienne** `purger_donnees()` (accord écrit de Samuel du 30/10/2026) à **3 h 30 UTC** : présences des tournois finis, avis de plus de 24 mois, annonces finies depuis 30 jours, comptes sans activité depuis 3 ans. L'ancien job facultatif `purger-annonces` est retiré s'il existe, car `purger_donnees()` appelle déjà `purger_annonces()`.
+
+## Étapes pour Samuel
+
+1. **Avant** : compte ce que la première purge supprimerait : `select count(*) from public.comptes_inactifs();` (comptes), et si besoin lance une fois la purge à la main pour voir le nombre : `select public.purger_donnees();`.
+2. **Exécuter dans l'ordre** (SQL Editor, coller le fichier, *Run* ; chacun est relançable sans risque) :
+   1. `2026-10-30-auto-01-extensions` : extensions `pg_cron` et `http` (équivaut à les activer dans *Database > Extensions*).
+   2. `2026-10-30-auto-02-fonction-actualiser-tournois-ref` : la fonction `actualiser_tournois_ref()` (non appelable par le site).
+   3. `2026-10-30-auto-03-planification` : les deux jobs `actualiser-tournois-ref` (mardi 5 h UTC) et `purger-donnees` (chaque nuit 3 h 30 UTC).
+3. **Contrôler** :
+   - lance une fois à la main `select public.actualiser_tournois_ref();` : réponse = un nombre (environ 7 700 aujourd'hui), le bilan s'affiche en message (*NOTICE*) ; puis `select count(*), max(maj) from public.tournois_ref;` : `maj` vient de changer ;
+   - `select * from cron.job;` : deux lignes, `actualiser-tournois-ref` (`0 5 * * 2`) et `purger-donnees` (`30 3 * * *`), pas de `purger-annonces` ;
+   - après le premier passage : `select * from cron.job_run_details order by start_time desc limit 5;` : `status` = `succeeded`, sinon le message d'erreur (`TOURNOIS_REF_…`) dit pourquoi.
+4. Rien à ajouter à `PA_SUPABASE.activees` : le site ne change pas.
+
+Pour arrêter : `select cron.unschedule('actualiser-tournois-ref');` et/ou `select cron.unschedule('purger-donnees');`. Le remplissage à la main (`node scripts/generer-tournois-ref.js`) reste possible à tout moment ; les deux donnent les mêmes lignes.
+
+Notes : si l'extension `http` n'était pas proposée sur le projet, l'alternative est `pg_net` (asynchrone : la réponse arrive dans `net._http_response` et doit être lue par un second job) ; à me redemander. Le robot doit publier `tournois.json` avant le mardi 5 h UTC ; sinon les tournois de la semaine précédente sont simplement remis à jour (sans perte).

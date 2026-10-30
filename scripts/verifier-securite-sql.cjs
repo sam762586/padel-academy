@@ -10,6 +10,8 @@
       refusé, filtre de coordonnées (identique au filtre JS sur un corpus, sur tous les textes de tournois.json et sur des
       textes tirés au hasard), pseudo, droits par colonne, présences (fenêtre de 60 jours), quotas, signalements (par jour,
       masquage par comptes fiables), purge (dernière activité, y compris Mon académie), cascade.
+   3) auto-01 à 03 (30/10/2026) : actualiser_tournois_ref() comparée à generer-tournois-ref.js (échantillon et tournois.json
+      complet), erreurs HTTP sans modification, aucune suppression, droits ; extension http et pg_cron simulées.
    pglite n'est pas une dépendance du site : s'il n'est pas installé dans scripts/node_modules, la partie 2 est sautée
    (message « pglite absent »). Pour la lancer quand même : PA_PGLITE=<dossier contenant node_modules/@electric-sql/pglite>.
    Lancer depuis la racine du site : node scripts/verifier-securite-sql.cjs */
@@ -287,6 +289,29 @@ function statique() {
   const rejets = textes.filter(filtreJs);
   assert.deepEqual(rejets.slice(0, 5), [], 'textes de tournois.json refusés par le filtre');
   ok(`filtre JS de référence : ${CONTACTS.length} contacts détectés, ${PROPRES.length} textes propres et ${textes.length} textes de tournois.json acceptés`);
+
+  // --- Mise à jour automatique de tournois_ref (auto-01 à 03, 30/10/2026) ---
+  const auto = fs.readdirSync(dossierMig).filter(f => /^2026-10-30-auto-/.test(f)).sort();
+  assert.deepEqual(auto, ['2026-10-30-auto-01-extensions.sql', '2026-10-30-auto-02-fonction-actualiser-tournois-ref.sql', '2026-10-30-auto-03-planification.sql']);
+  auto.forEach((f, i) => assert.ok(mig(f).startsWith('-- Auto · ' + (i + 1) + '/3 — '), 'en-tête ' + f));
+  const [a1, a2, a3] = auto.map(mig);
+  const codeA = t => t.split('\n').filter(l => !/^\s*--/.test(l)).join('\n');
+  assert.match(a1, /^create extension if not exists pg_cron with schema pg_catalog;$/m);
+  assert.match(a1, /^create extension if not exists http with schema extensions;$/m);
+  assert.match(a2, /\nreturns integer\nlanguage plpgsql\nsecurity definer\nset search_path = public, extensions, pg_temp\nas \$fn\$\n/);
+  assert.equal((codeA(a2).match(/create or replace function/g) || []).length, 1);
+  assert.ok(!/\$\$/.test(codeA(a2)), '$$ dans auto-02');
+  assert.match(a2, /^revoke all on function public\.actualiser_tournois_ref\(\) from public, anon, authenticated;$/m);
+  assert.ok(!/\bdelete\b|\btruncate\b/i.test(codeA(a2)), 'auto-02 ne supprime rien');
+  assert.ok(a2.includes("'https://apprendre-padel.fr/assets/data/tournois.json'"));
+  assert.ok(a2.includes("'^(FED_)?[0-9]{1,12}$'") && a2.includes("'^[0-9A-Za-z]{1,3}$'"));
+  a2.split('$fn$')[1].split('\n').forEach(l => assert.ok((l.replace(/'[^']*'/g, "''").match(/;/g) || []).length <= 1, 'une instruction par ligne : ' + l));
+  assert.match(a3, /^select cron\.unschedule\(jobid\) from cron\.job where jobname = 'actualiser-tournois-ref';\nselect cron\.schedule\('actualiser-tournois-ref', '0 5 \* \* 2', \$\$select public\.actualiser_tournois_ref\(\)\$\$\);$/m);
+  assert.match(a3, /^select cron\.unschedule\(jobid\) from cron\.job where jobname = 'purger-donnees';\nselect cron\.schedule\('purger-donnees', '30 3 \* \* \*', \$\$select public\.purger_donnees\(\)\$\$\);$/m);
+  assert.match(a3, /^select cron\.unschedule\(jobid\) from cron\.job where jobname = 'purger-annonces';$/m);
+  assert.ok(s(23).includes('total := total + public.purger_annonces();'), 'purger_donnees appelle purger_annonces (sinon garder le job purger-annonces)');
+  for (const m of auto.map(f => f.replace(/\.sql$/, '')).concat(['select public.actualiser_tournois_ref();', 'select * from cron.job;', 'cron.job_run_details'])) assert.ok(lisez.includes(m), 'LISEZMOI : ' + m);
+  ok('auto-01 à 03 : extensions (syntaxe Supabase), fonction non exposée sans suppression, jobs relançables (tournois mardi 5 h UTC, purge 3 h 30, ancien purger-annonces retiré), LISEZMOI');
 }
 function textesTournois(tournois) {
   const s = new Set();
@@ -639,6 +664,121 @@ async function dynamique(PGlite) {
   await exec(`delete from auth.users where id = '${A}'`);
   assert.equal((await q(`select (select count(*) from public.avis where user_id = '${A}') + (select count(*) from public.matchs where user_id = '${A}') + (select count(*) from public.quiz_results where user_id = '${A}') + (select count(*) from public.academie_niveaux where user_id = '${A}') + (select count(*) from public.reponses where annonce_id = '${annonce1102}') as n`)).rows[0].n, 0);
   ok('pglite : suppression d\'un compte = présences, annonces (et leurs réponses), avis, signalements, matchs, résultats, Mon académie effacés (cascade)');
+
+  // Mise à jour automatique de tournois_ref : extension http et pg_cron simulées (absentes de pglite)
+  await exec(`create schema if not exists extensions;
+    create table extensions.http_simule (status integer, content_type text, content text, erreur text);
+    insert into extensions.http_simule values (200, 'application/json; charset=utf-8', '{}', null);
+    create table extensions.http_appels (uri text);
+    create type extensions.http_response as (status integer, content_type varchar, headers text[], content varchar);
+    create function extensions.http_set_curlopt(curlopt varchar, value varchar) returns boolean language sql as $$ select true $$;
+    create function extensions.http_get(uri varchar) returns extensions.http_response language plpgsql as $f$
+    declare s record; begin insert into extensions.http_appels values (uri); select * into s from extensions.http_simule;
+    if s.erreur is not null then raise exception '%', s.erreur; end if; return row(s.status, s.content_type, null, s.content)::extensions.http_response; end $f$;
+    create schema cron;
+    create table cron.job (jobid bigserial primary key, jobname text, schedule text, command text);
+    create function cron.schedule(n text, s text, c text) returns bigint language sql as $$ insert into cron.job (jobname, schedule, command) values (n, s, c) returning jobid $$;
+    create function cron.unschedule(j bigint) returns boolean language sql as $$ delete from cron.job where jobid = j returning true $$;
+    insert into cron.job (jobname, schedule, command) values ('purger-annonces', '0 3 * * 1', 'select public.purger_annonces()');`);
+  const AUTO2 = mig('2026-10-30-auto-02-fonction-actualiser-tournois-ref.sql');
+  const AUTO3 = mig('2026-10-30-auto-03-planification.sql');
+  for (let i = 0; i < 2; i++) await exec(AUTO2);
+  for (let i = 0; i < 3; i++) await exec(AUTO3);
+  assert.deepEqual((await q('select jobname, schedule, command from cron.job order by jobname')).rows, [
+    {jobname: 'actualiser-tournois-ref', schedule: '0 5 * * 2', command: 'select public.actualiser_tournois_ref()'},
+    {jobname: 'purger-donnees', schedule: '30 3 * * *', command: 'select public.purger_donnees()'},
+  ]);
+  ok('pglite : auto-02 et auto-03 relancés sans erreur ; deux jobs, jamais en double, ancien purger-annonces retiré');
+
+  const {lignesRef} = require('./generer-tournois-ref.js');
+  const simuler = (content, extra = {}) => q('update extensions.http_simule set status = $1, content_type = $2, content = $3, erreur = $4',
+    [extra.status ?? 200, 'type' in extra ? extra.type : 'application/json; charset=utf-8', content, extra.erreur ?? null]);
+  const actualiser = async () => (await q('select public.actualiser_tournois_ref() as n')).rows[0].n;
+  const COLS_REF = 'id, club, date_debut::text date_debut, date_fin::text date_fin, nom, ville, categorie, dep';
+  const lignesBase = async ids => (await q(`select ${COLS_REF} from public.tournois_ref where id = any($1) order by id collate "C"`, [ids])).rows;
+  const empreinte = async () => (await q(`select count(*)::int n, md5(string_agg(id || '|' || club || '|' || date_debut || '|' || date_fin || '|' || coalesce(nom, '-') || '|' || coalesce(ville, '-') || '|' || coalesce(categorie, '-') || '|' || coalesce(dep, '-') || '|' || maj, ',' order by id)) h from public.tournois_ref`)).rows[0];
+  const horsFlux = async ids => (await q(`select md5(string_agg(id || club || maj, ',' order by id)) h, count(*)::int n from public.tournois_ref where not (id = any($1))`, [ids])).rows[0];
+
+  // Échantillon fabriqué : cas limites, coordonnées, doublons, identifiants invalides
+  const u = (id, extra) => ({id, club: 'CLUB ' + id, date_debut: '2026-11-01', date_fin: '2026-11-02', ...extra});
+  const echantillon = [
+    u('9100001', {club: "  L'ARÈNE\u0007 DE  L'EST  ", nom: "  P250 L'Été\u0007  ", ville: 'ST-ÉTIENNE', categorie: 'P250', dep: '42'}),
+    u('9100002', {date_fin: undefined}), u('9100003', {date_fin: ''}), u('9100004', {date_fin: null}),
+    u('FED_9100005', {club: 'COMITE'}), u('abc'), u('1234567890123'), u('91 00006'), u(''), {club: 'SANS ID', date_debut: '2026-11-01'},
+    u('9100007', {club: ''}), u('9100008', {club: '   '}), u('9100009', {club: 'X'.repeat(121)}), u('9100010', {club: 'X'.repeat(120)}),
+    u('9100011', {club: '🎾'.repeat(60)}), u('9100012', {club: '🎾'.repeat(61)}), u('9100013', {club: 0}), u('9100014', {club: 12345}),
+    u('9100015', {date_debut: '2026-02-29', date_fin: '2026-03-01'}), u('9100016', {date_debut: '2028-02-29', date_fin: '2028-02-29'}),
+    u('9100017', {date_debut: '2026-11-05', date_fin: '2026-11-01'}), u('9100018', {date_debut: null, date_fin: null}),
+    u('9100019', {date_debut: '0050-01-01', date_fin: '0050-01-02'}), u('9100020', {date_debut: '2026-1-01'}), u('9100021', {date_debut: '2026-11-01 '}),
+    u('9100022', {date_debut: '2026-04-31', date_fin: '2026-05-01'}), u('9100023', {date_debut: 20261101}),
+    u('9100024', {nom: 'Écris-moi sur insta', ville: 'jean@gmail.com', categorie: '06 12 34 56 78'}),
+    u('9100025', {nom: 'Tournoi wa.me/33612', ville: 'Appelle 06a12b34c56d78', categorie: 'snap'}),
+    u('9100026', {nom: 'P25 26/10/26 18H MAISON PADEL', ville: 'LYON', dep: '976', categorie: 'P25'}),
+    u('9100027', {nom: 'x'.repeat(201), ville: 'v'.repeat(101), categorie: 'c'.repeat(21), dep: '2A'}),
+    u('9100028', {nom: 'x'.repeat(200), ville: 'v'.repeat(100), categorie: 'c'.repeat(20), dep: ' 2B '}),
+    u('9100029', {nom: '', ville: '   ', categorie: null, dep: ''}), u('9100030', {dep: 'ABCD'}), u('9100031', {dep: '7 6'}), u('9100032', {dep: 69}),
+    u('9100033', {dep: ' 976﻿', nom: '﻿P100　OPEN', categorie: 'P100'}), u('9100034', {nom: '😀'.repeat(100), ville: '😀'.repeat(51)}),
+    u('9100035', {nom: 1000, ville: true, categorie: false}), u('9100036', {nom: 'Tournoi des connards'}),
+    u('9100040', {club: 'PREMIER'}), u('9100040', {club: 'DERNIER', nom: 'P500'}), u('9100041', {club: 'VALIDE'}), u('9100041', {club: ''}),
+    9100050, 'texte', null, [1, 2],
+    {id: 9100051, club: 'ID NOMBRE', date_debut: '2026-11-01'},
+  ];
+  const attenduE = lignesRef(echantillon);
+  assert.ok(attenduE.bilan.invalides >= 15 && attenduE.bilan.doublons === 1, 'échantillon : ' + JSON.stringify(attenduE.bilan));
+  const idsE = attenduE.lignes.map(l => l.id);
+  const avantE = await horsFlux(idsE);
+  await simuler(JSON.stringify({genere_le: '2026-10-30T05:00:00Z', tournois: echantillon}));
+  assert.equal(await actualiser(), attenduE.lignes.length);
+  assert.deepEqual(await lignesBase(idsE), attenduE.lignes, 'SQL et generer-tournois-ref.js divergent sur l\'échantillon');
+  assert.deepEqual(await horsFlux(idsE), avantE, 'lignes absentes du flux modifiées ou supprimées');
+  const vu = Object.fromEntries(attenduE.lignes.map(l => [l.id, l]));
+  assert.deepEqual([vu['9100040'].club, vu['9100040'].nom, vu['9100041'].club, vu['9100024'].nom, vu['9100025'].ville, vu['9100026'].nom], ['DERNIER', 'P500', 'VALIDE', null, null, 'P25 26/10/26 18H MAISON PADEL']);
+  assert.ok((await q(`select count(*)::int n from public.tournois_ref where id in ('abc', '1234567890123', '9100015', '9100017')`)).rows[0].n === 0);
+  assert.deepEqual((await q('select distinct uri from extensions.http_appels')).rows.map(r => r.uri), ['https://apprendre-padel.fr/assets/data/tournois.json']);
+  ok(`pglite : actualiser_tournois_ref() = generer-tournois-ref.js sur ${echantillon.length} cas (${attenduE.lignes.length} lignes : coordonnées et textes trop longs à null, identifiants et dates invalides refusés, doublons : la dernière ligne valide gagne) ; aucune autre ligne touchée`);
+
+  // tournois.json complet : mêmes lignes que le générateur, deux fois (relançable), sans suppression
+  const tousTournois = JSON.parse(lire('assets/data/tournois.json')).tournois;
+  const attenduT = lignesRef(tousTournois);
+  const idsT = attenduT.lignes.map(l => l.id);
+  await exec(`update public.tournois_ref set club = 'PIRATE', nom = null where id = '${idsT[0]}'`);
+  const avantT = await horsFlux(idsT);
+  await simuler(lire('assets/data/tournois.json'));
+  assert.equal(await actualiser(), attenduT.lignes.length);
+  assert.deepEqual(await lignesBase(idsT), attenduT.lignes, 'SQL et generer-tournois-ref.js divergent sur tournois.json');
+  assert.equal(await actualiser(), attenduT.lignes.length);
+  assert.deepEqual(await lignesBase(idsT), attenduT.lignes);
+  assert.deepEqual(await horsFlux(idsT), avantT, 'lignes absentes de tournois.json modifiées ou supprimées');
+  ok(`pglite : tournois.json complet (${attenduT.lignes.length} tournois) identique au générateur, deux exécutions, ligne modifiée remise à jour, aucune ligne supprimée`);
+
+  // Erreurs : exception claire et rien n'est modifié
+  const avantErreurs = await empreinte();
+  const cas = [
+    ['{"tournois":[]}', {status: 404}, /TOURNOIS_REF_STATUT : HTTP 404/],
+    ['{"tournois":[]}', {status: 301}, /TOURNOIS_REF_STATUT : HTTP 301/],
+    ['<html>maintenance</html>', {type: 'text/html; charset=utf-8'}, /TOURNOIS_REF_TYPE/],
+    ['{"tournois":[]}', {type: null}, /TOURNOIS_REF_TYPE/],
+    ['{"tournois": [', {}, /TOURNOIS_REF_JSON : contenu illisible/],
+    ['{"tournois":[]}', {}, /TOURNOIS_REF_JSON : pas de tableau/],
+    ['[1,2]', {}, /TOURNOIS_REF_JSON : pas de tableau/],
+    ['{"tournois":{"id":"1"}}', {}, /TOURNOIS_REF_JSON : pas de tableau/],
+    [JSON.stringify({tournois: [u('abc'), u('9200001', {club: ''})]}), {}, /TOURNOIS_REF_VIDE : aucun tournoi valide sur 2/],
+    [null, {erreur: 'Timeout was reached'}, /TOURNOIS_REF_TELECHARGEMENT : Timeout was reached/],
+    ['{"tournois":[' + ' '.repeat(20000000) + ']}', {}, /TOURNOIS_REF_TAILLE/],
+  ];
+  for (const [contenu, extra, motif] of cas) {
+    await simuler(contenu, extra);
+    await refuse(actualiser(), motif, 'erreur ' + motif);
+  }
+  assert.deepEqual(await empreinte(), avantErreurs, 'tournois_ref modifiée malgré une erreur');
+  ok('pglite : HTTP ≠ 200, type non JSON, JSON illisible ou sans tournois, aucun tournoi valide, réseau, plus de 20 Mo : exception claire, tournois_ref inchangée');
+
+  await simuler(JSON.stringify({tournois: [u('9300001')]}));
+  for (const [role, qui] of [['anon', null], ['authenticated', B], ['authenticated', C]]) {
+    await refuse(comme(role, qui, 'select public.actualiser_tournois_ref()'), /permission denied/, 'actualiser_tournois_ref par ' + role);
+  }
+  assert.equal((await q(`select count(*)::int n from public.tournois_ref where id = '9300001'`)).rows[0].n, 0);
+  ok('pglite : actualiser_tournois_ref() refusée aux visiteurs, aux joueurs et à l\'admin du site (seuls postgres et pg_cron)');
   await db.close();
 }
 
