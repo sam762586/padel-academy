@@ -564,7 +564,7 @@
     séparateur de milliers choisi dans les réglages ; 404 tant qu'aucune carte n'a été comptée). Tant que l'option
     « Allow adding visitor counts on your website » n'est pas cochée dans GoatCounter, l'adresse répond 403 sans en-tête
     CORS, ce qui affiche une erreur dans la console du visiteur : actif reste à false jusqu'à ce que Samuel l'ait cochée. */
- const COMPTEUR={actif:true,adresse:"https://apprendre-padel.goatcounter.com/counter/carte-generee.json"};
+ const COMPTEUR={actif:true,adresse:"https://apprendre-padel.goatcounter.com/counter/carte-generee.json?start=2026-01-01"}; // sans start, GoatCounter ne renvoie pas le total depuis le début (1 au lieu de 4 le 30/10/2026)
  function afficherCompteur(){
   const zone=$("cj-compteur");
   if(!zone||!COMPTEUR.actif||navigator.onLine===false||typeof fetch!=="function")return;

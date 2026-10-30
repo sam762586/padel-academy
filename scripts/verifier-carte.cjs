@@ -304,7 +304,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   assert.equal((await gc(page)).length,3,'aucun événement si skipgc = t');
   await page.evaluate(()=>localStorage.removeItem('skipgc'));
   // Compteur public activé (option GoatCounter cochée par Samuel le 30/10/2026) : lu en lecture seule, sur la seule adresse de l'événement
-  assert.ok(demandesCompteur.every(u=>/\/counter\/carte-generee\.json$/.test(u)),'total public : seule l\'adresse du compteur de cartes est lue');
+  assert.ok(demandesCompteur.every(u=>/\/counter\/carte-generee\.json\?start=2026-01-01$/.test(u)),'total public : seule l\'adresse du compteur de cartes est lue');
   ok('GoatCounter : événement « carte-generee » (path, title, event seulement) à chaque téléchargement ou partage, aucun si skipgc');
   // Rien n'a été écrit dans les repères
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-quiz-dernier')),quizAvant);
@@ -366,7 +366,7 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
    const p3=await ctx.newPage();const erreursJs=[];p3.on('pageerror',e=>erreursJs.push(e.message));
    await p3.route(/\/assets\/js\/carte\.js/,async r=>{const rep=await r.fetch();r.fulfill({response:rep,body:(await rep.text()).replace('actif:false','actif:true')});});
    let demande=false;
-   await p3.route(/goatcounter\.com\/counter\/carte-generee\.json$/,r=>{demande=true;if(!reponse)return r.abort('failed');r.fulfill({status:reponse.status,contentType:reponse.status===200?'application/json':'text/html',headers:{'Access-Control-Allow-Origin':'*'},body:reponse.body});});
+   await p3.route(/goatcounter\.com\/counter\/carte-generee\.json(\?start=2026-01-01)?$/,r=>{demande=true;if(!reponse)return r.abort('failed');r.fulfill({status:reponse.status,contentType:reponse.status===200?'application/json':'text/html',headers:{'Access-Control-Allow-Origin':'*'},body:reponse.body});});
    await p3.goto(base+'/carte.html');
    if(reponse&&reponse.status===200)await p3.waitForFunction(()=>document.getElementById('cj-compteur').textContent!=='');
    else await p3.waitForTimeout(500);
