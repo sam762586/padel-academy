@@ -6,7 +6,8 @@
       photo recadrée et gardée après rechargement, téléchargement WebP (JPEG si le navigateur ne sait pas l'encoder) aux bonnes
       dimensions (carte et story) et ≤ 500 Ko, aperçu canvas décrit (aria-label), carte retrouvée au rechargement, « Retirer la photo » ;
       choix du modèle (4 boutons aria-pressed, miniatures, aperçu et export changés, modèle gardé, repli sans MODELES) ;
-      « Modifier mes notes » (tout gardé) ; « Faire une nouvelle carte » (notes à 60, poste et rang par défaut, sans photo ni nom,
+      « Modifier mes notes » (tout gardé) ; sans compte, une seule carte (nouvelle carte refusée avec message et lien vers
+      connexion.html, carte toujours modifiable ; connecté ou session gardée : illimité) ; « Faire une nouvelle carte » (notes à 60, poste et rang par défaut, sans photo ni nom,
       ancienne carte gardée jusqu'à la validation des notes) ; migration d'une carte version 1 ; aucune lecture de pa-quiz-dernier
       ni de pa-academie ; événement GoatCounter « carte-generee » à chaque téléchargement ou partage (aucun si skipgc) ; total public
       affiché ou rien ; aucun débordement à 390 et 320 px, 0 erreur console.
@@ -60,6 +61,16 @@ const EXT_ATTENDUE='webp',TYPE_ATTENDU='image/webp'; // Edge encode le WebP ; Sa
 async function poserNote(page,cle,valeur){await page.fill('#cj-v-'+cle,String(valeur));await page.press('#cj-v-'+cle,'Tab');}
 async function poserNotes(page,notes){for(const [k,v] of Object.entries(notes))await poserNote(page,k,v);}
 const lireNotes=page=>page.evaluate(()=>Object.fromEntries(window.PA_CARTE.CLES.map(k=>[k,Number(document.getElementById('cj-n-'+k).value)])));
+// Faux SDK Supabase : session lue dans sessionStorage (clé « session »), aucun appel réseau
+const SDK_SIMULE=`(function(){
+ const session=()=>sessionStorage.getItem('session')?{user:{id:'u1',email:'j@t.fr'}}:null;
+ const requete=()=>{const q=new Proxy({},{get(_,k){
+  if(k==='then')return ok=>ok({data:[],error:null});
+  if(k==='maybeSingle'||k==='single')return ()=>Promise.resolve({data:null,error:null});
+  return ()=>q;}});return q;};
+ window.supabase={createClient(){return {auth:{getSession:async()=>({data:{session:session()}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>({})},
+  from:requete,rpc:async()=>({data:null,error:null})};}};
+})();`;
 const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.textContent));
 (async()=>{
  moteur();
@@ -70,6 +81,8 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
  try{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true,acceptDownloads:true});
   await ctx.route(/^https:/,r=>r.fulfill({status:204,body:''})); // aucun service externe
+  // Supabase simulé (même principe que verifier-parcours-joueurs.cjs) : connecté si sessionStorage.session existe
+  await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:SDK_SIMULE}));
   // Faux GoatCounter : count.js est bloqué, window.goatcounter.count enregistre les événements envoyés
   await ctx.addInitScript(()=>{window.__gc=[];window.goatcounter={count:o=>{window.__gc.push(JSON.parse(JSON.stringify(o)));}};});
   const demandesCompteur=[];ctx.on('request',r=>{if(/goatcounter\.com\/counter\//.test(r.url()))demandesCompteur.push(r.url());});
@@ -132,10 +145,12 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   assert.equal(await page.inputValue('#cj-v-VOL'),'5');
   ok('curseur au clavier : Fin → 99, flèche au-delà sans effet, Début → 1, flèches pas à pas, champ numérique synchronisé');
   // Curseur à la souris : bords gauche et droit
-  await page.locator('#cj-n-AER').scrollIntoViewIfNeeded();const boite=await page.locator('#cj-n-AER').boundingBox();
-  await page.mouse.click(boite.x+boite.width-1,boite.y+boite.height/2);
+  // Position relative au curseur, remesurée à chaque clic (la page peut bouger sous charge : polices, aperçu)
+  const curseurAER=page.locator('#cj-n-AER');await curseurAER.scrollIntoViewIfNeeded();const boite=await curseurAER.boundingBox();
+  await curseurAER.click({position:{x:boite.width-1,y:boite.height/2}});
   assert.equal(await page.inputValue('#cj-n-AER'),'99');assert.equal(await page.inputValue('#cj-v-AER'),'99');
-  await page.mouse.click(boite.x+1,boite.y+boite.height/2);
+  await page.waitForTimeout(400); // pas de double clic
+  await curseurAER.click({position:{x:1,y:boite.height/2}});
   assert.equal(await page.inputValue('#cj-n-AER'),'1');
   await page.evaluate(()=>{const i=document.getElementById('cj-n-AER');i.value='150';i.dispatchEvent(new Event('input',{bubbles:true}));});
   assert.equal(await page.inputValue('#cj-v-AER'),'99');
@@ -361,7 +376,47 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   const gHugo=await page.evaluate(()=>window.PA_CARTE.calcul.globale({VOL:90,AER:59,DEF:63,LOB:64,SER:63,TAC:63},'droite'));
   assert.match(await page.getAttribute('#cj-apercu-canvas','aria-label'),new RegExp('^Carte de joueur de Hugo D\\.\\s: '+gHugo+', Argent, poste droite\\. Volée 90.*Avec ta photo\\.'));
   ok('« Modifier mes notes » (étapes photo et carte) : notes, poste, rang choisi, nom et photo gardés, note modifiée enregistrée');
+  // Sans compte, une carte gardée : « Faire une nouvelle carte » refusée (message, lien, focus), la carte reste modifiable
+  {
+   await page.waitForFunction(()=>document.getElementById('cj-nouvelle-aide-2').textContent.startsWith('Sans compte'));
+   assert.equal(await page.evaluate(()=>!!window.PA_COMPTE&&window.PA_COMPTE.actif&&window.PA_COMPTE.user===null),true,'non connecté');
+   assert.equal(await page.textContent('#cj-nouvelle-aide-2'),'Sans compte : une seule carte par appareil. Ta carte reste modifiable.');
+   const avant=await page.evaluate(()=>localStorage.getItem('pa-carte'));
+   const photoAvant=await page.evaluate(()=>localStorage.getItem('pa-carte-photo'));
+   await page.focus('#cj-nouvelle-2');await page.keyboard.press('Enter');
+   assert.equal(await page.locator('#cj-final').isVisible(),true,'toujours à l\'étape carte');
+   const msg=page.locator('#cj-final .cj-limite');
+   assert.equal(await msg.isVisible(),true);
+   assert.equal(await msg.getAttribute('role'),'status');
+   assert.match(await msg.getAttribute('class'),/\bmsg\b/);
+   assert.equal((await msg.textContent()).replace(/\s+/g,' '),"Sans compte, tu peux créer une seule carte. Crée un compte gratuit (ou connecte-toi) pour en faire d'autres, par exemple pour tes amis. Ta carte actuelle reste modifiable.");
+   assert.equal(await msg.locator('a').getAttribute('href'),'connexion.html?suite=carte.html');
+   assert.equal(await page.evaluate(()=>document.activeElement.classList.contains('cj-limite')),true,'focus sur le message');
+   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),avant,'carte inchangée');
+   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAvant,'photo inchangée');
+   assert.equal(await page.inputValue('#cj-pseudo'),'Hugo D.','nom gardé');
+   await page.keyboard.press('Enter');assert.equal(await page.locator('#cj-final .cj-limite').count(),1,'un seul message même au second essai');
+   // Toujours modifiable : notes (bouton du haut refusé aussi), puis retour à la carte
+   await page.click('#cj-modifier-notes');
+   assert.equal(await msg.isHidden(),true,'message masqué en changeant d\'étape');
+   assert.equal(await page.locator('#cj-nouvelle-haut').isVisible(),true);
+   await page.click('#cj-nouvelle-1');
+   assert.equal(await page.locator('#cj-nouvelle-haut .cj-limite').isVisible(),true);
+   assert.equal(await page.inputValue('#cj-n-VOL'),'90','notes de la carte gardées');
+   await poserNote(page,'VOL',91);
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).notes.VOL),91,'carte existante toujours modifiable');
+   await poserNote(page,'VOL',90);
+   await page.click('#cj-vers-photo');await page.click('#cj-vers-pseudo');await page.focus('#cj-pseudo');await page.keyboard.press('Enter');
+   assert.equal(await page.locator('#cj-final').isVisible(),true);
+   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')).pseudo),'Hugo D.');
+  }
+  ok('sans compte, une carte gardée : « Faire une nouvelle carte » (haut et bas) refusée, message role=status focalisé avec lien connexion.html?suite=carte.html, carte et photo intactes, notes toujours modifiables');
+  // Connecté (session simulée) : nouvelles cartes illimitées
+  await page.evaluate(()=>sessionStorage.setItem('session','1'));
+  await page.goto(base+'/carte.html');
+  await page.waitForFunction(()=>window.PA_COMPTE&&window.PA_COMPTE.user&&document.getElementById('cj-nouvelle-aide-2').textContent.startsWith('Pour toi'));
   // « Faire une nouvelle carte » (pour un ami) depuis l'étape carte, au clavier
+  await page.waitForSelector('#cj-modeles .cj-modele');
   await page.click('#cj-modeles .cj-modele:nth-child(3)');
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pa-carte')).modele!=='neon');
   const ancienne=await page.evaluate(()=>localStorage.getItem('pa-carte'));
@@ -388,7 +443,8 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   await poserNote(page,'TAC',80);
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte')),ancienne,'ancienne carte gardée tant que les notes ne sont pas validées');
   assert.equal(await page.evaluate(()=>localStorage.getItem('pa-carte-photo')),photoAncienne,'ancienne photo gardée au clic');
-  ok('« Faire une nouvelle carte » : notes à 60, Polyvalent et rang suggéré, focus sur le titre, annonce aria-live, pseudo vide, sans photo, ancienne carte et photo gardées');
+  assert.equal(await page.locator('.cj-limite:visible').count(),0,'connecté : aucun message de limite');
+  ok('connecté : « Faire une nouvelle carte » : notes à 60, Polyvalent et rang suggéré, focus sur le titre, annonce aria-live, pseudo vide, sans photo, ancienne carte et photo gardées');
   await page.click('#cj-vers-photo');
   const nouvelle=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-carte')));
   assert.deepEqual(nouvelle.notes,{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80});
@@ -451,6 +507,39 @@ const presse=(page,groupe)=>page.$$eval(groupe+' button',bs=>bs.filter(b=>b.getA
   assert.ok(lus.has('pa-carte'),'relevé des lectures actif');
   assert.ok(!lus.has('pa-quiz-dernier')&&!lus.has('pa-academie'),'lectures de la carte : '+[...lus].join(', '));
   ok('pa-quiz-dernier et pa-academie ni lus ni écrits par la carte (lectures : '+[...lus].sort().join(', ')+')');
+  // Comptes indisponibles (SDK bloqué, hors connexion) : session gardée dans le navigateur (sb-…-auth-token, lecture locale)
+  {
+   const ctx2=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+   await ctx2.route(/^https:/,r=>r.fulfill({status:204,body:''}));
+   await ctx2.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:''}));
+   const envois=[];ctx2.on('request',r=>{if(/^https:\/\/[^/]*\.supabase\.co\//.test(r.url()))envois.push(r.url());});
+   const p4=await ctx2.newPage();p4.on('pageerror',e=>erreurs.push(e.message));
+   await p4.goto(base+'/carte.html');
+   // Sans carte et sans compte : création possible
+   await p4.click('#cj-commencer');assert.equal(await p4.locator('#cj-notes').isVisible(),true);
+   await p4.click('#cj-vers-photo');await p4.click('#cj-vers-pseudo');await p4.fill('#cj-pseudo','Zoé');await p4.keyboard.press('Enter');
+   assert.equal(await p4.locator('#cj-final').isVisible(),true);
+   const carteZoe=await p4.evaluate(()=>localStorage.getItem('pa-carte'));
+   assert.ok(carteZoe&&JSON.parse(carteZoe).pseudo==='Zoé','première carte créée sans compte');
+   await p4.click('#cj-nouvelle-2');
+   assert.equal(await p4.locator('#cj-final .cj-limite').isVisible(),true,'deuxième carte refusée sans session');
+   // Session gardée dans le navigateur : nouvelle carte possible, même sans le SDK
+   await p4.evaluate(()=>localStorage.setItem('sb-test-auth-token',JSON.stringify({access_token:'jeton',refresh_token:'r'})));
+   await p4.goto(base+'/carte.html');
+   assert.equal(await p4.evaluate(()=>!window.PA_COMPTE||!window.PA_COMPTE.actif),true,'compte.js inactif');
+   await p4.click('#cj-nouvelle-2');
+   assert.equal(await p4.locator('#cj-notes').isVisible(),true,'session gardée : nouvelle carte');
+   assert.equal(await p4.locator('.cj-limite').count(),0);
+   assert.equal(await p4.evaluate(()=>localStorage.getItem('pa-carte')),carteZoe,'carte gardée jusqu\'à la validation');
+   // Session illisible : traité comme non connecté
+   await p4.evaluate(()=>localStorage.setItem('sb-test-auth-token','{illisible'));
+   await p4.goto(base+'/carte.html');
+   await p4.click('#cj-nouvelle-2');
+   assert.equal(await p4.locator('#cj-final .cj-limite').isVisible(),true,'session illisible : refus');
+   assert.deepEqual(envois,[],'aucun appel à Supabase');
+   await ctx2.close();
+  }
+  ok('sans le SDK : première carte créée sans compte, deuxième refusée ; session gardée (sb-…-auth-token) → nouvelle carte ; session illisible → refus ; aucun appel à Supabase');
   // Carte de Nina remise pour la suite
   await page.evaluate(()=>localStorage.setItem('pa-carte',JSON.stringify({version:2,notes:{VOL:60,AER:60,DEF:60,LOB:60,SER:60,TAC:80},poste:'polyvalent',posteChoisi:false,rang:'argent',rangChoisi:false,pseudo:'Nina R.',modele:'neon',photo:false})));
   // Débordement : 390 puis 320 px, à chaque étape

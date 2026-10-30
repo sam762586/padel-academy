@@ -12,6 +12,12 @@
    pas choisi un ; ensuite son choix est gardé, même si la globale change. « Modifier mes notes » revient à l'étape notes en
    gardant tout ; « Faire une nouvelle carte » remet les notes à 60, poste et rang par défaut, sans photo ni nom, et ne
    remplace la carte gardée qu'au passage à l'étape photo (« Continuer : ma photo »).
+   Une seule carte sans compte : un visiteur non connecté qui a déjà une carte gardée (pa-carte valide) peut la modifier
+   (notes, photo, nom, modèle, format, téléchargement, partage), mais « Faire une nouvelle carte » affiche un message avec un
+   lien vers connexion.html?suite=carte.html au lieu de repartir de zéro. Connecté : nouvelles cartes illimitées.
+   Connexion constatée sans rien envoyer : PA_COMPTE.user une fois PA_COMPTE.ready résolu ; avant, ou si compte.js est
+   inactif (SDK absent, hors connexion), session Supabase gardée dans le navigateur (sb-…-auth-token, même règle que nav.js).
+   Le moindre doute (lecture impossible) compte comme « non connecté ».
    Chaque étape a son titre (tabindex -1) qui reçoit le focus quand on y arrive au clavier.
    Mesure : un téléchargement ou un partage réussi envoie à GoatCounter l'événement « carte-generee », sans aucune donnée
    de la carte (rien si le visiteur a refusé la mesure : clé skipgc). Le total public n'est lu que si COMPTEUR.actif. */
@@ -121,12 +127,57 @@
   // « Faire une nouvelle carte » en haut : seulement si une carte est gardée, et hors étape Carte (qui a son propre bouton)
   const haut=$("cj-nouvelle-haut");
   if(haut)haut.hidden=nom==="final"||!carteGardee();
+  masquerLimite();majAidesNouvelle();
   const apercu=$("cj-apercu");
   if(apercu){apercu.hidden=nom==="intro";if(!apercu.hidden)rendreApercu();else if(arretApercu){arretApercu();arretApercu=null;}}
   if(focus){
    const z=page.querySelector('.cj-etape[data-etape="'+nom+'"] h2');
    if(z){z.scrollIntoView({block:"nearest"});z.focus({preventScroll:true});}
   }
+ }
+
+ /* ---- Une seule carte sans compte ---- */
+ // Session Supabase gardée dans le navigateur (lecture locale seulement, même règle que nav.js)
+ function sessionGardee(){
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^sb-.+-auth-token$/.test(k||"")){const v=JSON.parse(localStorage.getItem(k)||"null");if(v&&(v.access_token||v.refresh_token||v.currentSession))return true;}}}catch(e){}
+  return false;
+ }
+ let compteVerifie=false; // PA_COMPTE.ready résolu : PA_COMPTE.user fait foi
+ function estConnecte(){
+  try{
+   const c=window.PA_COMPTE;
+   if(c&&c.actif&&compteVerifie)return !!c.user;
+   return sessionGardee();
+  }catch(e){return false;}
+ }
+ // Nouvelle carte refusée : visiteur sans compte qui a déjà sa carte sur l'appareil
+ const nouvelleLimitee=()=>!estConnecte()&&carteGardee();
+ const AIDE_NOUVELLE_LIMITEE="Sans compte : une seule carte par appareil. Ta carte reste modifiable.";
+ const aidesNouvelle={}; // id → texte d'origine de l'aide sous le bouton (écrit dans carte.html)
+ function majAidesNouvelle(){
+  ["cj-nouvelle-aide-1","cj-nouvelle-aide-2"].forEach(id=>{
+   const a=$(id);if(!a)return;
+   if(!(id in aidesNouvelle))aidesNouvelle[id]=a.textContent;
+   a.textContent=nouvelleLimitee()?AIDE_NOUVELLE_LIMITEE:aidesNouvelle[id];
+  });
+ }
+ function masquerLimite(){page.querySelectorAll(".cj-limite").forEach(m=>{m.hidden=true;});}
+ // Message posé sous le bouton cliqué (créé une fois par bouton), puis focus dessus
+ function montrerLimite(bouton){
+  const bloc=bouton&&bouton.closest(".cj-nouvelle");if(!bloc)return;
+  let m=bloc.querySelector(".cj-limite");
+  if(!m){
+   m=el("p","msg msg-info cj-limite");m.setAttribute("role","status");m.tabIndex=-1;
+   const lien=el("a","","Crée un compte gratuit (ou connecte-toi)");lien.href="connexion.html?suite=carte.html";
+   m.append("Sans compte, tu peux créer une seule carte. ",lien," pour en faire d'autres, par exemple pour tes amis. Ta carte actuelle reste modifiable.");
+   bloc.appendChild(m);
+  }
+  m.hidden=false;
+  m.focus({preventScroll:true});m.scrollIntoView({block:"nearest"});
+ }
+ function demanderNouvelleCarte(ev){
+  if(nouvelleLimitee()){montrerLimite(ev&&ev.currentTarget);return;}
+  masquerLimite();nouvelleCarte();
  }
 
  /* Nouvelle carte (pour soi ou pour un ami) : notes à 60, poste et rang suggérés, sans photo ni nom. Rien n'est effacé ici :
@@ -513,8 +564,8 @@
  /* ---- Navigation entre étapes ---- */
  const sur=(id,fn)=>{const b=$(id);if(b)b.addEventListener("click",fn);};
  sur("cj-commencer",()=>{rendreNotes();allerA("notes",true);});
- sur("cj-nouvelle-1",nouvelleCarte);
- sur("cj-nouvelle-2",nouvelleCarte);
+ sur("cj-nouvelle-1",demanderNouvelleCarte);
+ sur("cj-nouvelle-2",demanderNouvelleCarte);
  // Quitter l'étape notes valide la carte : elle est gardée (et remplace, pour une nouvelle carte, celle d'avant)
  sur("cj-vers-photo",()=>{etat.enregistrable=true;sauver();allerA("photo",true);});
  sur("cj-retour-notes",()=>{rendreNotes();allerA("notes",true);});
@@ -531,6 +582,12 @@
  if(photoGardee&&!(sauvee&&sauvee.photo===false))poserPhoto(photoGardee,false);
  proposerPseudoDuProfil();
  afficherCompteur();
+ // Session confirmée (ou fermée) par compte.js : aides des boutons « Faire une nouvelle carte » mises à jour
+ (()=>{
+  const c=window.PA_COMPTE;if(!c||!c.actif)return;
+  const maj=()=>{compteVerifie=true;majAidesNouvelle();if(!nouvelleLimitee())masquerLimite();};
+  try{Promise.resolve(c.ready).then(maj,maj);if(typeof c.onChange==="function")c.onChange(maj);}catch(e){}
+ })();
  if(sauvee){
   // Carte version 1 (ancien questionnaire) : réécrite au format 2 avec les mêmes notes, poste, nom, modèle et photo
   if(sauvee.migree)sauver();
