@@ -20,7 +20,11 @@
       vérificateur) : ?access_token=, #%61ccess_token=, ?error_description=, #error_description= ne déconnectent plus ;
       ?code= arrivé sur une fiche tournoi (sans SDK) transmis à connexion.html ;
    10) déconnexion : session inconnue du serveur (AuthSessionMissingError de supabase-js 2.45.4) → session terminée sur
-      l'appareil (jeton local effacé), y compris après la suppression du compte ; réseau coupé : message, rien d'effacé.
+      l'appareil (jeton local effacé), y compris après la suppression du compte ; réseau coupé : message, rien d'effacé ;
+   11) compte.html, historique du test de niveau : bouton « Supprimer » nommé par la date sur chaque résultat,
+      confirmation dans la ligne (Annuler ou Échap : rien supprimé), delete filtré par id et user_id avec .select(),
+      ligne retirée, « Résultat supprimé. » en role=status, focus sur le résultat suivant puis le titre ; réseau coupé ou
+      aucune ligne effacée : message, rien retiré.
    Supabase est simulé (aucun appel réseau). Lancer depuis la racine du site : node scripts/verifier-connexion.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -48,7 +52,27 @@ const SDK=`(function(){
  // Appels notés dans sessionStorage « appels » (gardés d'une page à l'autre)
  const noter=(nom,args)=>{const l=JSON.parse(sessionStorage.getItem('appels')||'[]');l.push({nom,args});sessionStorage.setItem('appels',JSON.stringify(l));};
  const prevenir=(ev)=>setTimeout(()=>ecouteurs.forEach(f=>f(ev,session())),0);
- const requete=()=>{const q=new Proxy({},{get(_,k){
+ // Table quiz_results : lignes dans sessionStorage « quizLignes » ; delete noté (« quizDelete ») ; « quizReseau » : réseau
+ // coupé ; « quizRien » : le serveur n'efface aucune ligne (comme une politique RLS qui refuse)
+ const requeteQuiz=()=>{
+  const etat={op:'select',filtres:{},renvoie:false};
+  const executer=async()=>{
+   const lignes=JSON.parse(sessionStorage.getItem('quizLignes')||'[]');
+   if(etat.op==='select')return {data:lignes.filter(l=>l.user_id===etat.filtres.user_id),error:null};
+   if(etat.op!=='delete')return {data:null,error:null};
+   noter('quizDelete',{filtres:etat.filtres,renvoie:etat.renvoie});
+   await new Promise(r=>setTimeout(r,30));
+   if(sessionStorage.getItem('quizReseau'))return {data:null,error:{message:'TypeError: Failed to fetch'}};
+   const vise=l=>'id' in etat.filtres&&'user_id' in etat.filtres&&l.id===etat.filtres.id&&l.user_id===etat.filtres.user_id;
+   const effacees=sessionStorage.getItem('quizRien')?[]:lignes.filter(vise);
+   sessionStorage.setItem('quizLignes',JSON.stringify(lignes.filter(l=>!effacees.some(e=>e.id===l.id))));
+   return {data:etat.renvoie?effacees.map(l=>({id:l.id})):null,error:null};
+  };
+  const q={select(){if(etat.op==='delete')etat.renvoie=true;return q;},delete(){etat.op='delete';return q;},insert(){etat.op='insert';return q;},
+   eq(k,v){etat.filtres[k]=v;return q;},order(){return q;},limit(){return q;},then(ok,ko){return executer().then(ok,ko);}};
+  return q;
+ };
+ const requete=table=>{if(table==='quiz_results')return requeteQuiz();const q=new Proxy({},{get(_,k){
   if(k==='then')return (ok)=>ok({data:[],error:null});
   if(k==='maybeSingle'||k==='single')return ()=>Promise.resolve({data:null,error:null});
   return ()=>q;}});return q;};
@@ -580,6 +604,79 @@ const serveur=http.createServer((req,res)=>{
    await ctxCadre.close();
   }
   ok('anti-cadre : script en tête de connexion.html, compte.html, espace.html et partenaires.html, page masquée dans le cadre d\'un autre site');
+  // 11. Historique du test de niveau : suppression d'un résultat
+  {
+   const {ctx:ctxQ,page:pq}=await ouvrir();
+   const lignesQuiz=[
+    {id:'r3',user_id:'u1',score:0,niveau:2,palier:2,reponses:null,created_at:'2026-10-30T10:00:00Z'},
+    {id:'r2',user_id:'u1',score:14,niveau:2,reponses:null,created_at:'2026-10-29T10:00:00Z'},
+    {id:'r1',user_id:'u1',score:20,niveau:3,reponses:null,created_at:'2026-10-28T10:00:00Z'},
+    {id:'r9',user_id:'u2',score:10,niveau:2,reponses:null,created_at:'2026-10-27T10:00:00Z'}];
+   await pq.goto(base+'/index.html');
+   await pq.evaluate(l=>{sessionStorage.setItem('session','1');sessionStorage.setItem('quizLignes',JSON.stringify(l));},lignesQuiz);
+   await pq.goto(base+'/compte.html');await pq.waitForSelector('#compte-quiz button[data-quiz-supprimer]');
+   const noms=()=>pq.$$eval('#compte-quiz button[data-quiz-supprimer]',bs=>bs.map(b=>b.getAttribute('aria-label')));
+   const suppressions=()=>pq.evaluate(()=>JSON.parse(sessionStorage.getItem('appels')||'[]').filter(a=>a.nom==='quizDelete').map(a=>a.args));
+   const idsServeur=()=>pq.evaluate(()=>JSON.parse(sessionStorage.getItem('quizLignes')).map(l=>l.id));
+   const focusSur=()=>pq.evaluate(()=>document.activeElement.getAttribute('aria-label')||document.activeElement.id||document.activeElement.textContent);
+   const confirmer=d=>'button[aria-label="Confirmer la suppression du résultat du '+d+'"]';
+   const nbLignes=()=>pq.$$eval('#compte-quiz tbody tr',t=>t.length);
+   assert.deepEqual(await noms(),['Supprimer le résultat du 30/10/2026','Supprimer le résultat du 29/10/2026','Supprimer le résultat du 28/10/2026']);
+   assert.deepEqual(await pq.$$eval('#compte-quiz button[data-quiz-supprimer]',bs=>bs.map(b=>b.className+'|'+b.textContent.trim())),Array(3).fill('btn petit ghost|Supprimer'));
+   assert.equal(await pq.getAttribute('#compte-quiz-msg','role'),'status');
+   ok('historique du test : un bouton « Supprimer » par résultat, nommé par sa date (« Supprimer le résultat du 30/10/2026 »)');
+   // Annuler, puis Échap : rien n'est supprimé, le focus revient sur « Supprimer »
+   await pq.click('button[data-quiz-supprimer="r2"]');
+   assert.equal(await focusSur(),'Annuler la suppression du résultat du 29/10/2026');
+   assert.ok(await pq.isVisible(confirmer('29/10/2026')));
+   assert.ok(await pq.evaluate(()=>document.documentElement.scrollWidth<=390),'confirmation sans débordement à 390 px');
+   await pq.click('button[aria-label="Annuler la suppression du résultat du 29/10/2026"]');
+   assert.equal(await focusSur(),'Supprimer le résultat du 29/10/2026');
+   await pq.click('button[data-quiz-supprimer="r2"]');await pq.keyboard.press('Escape');
+   assert.equal(await focusSur(),'Supprimer le résultat du 29/10/2026');
+   assert.deepEqual(await suppressions(),[]);
+   assert.equal(await nbLignes(),3);
+   ok('suppression d\'un résultat : confirmation dans la ligne (focus sur « Annuler ») ; Annuler ou Échap : aucun appel, rien retiré');
+   // Réseau coupé, puis serveur qui n'efface rien : message, rien retiré, confirmation gardée
+   await pq.evaluate(()=>sessionStorage.setItem('quizReseau','1'));
+   await pq.click('button[data-quiz-supprimer="r2"]');
+   await pq.click(confirmer('29/10/2026'));
+   await pq.waitForFunction(()=>/réseau/.test(document.getElementById('compte-quiz-msg').textContent));
+   assert.ok(await pq.evaluate(()=>document.getElementById('compte-quiz-msg').classList.contains('msg-erreur')));
+   assert.equal(await nbLignes(),3);
+   assert.ok(await pq.isEnabled(confirmer('29/10/2026')));
+   await pq.evaluate(()=>{sessionStorage.removeItem('quizReseau');sessionStorage.setItem('quizRien','1');});
+   await pq.click(confirmer('29/10/2026'));
+   await pq.waitForFunction(()=>/n'a pas été supprimé/.test(document.getElementById('compte-quiz-msg').textContent));
+   assert.equal(await nbLignes(),3);
+   assert.deepEqual(await idsServeur(),['r3','r2','r1','r9']);
+   ok('suppression : réseau coupé ou aucune ligne effacée par le serveur → message clair, rien retiré, confirmation gardée');
+   // Confirmation : delete filtré par id et user_id, lignes effacées demandées (.select), ligne retirée, message, focus
+   await pq.evaluate(()=>sessionStorage.removeItem('quizRien'));
+   await pq.click(confirmer('29/10/2026'));
+   await pq.waitForFunction(()=>document.getElementById('compte-quiz-msg').textContent==='Résultat supprimé.');
+   assert.ok(await pq.evaluate(()=>document.getElementById('compte-quiz-msg').classList.contains('msg-ok')));
+   assert.deepEqual((await suppressions()).at(-1),{filtres:{id:'r2',user_id:'u1'},renvoie:true});
+   assert.deepEqual(await noms(),['Supprimer le résultat du 30/10/2026','Supprimer le résultat du 28/10/2026']);
+   assert.deepEqual(await idsServeur(),['r3','r1','r9']);
+   assert.equal(await focusSur(),'Supprimer le résultat du 28/10/2026','focus sur le résultat suivant');
+   // Dernière ligne : focus sur le précédent ; liste vide : texte « Aucun résultat » et focus sur le titre
+   await pq.click('button[data-quiz-supprimer="r1"]');
+   await pq.click(confirmer('28/10/2026'));
+   await pq.waitForFunction(()=>document.querySelectorAll('#compte-quiz tbody tr').length===1);
+   assert.equal(await focusSur(),'Supprimer le résultat du 30/10/2026','focus sur le résultat précédent');
+   await pq.click('button[data-quiz-supprimer="r3"]');
+   await pq.click(confirmer('30/10/2026'));
+   await pq.waitForFunction(()=>/Aucun résultat enregistré/.test(document.getElementById('compte-quiz').textContent));
+   assert.equal(await focusSur(),'historique-test');
+   assert.deepEqual(await idsServeur(),['r9'],'le résultat d\'un autre compte n\'est jamais touché');
+   // Rechargement : la liste vient du serveur, sans les résultats supprimés
+   await pq.reload();await pq.waitForFunction(()=>/Aucun résultat enregistré/.test(document.getElementById('compte-quiz').textContent));
+   ok('suppression confirmée : delete().eq("id").eq("user_id").select(), ligne retirée, « Résultat supprimé. » (role=status), focus sur le suivant, le précédent puis le titre');
+   assert.ok(fs.readFileSync(path.join(racine,'confidentialite.html'),'utf8').includes('href="compte.html#historique-test"'));
+   ok('politique de confidentialité : retrait du consentement en supprimant un résultat (lien compte.html#historique-test)');
+   await ctxQ.close();
+  }
   // 6. Liens « Connecte-toi » du site
   const src=f=>fs.readFileSync(path.join(racine,f),'utf8');
   assert.ok(src('assets/js/score.js').includes('connexion.html?suite=score.html'));

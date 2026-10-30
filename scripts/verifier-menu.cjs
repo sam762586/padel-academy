@@ -22,7 +22,7 @@ function gabarit(){
  G.PAGES_MENU.forEach(([href])=>assert.ok(fs.existsSync(path.join(racine,href)),href));
  assert.equal(new Set(G.PAGES_MENU.map(p=>p[0])).size,G.PAGES_MENU.length);
  const entrees=G.MENU.map(e=>Array.isArray(e)?e[1]:e.nom);
- assert.deepEqual(entrees,['Accueil','Apprendre','S\'entraîner','Tactique 3D','Compétition','Mon espace']);
+ assert.deepEqual(entrees,['Accueil','Apprendre','S\'entraîner','Tactique 3D','Ma carte','Compétition','Mon espace']);
  assert.deepEqual(G.APPEL,['materiel.html#raquette','Choisir sa raquette','Raquette']);
  const html=G.nav('bareme.html');
  assert.equal((html.match(/aria-current="page"/g)||[]).length,1);

@@ -79,7 +79,7 @@ a{color:var(--sky)}
 /* Monogramme du logo (assets/img/logo, versions « sombre ») : 38 px de haut, dimensions fixées dans le HTML (aucun décalage) ;
    décoratif (alt vide) car le nom écrit à côté est le nom accessible du lien */
 .brand-logo{display:block;flex:none;width:auto;height:38px}
-.brand span{color:var(--turf)}
+.brand-texte>span{color:var(--turf)}
 .nav #nav-menu{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-left:auto}
 .nav li a{display:block;color:var(--muted);text-decoration:none;font-weight:600;font-size:.78rem;padding:7px 8px;border-radius:999px;transition:color .15s,background .15s}
 .nav li a:hover,.nav li a:focus-visible{background:var(--glass-2);color:#fff}
@@ -981,9 +981,14 @@ details.geste summary{color:var(--turf)}
 @media (min-width:861px) and (max-width:1180px){
   .nav .cta-long{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
   .nav .cta-court{display:inline}
+}
+/* Menu à 7 entrées (« Ma carte » en accès direct depuis le 30/10/2026) : entrées resserrées sur tout ordinateur */
+@media (min-width:861px){
   .nav .wrap{gap:10px}.nav #nav-menu{gap:0}.nav .brand{font-size:1.3rem}
   .nav #nav-menu>li>a,.nav-titre{padding-inline:8px;font-size:.8rem}
 }
+/* Entre 861 et 1000 px, le menu a 7 entrées : seul le logo reste visible, le nom du site reste lu (lien d'accueil nommé) */
+@media (min-width:861px) and (max-width:1000px){.nav .brand-texte{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}}
 
 /* Sélecteur de raquette : marques préférées et suite du classement */
 .marques summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--line-2);border-radius:999px;font-weight:700;font-size:.9rem;color:var(--fg)}

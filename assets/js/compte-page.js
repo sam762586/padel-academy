@@ -180,27 +180,97 @@ const EFFACEMENT_CLES_LOCALES=["pa-exercices-faits","pa-quiz-dernier","pa-score-
  });
 
  // --- Historique du quiz ---
+ // Chaque résultat a son bouton « Supprimer » : confirmation dans la ligne (sans confirm()), puis suppression dans le
+ // compte (compte.deleteQuiz). Le résultat gardé sur l'appareil (pa-quiz-dernier) n'est pas touché.
+ const messageQuiz=document.getElementById("compte-quiz-msg");
+ const titreQuiz=document.getElementById("historique-test");
+ function annoncerQuiz(texte,etat){
+  if(!messageQuiz) return;
+  messageQuiz.hidden=!texte;
+  messageQuiz.textContent=texte||"";
+  messageQuiz.classList.remove("msg-ok","msg-erreur");
+  if(etat) messageQuiz.classList.add(etat==="ok"?"msg-ok":"msg-erreur");
+ }
+ function texteAucunQuiz(){
+  const p=document.createElement("p");p.className="acc-muted";
+  p.textContent="Aucun résultat enregistré pour l'instant. Passe le test, puis clique sur « Enregistrer dans mon profil ».";
+  return p;
+ }
+ function creerBouton(texte,classes){
+  const b=document.createElement("button");b.type="button";b.className="btn petit "+classes;b.textContent=texte;return b;
+ }
+ // Cellule « Supprimer » d'un résultat : état normal ou confirmation
+ function remplirActionQuiz(cellule,r,dateLisible){
+  const version=versionSession;
+  cellule.textContent="";
+  const supprimer=creerBouton("Supprimer","ghost");
+  supprimer.setAttribute("aria-label","Supprimer le résultat du "+dateLisible);
+  supprimer.dataset.quizSupprimer=String(r.id);
+  supprimer.addEventListener("click",()=>{
+   annoncerQuiz("","");
+   cellule.textContent="";
+   const confirmer=creerBouton("Confirmer la suppression","danger");
+   confirmer.setAttribute("aria-label","Confirmer la suppression du résultat du "+dateLisible);
+   const annuler=creerBouton("Annuler","ghost");
+   annuler.setAttribute("aria-label","Annuler la suppression du résultat du "+dateLisible);
+   const revenir=()=>{remplirActionQuiz(cellule,r,dateLisible);const b=cellule.querySelector("button");if(b)b.focus();};
+   annuler.addEventListener("click",revenir);
+   [confirmer,annuler].forEach(b=>b.addEventListener("keydown",e=>{if(e.key==="Escape"&&!confirmer.disabled){e.preventDefault();revenir();}}));
+   confirmer.addEventListener("click",async()=>{
+    confirmer.disabled=true;annuler.disabled=true;confirmer.setAttribute("aria-busy","true");
+    annoncerQuiz("Suppression en cours…","");
+    const reponse=await compte.deleteQuiz(r.id);
+    if(version!==versionSession||!compte.user) return; // session changée entre-temps : la liste a été rechargée
+    if(!reponse.ok){
+     // Rien n'est retiré : la confirmation reste ouverte pour réessayer ou annuler
+     confirmer.disabled=false;annuler.disabled=false;confirmer.removeAttribute("aria-busy");
+     annoncerQuiz(reponse.message,"err");
+     confirmer.focus();
+     return;
+    }
+    // Ligne retirée ; le focus va au résultat suivant, sinon au précédent, sinon au titre de la liste
+    const ligne=cellule.closest("tr"),corps=ligne.parentNode;
+    const voisine=ligne.nextElementSibling||ligne.previousElementSibling;
+    ligne.remove();
+    if(!corps.rows.length){
+     const zone=document.getElementById("compte-quiz");zone.textContent="";zone.appendChild(texteAucunQuiz());
+    }
+    annoncerQuiz("Résultat supprimé.","ok");
+    const cible=voisine&&voisine.querySelector("button[data-quiz-supprimer]");
+    if(cible) cible.focus(); else if(titreQuiz) titreQuiz.focus();
+   });
+   cellule.append(confirmer," ",annuler);
+   annuler.focus(); // pas sur le bouton destructeur
+  });
+  cellule.appendChild(supprimer);
+ }
  async function chargerQuiz(){
   const version=versionSession;
   const zone=document.getElementById("compte-quiz");
+  annoncerQuiz("","");
   const reponse=await compte.loadQuizzes();
   if(version!==versionSession||!compte.user)return;
   zone.textContent="";
   if(!reponse.ok){const p=document.createElement("p");p.className="acc-msg acc-err";p.textContent=reponse.message;zone.appendChild(p);return;}
-  if(!reponse.results.length){const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun résultat enregistré pour l'instant. Passe le test, puis clique sur « Enregistrer dans mon profil ».";zone.appendChild(p);return;}
+  if(!reponse.results.length){zone.appendChild(texteAucunQuiz());return;}
   const tableau=document.createElement("table");
   const entete=tableau.createTHead().insertRow();
   ["Date","Score","Palier"].forEach(t=>{const th=document.createElement("th");th.textContent=t;entete.appendChild(th);});
+  const thAction=document.createElement("th");thAction.className="sr-only";thAction.textContent="Supprimer";entete.appendChild(thAction);
   const corps=tableau.createTBody();
   reponse.results.forEach(r=>{
    const ligne=corps.insertRow();
-   ligne.insertCell().textContent=new Date(r.created_at).toLocaleDateString("fr-FR");
+   const dateLisible=new Date(r.created_at).toLocaleDateString("fr-FR");
+   ligne.insertCell().textContent=dateLisible;
    const v2=Number.isInteger(r.palier);
    ligne.insertCell().textContent=v2?"—":r.score+" / 30"; // le score v2 n'est qu'une somme interne, le palier suffit
    ligne.insertCell().textContent=(v2?PALIERS_QUIZ[r.palier]:NIVEAUX_QUIZ[r.niveau-1])||"—";
+   remplirActionQuiz(ligne.insertCell(),r,dateLisible);
   });
   const defilement=document.createElement("div");defilement.className="acc-scroll";defilement.appendChild(tableau);
   zone.appendChild(defilement);
+  // Arrivée par le lien de la politique de confidentialité (compte.html#historique-test) : la liste vient de s'afficher
+  if(location.hash==="#historique-test"&&titreQuiz&&!chargerQuiz.dejaAmene){chargerQuiz.dejaAmene=true;titreQuiz.scrollIntoView();}
  }
 
  // --- Progression du plan ---

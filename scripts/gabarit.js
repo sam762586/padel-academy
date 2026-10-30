@@ -16,8 +16,9 @@ const MENU = [
   ["index.html", "Accueil"],
   { id: "apprendre", nom: "Apprendre", liens: [["regles.html", "Règles"], ["technique.html", "Technique"], ["tactique.html", "Tactique"],
     ["tutos.html", "Tutos"], ["conseils.html", "Conseils"], ["videos.html", "Vidéos"], ["lexique.html", "Lexique"], ["materiel.html", "Matériel"]] },
-  { id: "entrainer", nom: "S'entraîner", liens: [["academie.html", "Mon académie"], ["niveau.html", "Test de niveau"], ["carte.html", "Ma carte de joueur"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
+  { id: "entrainer", nom: "S'entraîner", liens: [["academie.html", "Mon académie"], ["niveau.html", "Test de niveau"], ["entrainement.html", "Plan d'entraînement"], ["score.html", "Compteur de match"]] },
   ["simulateur-3d.html", "Tactique 3D"],
+  ["carte.html", "Ma carte"],
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["premier-tournoi.html", "Ton premier tournoi"], ["competition.html", "Jouer en compétition"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
@@ -47,7 +48,7 @@ function nav(actif, prefixe = "") {
   return `<a class="evitement" href="#contenu">Aller au contenu</a>
 <nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
-    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-256.webp" width="74" height="38" alt="" decoding="async">Apprendre <span>Padel</span></a>
+    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-256.webp" width="74" height="38" alt="" decoding="async"><span class="brand-texte">Apprendre <span>Padel</span></span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>
     <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}"><span class="cta-long">${APPEL[1]}</span><span class="cta-court" aria-hidden="true">${APPEL[2]}</span></a></li></ul>
   </div>

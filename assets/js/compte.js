@@ -342,6 +342,19 @@ const PA_MESSAGE_PSEUDO="2 à 30 caractères : lettres, chiffres, espaces, _ . 
   }catch(e){ return echec(e,"Impossible de charger ton historique."); }
  };
 
+ // Suppression d'un résultat du test (politique RLS quiz_delete : seulement ses propres lignes). Le delete renvoie les
+ // lignes effacées (.select) : zéro ligne = rien supprimé (résultat déjà effacé ailleurs ou refusé), annoncé comme un échec.
+ compte.deleteQuiz=async function(id){
+  if(!compte.user) return nonConnecte();
+  if(id===undefined||id===null||id==="") return {ok:false,message:"Résultat introuvable. Recharge la page puis réessaie."};
+  try{
+   const {data,error}=await client.from("quiz_results").delete().eq("id",id).eq("user_id",compte.user.id).select("id");
+   if(error) return echec(error,"Impossible de supprimer ce résultat. Réessaie dans un instant.");
+   if(!Array.isArray(data)||!data.length) return {ok:false,message:"Ce résultat n'a pas été supprimé : recharge la page puis réessaie."};
+   return {ok:true};
+  }catch(e){ return echec(e,"Impossible de supprimer ce résultat. Réessaie dans un instant."); }
+ };
+
  // Plan : semaines validées (indices 0 à 7 côté site, stockés tels quels dans plan_progress.semaine)
  compte.loadPlan=async function(proprietaire=compte.user&&compte.user.id){
   if(!compte.user||compte.user.id!==proprietaire) return nonConnecte();

@@ -139,7 +139,7 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
    btns.append(ajouter,effacer);bloc.appendChild(btns);zone.appendChild(bloc);return;
   }
   appareilAConfirmer=false;appareilErreur="";
-  if(!J.activee()){zone.append(el("p","acc-muted","Connecté. La sauvegarde de l'espace joueur dans le compte arrive bientôt : pour l'instant, tes données restent sur cet appareil."));return;}
+  if(!J.activee()){zone.append(el("p","acc-muted","Connecté. Ton test de niveau enregistré, Mon académie, les matchs du compteur et ton plan d'entraînement sont gardés dans ton compte. Le reste de ton espace (objectifs, résultats de tournois, matchs saisis à la main, exercices faits) reste sur cet appareil."));return;}
   if(e.texte){zone.append(el("p","acc-msg acc-err",e.texte));return;}
   zone.append(el("p","acc-muted",e.derniere?"Synchronisé avec ton compte à "+new Date(e.derniere).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+".":"Synchronisation avec ton compte…"));
  }
