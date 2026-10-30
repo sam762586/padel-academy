@@ -12,7 +12,7 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v44-accueil-vitre";
+const CACHE = "pa-v45-logo";
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
@@ -28,7 +28,8 @@ const SHELL = [
   "assets/js/quiz-niveau.js", "assets/js/carte-donnees.js", "assets/js/carte-rendu.js", "assets/js/carte.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
   "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/data/pages-tournois.js", "assets/data/stats.json",
-  "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png"
+  "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png",
+  "assets/img/logo/monogramme-sombre-256.webp" // monogramme du menu (toutes les pages)
 ];
 
 self.addEventListener("install", event => {

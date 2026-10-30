@@ -76,7 +76,9 @@ a{color:var(--sky)}
 .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:rgba(var(--bg-rgb),.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;gap:18px;min-height:64px;flex-wrap:wrap;padding-block:8px}
 .brand{font-family:var(--display);font-weight:900;font-size:1.7rem;text-transform:uppercase;letter-spacing:.03em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px;min-height:44px}
-.brand i{width:12px;height:12px;border-radius:50%;background:var(--turf);box-shadow:0 0 18px var(--turf)}
+/* Monogramme du logo (assets/img/logo, versions « sombre ») : 38 px de haut, dimensions fixées dans le HTML (aucun décalage) ;
+   décoratif (alt vide) car le nom écrit à côté est le nom accessible du lien */
+.brand-logo{display:block;flex:none;width:auto;height:38px}
 .brand span{color:var(--turf)}
 .nav #nav-menu{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-left:auto}
 .nav li a{display:block;color:var(--muted);text-decoration:none;font-weight:600;font-size:.78rem;padding:7px 8px;border-radius:999px;transition:color .15s,background .15s}
@@ -208,6 +210,8 @@ td.n{font-variant-numeric:tabular-nums;text-align:right}
 
 footer{border-top:1px solid var(--line);padding-block:40px;font-size:.88rem;color:var(--dim)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+/* Logo du pied de page (sans signature), seul sur sa ligne ; chargement différé */
+footer .pied-logo{display:block;flex:none;width:min(240px,100%);height:auto;margin:0 calc(100% - min(240px,100%)) var(--s-2) 0}
 footer b{color:#fff;font-family:var(--display);font-size:1.2rem;text-transform:uppercase;letter-spacing:.03em}
 footer a{color:var(--turf);display:inline-flex;align-items:center;vertical-align:middle;min-height:44px} /* cible tactile 44 px */
 
@@ -967,7 +971,7 @@ details.geste summary{color:var(--turf)}
   .nav-sous a{font-size:1rem;padding:11px 14px;color:var(--muted)}
   .nav-sous a.active{color:#fff}
 }
-@media (min-width:861px) and (max-width:979px){.nav .brand{font-size:1.35rem}.nav .wrap{gap:10px}.nav #nav-menu{gap:0}.nav #nav-menu>li>a,.nav-titre{padding:8px 9px}}
+@media (min-width:861px) and (max-width:979px){.nav .brand{font-size:1.35rem}.nav .brand-logo{height:30px}.nav .wrap{gap:10px}.nav #nav-menu{gap:0}.nav #nav-menu>li>a,.nav-titre{padding:8px 9px}}
 /* Bouton d'appel du menu : libellé court quand la place manque sur ordinateur (le libellé complet reste lu par les lecteurs d'écran) */
 .nav .cta-court{display:none}
 @media (min-width:861px) and (max-width:1180px){
@@ -1082,6 +1086,7 @@ html:not(.nav-js) .nav-groupe:focus-within .nav-sous{display:grid;gap:2px}
 /* Très petits écrans (≤ 360 px), y compris si la police des titres ne charge pas : logo et grands titres réduits */
 @media (max-width:360px){
   .brand{font-size:1.3rem;gap:8px}
+  .brand-logo{height:32px}
   .progression{padding:16px}
   .progression h2,.parcours h2,.outils-sec h2{font-size:2rem;overflow-wrap:break-word}
 }
@@ -1642,7 +1647,14 @@ main h1{view-transition-name:titre-page}
 
 /* ---------- Haut de page : « PADEL » géant, titre, accès, tableau de score ---------- */
 .hero.vitre-hero{padding-block:var(--s-5) var(--s-6)}
-.vitre-hero .wrap{display:grid;gap:0;grid-template-columns:minmax(0,1fr);grid-template-areas:"surtitre" "padel" "titre" "lead" "btns" "score";align-items:end}
+.vitre-hero .wrap{display:grid;gap:0;grid-template-columns:minmax(0,1fr);grid-template-areas:"marque" "surtitre" "padel" "titre" "lead" "btns" "score";align-items:end}
+/* Le logo de Samuel (version sombre sans signature : la signature intégrée à l'image ferait 5 px de haut à cette taille)
+   et la signature écrite dans la police du site, séparés par un filet vert énergie. Ce n'est pas le titre (le h1 reste dessous). */
+.vitre-marque{grid-area:marque;display:flex;align-items:center;gap:var(--s-4);margin-bottom:var(--s-4)}
+.vm-logo{display:block;flex:none;width:150px;height:auto}
+.vm-signature{padding-left:var(--s-4);border-left:2px solid var(--turf);font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:var(--fs-l);line-height:1.15;color:var(--fg)}
+.vm-signature span{display:block}
+.vm-signature span:last-child{color:var(--turf)}
 .vitre-hero .eyebrow{grid-area:surtitre}
 .vitre-hero h1{grid-area:titre;font-size:clamp(2.1rem,4.6vw,3.6rem)}
 .vitre-hero .lead{grid-area:lead;margin-top:var(--s-4);font-size:var(--fs-l);color:var(--muted);max-width:34em}
@@ -1732,7 +1744,11 @@ main h1{view-transition-name:titre-page}
 }
 @media (min-width:861px){
   .hero.vitre-hero{padding-block:var(--s-6) var(--s-7)}
-  .vitre-hero .wrap{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"surtitre surtitre" "padel padel" "titre score" "lead score" "btns btns";column-gap:var(--s-7)}
+  .vitre-hero .wrap{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"marque surtitre" "padel padel" "titre score" "lead score" "btns btns";column-gap:var(--s-7)}
+  .vitre-marque{margin-bottom:var(--s-2)}
+  .vm-logo{width:240px}
+  .vm-signature{font-size:var(--fs-xl)}
+  .vitre-hero .eyebrow{justify-self:end;margin-bottom:var(--s-2)}
   .vitre-score{grid-template-columns:repeat(2,minmax(0,1fr));margin:0;align-self:end}
   .vitre-score>div{padding:var(--s-5)}
   .vitre-score>div:nth-child(n){border-left:0;border-top:1px solid var(--line-2)}
@@ -1750,6 +1766,11 @@ main h1{view-transition-name:titre-page}
 }
 @media (max-width:480px){
   .vitre-hero .btns .btn{width:100%;justify-content:center}
+}
+@media (max-width:360px){
+  .vitre-marque{gap:var(--s-3)}
+  .vm-logo{width:124px}
+  .vm-signature{padding-left:var(--s-3);font-size:var(--fs-m)}
 }
 
 /* MOUVEMENT RÉDUIT (réglage du système) : défilement instantané, plus de transitions ni d'animations décoratives.

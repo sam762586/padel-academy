@@ -47,7 +47,7 @@ function nav(actif, prefixe = "") {
   return `<a class="evitement" href="#contenu">Aller au contenu</a>
 <nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
-    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><i></i>Apprendre <span>Padel</span></a>
+    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-256.webp" width="74" height="38" alt="" decoding="async">Apprendre <span>Padel</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>
     <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}"><span class="cta-long">${APPEL[1]}</span><span class="cta-court" aria-hidden="true">${APPEL[2]}</span></a></li></ul>
   </div>
@@ -56,6 +56,7 @@ function nav(actif, prefixe = "") {
 function footer(prefixe = "") {
   return `<footer>
   <div class="wrap">
+    <img class="pied-logo" src="${prefixe}assets/img/logo/logo-sombre-sans-signature-600.webp" width="240" height="117" alt="Apprendre Padel" loading="lazy" decoding="async">
     <div><b>${NOM_SITE}</b> · Guide d'apprentissage du padel, des tournois et du matériel, pour les joueurs amateurs. Écrit par un ${AUTEUR.presentation}.</div>
     <div>Sources utiles : <a href="https://www.fft.fr/nos-sports/padel" target="_blank" rel="noopener">FFT Padel<span class="sr-only"> (nouvel onglet)</span></a> · <a href="https://www.padelfip.com" target="_blank" rel="noopener">FIP (règles officielles)<span class="sr-only"> (nouvel onglet)</span></a></div>
     <div><a href="${prefixe}confidentialite.html">Confidentialité</a> · <a href="${prefixe}mentions-legales.html">Mentions légales</a></div>
