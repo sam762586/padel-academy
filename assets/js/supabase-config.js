@@ -16,6 +16,6 @@ window.PA_SUPABASE = { url: "https://bvhfizdfgccrkhdfqzkf.supabase.co", anonKey:
 //   "progression" : migrations 2026-10-27-progression-01 et 02, avec "espace" (objectifs de jeu synchronisés)
 //   "diagnostic"  : migrations 2026-10-27-diagnostic-01 et 02, avec "journal" (bilans après match dans le compte)
 //   "academie"    : migrations 2026-10-27-academie-01 à 03, après "espace" (niveau déclaré et quiz de Mon académie)
-window.PA_SUPABASE.activees = ["academie"]; // academie : SQL appliqué le 29/10/2026
+window.PA_SUPABASE.activees = ["academie", "communaute"]; // academie : SQL appliqué le 29/10/2026 ; communaute : t4-01…12 et s2-01…42 appliqués et tournois_ref remplie le 30/10/2026
 // Bouton « Continuer avec Google » (connexion.html) : fournisseur Google configuré dans Supabase le 27/10/2026.
 window.PA_SUPABASE.google = true;

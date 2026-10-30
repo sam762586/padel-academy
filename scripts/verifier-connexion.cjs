@@ -507,15 +507,50 @@ const serveur=http.createServer((req,res)=>{
   await page.waitForFunction(()=>document.getElementById('cx-msg').textContent.trim());
   assert.match(await page.textContent('#cx-msg'),/expiré ou a déjà servi/);
   ok('?code= et erreurs arrivés sur l\'accueil : transmis à connexion.html (code échangé une seule fois)');
-  // Fiche tournoi (compte.js sans SDK : PA_COMPTE inactif) : le ?code= est transmis à connexion.html malgré le vérificateur
-  await page.evaluate(()=>sessionStorage.clear());
-  await poserVerif();
-  await page.goto(base+'/tournoi/'+fs.readdirSync(path.join(racine,'tournoi'))[0]+'?code=bon');
-  await page.waitForURL(/\/espace\.html$/);
-  assert.equal((await appels('echange')).length,1,'code échangé une seule fois, sur connexion.html');
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
-  await page.evaluate(()=>sessionStorage.clear());
-  ok('?code= arrivé sur une fiche tournoi (sans SDK) : transmis à connexion.html, session ouverte');
+  // Fiches tournoi : avec la communauté (ou les favoris) activée, elles chargent le SDK (SDK_SUR_FICHES de generer-pages.js)
+  // et compte.js y est actif ; sinon compte.js est chargé sans SDK (PA_COMPTE inactif). Les deux cas sont couverts.
+  const ficheTournoi='/tournoi/'+fs.readdirSync(path.join(racine,'tournoi')).filter(n=>/^\d+\.html$/.test(n))[0];
+  const htmlFiche=fs.readFileSync(path.join(racine,ficheTournoi.slice(1)),'utf8');
+  // 1. Fiche avec SDK (cas actuel si la communauté est activée) : le code est échangé sur la fiche même, une seule fois,
+  // retiré de l'adresse ; le visiteur reste sur la fiche, connecté (aucun relais vers connexion.html, aucune boucle)
+  if(/assets\/vendor\/supabase-[^"]+\.js/.test(htmlFiche)){
+   await page.evaluate(()=>sessionStorage.clear());
+   await poserVerif();
+   await page.goto(base+ficheTournoi+'?code=bon');
+   await page.waitForFunction(()=>sessionStorage.getItem('session')==='1'&&!/[?&]code=/.test(location.search));
+   await page.waitForTimeout(600);
+   assert.equal(new URL(page.url()).pathname,ficheTournoi,'reste sur la fiche : '+page.url());
+   assert.equal((await appels('echange')).length,1,'code échangé une seule fois, sur la fiche');
+   assert.equal(await page.evaluate(()=>window.PA_COMPTE&&window.PA_COMPTE.actif&&window.PA_COMPTE.erreurCode),'');
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
+   ok('?code= arrivé sur une fiche tournoi (avec SDK, compte actif) : échangé une fois sur la fiche, adresse nettoyée, session ouverte');
+   // Sans vérificateur dans ce navigateur : la fiche ne peut pas l'échanger, le code part vers connexion.html (message clair)
+   await page.evaluate(()=>{sessionStorage.clear();localStorage.removeItem('sb-bvhfizdfgccrkhdfqzkf-auth-token-code-verifier');});
+   await page.goto(base+ficheTournoi+'?code=bon');
+   await page.waitForFunction(()=>/\/connexion\.html$/.test(location.pathname)&&document.getElementById('cx-msg')&&document.getElementById('cx-msg').textContent.trim(),null,{timeout:15000});
+   assert.equal((await appels('echange')).length,0,'aucun échange sans vérificateur');
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),null);
+   // Erreur de retour (lien expiré) arrivée sur la fiche : transmise à connexion.html
+   await page.goto(base+ficheTournoi+'?error=access_denied&error_code=otp_expired&error_description=x');
+   // (connexion.js retire ensuite l'erreur de l'adresse : seule la page d'arrivée est attendue)
+   await page.waitForFunction(()=>/\/connexion\.html$/.test(location.pathname)&&document.getElementById('cx-msg')&&document.getElementById('cx-msg').textContent.trim(),null,{timeout:15000});
+   assert.match(await page.textContent('#cx-msg'),/expiré ou a déjà servi/);
+   ok('fiche tournoi avec SDK : ?code= sans vérificateur et erreurs de retour transmis à connexion.html');
+  }
+  // 2. Fiche sans SDK (communauté et favoris désactivés) : la fiche est servie sans la balise du SDK
+  {
+   const sansSdk=htmlFiche.replace(/<script src="[^"]*assets\/vendor\/supabase-[^"]+"[^>]*><\/script>\s*/,'');
+   await page.route(base+ficheTournoi+'?code=bon',r=>r.fulfill({contentType:'text/html',body:sansSdk}));
+   await page.evaluate(()=>sessionStorage.clear());
+   await poserVerif();
+   await page.goto(base+ficheTournoi+'?code=bon');
+   await page.waitForURL(/\/espace\.html$/);
+   assert.equal((await appels('echange')).length,1,'code échangé une seule fois, sur connexion.html');
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('session')),'1');
+   await page.unroute(base+ficheTournoi+'?code=bon');
+   await page.evaluate(()=>sessionStorage.clear());
+   ok('?code= arrivé sur une fiche tournoi (sans SDK, PA_COMPTE inactif) : transmis à connexion.html, session ouverte');
+  }
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
   await ctx.close();
 

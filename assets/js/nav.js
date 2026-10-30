@@ -20,7 +20,8 @@
   // exemple l'accueil, si Supabase renvoie vers l'adresse du site) : transmis à connexion.html, qui ouvre la session ou
   // affiche l'erreur. Un ?code= reste ici si la page a un compte actif (compte.js et son SDK) et que ce navigateur garde
   // un vérificateur PKCE : compte.js l'échange déjà sur cette page (le transmettre en même temps le ferait servir deux
-  // fois). Page sans SDK (fiche tournoi) : PA_COMPTE existe mais n'est pas actif, le code part vers connexion.html.
+  // fois) : c'est le cas des fiches tournoi quand les favoris ou la communauté sont activés (SDK chargé). Page sans
+  // SDK (fiche tournoi sinon) : PA_COMPTE existe mais n'est pas actif, le code part vers connexion.html.
   var verificateurPkce=function(){
     try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token-code-verifier$/.test(localStorage.key(i)||'')) return true;}}catch(e){}
     return false;
