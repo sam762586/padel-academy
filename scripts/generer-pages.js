@@ -483,7 +483,7 @@ for (const region of REGIONS.filter(r => r.deps.every(d => publies.includes(d)))
 <section class="gen-bloc"><h2>Combien de points rapporte un ${cat} ?</h2>${tableBareme(cat, null)}</section>
 <section class="gen-bloc"><h2>Par département</h2><ul class="gen-liens gen-liens-ligne">${region.deps.filter(d => depsPublies.includes(d)).map(d => `<li><a href="${pre}tournois/${d}.html">${echapper(nomDep(d))} (${d})</a></li>`).join("")}</ul>
 <h2>Autres catégories</h2><ul class="gen-liens gen-liens-ligne">${CATEGORIES_REGION.filter(c => c !== cat).map(c => `<li><a href="${c.toLowerCase()}.html">${c}</a></li>`).join("")}</ul></section>`;
-    ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd: [fil([["Accueil", ""], ["Tournois", "tournois.html"], [region.nom + " " + cat, chemin]])], noindex: !liste.length }), { indexer: liste.length > 0 });
+    ecrire(chemin, page({ chemin, titre, description, h1, corps, jsonLd: [fil([["Accueil", ""], ["Tournois", "tournois.html"], [region.nom + " " + cat, chemin]])], noindex: !liste.length, scripts: ["assets/js/liste-tournois.js"] }), { indexer: liste.length > 0 });
   }
 }
 

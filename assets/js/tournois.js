@@ -100,17 +100,22 @@ function initialiser(donnees,contenu,horsConnexion){
  const MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
  const JOURS=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
  const SEXES=[["messieurs","Messieurs"],["dames","Dames"],["mixte","Mixte"]];
- const tournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
+ // ----- Dates (ISO AAAA-MM-JJ, comparables comme du texte) -----
+ const dateLocale=iso=>{const p=iso.split("-");return new Date(+p[0],+p[1]-1,+p[2]);};
+ const versIso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+ const aujourdhui=versIso(new Date());
+ // Tous les tournois lisibles (y compris terminés) : « Mes tournois » doit retrouver les favoris passés
+ const tousLesTournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
+ // Le fichier n'est régénéré qu'une fois par semaine : les tournois terminés (date de fin, sinon de début,
+ // avant aujourd'hui sur l'appareil) sont retirés ici, avant tout calcul (liste, carte, compteurs, filtres).
+ const estTermine=t=>(t.date_fin||t.date_debut)<aujourdhui;
+ const tournois=tousLesTournois.filter(t=>!estTermine(t));
  const favoris=window.PA_FAVORIS||null; // favoris.js (étoiles, « Mes tournois », calendrier)
  const depsAvecFiches=new Set(((window.PA_PAGES_TOURNOIS||{}).departements)||[]);
  const aUneFiche=t=>!!t.id&&/^\d+$/.test(String(t.id))&&depsAvecFiches.has(t.dep);
  // Sexe : liste « sexes » (une entrée par épreuve), ou ancien champ « sexe »
  const sexesDe=t=>Array.isArray(t.sexes)?t.sexes:(t.sexe?[t.sexe]:[]);
 
- // ----- Dates (ISO AAAA-MM-JJ, comparables comme du texte) -----
- const dateLocale=iso=>{const p=iso.split("-");return new Date(+p[0],+p[1]-1,+p[2]);};
- const versIso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
- const aujourdhui=versIso(new Date());
  const anneeCourante=new Date().getFullYear();
  const ecartJours=iso=>Math.round((dateLocale(iso)-dateLocale(aujourdhui))/86400000);
  function formaterPeriode(debut,fin){
@@ -141,7 +146,7 @@ function initialiser(donnees,contenu,horsConnexion){
  let texteMaj="";
  if(dateGeneree&&!isNaN(dateGeneree)) texteMaj+=(horsConnexion?"Hors connexion : liste du ":"Mis à jour le ")+dateGeneree.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+". ";
  else if(horsConnexion) texteMaj+="Hors connexion : liste enregistrée. ";
- if(donnees.periode&&donnees.periode.du&&donnees.periode.au&&/^\d{4}-/.test(donnees.periode.du)&&/^\d{4}-/.test(donnees.periode.au)) texteMaj+="Tournois du "+formaterJour(donnees.periode.du)+" au "+formaterJour(donnees.periode.au)+". ";
+ if(donnees.periode&&donnees.periode.du&&donnees.periode.au&&/^\d{4}-/.test(donnees.periode.du)&&/^\d{4}-/.test(donnees.periode.au)) texteMaj+="Tournois du "+formaterJour(donnees.periode.du<aujourdhui?aujourdhui:donnees.periode.du)+" au "+formaterJour(donnees.periode.au)+". ";
  maj.textContent=texteMaj;
  if(donnees.source) document.getElementById("tournois-source").textContent=donnees.source;
 
@@ -338,8 +343,8 @@ function initialiser(donnees,contenu,horsConnexion){
   if(!favoris||!blocMes) return;
   const ids=favoris.liste();
   const connus=ids.map(id=>parId.get(id)).filter(Boolean);
-  const aVenir=connus.filter(t=>(t.date_fin||t.date_debut)>=aujourdhui).sort((a,b)=>a.date_debut<b.date_debut?-1:1);
-  const passes=connus.filter(t=>(t.date_fin||t.date_debut)<aujourdhui).sort((a,b)=>a.date_debut<b.date_debut?1:-1);
+  const aVenir=connus.filter(t=>!estTermine(t)).sort((a,b)=>a.date_debut<b.date_debut?-1:1);
+  const passes=connus.filter(estTermine).sort((a,b)=>a.date_debut<b.date_debut?1:-1);
   blocMes.hidden=!ids.length;
   listeMes.textContent="";
   const cartes=[...aVenir,...passes].map(t=>{const c=creerCarte(t);if(passes.includes(t))c.classList.add("tpasse");listeMes.appendChild(c);return c;});
@@ -405,7 +410,7 @@ function initialiser(donnees,contenu,horsConnexion){
    });
   });
  }
- const parId=new Map(tournois.map(t=>[String(t.id||""),t]));
+ const parId=new Map(tousLesTournois.map(t=>[String(t.id||""),t])); // favoris passés compris
 
  // ----- Filtrage, tri, rendu paginé -----
  let resultats=[], affiches=0;

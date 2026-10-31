@@ -1,7 +1,8 @@
 /* Vérification du chargement des tournois (tournois.html, assets/js/tournois.js) et du bloc de l'accueil
    (assets/js/accueil-tournois.js), avec des données de test isolées (interceptées, les vraies ne sont pas touchées) :
    chargement visible, liste valide, liste vide (vraie absence), erreur HTTP, JSON invalide, connexion coupée, délai,
-   « Réessayer », repli sur la copie .js, filtres catégorie et département, mobile, rechargement, accueil.
+   « Réessayer », repli sur la copie .js, filtres catégorie et département, mobile, rechargement, accueil,
+   tournois terminés depuis la collecte hebdomadaire retirés (liste, carte, pages département), favoris passés gardés.
    Lancer depuis la racine du site : node scripts/verifier-tournois.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -148,6 +149,61 @@ const serveur=http.createServer((req,res)=>{
    await c2.close();
   }
   ok('accueil : erreur avec « Réessayer », vraie absence sans message d\'erreur');
+  // 10. Tournois terminés depuis la dernière collecte (fichier hebdomadaire) : retirés chaque jour côté navigateur
+  const PASSES={...DONNEES,periode:{du:jour(-6),au:jour(90)},tournois:[
+   t(910001,'76','P100','HIER',-1),                          // terminé hier : retiré
+   t(910002,'76','P100','AUJOURDHUI',0),                     // se joue aujourd'hui : reste
+   {...t(910003,'76','P250','EN COURS',-3),date_fin:jour(1)}, // commencé avant-hier, finit demain : reste
+   {...t(910004,'27','P25','SANS FIN',-2),date_fin:null},     // sans date de fin, commencé avant-hier : retiré
+   t(910005,'76','P25','DEMAIN',1)]};
+  ({ctx,page}=await ouvrir({reponse:r=>r.fulfill({contentType:'application/json',body:JSON.stringify(PASSES)})}));
+  await page.evaluate(()=>{localStorage.setItem('pa-tournois-favoris',JSON.stringify(['910001','910002']));localStorage.removeItem('pa-tournois-filtres');});
+  await page.reload();
+  await page.waitForSelector('#tournois-contenu:not([hidden])');
+  const villes=await page.$$eval('#tournois-liste article',a=>a.map(x=>x.textContent));
+  assert.equal(villes.length,3,villes.join(' | '));
+  assert.ok(!villes.some(v=>/HIER|SANS FIN/i.test(v)),'un tournoi terminé est encore affiché');
+  assert.ok(villes.some(v=>/AUJOURDHUI/i.test(v))&&villes.some(v=>/EN COURS/i.test(v))&&villes.some(v=>/DEMAIN/i.test(v)));
+  assert.equal(await page.textContent('#tournois-compteur'),'3 tournois');
+  ok('tournoi d\'hier (et sans date de fin, commencé avant-hier) retiré ; tournoi d\'aujourd\'hui et en cours gardés ; compteur à 3');
+  // Le texte de période commence aujourd'hui, pas à la date de la collecte
+  const auj=new Date(),MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  assert.match(await page.textContent('#tournois-maj'),new RegExp('Tournois du '+auj.getDate()+' '+MOIS[auj.getMonth()].replace('.','\\.')+' au'));
+  ok('période annoncée à partir d\'aujourd\'hui');
+  // Département 27 : son seul tournoi est terminé, la carte ne le compte plus
+  await page.click('label:has(input[name=zone-mode][value=dep])');
+  await page.selectOption('#zone-dep','27');
+  await page.waitForFunction(()=>!document.getElementById('tournois-aucun').hidden);
+  assert.equal(await page.locator('#tournois-liste article').count(),0);
+  ok('filtre département : un département dont les tournois sont terminés n\'en montre plus');
+  // « Mes tournois » : le favori passé reste visible, grisé, pour pouvoir le retirer
+  await page.waitForSelector('#tournois-mes:not([hidden])');
+  const mes=await page.$$eval('#tournois-mes-liste article',a=>a.map(x=>({texte:x.textContent,passe:x.classList.contains('tpasse')})));
+  assert.equal(mes.length,2,JSON.stringify(mes));
+  assert.ok(mes.find(m=>/HIER/i.test(m.texte)).passe,'favori passé non grisé');
+  assert.ok(!mes.find(m=>/AUJOURDHUI/i.test(m.texte)).passe,'favori du jour grisé à tort');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('pa-tournois-favoris')),'["910001","910002"]');
+  await ctx.close();
+  ok('« Mes tournois » : favori d\'hier toujours affiché (grisé, classe tpasse), favoris conservés');
+  // 11. Pages département générées (liste-tournois.js) : un tournoi terminé depuis la génération est retiré
+  ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true});
+  page=await ctx.newPage(); // page vide : seul liste-tournois.js est chargé
+  page.on('pageerror',e=>erreurs.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
+  await page.setContent(`<!doctype html><html lang="fr"><body><form id="gl-filtres"></form><p id="gl-compteur"></p>
+<ul id="gl-liste"><li class="gen-item" data-cat="P100" data-sexes="messieurs" data-debut="${jour(-1)}" data-fin="${jour(-1)}">HIER</li>
+<li class="gen-item" data-cat="P100" data-sexes="messieurs" data-debut="${jour(0)}" data-fin="${jour(0)}">AUJOURDHUI</li>
+<li class="gen-item" data-cat="P25" data-sexes="dames" data-debut="${jour(-2)}" data-fin="${jour(2)}">EN COURS</li></ul>
+<p id="gl-aucun" hidden>Aucun</p></body></html>`);
+  await page.addScriptTag({path:path.join(racine,'assets/js/liste-tournois.js')});
+  assert.deepEqual(await page.$$eval('#gl-liste .gen-item',l=>l.map(x=>x.textContent)),['AUJOURDHUI','EN COURS']);
+  assert.equal(await page.textContent('#gl-compteur'),'2 tournois à venir');
+  // Page région × catégorie : liste seule, sans filtres ni compteur (le script tolère leur absence)
+  await page.setContent(`<!doctype html><html lang="fr"><body><ul id="gl-liste"><li class="gen-item" data-debut="${jour(-1)}" data-fin="${jour(-1)}">HIER</li><li class="gen-item" data-debut="${jour(0)}" data-fin="${jour(0)}">AUJOURDHUI</li></ul></body></html>`);
+  await page.addScriptTag({path:path.join(racine,'assets/js/liste-tournois.js')});
+  assert.deepEqual(await page.$$eval('#gl-liste .gen-item',l=>l.map(x=>x.textContent)),['AUJOURDHUI']);
+  await ctx.close();
+  ok('pages département et région : tournoi d\'hier retiré, tournoi d\'aujourd\'hui gardé, compteur « 2 tournois à venir »');
   assert.deepEqual(erreurs,[]);
   ok('aucune erreur JavaScript non gérée');
   console.log('TOTAL '+nb+' contrôles réussis.');
