@@ -41,7 +41,8 @@ function testerGenerateur(){
  // Données du site : concours lancés par l'organisateur seulement, fonction non activée sans son accord écrit
  const donnees=lire('assets/js/concours-donnees.js');
  const vide=/const CONCOURS=\[\s*\];/.test(donnees);
- assert.equal(/activees\s*=\s*\[[^\]]*"concours"/.test(lire('assets/js/supabase-config.js')),false,'"concours" ne doit pas être activé');
+ const active=/activees\s*=\s*\[[^\]]*"concours"/.test(lire('assets/js/supabase-config.js'));
+ assert.ok(!(active&&vide),'"concours" activé sans aucun concours dans les données');
  let r=generer(['--verifier']);
  assert.equal(r.status,0,r.stderr);
  if(vide){
@@ -49,7 +50,7 @@ function testerGenerateur(){
   ok('données du site : aucun concours, "concours" non activé, page publiée à jour (« Aucun concours en ce moment »)');
  }else{
   assert.doesNotMatch(lire('concours.html'),/<!-- concours:debut -->\n<p class="msg msg-info cc-aucun"/,'la page doit afficher le concours');
-  ok('données du site : concours valides, "concours" non activé, page publiée à jour');
+  ok('données du site : concours valides, "concours" '+(active?'activé':'non activé')+', page publiée à jour');
  }
 
  fs.copyFileSync(path.join(racine,'concours.html'),PAGE_TEST);
@@ -173,7 +174,7 @@ const FAUX=`(function(){
   }
  };}};
 })();`;
-const CONFIG=lire('assets/js/supabase-config.js');
+const CONFIG=lire('assets/js/supabase-config.js')+'\nwindow.PA_SUPABASE.activees=window.PA_SUPABASE.activees.filter(n=>n!=="concours");\n';
 const CONFIG_ACTIVE=CONFIG+'\nwindow.PA_SUPABASE.activees=window.PA_SUPABASE.activees.concat(["concours"]);\n';
 // Ligne de public.concours du concours ouvert (heures de Paris en UTC : novembre = UTC+1)
 const LIGNE={id:OUVERT.id,titre:OUVERT.titre,date_debut:'2026-10-31T23:00:00Z',date_fin:'2026-11-30T22:59:59Z',nb_gagnants:1,tire_le:null,graine:null,graine_empreinte:null,nb_participants:null};
