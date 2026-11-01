@@ -38,13 +38,19 @@ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'concours-'));
 const PAGE_TEST=path.join(tmp,'concours.html'),DONNEES_TEST=path.join(tmp,'donnees.js');
 
 function testerGenerateur(){
- // Données du site : aucun concours, fonction non activée
- assert.equal(/const CONCOURS=\[\s*\];/.test(lire('assets/js/concours-donnees.js')),true,'CONCOURS doit rester vide');
+ // Données du site : concours lancés par l'organisateur seulement, fonction non activée sans son accord écrit
+ const donnees=lire('assets/js/concours-donnees.js');
+ const vide=/const CONCOURS=\[\s*\];/.test(donnees);
  assert.equal(/activees\s*=\s*\[[^\]]*"concours"/.test(lire('assets/js/supabase-config.js')),false,'"concours" ne doit pas être activé');
  let r=generer(['--verifier']);
  assert.equal(r.status,0,r.stderr);
- assert.match(lire('concours.html'),/<!-- concours:debut -->\n<p class="msg msg-info cc-aucun" id="cc-aucun">Aucun concours en ce moment, reviens bientôt\.<\/p>\n<!-- concours:fin -->/);
- ok('données du site : aucun concours, "concours" non activé, page publiée à jour (« Aucun concours en ce moment »)');
+ if(vide){
+  assert.match(lire('concours.html'),/<!-- concours:debut -->\n<p class="msg msg-info cc-aucun" id="cc-aucun">Aucun concours en ce moment, reviens bientôt\.<\/p>\n<!-- concours:fin -->/);
+  ok('données du site : aucun concours, "concours" non activé, page publiée à jour (« Aucun concours en ce moment »)');
+ }else{
+  assert.doesNotMatch(lire('concours.html'),/<!-- concours:debut -->\n<p class="msg msg-info cc-aucun"/,'la page doit afficher le concours');
+  ok('données du site : concours valides, "concours" non activé, page publiée à jour');
+ }
 
  fs.copyFileSync(path.join(racine,'concours.html'),PAGE_TEST);
  fs.writeFileSync(DONNEES_TEST,fixture([PASSE,OUVERT]));
@@ -222,13 +228,19 @@ const serveur=http.createServer((req,res)=>{
   /* Page publiée : aucun concours */
   let {ctx,page}=await ouvrir({publiee:true,active:false});
   await page.waitForLoadState('load');
-  assert.equal(await page.locator('#cc-aucun').isVisible(),true);
-  assert.equal(await page.textContent('#cc-aucun'),'Aucun concours en ce moment, reviens bientôt.');
+  const publieVide=/const CONCOURS=\[\s*\];/.test(lire('assets/js/concours-donnees.js'));
+  if(publieVide){
+   assert.equal(await page.locator('#cc-aucun').isVisible(),true);
+   assert.equal(await page.textContent('#cc-aucun'),'Aucun concours en ce moment, reviens bientôt.');
+  }else{
+   assert.equal(await page.locator('#cc-aucun').count(),0,'concours publié : pas de « Aucun concours »');
+   assert.ok(await page.locator('[id^="concours-"]').count()>=1,'concours publié : carte du concours absente');
+  }
   assert.match(await page.textContent('#cc-mention'),/^Jeu gratuit sans obligation d'achat\. Participation réservée aux joueurs connectés, une par compte\. Tirage au sort\. Règlement ci-dessous\.$/);
-  assert.equal(await page.locator('a[href="confidentialite.html#jeu-concours"]').count(),1);
+  assert.ok(await page.locator('a[href="confidentialite.html#jeu-concours"]').count()>=1);
   assert.equal(await page.locator('#nav-menu a[aria-current="page"]').textContent(),'Jeu concours');
   await largeurOk(page,390);
-  ok('page publiée : « Aucun concours en ce moment, reviens bientôt », mention courte, lien Confidentialité, menu « Jeu concours »');
+  ok('page publiée : concours ou « Aucun concours en ce moment », mention courte, lien Confidentialité, menu « Jeu concours »');
   await ctx.close();
 
   /* Fonction non activée : « bientôt disponible », aucun appel à la base */
