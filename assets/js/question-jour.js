@@ -5,6 +5,9 @@
    - Une seule réponse par jour ; série de jours d'affilée et record, gardés sur l'appareil (pa-question-jour) :
      {v:1, dernier:"AAAA-MM-JJ", serie, meilleure, reponses:{"AAAA-MM-JJ":{ok, c:choix, q:id}}} (60 derniers jours).
      Répondre aujourd'hui (juste ou faux) prolonge la série si hier a été répondu, sinon elle repart à 1.
+   - Partage (assets/js/partage.js, chargé avant ce script) : après la réponse, bouton « Partager ma série » sous la ligne
+     de série, à la manière de Wordle : résultat du jour (carré vert ou rouge), numéro du jour et série, jamais la question
+     ni la réponse. Texte construit par textePartage(etat, jour), exposé pour les tests.
    - Un bloc = un élément [data-question-jour] contenant .qj-zone ; le script ne fait rien s'il n'y en a pas. */
 (function(){
  const QJ_CLE="pa-question-jour";
@@ -12,6 +15,7 @@
  const QJ_DEPART=Date.UTC(2026,0,1);
  const QJ_JOURS_GARDES=60;
  const JOUR_MS=86400000;
+ const QJ_URL_PARTAGE="https://apprendre-padel.fr/#question-du-jour"; // ancre du bloc sur l'accueil
 
  /* ---------- Dates (heure de Paris) ---------- */
  // Date du jour à Paris, "AAAA-MM-JJ" (repli : date locale de l'appareil si le fuseau n'est pas connu)
@@ -50,6 +54,7 @@
  function serieDuJour(etat,jour){
   return etat.dernier===jour||etat.dernier===jourPrecedent(jour)?etat.serie:0;
  }
+ const jours=n=>n+(n>1?" jours":" jour");
  // Nouvel état après une réponse ; null si ce jour a déjà sa réponse
  function enregistrer(etat,jour,reponse){
   if(etat.reponses[jour])return null;
@@ -60,11 +65,21 @@
   return {v:1,dernier:jour,serie,meilleure:Math.max(etat.meilleure||0,serie),reponses:gardees};
  }
 
+ // Texte partagé après la réponse du jour (vide si le jour n'a pas sa réponse) : carré vert si juste, rouge sinon,
+ // numéro du jour (n°1 le 1er janvier 2026) et série ; jamais la question ni la réponse. L'adresse est ajoutée par
+ // partage.js. Les emoji sont réservés au message partagé, jamais à l'interface du site.
+ function textePartage(etat,jour){
+  const r=etat&&etat.reponses&&etat.reponses[jour];
+  if(!r)return "";
+  return "Question padel du jour n° "+(numeroJour(jour)+1)+" : "+(r.ok?"\u{1F7E9}":"\u{1F7E5}")
+   +" · série de "+jours(serieDuJour(etat,jour))+" \u{1F3BE} Joue la tienne, gratuit :";
+ }
+
  /* ---------- Stockage de l'appareil ---------- */
  function lireEtat(){try{return normaliser(JSON.parse(localStorage.getItem(QJ_CLE)||"null"));}catch(e){return etatVide();}}
  function ecrireEtat(etat){try{localStorage.setItem(QJ_CLE,JSON.stringify(etat));return true;}catch(e){return false;}}
 
- window.PA_QUESTION_JOUR={jourParis,numeroJour,jourPrecedent,indexDuJour,serieDuJour,enregistrer,normaliser,CLE:QJ_CLE};
+ window.PA_QUESTION_JOUR={jourParis,numeroJour,jourPrecedent,indexDuJour,serieDuJour,enregistrer,normaliser,textePartage,URL_PARTAGE:QJ_URL_PARTAGE,CLE:QJ_CLE};
 
  const blocs=[...document.querySelectorAll("[data-question-jour]")];
  if(!blocs.length)return;
@@ -83,12 +98,11 @@
 
  /* ---------- Affichage ---------- */
  const el=(balise,classe,texte)=>{const n=document.createElement(balise);if(classe)n.className=classe;if(texte!=null)n.textContent=texte;return n;};
- const jours=n=>n+(n>1?" jours":" jour");
  let compteur=0;
 
  function texteSerie(etat,jour){
   const s=serieDuJour(etat,jour);
-  let t="Série : "+jours(s)+" · Record : "+jours(etat.meilleure);
+  let t="Série : "+jours(s)+" · Record : "+jours(etat.meilleure);
   if(!etat.reponses[jour]&&s>0)t+=". Réponds aujourd'hui pour la prolonger.";
   return t;
  }
@@ -118,9 +132,12 @@
   zone.appendChild(resultat);
   const serie=el("p","qj-serie",texteSerie(etat,jour));
   zone.appendChild(serie);
+  const partage=el("div","qj-partage"); // vide avant la réponse
+  zone.appendChild(partage);
 
-  // Corrigé : bonne réponse marquée, choix du joueur, explication, lien vers la page du site
-  function corriger(choix,ok){
+  // Corrigé : bonne réponse marquée, choix du joueur, explication, lien vers la page du site,
+  // puis bouton de partage de la série (etatCourant : état après la réponse, celle-ci comprise)
+  function corriger(choix,ok,etatCourant){
    boutons.forEach((bt,i)=>{
     bt.disabled=true;
     if(i===q.bonne)bt.classList.add("bonne");
@@ -129,20 +146,28 @@
    });
    resultat.textContent="";
    const verdict=el("p","msg "+(ok?"msg-ok":"msg-erreur"));
-   verdict.appendChild(el("b",null,ok?"Bonne réponse !":"Pas cette fois."));
-   if(!ok)verdict.appendChild(document.createTextNode(" La bonne réponse : "+q.choix[q.bonne]+"."));
+   verdict.appendChild(el("b",null,ok?"Bonne réponse !":"Pas cette fois."));
+   if(!ok)verdict.appendChild(document.createTextNode(" La bonne réponse : "+q.choix[q.bonne]+"."));
    resultat.appendChild(verdict);
    resultat.appendChild(el("p","qj-explication",q.explication));
    const lien=b.liens[q.lien];
    if(lien){const a=el("a","qj-lien","En savoir plus");a.href=lien;resultat.appendChild(a);}
    resultat.appendChild(el("p","qj-demain","Reviens demain pour la suivante."));
+   // Partage (assets/js/partage.js) : résultat du jour et série, sans la question ni la réponse ;
+   // rien n'est envoyé tant que le joueur ne clique pas
+   partage.textContent="";
+   const texte=textePartage(etatCourant,jour);
+   if(texte&&window.PA_PARTAGE&&typeof window.PA_PARTAGE.bouton==="function"){
+    partage.appendChild(window.PA_PARTAGE.bouton({titre:"Question du jour · Apprendre Padel",texte,url:QJ_URL_PARTAGE,
+     libelle:"Partager ma série",classe:"btn ghost petit"}));
+   }
   }
 
   const deja=etat.reponses[jour];
   if(deja){
    // Déjà répondu aujourd'hui : le corrigé, sans nouvelle réponse possible
    const memeQuestion=deja.q===q.id&&Number.isInteger(deja.c);
-   corriger(memeQuestion?deja.c:-1,!!deja.ok);
+   corriger(memeQuestion?deja.c:-1,!!deja.ok,etat);
    return;
   }
 
@@ -152,8 +177,9 @@
    const ok=i===q.bonne;
    const nouvel=enregistrer(lireEtat(),jour,{ok,c:i,q:q.id});
    if(nouvel)ecrireEtat(nouvel);
-   corriger(i,ok);
-   serie.textContent=texteSerie(nouvel||lireEtat(),jour);
+   const courant=nouvel||lireEtat();
+   corriger(i,ok,courant);
+   serie.textContent=texteSerie(courant,jour);
    // Les autres blocs de la page (s'il y en a) suivent
    blocs.filter(x=>x!==bloc&&x.dataset.qjCharge==="1").forEach(x=>afficher(x,b));
    resultat.focus();

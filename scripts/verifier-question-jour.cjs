@@ -3,11 +3,13 @@
    1) sous Node : banque à jour, sans question inventée (toutes viennent des questions validées de Mon académie, texte
       identique), légère, liens existants, thèmes qui alternent ; jour de Paris (heure d'été, d'hiver, minuit), même
       question toute la journée et nouvelle le lendemain ; série (+1 le lendemain, remise à 1 après un jour sauté, record
-      gardé, une seule réponse par jour, 60 jours gardés, données abîmées ignorées) ;
+      gardé, une seule réponse par jour, 60 jours gardés, données abîmées ignorées) ; texte partagé (carré vert ou rouge,
+      numéro du jour, série, jamais la question ni la réponse, vide avant la réponse) ;
    2) dans Edge (horloge simulée, 390 et 320 px) : chargement seulement à l'approche du bloc, place réservée (rien ne
       bouge), même question pour deux heures du même jour, autre question le lendemain, réponse juste puis fausse,
       corrigé (explication, « En savoir plus », « Reviens demain »), une seule réponse par jour (même après
-      rechargement), série et record, jour sauté, clavier et focus, cibles de 44 px, Mon espace, banque indisponible
+      rechargement), série et record, jour sauté, bouton « Partager ma série » (absent avant la réponse, présent après et au
+      rechargement, WhatsApp/Facebook/X, partage natif, Mon espace), clavier et focus, cibles de 44 px, banque indisponible
       (message court, aucune erreur), pas de débordement, console sans erreur.
    Lancer depuis la racine du site : node scripts/verifier-question-jour.cjs */
 const assert=require('node:assert/strict');
@@ -83,6 +85,24 @@ function horsNavigateur(){
  }
  assert.equal(Q.normaliser({v:1,serie:5,meilleure:2,dernier:'2026-10-30',reponses:{}}).meilleure,5,'record jamais sous la série');
  ok('jour de Paris (été, hiver, minuit), même question toute la journée, nouvelle le lendemain, série (+1, remise à 1, record), une réponse par jour, 60 jours, données abîmées');
+ // Texte partagé (à la manière de Wordle) : carré vert ou rouge, numéro du jour, série, invitation ; jamais la question ni la réponse
+ assert.equal(Q.URL_PARTAGE,'https://apprendre-padel.fr/#question-du-jour');
+ assert.equal(Q.textePartage(Q.normaliser(null),'2026-11-01'),'','pas de texte avant la réponse');
+ let p=Q.enregistrer(Q.normaliser(null),'2026-10-26',{ok:true,c:0,q:'a'});
+ for(const j of ['2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-10-31'])p=Q.enregistrer(p,j,{ok:true,c:0,q:'a'});
+ p=Q.enregistrer(p,'2026-11-01',{ok:true,c:2,q:QUESTIONS[0].id});
+ assert.equal(Q.textePartage(p,'2026-11-01'),'Question padel du jour n° 305 : \u{1F7E9} · série de 7 jours \u{1F3BE} Joue la tienne, gratuit :');
+ const faux=Q.enregistrer(Q.normaliser(null),'2026-01-01',{ok:false,c:1,q:QUESTIONS[0].id});
+ assert.equal(Q.textePartage(faux,'2026-01-01'),'Question padel du jour n° 1 : \u{1F7E5} · série de 1 jour \u{1F3BE} Joue la tienne, gratuit :');
+ assert.equal(Q.textePartage(p,'2026-11-02'),'','le lendemain, avant de répondre : pas de texte');
+ for(const t of [Q.textePartage(p,'2026-11-01'),Q.textePartage(faux,'2026-01-01')]){
+  for(const q of QUESTIONS){
+   assert.ok(!t.includes(q.question.slice(0,25)),'texte de la question partagé');
+   q.choix.forEach(c=>assert.ok(c.length<8||!t.includes(c),'réponse partagée : '+c));
+  }
+  assert.ok(!/\bp\d{2,4}\b|niveau/i.test(t),'ni niveau ni catégorie dans le texte');
+ }
+ ok('textePartage : carré vert ou rouge, numéro du jour (n°1 le 1er janvier 2026), série au pluriel, invitation ; vide avant la réponse ; ni question ni réponse');
 }
 
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.webmanifest':'application/manifest+json'};
@@ -134,7 +154,8 @@ async function dansLeNavigateur(base){
    assert.equal(await page.locator('.qj-choix .qt-reponse').count(),q1.choix.length);
    assert.equal(await page.textContent('.qj-meta'),BANQUE.themes[q1.theme]+' · '+(q1.niveauMin===q1.niveauMax?'niveau '+q1.niveauMin:'niveaux '+q1.niveauMin+' à '+q1.niveauMax));
    assert.equal(await page.locator('fieldset.qj-choix > legend').count(),1,'groupe nommé (fieldset et legend)');
-   assert.equal(await page.textContent('.qj-serie'),'Série : 0 jour · Record : 0 jour');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 0 jour · Record : 0 jour');
+   assert.equal(await page.locator('.qj-partage .pa-partage').count(),0,'pas de bouton de partage avant la réponse');
    for(const h of await page.locator('.qj-choix .qt-reponse').evaluateAll(l=>l.map(b=>b.getBoundingClientRect().height)))assert.ok(h>=44,'cible de '+h+' px');
    await sansDebordement(page,largeur);
    // Même jour, 23 h 30 à Paris : même question
@@ -143,7 +164,7 @@ async function dansLeNavigateur(base){
    assert.equal(await page.textContent('.qj-question'),q1.question,'même question toute la journée');
    // Bonne réponse
    await page.locator('.qj-choix .qt-reponse').nth(q1.bonne).click();
-   assert.equal(await page.textContent('.qj-resultat .msg b'),'Bonne réponse !');
+   assert.equal(await page.textContent('.qj-resultat .msg b'),'Bonne réponse !');
    assert.equal(await page.textContent('.qj-explication'),q1.explication);
    assert.equal(await page.getAttribute('.qj-lien','href'),BANQUE.liens[q1.lien]);
    assert.equal(await page.textContent('.qj-lien'),'En savoir plus');
@@ -152,33 +173,69 @@ async function dansLeNavigateur(base){
    assert.equal(await page.evaluate(()=>document.activeElement.classList.contains('qj-resultat')),true,'focus sur le résultat');
    assert.equal(await page.locator('.qj-choix .qt-reponse:disabled').count(),q1.choix.length,'une seule réponse');
    assert.equal(await page.locator('.qt-reponse.bonne[aria-pressed="true"]').count(),1);
-   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour');
    let etat=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-question-jour')));
    assert.deepEqual(etat,{v:1,dernier:'2026-10-29',serie:1,meilleure:1,reponses:{'2026-10-29':{ok:true,c:q1.bonne,q:q1.id}}});
+   // Partage de la série (assets/js/partage.js) : bouton sous la ligne de série, options repliées, texte attendu + ancre de l'accueil
+   const URL_PARTAGE='https://apprendre-padel.fr/#question-du-jour';
+   const texte1='Question padel du jour n° 302 : \u{1F7E9} · série de 1 jour \u{1F3BE} Joue la tienne, gratuit :';
+   assert.equal(await page.evaluate(()=>window.PA_QUESTION_JOUR.textePartage(JSON.parse(localStorage.getItem('pa-question-jour')),'2026-10-29')),texte1);
+   const partage=page.locator('#question-du-jour .qj-partage .pa-partage');
+   assert.equal(await partage.count(),1,'bouton de partage après la réponse');
+   assert.equal(await partage.locator('> button').textContent(),'Partager ma série');
+   assert.equal(await partage.locator('> button').getAttribute('aria-expanded'),'false');
+   assert.equal(await partage.locator('.pa-partage-options').isHidden(),true);
+   assert.equal(await page.evaluate(()=>document.querySelector('#question-du-jour .qj-serie').nextElementSibling.className),'qj-partage','sous la ligne de série');
+   assert.equal(await page.evaluate(()=>/[\u{1F300}-\u{1FAFF}]/u.test(document.querySelector('#question-du-jour .qj-zone').textContent)),false,'aucun emoji dans l\'interface');
+   const hrefs=await partage.locator('.pa-partage-options a').evaluateAll(a=>a.map(x=>[x.textContent.trim().replace(/\s*\(nouvel onglet\)$/,''),x.href]));
+   assert.deepEqual(hrefs.map(h=>h[0]),['WhatsApp','Facebook','X']);
+   assert.equal(decodeURIComponent(hrefs[0][1].split('?text=')[1]),texte1+' '+URL_PARTAGE);
+   assert.ok(!decodeURIComponent(hrefs[0][1]).includes(q1.question.slice(0,25))&&!decodeURIComponent(hrefs[0][1]).includes(q1.choix[q1.bonne]),'WhatsApp : ni question ni réponse');
+   // Partage natif : titre, texte et adresse
+   const natif=await page.evaluate(async()=>{
+    const appels=[];Object.defineProperty(navigator,'share',{configurable:true,writable:true,value:async d=>{appels.push(d);}});
+    document.querySelector('#question-du-jour .qj-partage .pa-partage > button').click();
+    await new Promise(r=>setTimeout(r,20));
+    const replie=document.querySelector('#question-du-jour .pa-partage-options').hidden;
+    Object.defineProperty(navigator,'share',{configurable:true,writable:true,value:undefined}); // neutralise aussi la méthode native d'Edge
+    return {appels,replie};
+   });
+   assert.deepEqual(natif,{appels:[{title:'Question du jour · Apprendre Padel',text:texte1,url:URL_PARTAGE}],replie:true});
+   // Sans partage natif : options dépliées sans débordement, puis repliées
+   await partage.locator('> button').click();
+   assert.equal(await partage.locator('.pa-partage-options').isVisible(),true);
    await sansDebordement(page,largeur);
-   // Rechargé le même jour : corrigé affiché, pas de seconde réponse
+   await partage.locator('> button').click();
+   assert.equal(await partage.locator('.pa-partage-options').isHidden(),true);
+   await sansDebordement(page,largeur);
+   // Rechargé le même jour : corrigé affiché, pas de seconde réponse, bouton de partage toujours là
    await ouvrir(page,base+'/index.html#question-du-jour');
    assert.equal(await page.locator('.qj-choix .qt-reponse:disabled').count(),q1.choix.length);
-   assert.equal(await page.textContent('.qj-resultat .msg b'),'Bonne réponse !');
-   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour');
+   assert.equal(await page.textContent('.qj-resultat .msg b'),'Bonne réponse !');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour');
+   assert.equal(await page.locator('#question-du-jour .qj-partage .pa-partage > button').textContent(),'Partager ma série','bouton de partage au rechargement');
+   assert.equal(decodeURIComponent((await page.getAttribute('#question-du-jour .pa-partage-options a','href')).split('?text=')[1]),texte1+' '+URL_PARTAGE);
    // Lendemain, 0 h 10 à Paris : autre question, réponse fausse, la série continue
    await page.clock.setFixedTime(new Date('2026-10-30T00:10:00+01:00'));
    await ouvrir(page,base+'/index.html#question-du-jour');
    const q2=attendue('2026-10-30');
    assert.notEqual(q2.id,q1.id);
    assert.equal(await page.textContent('.qj-question'),q2.question,'nouvelle question le lendemain');
-   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour. Réponds aujourd\'hui pour la prolonger.');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 1 jour. Réponds aujourd\'hui pour la prolonger.');
    const fausse=q2.bonne===0?1:0;
    await page.locator('.qj-choix .qt-reponse').nth(fausse).click();
-   assert.equal(await page.textContent('.qj-resultat .msg'),'Pas cette fois. La bonne réponse : '+q2.choix[q2.bonne]+'.');
+   assert.equal(await page.textContent('.qj-resultat .msg'),'Pas cette fois. La bonne réponse : '+q2.choix[q2.bonne]+'.');
    assert.equal(await page.locator('.qt-reponse.fausse').count(),1);assert.equal(await page.locator('.qt-reponse.bonne').count(),1);
-   assert.equal(await page.textContent('.qj-serie'),'Série : 2 jours · Record : 2 jours');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 2 jours · Record : 2 jours');
+   // Réponse fausse : carré rouge, série de 2 jours
+   const texte2='Question padel du jour n° 303 : \u{1F7E5} · série de 2 jours \u{1F3BE} Joue la tienne, gratuit :';
+   assert.equal(decodeURIComponent((await page.getAttribute('#question-du-jour .pa-partage-options a','href')).split('?text=')[1]),texte2+' '+URL_PARTAGE);
    // Jour sauté (31 octobre) : série remise à 1 le 1er novembre, record gardé
    await page.clock.setFixedTime(new Date('2026-11-01T12:00:00+01:00'));
    await ouvrir(page,base+'/index.html#question-du-jour');
-   assert.equal(await page.textContent('.qj-serie'),'Série : 0 jour · Record : 2 jours');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 0 jour · Record : 2 jours');
    await page.locator('.qj-choix .qt-reponse').first().click();
-   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 2 jours');
+   assert.equal(await page.textContent('.qj-serie'),'Série : 1 jour · Record : 2 jours');
    etat=await page.evaluate(()=>JSON.parse(localStorage.getItem('pa-question-jour')));
    assert.deepEqual(Object.keys(etat.reponses).sort(),['2026-10-29','2026-10-30','2026-11-01']);
    assert.equal(etat.meilleure,2);
@@ -187,11 +244,16 @@ async function dansLeNavigateur(base){
    await ouvrir(page,base+'/espace.html#esp-bloc-question');
    assert.equal(await page.textContent('#esp-bloc-question .qj-question'),attendue('2026-11-01').question);
    assert.equal(await page.locator('#esp-bloc-question .qt-reponse:disabled').count(),attendue('2026-11-01').choix.length,'déjà répondu sur l\'accueil');
-   assert.equal(await page.textContent('#esp-bloc-question .qj-serie'),'Série : 1 jour · Record : 2 jours');
+   assert.equal(await page.textContent('#esp-bloc-question .qj-serie'),'Série : 1 jour · Record : 2 jours');
+   assert.equal(await page.locator('#esp-bloc-question .qj-partage .pa-partage > button').textContent(),'Partager ma série','Mon espace : bouton de partage');
+   await page.evaluate(()=>{Object.defineProperty(navigator,'share',{configurable:true,writable:true,value:undefined});});
+   await page.locator('#esp-bloc-question .qj-partage .pa-partage > button').click();
+   assert.equal(await page.locator('#esp-bloc-question .pa-partage-options').isVisible(),true);
    await sansDebordement(page,largeur);
    await ctx.close();
   }
   ok('accueil 390 et 320 px : chargement à l\'approche, place réservée, même question le même jour, nouvelle le lendemain, juste puis faux, corrigé, une réponse par jour, série, jour sauté, record, Mon espace, cibles 44 px, sans débordement');
+  ok('partage : absent avant la réponse, « Partager ma série » sous la série après la réponse et au rechargement du même jour, WhatsApp/Facebook/X + texte attendu (vert puis rouge), partage natif (titre, texte, url), options dépliées sans débordement, Mon espace');
 
   // Clavier : Tab jusqu'aux choix, flèche de tabulation entre eux, Entrée pour répondre, focus sur le résultat
   {
@@ -205,7 +267,7 @@ async function dansLeNavigateur(base){
    assert.equal(await page.evaluate(()=>document.activeElement.dataset.i),'1','Tab : deuxième choix');
    await page.keyboard.press('Enter');
    assert.equal(await page.evaluate(()=>document.activeElement.classList.contains('qj-resultat')),true);
-   assert.match(await page.textContent('.qj-resultat .msg b'),/^(Bonne réponse !|Pas cette fois\.)$/);
+   assert.match(await page.textContent('.qj-resultat .msg b'),/^(Bonne réponse !|Pas cette fois\.)$/);
    await page.keyboard.press('Tab');
    assert.equal(await page.evaluate(()=>document.activeElement.textContent),'En savoir plus','Tab suivant : le lien');
    await ctx.close();

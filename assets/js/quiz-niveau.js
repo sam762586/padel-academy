@@ -156,7 +156,9 @@ function pnEstimer(e){
   .slice(0,3).map(x=>x.theme);
  return {palier,source,moyenne,notes,themes,priorites};
 }
-window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS,THEMES:PN_THEMES,NIVEAU_EXERCICES:PN_NIVEAU_EXERCICES,palierDuRang:pnPalierDuRang,estimer:pnEstimer};
+// Texte partagé après le test (l'emoji est accepté dans un message partagé, jamais dans l'interface du site)
+function pnTextePartage(nomPalier){ return "Mon niveau au padel : "+nomPalier+" \u{1F3BE} Fais le test, gratuit :"; }
+window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS,THEMES:PN_THEMES,NIVEAU_EXERCICES:PN_NIVEAU_EXERCICES,palierDuRang:pnPalierDuRang,estimer:pnEstimer,textePartage:pnTextePartage};
 
 (function(){
  const carte=document.getElementById("qcard");
@@ -224,7 +226,14 @@ window.PA_NIVEAU={PALIERS:PN_PALIERS,REPERES:PN_REPERES,SITUATIONS:PN_SITUATIONS
   // Titre du résultat : il reçoit le focus (le bouton de la dernière réponse a disparu)
   const titre=el("h3","");titre.tabIndex=-1;
   titre.append(el("span","sr-only","Ton palier : "),el("span","vtag "+P.cls,P.nom));
-  z.append(titre,el("p","score",fiabilite),el("p","",P.txt));
+  z.append(titre,el("p","score",fiabilite));
+  // Partage du résultat (assets/js/partage.js, chargé avant ce script) : le palier et une invitation à faire le test,
+  // sans dévoiler les questions ni mentionner le niveau 1 à 10 (autre échelle). Rien n'est envoyé tant que le joueur ne clique pas.
+  if(window.PA_PARTAGE&&typeof window.PA_PARTAGE.bouton==="function"){
+   z.appendChild(window.PA_PARTAGE.bouton({titre:"Test de niveau padel · Apprendre Padel",
+    texte:pnTextePartage(P.nom),url:"https://apprendre-padel.fr/niveau.html",libelle:"Partager mon résultat",classe:"btn ghost"}));
+  }
+  z.appendChild(el("p","",P.txt));
   z.appendChild(el("p","qnote","Ce résultat estime la catégorie de tournoi qui te correspond. Ton niveau de 1 à 10 (grille FFT) se choisit à part, dans Mon académie : l'un n'est pas converti en l'autre."));
   r.notes.forEach(n=>z.appendChild(el("p","qnote",n)));
   if(r.priorites.length){

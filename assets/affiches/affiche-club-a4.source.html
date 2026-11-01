@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Affiche A4 · Apprendre Padel</title>
+<!-- Source de affiche-club-a4.pdf : ouvrir ce fichier dans Edge ou Chrome, Imprimer, A4 sans marges, « Graphiques d’arrière-plan » cochés. Le QR (qr-apprendre-padel.png) pointe vers https://apprendre-padel.fr/?utm_source=affiche&utm_medium=qr&utm_campaign=clubs. Polices : voir assets/fonts/LICENCES.md. -->
+<style>
+  @font-face{font-family:"Big Shoulders Display";src:url("../fonts/big-shoulders-display-latin.woff2") format("woff2");font-weight:100 900}
+  @font-face{font-family:Manrope;src:url("../fonts/manrope-latin.woff2") format("woff2");font-weight:200 800}
+  :root{--nuit:#101F35;--turf:#C8F14B;--blanc:#F4F7FA;--terrain:#1674A6}
+  @page{size:A4;margin:0}
+  html,body{margin:0;padding:0;background:var(--nuit);color:var(--blanc);font-family:Manrope,system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{position:relative;width:210mm;height:297mm;overflow:hidden;padding:16mm 14mm 12mm;box-sizing:border-box;display:flex;flex-direction:column}
+  .fond{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .fond .ligne{position:absolute;background:rgba(200,241,75,.14)}
+  .fond .l1{left:-20mm;top:120mm;width:260mm;height:1.2mm;transform:rotate(-12deg)}
+  .fond .l2{left:-20mm;top:124mm;width:260mm;height:.5mm;transform:rotate(-12deg)}
+  .fond .l3{left:70mm;top:170mm;width:220mm;height:1mm;transform:rotate(-12deg);background:rgba(22,116,166,.35)}
+  .fond .terrain{position:absolute;right:-30mm;top:40mm;width:120mm;height:220mm;border:1.2mm solid rgba(22,116,166,.35);border-radius:4mm;transform:perspective(600mm) rotateX(55deg) rotateZ(-14deg)}
+  .fond .terrain i{position:absolute;left:0;right:0;top:50%;height:.8mm;background:rgba(22,116,166,.35)}
+  .contenu{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
+  .sur{font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--turf);font-size:11pt}
+  h1{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;text-transform:uppercase;line-height:.9;font-size:74pt;margin:4mm 0 0;letter-spacing:.005em}
+  h1 em{font-style:normal;color:var(--turf)}
+  .sous{font-size:15.5pt;font-weight:600;margin:7mm 0 0;max-width:150mm;line-height:1.3;color:rgba(244,247,250,.92)}
+  .colonnes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;margin-top:11mm}
+  .col{border:.5mm solid rgba(244,247,250,.18);border-radius:4mm;padding:5mm 5mm 5.5mm;background:rgba(16,31,53,.55)}
+  .col b{display:block;font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:800;text-transform:uppercase;font-size:21pt;color:var(--turf);letter-spacing:.02em;margin-bottom:2mm}
+  .col p{margin:0;font-size:11.2pt;line-height:1.35;color:rgba(244,247,250,.9)}
+  .bas{margin-top:auto;display:grid;grid-template-columns:62mm 1fr;gap:9mm;align-items:center}
+  .qr{background:#fff;border-radius:5mm;padding:4mm;width:54mm;height:54mm;box-sizing:content-box}
+  .qr img{display:block;width:54mm;height:54mm}
+  .appel{display:flex;flex-direction:column;gap:4mm}
+  .appel .scan{font-size:14pt;font-weight:700;color:rgba(244,247,250,.92)}
+  .url{display:inline-block;font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;text-transform:uppercase;font-size:29pt;white-space:nowrap;color:var(--nuit);background:var(--turf);padding:3mm 6mm 2.5mm;border-radius:4mm;letter-spacing:.01em;align-self:flex-start}
+  .mini{font-size:10pt;color:rgba(244,247,250,.7);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .pied{margin-top:7mm;display:flex;justify-content:space-between;font-size:8.5pt;color:rgba(244,247,250,.55)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="fond"><div class="ligne l1"></div><div class="ligne l2"></div><div class="ligne l3"></div><div class="terrain"><i></i></div></div>
+  <div class="contenu">
+    <div class="sur">Pour les joueurs du club · débutants bienvenus</div>
+    <h1>Apprends<br>le padel<br><em>gratuitement</em></h1>
+    <p class="sous">Règles, coups expliqués en 3D, tactique, test de niveau selon la grille FFT, et les tournois près de chez toi mis à jour chaque semaine.</p>
+    <div class="colonnes">
+      <div class="col"><b>Débutant</b><p>Les règles essentielles, les coups de base et les 20 erreurs à éviter pour tes premiers matchs.</p></div>
+      <div class="col"><b>Je progresse</b><p>Le test de niveau, les fiches techniques en 3D avec mode quiz, et un plan d'entraînement de 8 semaines.</p></div>
+      <div class="col"><b>Compétiteur</b><p>Les tournois de ton département, le barème des points et le classement, un partenaire pour ton prochain tournoi.</p></div>
+    </div>
+    <div class="bas">
+      <div class="qr"><img src="qr-apprendre-padel.png" alt="QR code vers apprendre-padel.fr"></div>
+      <div class="appel">
+        <div class="scan">Scanne le code, ou tape l'adresse :</div>
+        <div class="url">apprendre-padel.fr</div>
+        <div class="mini">Gratuit · sans pub · sans inscription obligatoire</div>
+      </div>
+    </div>
+    <div class="pied"><span>Site indépendant, fait par un joueur licencié FFT. Non affilié à la FFT ni à la FIP.</span><span>Fonctionne sur téléphone</span></div>
+  </div>
+</div>
+</body>
+</html>

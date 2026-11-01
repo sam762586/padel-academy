@@ -92,6 +92,13 @@ ensuite (liens fiches 3D).
 - Le guide « Ton premier tournoi » une fois publié.
 Démarche : un message personnel aux clubs de Normandie et d'Île-de-France que tu connais, et partage dans les
 groupes de joueurs quand c'est utile à la discussion. Pas d'échange de liens ni d'annuaires.
+- **Page « Pour les clubs » (`clubs.html`, 01/11/2026)** : widget « prochains tournois » à coller sur le site d'un club
+  (`assets/js/widget-tournois.js`, lit `assets/data/prochains/<dep>.json`) ; le lien « Tous les tournois en … sur
+  apprendre-padel.fr » est posé dans la page du club, hors Shadow DOM, donc lu par les moteurs : chaque club qui
+  l'installe fait un lien naturel vers `tournois/<dep>.html`. Affiche A4 avec QR (`assets/affiches/`, QR vers
+  `/?utm_source=affiche&utm_medium=qr&utm_campaign=clubs` : les scans se lisent à part dans GoatCounter).
+- **Partage par les joueurs (01/11/2026)** : résultat du test de niveau et série de la question du jour partageables
+  en un clic (`assets/js/partage.js`) ; les liens partagés pointent vers `niveau.html` et `/#question-du-jour`.
 
 ## 3. Outils gratuits de suivi
 

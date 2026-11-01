@@ -114,6 +114,63 @@ async function repondre(page,choix){
   assert.equal(q.version,2);assert.equal(q.palier,2);assert.equal(q.niveau,2);assert.equal(q.reponses.length,10);
   assert.equal(q.score,q.reponses.reduce((s,x)=>s+x.pts,0));
   ok('parcours sans classement : P100 plafonné par l\'ancienneté, résultat v2 gardé sur l\'appareil, pas de bouton sans compte actif');
+  // Partage du résultat (assets/js/partage.js) : bouton juste après le palier, avant les conseils ; options repliées
+  const partage=page.locator('#qresult .pa-partage');
+  assert.equal(await partage.count(),1);
+  const declencheur=partage.locator('> button');
+  assert.equal(await declencheur.textContent(),'Partager mon résultat');
+  assert.equal(await declencheur.getAttribute('aria-expanded'),'false');
+  assert.equal(await partage.locator('.pa-partage-options').isHidden(),true);
+  // Placé après le palier et la fiabilité, avant le texte de conseils du palier
+  const ordre=await page.evaluate(()=>[...document.querySelectorAll('#qresult > *')].map(n=>n.className||n.tagName.toLowerCase()));
+  assert.ok(ordre.indexOf('pa-partage')>ordre.indexOf('score')&&ordre.indexOf('pa-partage')<ordre.indexOf('qnote'),'bouton de partage mal placé : '+ordre.join(','));
+  ok('résultat : bouton « Partager mon résultat » après le palier, options repliées (aria-expanded=false)');
+  // Texte partagé : le nom du palier et l'adresse du test, jamais le niveau 1 à 10 ; les liens WhatsApp et X le portent
+  const URL_TEST='https://apprendre-padel.fr/niveau.html';
+  const texte=await page.evaluate(()=>window.PA_NIVEAU.textePartage('P100'));
+  assert.match(texte,/P100/);assert.doesNotMatch(texte,/1 à 10|niveau \d\b/);
+  assert.match(texte,/Fais le test, gratuit\u00A0:$/);assert.doesNotMatch(texte,/5 minutes/);
+  const hrefs=await partage.locator('.pa-partage-options a').evaluateAll(a=>a.map(x=>[x.textContent.trim(),x.href,x.target,x.rel]));
+  assert.deepEqual(hrefs.map(h=>h[0].replace(/\s*\(nouvel onglet\)$/,'')),['WhatsApp','Facebook','X']);
+  hrefs.forEach(h=>{assert.equal(h[2],'_blank');assert.match(h[3],/noopener/);});
+  assert.equal(decodeURIComponent(hrefs[0][1].split('?text=')[1]),texte+' '+URL_TEST);
+  assert.ok(hrefs[1][1].includes(encodeURIComponent(URL_TEST)));
+  assert.ok(hrefs[2][1].includes(encodeURIComponent(texte))&&hrefs[2][1].includes(encodeURIComponent(URL_TEST)));
+  ok('texte partagé : nom du palier + adresse du test (WhatsApp, Facebook, X en nouvel onglet), sans niveau 1 à 10');
+  // Sans navigator.share : le clic déplie les options ; « Copier le texte et le lien » met texte + url dans le presse-papiers (simulé)
+  await page.evaluate(()=>{
+   Object.defineProperty(navigator,'share',{configurable:true,writable:true,value:undefined}); // neutralise la méthode du prototype
+   window.__copies=[];
+   Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async t=>{window.__copies.push(t);}}});
+  });
+  await declencheur.click();
+  assert.equal(await declencheur.getAttribute('aria-expanded'),'true');
+  assert.equal(await declencheur.getAttribute('aria-controls'),await partage.locator('.pa-partage-options').getAttribute('id'));
+  assert.equal(await partage.locator('.pa-partage-options').isVisible(),true);
+  assert.deepEqual(await partage.locator('.pa-partage-options .btn').allTextContents().then(l=>l.map(t=>t.replace(/\s*\(nouvel onglet\)$/,'').trim())),['WhatsApp','Facebook','X','Copier le texte et le lien']);
+  await partage.locator('button',{hasText:'Copier le texte et le lien'}).click();
+  await page.waitForSelector('#qresult .pa-partage-retour .msg');
+  assert.deepEqual(await page.evaluate(()=>window.__copies),[texte+' '+URL_TEST]);
+  assert.equal(await partage.locator('.pa-partage-retour').getAttribute('role'),'status');
+  assert.match(await partage.locator('.pa-partage-retour .msg').textContent(),/Texte et lien copiés/);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
+  // Second clic : options repliées
+  await declencheur.click();
+  assert.equal(await declencheur.getAttribute('aria-expanded'),'false');
+  assert.equal(await partage.locator('.pa-partage-options').isHidden(),true);
+  ok('sans navigator.share : le clic déplie WhatsApp, Facebook, X, Copier ; « Copier le texte et le lien » copie texte + url, retour role=status, replié au second clic');
+  // Avec navigator.share : appelé avec titre, texte et url, les options restent repliées
+  const natif=await page.evaluate(async()=>{
+   const appels=[];Object.defineProperty(navigator,'share',{configurable:true,writable:true,value:async d=>{appels.push(d);}});
+   document.querySelector('#qresult .pa-partage > button').click();
+   await new Promise(r=>setTimeout(r,20));
+   const replie=document.querySelector('#qresult .pa-partage-options').hidden;
+   delete navigator.share;
+   return {appels,replie};
+  });
+  assert.equal(natif.appels.length,1);assert.equal(natif.replie,true);
+  assert.equal(natif.appels[0].title,'Test de niveau padel · Apprendre Padel');assert.equal(natif.appels[0].text,texte);assert.equal(natif.appels[0].url,URL_TEST);
+  ok('avec navigator.share : partage natif (titre, texte, url), options non dépliées');
   // Options mélangées : sur plusieurs affichages, l'ordre de la première situation change
   const ordres=new Set();
   for(let k=0;k<6;k++){

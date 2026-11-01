@@ -35,7 +35,8 @@ function gabarit(){
  // Pages de scénario du simulateur 3D : rattachées à l'entrée « Tactique 3D », aucun groupe marqué
  assert.match(G.nav('simulateur-3d-vibora.html'),/href="simulateur-3d\.html" class="active">Tactique 3D/);
  assert.equal((G.nav('simulateur-3d-vibora.html').match(/nav-titre active/g)||[]).length,0);
- assert.deepEqual(hors.sort(),['404.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
+ // clubs.html (« Pour les clubs ») est liée depuis le pied de page, pas depuis le menu
+ assert.deepEqual(hors.sort(),['404.html','clubs.html','compte.html','confidentialite.html','connexion.html','hors-ligne.html','mentions-legales.html']);
  // Simulateur 3D : entrée principale « Tactique 3D », marquée comme page en cours
  assert.match(G.nav('simulateur-3d.html'),/href="simulateur-3d\.html" class="active" aria-current="page">Tactique 3D/);
  ok('gabarit : Accueil, Apprendre, S\'entraîner, Tactique 3D, Compétition, Mon espace + bouton raquette ; pages actives ; aucune page oubliée');

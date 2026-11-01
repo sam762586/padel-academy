@@ -496,12 +496,14 @@ if (!partiel) {
   const dossierProchains = path.join(RACINE, "assets/data/prochains");
   fs.mkdirSync(dossierProchains, { recursive: true });
   const attendus = new Set();
-  for (const dep of Object.keys(parDep).sort()) {
-    const prochains = parDep[dep].filter(aVenir).sort(parDate).slice(0, 12).map(t => ({
+  // Tous les départements de la liste (101), même sans tournoi (tournois: []) : le widget des clubs ne reçoit jamais de 404
+  for (const dep of [...DEPARTEMENTS.keys()].sort()) {
+    const prochains = (parDep[dep] || []).filter(aVenir).sort(parDate).slice(0, 12).map(t => ({
       id: String(t.id), nom: t.nom, categorie: t.categorie || null, ville: casse(t.ville), date_debut: t.date_debut, date_fin: t.date_fin || t.date_debut,
       ...(typeof t.lat === "number" ? { lat: t.lat, lng: t.lng } : {}), page: publies.includes(dep),
     }));
-    const f = path.join(dossierProchains, dep + ".json"), contenu = JSON.stringify({ dep, nom: nomDep(dep), tournois: prochains }) + "\n";
+    // lieu (« en Seine-Maritime », « dans le Calvados ») et page_dep : lus par le widget des clubs (assets/js/widget-tournois.js)
+    const f = path.join(dossierProchains, dep + ".json"), contenu = JSON.stringify({ dep, nom: nomDep(dep), lieu: dansDep(dep), page_dep: publies.includes(dep), tournois: prochains }) + "\n";
     attendus.add(dep + ".json");
     if (!fs.existsSync(f) || fs.readFileSync(f, "utf8") !== contenu) fs.writeFileSync(f, contenu);
   }

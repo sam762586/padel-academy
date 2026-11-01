@@ -15,7 +15,7 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v50-concours";
+const CACHE = "pa-v52-clubs";
 const DELAI_PAGE = 4000; // ms : au-delà, une page déjà en cache est servie sans attendre le réseau
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
@@ -23,15 +23,15 @@ const SHELL = [
   "./",
   "index.html", "technique.html", "tactique.html", "tutos.html", "niveau.html", "entrainement.html", "videos.html",
   "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
-  "premier-tournoi.html", "academie.html", "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "connexion.html", "score.html", "partenaires.html", "carte.html", "actus-pro.html", "concours.html", "hors-ligne.html",
+  "premier-tournoi.html", "academie.html", "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "connexion.html", "score.html", "partenaires.html", "carte.html", "actus-pro.html", "concours.html", "clubs.html", "hors-ligne.html",
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
   "assets/style.css", "assets/carte.css", "assets/fonts/manrope-latin.woff2", "assets/fonts/big-shoulders-display-latin.woff2",
   "assets/vendor/supabase-2.45.4.js", // supabase-js hébergé sur le site (jamais de CDN)
   "assets/js/bareme.js", "assets/js/carte-france.js", "assets/js/compte-page.js", "assets/js/compte.js", "assets/js/coups.js",
   "assets/js/lexique.js", "assets/js/nav.js", "assets/js/placement.js", "assets/js/quiz-tactique-donnees.js", "assets/js/quiz-tactique.js", "assets/js/tableau-tactique.js", "assets/js/diagnostic-paire.js", "assets/js/defis.js", "assets/js/academie.js", "assets/js/academie-questions.js", "assets/js/academie-quiz.js", "assets/js/academie-contenus.js", "assets/js/academie-parcours.js", "assets/js/academie-sync.js", "assets/js/carnet-outils.js", "assets/js/plan.js", "assets/js/mon-plan.js", "assets/js/pwa.js",
-  "assets/js/quiz-niveau.js", "assets/js/carte-donnees.js", "assets/js/carte-rendu.js", "assets/js/carte.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
+  "assets/js/quiz-niveau.js", "assets/js/partage.js", "assets/js/carte-donnees.js", "assets/js/carte-rendu.js", "assets/js/carte.js", "assets/js/raquettes.js", "assets/js/schemas-coups.js", "assets/js/supabase-config.js",
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
-  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/js/question-jour.js", "assets/js/concours-donnees.js", "assets/js/concours.js", "assets/data/pages-tournois.js", "assets/data/stats.json", "assets/data/questions-jour.json", "assets/data/clubs.json",
+  "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/js/question-jour.js", "assets/js/concours-donnees.js", "assets/js/concours.js", "assets/js/clubs.js", "assets/js/widget-tournois.js", "assets/data/pages-tournois.js", "assets/data/stats.json", "assets/data/questions-jour.json", "assets/data/clubs.json",
   "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png",
   "assets/img/logo/monogramme-sombre-256.webp" // monogramme du menu (toutes les pages)
 ];

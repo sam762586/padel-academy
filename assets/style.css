@@ -1881,3 +1881,53 @@ main h1{view-transition-name:titre-page}
 .cc-partage-note{margin:0;color:var(--muted);font-size:var(--fs-s)}
 .cc-retour-copie .msg{overflow-wrap:anywhere}
 .cc-partage-options[hidden]{display:none}
+
+/* PARTAGE (module commun assets/js/partage.js, PA_PARTAGE.bouton) : un bouton .btn[aria-expanded], puis les options repliées
+   (.pa-partage-options[hidden] : WhatsApp, Facebook, X, Copier le lien dans un .btns) et le retour « Lien copié » (role=status).
+   Le volet s'ouvre sous le bouton dans un encadré au liseré vert (même famille que .cc-partage-avant) et apparaît en fondu
+   (@starting-style, rien sous prefers-reduced-motion) : le contenu qui suit descend d'un seul bloc, sans à-coup.
+   À 320 px les quatre options passent à la ligne (flex-wrap) ; chaque option fait au moins 44 px de haut. */
+.pa-partage{display:grid;gap:var(--s-2);justify-items:start;min-width:0;max-width:100%}
+.pa-partage>[aria-expanded="true"]{border-color:rgba(var(--turf-rgb),.6)}
+.pa-partage-options{display:grid;gap:var(--s-2);justify-self:stretch;min-width:0;padding:var(--s-3);border:1px solid var(--line);border-left:3px solid var(--turf);border-radius:var(--r-s);background:var(--glass)}
+.pa-partage-options[hidden]{display:none}
+.pa-partage-options .btns{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0}
+.pa-partage-options .btns>*{min-height:44px;justify-content:center;color:var(--fg)}
+.pa-partage-retour{display:grid;gap:var(--s-2);min-width:0}
+.pa-partage-retour:empty{display:none}
+.pa-partage-retour .msg{margin:0;color:var(--fg);font-size:var(--fs-s);overflow-wrap:anywhere}
+@media (prefers-reduced-motion:no-preference){
+  .pa-partage-options{transition:opacity var(--t),translate var(--t)}
+  @starting-style{.pa-partage-options{opacity:0;translate:0 -4px}}
+}
+/* Emplacements : résultat du test de niveau (sous le palier, avant les conseils) et question du jour (sous la série, carte compacte) */
+.qresult .pa-partage{margin-top:var(--s-4)}
+.qj-partage{display:grid;justify-items:start;padding-top:var(--s-3);border-top:1px solid var(--line)}
+.qj-partage:empty{display:none}
+
+/* CODE (pre, code) : bloc de code lisible, police mono, fond --bg-2, bordure --line-2 ; les lignes longues passent à la ligne
+   (jamais de défilement horizontal, même à 320 px). Un <code> seul dans une phrase = pastille discrète. */
+pre,code{font-family:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",Menlo,monospace;font-size:var(--fs-s)}
+code{padding:1px 6px;border-radius:6px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);overflow-wrap:anywhere}
+pre{margin:var(--s-3) 0 0;padding:var(--s-4);max-width:100%;min-width:0;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-s);color:var(--fg);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2}
+pre code{padding:0;border:0;background:none;font-size:inherit;color:inherit}
+
+/* PAGE « POUR LES CLUBS » (clubs.html, assets/js/clubs.js) : composants communs (.grille-blocs > .bloc, .champ, .exemple, .btn, .msg).
+   .clubs-demo : aperçu du widget (Shadow DOM, assets/js/widget-tournois.js, jamais stylé d'ici) ; hauteur réservée pour le titre,
+   5 tournois et le lien de pied : la liste arrive après le chargement sans décaler le reste. Seul p.apprendre-padel-pied[slot=pied]
+   est dans la page (lien de bas de liste). */
+.clubs-widget .champ{max-width:28em}
+.clubs-demo{min-height:36rem;margin-top:var(--s-4);min-width:0} /* mesuré : 5 tournois ≈ 580 px à 390 px de large, 700 px à 320, 460 px sur ordinateur */
+@media (max-width:359px){.clubs-demo{min-height:44rem}}
+@media (min-width:700px){.clubs-demo{min-height:29rem}}
+.clubs-demo .apprendre-padel-pied{margin:0;overflow-wrap:anywhere}
+.clubs-code{margin-top:var(--s-3)}
+.clubs-actions{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-4)}
+.clubs-actions .btn{max-width:100%;justify-content:center;text-align:center}
+.clubs-retour{display:grid;gap:var(--s-2);margin-top:var(--s-3);min-width:0}
+.clubs-retour:empty{display:none}
+.clubs-retour .msg{margin:0;color:var(--fg);font-size:var(--fs-s);overflow-wrap:anywhere}
+.clubs-texte{display:grid;gap:var(--s-3);color:var(--fg);overflow-wrap:anywhere}
+.clubs-texte p{margin:0}
+#clubs .grille-blocs{margin-top:var(--s-5)}
+#clubs>.wrap>h2{font-size:clamp(1.8rem,4vw,2.6rem)}
