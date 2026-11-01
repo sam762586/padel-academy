@@ -8,7 +8,7 @@
 const NOM_SITE = "Apprendre Padel";
 const AUTEUR = {
   nom: "un joueur de padel",
-  presentation: "joueur de droite, licencié FFT, compétiteur en P50/P100 en Normandie",
+  presentation: "joueur licencié FFT, compétiteur en P50/P100 en Normandie",
 };
 // Menu : groupes (menu déroulant sur ordinateur, accordéon sur mobile) et liens directs, dans l'ordre d'affichage.
 // Un lien direct = [page, libellé] ; un groupe = { id, nom, liens: [[page, libellé], ...] }. Le bouton d'appel ferme la marche.
