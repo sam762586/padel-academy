@@ -1,0 +1,64 @@
+# Actus pro : résultats Premier Padel mis à jour chaque jour, sans PC allumé.
+# Robot scripts/scrape-pro.js -> assets/data/pro.json -> actus-pro.html, puis régénération des pages tournois
+# (fiches passées « Terminé » / noindex, assets/data/prochains/ à la date du jour).
+# Seulement le cron et le lancement à la main : jamais sur un push ni une pull request.
+# Secours sur le PC : scripts\maj-quotidienne.bat
+name: Actus pro (quotidien)
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC, soit 4 h (hiver) ou 5 h (été) à Paris
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maj-site
+  cancel-in-progress: false
+
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Robot Premier Padel
+        run: node scripts/scrape-pro.js
+
+      - name: Générer actus-pro.html
+        run: node scripts/generer-pro.js
+
+      - name: Régénérer les pages tournois
+        run: node scripts/generer-pages.js
+
+      - name: Commit et publication
+        run: |
+          set -eu
+          CHEMINS="assets/data/pro.json actus-pro.html sitemap.xml tournois.html assets/data/prochains assets/data/stats.json assets/data/clubs.json assets/data/pages-tournois.js tournoi tournois scripts/cache/pages-empreintes.json scripts/cache/tournois-archive.json"
+          git add -A -- $CHEMINS
+          if git diff --cached --quiet; then
+            echo "Aucun changement : rien à commiter."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Actus pro : mise à jour du $(date -u +%Y-%m-%d)"
+          for essai in 1 2; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              echo "Publié sur main."
+              exit 0
+            fi
+            echo "Push refusé (essai $essai)."
+          done
+          exit 1

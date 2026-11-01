@@ -1,0 +1,122 @@
+# Tournois : robot Ten'Up chaque lundi, sans PC allumé.
+# Robot scripts/scrape-tenup.js (Chromium de Playwright, sans --edge) -> vérification des JSON -> pages tournois -> commit -> push.
+# Si Ten'Up bloque (Queue-it, accès restreint), le robot sort en erreur : le job échoue sans rien commiter, GitHub prévient Samuel.
+# Essai à la main : Run workflow avec « departements » (ex. 76,27) : aucun push, résumé et artefact seulement.
+# Seulement le cron et le lancement à la main : jamais sur un push ni une pull request.
+# Secours sur le PC : scripts\maj-hebdo.bat
+name: Tournois (hebdomadaire)
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # lundi 04:00 UTC, soit 5 h (hiver) ou 6 h (été) à Paris
+  workflow_dispatch:
+    inputs:
+      departements:
+        description: "Essai sur quelques départements, séparés par des virgules (ex. 76,27). Vide = toute la France et publication."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maj-site
+  cancel-in-progress: false
+
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      DEPARTEMENTS: ${{ github.event.inputs.departements }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Vérifier la liste de départements
+        run: |
+          set -eu
+          if [ -n "$DEPARTEMENTS" ]; then
+            printf '%s' "$DEPARTEMENTS" | grep -Eq '^[0-9AB]{2,3}(,[0-9AB]{2,3})*$' || { echo "Liste de départements invalide : $DEPARTEMENTS"; exit 1; }
+          fi
+
+      - name: Installer les dépendances du robot
+        working-directory: scripts
+        run: npm ci
+
+      - name: Installer Chromium
+        working-directory: scripts
+        run: npx playwright install --with-deps chromium
+
+      - name: Robot Ten'Up
+        run: |
+          set -eu
+          if [ -n "$DEPARTEMENTS" ]; then
+            node scripts/scrape-tenup.js --departements "$DEPARTEMENTS"
+          else
+            node scripts/scrape-tenup.js
+          fi
+
+      - name: Vérifier les JSON
+        run: node scripts/verifier-json.js
+
+      - name: Générer les pages tournois
+        run: |
+          set -eu
+          if [ -n "$DEPARTEMENTS" ]; then
+            node scripts/generer-pages.js --departements "$DEPARTEMENTS"
+          else
+            node scripts/generer-pages.js
+          fi
+
+      - name: Essai, résumé des changements (aucun push)
+        if: ${{ env.DEPARTEMENTS != '' }}
+        run: |
+          {
+            echo "### Essai sur les départements $DEPARTEMENTS : rien n'est publié"
+            echo '```'
+            git status --short -- assets/data scripts/cache tournoi tournois sitemap.xml tournois.html | head -40
+            git diff --stat -- assets/data scripts/cache tournoi tournois sitemap.xml tournois.html | tail -5
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Essai, artefact
+        if: ${{ env.DEPARTEMENTS != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: essai-tournois
+          path: |
+            assets/data/tournois.json
+            assets/data/prochains
+            tournois
+          retention-days: 7
+
+      - name: Commit et publication
+        if: ${{ env.DEPARTEMENTS == '' }}
+        run: |
+          set -eu
+          CHEMINS="assets/data scripts/cache tournoi tournois sitemap.xml tournois.html"
+          git add -A -- $CHEMINS
+          if git diff --cached --quiet; then
+            echo "Aucun changement : rien à commiter."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Tournois : mise à jour hebdomadaire du $(date -u +%Y-%m-%d)"
+          for essai in 1 2; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              echo "Publié sur main."
+              exit 0
+            fi
+            echo "Push refusé (essai $essai)."
+          done
+          exit 1
