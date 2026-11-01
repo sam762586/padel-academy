@@ -1,7 +1,7 @@
 <!--
 NOTES INTERNES (ne pas publier : le générateur retire tout commentaire HTML).
 Règlement-type des jeux concours d'Apprendre Padel. Brouillon à faire valider par Samuel (et, si possible, par un professionnel).
-Champs remplis depuis le fichier de données de chaque concours : {titre}, {lot}, {valeur}, {date_debut}, {date_fin}, {nb_gagnants}.
+Champs remplis depuis le fichier de données de chaque concours : {titre}, {lot}, {valeur}, {date_debut}, {date_fin}, {nb_gagnants} ; accords calculés : {gagnants_designes}, {regle_gagnants}.
 Texte au tutoiement, comme le reste du site : aucun texte n'impose le vouvoiement dans un règlement de jeu, l'essentiel est que les règles soient claires.
 Typographie : ce fichier utilise des espaces ordinaires (mon outil ne sait pas écrire U+00A0). Le générateur doit remplacer l'espace avant : ; ? ! et à l'intérieur des guillemets « » par une espace insécable (U+00A0 ou &amp;nbsp;), SAUF dans « graine:identifiant du compte », où le « : » est volontairement collé : c'est le texte exact qui est haché.
 -->
@@ -32,13 +32,13 @@ Le jeu n'est ni parrainé, ni géré, ni associé à Facebook, Instagram, Google
 
 ### Article 3. Désignation du ou des gagnants
 
-3.1. Le jeu comporte {nb_gagnants} gagnant(s), désigné(s) par tirage au sort parmi toutes les participations valables. Le tirage est effectué dans les 7 jours qui suivent le premier tirage EuroMillions qui suit la date de fin ({date_fin}).
+3.1. Le jeu comporte {gagnants_designes} par tirage au sort parmi toutes les participations valables. Le tirage est effectué dans les 7 jours qui suivent le premier tirage EuroMillions qui suit la date de fin ({date_fin}).
 
 3.2. Méthode du tirage, vérifiable par tous :
 - La « graine » est formée de la date et des numéros du premier tirage EuroMillions qui suit la date de fin. Ces numéros sont publics et connus de tous ; l'organisateur ne peut pas les choisir ni les connaître à l'avance.
-- Format exact de la graine : « AAAA-MM-JJ:n1-n2-n3-n4-n5:e1-e2 », c'est-à-dire la date du tirage EuroMillions, puis les 5 numéros, puis les 2 étoiles, dans l'ordre de sortie, séparés par des tirets. Exemple fictif, sans rapport avec un vrai tirage : « 2030-01-01:7-12-23-34-45:3-9 ».
+- Format exact de la graine : « AAAA-MM-JJ:n1-n2-n3-n4-n5:e1-e2 », c'est-à-dire la date du tirage EuroMillions, puis les 5 numéros, puis les 2 étoiles, dans l'ordre de sortie : les numéros sont séparés par des tirets, les trois groupes par deux-points. Exemple fictif, sans rapport avec un vrai tirage : « 2030-01-01:7-12-23-34-45:3-9 ».
 - Pour chaque participation valable, on calcule l'empreinte SHA-256 du texte « graine:identifiant du compte ». L'identifiant du compte est un identifiant interne, que les autres joueurs et le public ne connaissent pas.
-- Les {nb_gagnants} participations qui ont les plus petites empreintes gagnent.
+- {regle_gagnants}
 - Chaque participation valable a ainsi la même chance d'être tirée, sans autre critère que la validité de la participation.
 - Le jeu n'a aucun lien avec EuroMillions, qui sert seulement de source publique de hasard. La participation au jeu ne demande, ni n'implique, aucun achat.
 
@@ -60,7 +60,7 @@ Le jeu n'est ni parrainé, ni géré, ni associé à Facebook, Instagram, Google
 
 ### Article 5. Remise du lot
 
-5.1. Le lot est : {lot}, d'une valeur commerciale indicative de {valeur} € TTC, à la date de rédaction du règlement.
+5.1. Le lot est {lot}, d'une valeur commerciale indicative de {valeur} € TTC, à la date de rédaction du règlement.
 
 5.2. Le lot est offert par l'organisateur à titre personnel et envoyé par lui, par la poste, à l'adresse indiquée par le gagnant, en France métropolitaine, sans frais pour le gagnant, dans un délai de 30 jours après réception des coordonnées.
 
@@ -68,7 +68,7 @@ Le jeu n'est ni parrainé, ni géré, ni associé à Facebook, Instagram, Google
 
 5.4. Le gagnant n'a rien à payer pour recevoir son lot. Les éventuelles obligations fiscales ou sociales du gagnant liées au lot restent les siennes.
 
-5.5. Les photos et la description du lot sont données à titre indicatif. L'organisateur n'est pas le fabricant du lot : en cas de défaut, la garantie du fabricant ou du vendeur d'origine s'applique, dans la mesure où elle existe.
+5.5. La description du lot est donnée à titre indicatif. L'organisateur n'est pas le fabricant du lot : en cas de défaut, la garantie du fabricant ou du vendeur d'origine s'applique, dans la mesure où elle existe.
 
 ### Article 6. Données personnelles
 

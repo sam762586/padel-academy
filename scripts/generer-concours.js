@@ -1,6 +1,7 @@
 /* JEU CONCOURS : écrit dans concours.html le contenu des concours, lisible sans JavaScript et par les moteurs de recherche.
    Sources : assets/js/concours-donnees.js (tableau CONCOURS) et le règlement-type scripts/donnees/concours-reglement.md
-   (texte entre les deux lignes « --- », champs {titre} {lot} {valeur} {date_debut} {date_fin} {nb_gagnants}).
+   (texte entre les deux lignes « --- », champs {titre} {lot} {valeur} {date_debut} {date_fin} {nb_gagnants},
+   et les accords {gagnants_designes} {regle_gagnants}).
    Pour chaque concours : titre, dates, lot, valeur indicative, nombre de gagnants, gagnants publics, et règlement complet
    rempli (dépliable). Aucun concours : « Aucun concours en ce moment, reviens bientôt. »
    Le contenu va entre <!-- concours:debut --> et <!-- concours:fin --> ; tout est échappé ; relancer sans changement
@@ -98,7 +99,11 @@ function dateLongue(iso) {
 // 249.95 → « 249,95 » ; 150 → « 150 »
 const euros = v => Number.isInteger(v) ? String(v) : v.toFixed(2).replace(".", ",");
 function valeursChamps(c) {
-  return { titre: c.titre, lot: c.lot, valeur: euros(c.valeur), date_debut: dateLongue(c.date_debut), date_fin: dateLongue(c.date_fin), nb_gagnants: String(c.nb_gagnants) };
+  return { titre: c.titre, lot: c.lot, valeur: euros(c.valeur), date_debut: dateLongue(c.date_debut), date_fin: dateLongue(c.date_fin), nb_gagnants: String(c.nb_gagnants),
+    // Accords selon le nombre de gagnants (règlement, articles 3.1 et 3.2)
+    gagnants_designes: c.nb_gagnants > 1 ? c.nb_gagnants + " gagnants, désignés" : "1 gagnant, désigné",
+    regle_gagnants: c.nb_gagnants > 1 ? `Les ${c.nb_gagnants} participations qui ont les plus petites empreintes gagnent.`
+      : "La participation qui a la plus petite empreinte gagne." };
 }
 // Texte échappé, puis champs {…} remplacés par leur valeur échappée, puis liens [texte](page.html) du règlement
 function enLigne(texte, valeurs) {
@@ -144,7 +149,7 @@ function rendreConcours(c, md) {
   <dl class="cc-infos">
     <div><dt>Lot</dt><dd>${echapper(c.lot)}</dd></div>
     <div><dt>Valeur indicative</dt><dd>${echapper(v.valeur)} € TTC</dd></div>
-    <div><dt>Nombre de gagnants</dt><dd>${c.nb_gagnants}, tiré${c.nb_gagnants > 1 ? "s" : ""} au sort</dd></div>${gagnants}
+    <div><dt>Nombre de gagnants</dt><dd>${c.nb_gagnants} gagnant${c.nb_gagnants > 1 ? "s" : ""}, tiré${c.nb_gagnants > 1 ? "s" : ""} au sort</dd></div>${gagnants}
   </dl>
   <div class="cc-action" data-action><p>Pour participer, <a href="connexion.html?suite=concours.html">connecte-toi à ton compte</a> pendant la période du jeu.</p></div>
   <details class="cc-reglement">

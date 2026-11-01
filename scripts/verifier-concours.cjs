@@ -75,7 +75,10 @@ function testerGenerateur(){
  assert.match(bloc,/<h2 id="cc-titre-2026-11-raquette">La raquette &lt;de&gt; Noël &amp; &quot;toi&quot;<\/h2>/);
  assert.match(bloc,/Du 1er novembre 2026 au 30 novembre 2026 inclus \(heure de Paris\)/);
  assert.match(bloc,/<dd>249,95 € TTC<\/dd>/);
- assert.match(bloc,/<dd>2, tirés au sort<\/dd>/);
+ assert.match(bloc,/<dd>2 gagnants, tirés au sort<\/dd>/);
+ assert.match(bloc,/Le jeu comporte 2 gagnants, désignés par tirage/);
+ assert.match(bloc,/Les 2 participations qui ont les plus petites empreintes gagnent\./);
+ assert.doesNotMatch(bloc,/\(s\)/,"pas de « (s) » dans le règlement");
  assert.match(bloc,/<dt>Tirage au sort<\/dt><dd>fait : graine, empreintes des gagnants/);
  assert.ok(!/gagnants_publics|pseudo :/.test(bloc),'donnée de gagnant dans le fichier de données');
  assert.match(bloc,/Le jeu concours « La raquette &lt;de&gt; Noël &amp; &quot;toi&quot; » \(ci-après/);
