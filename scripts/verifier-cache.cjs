@@ -33,6 +33,17 @@ ok('pages de la racine : style et scripts tous versionnés');
   for(const m of fs.readFileSync(path.join(racine,f),'utf8').matchAll(/src="(assets\/js\/[\w-]+\.js)/g))
    assert.ok(shell.includes(m[1]),f+' : '+m[1]+' absent du SHELL');
 }
+{
+ // Pages du menu : toutes dans le SHELL ; navigations en network-first
+ const {MENU}=require('./gabarit.js');
+ const liens=[];for(const m of MENU){if(Array.isArray(m))liens.push(m[0]);else for(const l of m.liens)liens.push(l[0]);}
+ const sw2=fs.readFileSync(path.join(racine,'sw.js'),'utf8');
+ const shell2=eval(sw2.match(/const SHELL = (\[[\s\S]*?\n\]);/)[1]);
+ const manque=liens.map(l=>l.split('#')[0]).filter(l=>l!=='simulateur-3d.html'&&!shell2.includes(l));
+ assert.deepEqual(manque,[],'pages du menu absentes du SHELL');
+ assert.ok(/pageReseauDabord\(event\)/.test(sw2)&&/navigation \? pageReseauDabord/.test(sw2),'navigations : network-first');
+}
+ok('pages du menu toutes dans le SHELL ; navigations en network-first');
 ok('academie-sync : compte.js versionné ; SHELL complet, sans fichier absent ; prochains en network-first');
 
 // Serveur : le site réel, sauf index.html et style.css qui changent à la « publication »
@@ -78,6 +89,7 @@ const serveur=http.createServer((req,res)=>{
    e=await etat();vus.push(e.page);
    assert.equal(e.style,e.page,'rechargement '+(k+1)+' : page v'+e.page+' avec style v'+e.style);
   }
+  assert.equal(vus[0],2,'première visite après publication : version du réseau attendue, pas la copie du cache');
   assert.equal(vus[vus.length-1],2);
   ok('après publication : page et style toujours de la même version, puis la nouvelle arrive ('+vus.join(' → ')+')');
   // Une seule version du style gardée dans le cache
@@ -101,6 +113,10 @@ const serveur=http.createServer((req,res)=>{
   e=await etat();
   assert.deepEqual(e,{page:2,style:2,sw:true});
   ok('hors connexion : page et style de la dernière version');
+  // Hors connexion, une page jamais visitée mais précachée (actus-pro.html) vient du cache
+  const r=await page.goto(base+'/actus-pro.html');
+  assert.ok(r.ok()&&(await page.title()).length>0,'actus-pro.html hors connexion');
+  ok('hors connexion : actus-pro.html servie depuis le cache');
   await ctx.setOffline(false);
   console.log('TOTAL '+nb+' contrôles réussis.');
  }finally{await browser.close();serveur.close();}

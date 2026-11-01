@@ -1,5 +1,7 @@
 /* SERVICE WORKER de Apprendre Padel.
-   - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation, servi en « stale-while-revalidate ».
+   - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation. Les pages (navigations) sont en « network-first » :
+     la version du serveur dès la première visite (le site est mis à jour chaque jour), copie du cache au-delà de 4 s ou hors
+     connexion (la requête réseau continue alors et met le cache à jour). CSS, scripts, polices et images : « stale-while-revalidate ».
    - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) et « près de chez toi » (assets/data/prochains/*.json),
      chiffres de l'accueil (stats.json), banque de la question du jour (questions-jour.json, précachée) et noms de clubs de la carte de joueur (clubs.json, précaché) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
@@ -13,14 +15,15 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v48-question";
+const CACHE = "pa-v49-actus";
+const DELAI_PAGE = 4000; // ms : au-delà, une page déjà en cache est servie sans attendre le réseau
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
 const SHELL = [
   "./",
   "index.html", "technique.html", "tactique.html", "tutos.html", "niveau.html", "entrainement.html", "videos.html",
   "regles.html", "conseils.html", "materiel.html", "competition.html", "bareme.html", "tournois.html", "lexique.html",
-  "premier-tournoi.html", "academie.html", "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "connexion.html", "score.html", "partenaires.html", "carte.html", "hors-ligne.html",
+  "premier-tournoi.html", "academie.html", "compte.html", "confidentialite.html", "mentions-legales.html", "espace.html", "connexion.html", "score.html", "partenaires.html", "carte.html", "actus-pro.html", "hors-ligne.html",
   "manifest.webmanifest", "favicon.png", "apple-touch-icon.png",
   "assets/style.css", "assets/carte.css", "assets/fonts/manrope-latin.woff2", "assets/fonts/big-shoulders-display-latin.woff2",
   "assets/vendor/supabase-2.45.4.js", // supabase-js hébergé sur le site (jamais de CDN)
@@ -133,6 +136,33 @@ async function perimeEtRevalide(requete, estNavigation) {
   }
 }
 
+// Pages : réseau d'abord (contenu du jour), copie du cache si le réseau échoue ou tarde trop, puis hors-ligne.html
+async function pageReseauDabord(event) {
+  const requete = event.request;
+  const cache = await caches.open(CACHE);
+  const cle = sansQuery(requete.url);
+  const reseau = fetch(requete, { cache: "no-cache" }).then(reponse => {
+    if (reponse.ok && reponse.type === "basic") cache.put(cle, reponse.clone());
+    return reponse;
+  });
+  const copie = () => cache.match(cle, { ignoreSearch: true });
+  try {
+    const delai = new Promise((_, rejet) => setTimeout(() => rejet(new Error("delai")), DELAI_PAGE));
+    delai.catch(() => null);
+    // Une copie existe : on n'attend le réseau que DELAI_PAGE ; sans copie, on l'attend sans limite
+    const existe = await copie();
+    if (!existe) return await reseau;
+    try {
+      return await Promise.race([reseau, delai]);
+    } catch (erreur) {
+      event.waitUntil(reseau.catch(() => null)); // le cache se met à jour quand le réseau répond
+      return existe;
+    }
+  } catch (erreur) {
+    return await copie() || await cache.match("hors-ligne.html") || Promise.reject(erreur);
+  }
+}
+
 self.addEventListener("fetch", event => {
   const requete = event.request;
   if (requete.method !== "GET" || requete.headers.has("range")) return;
@@ -148,5 +178,5 @@ self.addEventListener("fetch", event => {
     event.respondWith(navigationSensible(requete));
     return;
   }
-  event.respondWith(perimeEtRevalide(requete, navigation));
+  event.respondWith(navigation ? pageReseauDabord(event) : perimeEtRevalide(requete, false));
 });
