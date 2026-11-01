@@ -19,5 +19,5 @@
 */
 const CONCOURS=[
   {id:"2026-11-pack-nox",titre:"Ton pack Nox offert",lot:"un t-shirt de padel Nox Team 2026 (taille au choix du gagnant) et 2 tubes de 3 balles Nox Pro Titanium",valeur:47.89,
-   date_debut:"2026-11-03",date_fin:"2026-11-30",nb_gagnants:1},
+   date_debut:"2026-11-01",date_fin:"2026-11-30",nb_gagnants:1},
 ];
