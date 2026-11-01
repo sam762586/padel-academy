@@ -366,7 +366,7 @@ Pour arrêter : `select cron.unschedule('actualiser-tournois-ref');` et/ou `sele
 
 Notes : si l'extension `http` n'était pas proposée sur le projet, l'alternative est `pg_net` (asynchrone : la réponse arrive dans `net._http_response` et doit être lue par un second job) ; à me redemander. Le robot doit publier `tournois.json` avant le mardi 5 h UTC ; sinon les tournois de la semaine précédente sont simplement remis à jour (sans perte).
 
-# Jeu concours (concours.html) — PRÉPARÉ LE 01/11/2026, NON APPLIQUÉ
+# Jeu concours (concours.html) — APPLIQUÉ EN PRODUCTION LE 01/11/2026 (concours 2026-11-pack-nox créé)
 
 Concours gratuits avec tirage au sort. Participation réservée aux joueurs connectés (pas au compte admin de l'organisateur), une seule par compte et par concours, deux cases obligatoires (« 18 ans ou accord des parents », « règlement accepté »), retrait possible tant que le concours est ouvert. Le site décrit les concours (titre, lot, textes) dans son fichier de données ; la base garde seulement les dates (pour refuser une participation hors période) et le tirage.
 
