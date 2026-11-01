@@ -1844,3 +1844,40 @@ main h1{view-transition-name:titre-page}
 .pro-calendrier .pro-lieu{color:var(--muted)}
 .pro-source{font-size:var(--fs-s);color:var(--muted);margin-top:var(--s-5);max-width:48em}
 .pro-source+.pro-source{margin-top:var(--s-2)}
+
+/* JEU CONCOURS (concours.html : contenu écrit par scripts/generer-concours.js, états par assets/js/concours.js).
+   Cartes .acc-card, messages .msg, boutons .btn, cases .cx-case et règlement dépliable : composants communs. */
+.cc-mention{max-width:760px;margin-bottom:var(--s-5)}
+.cc-etat{max-width:760px;margin-bottom:var(--s-4)}
+.cc-concours h2{font-size:var(--fs-xl);overflow-wrap:anywhere}
+.cc-dates{color:var(--fg);font-weight:600}
+.cc-infos{display:grid;gap:var(--s-2);margin:var(--s-3) 0 0}
+.cc-infos div{display:flex;flex-wrap:wrap;gap:var(--s-1) var(--s-3)}
+.cc-infos dt{color:var(--dim);font-size:var(--fs-s);font-weight:700;min-width:10em}
+.cc-infos dd{margin:0;color:var(--fg);flex:1 1 12em;min-width:0;overflow-wrap:anywhere}
+.cc-action{display:grid;gap:var(--s-3);margin-top:var(--s-4)}
+.cc-action:empty{display:none}
+.cc-compteur{min-height:1.6em;margin:0;color:var(--muted);font-weight:600}
+.cc-corps,.cc-retour,.cc-retour-pseudo{display:grid;gap:var(--s-3);min-width:0}
+.cc-corps .btns,.cc-confirmation .btns{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.cc-confirmation p{margin:0 0 var(--s-3);color:var(--fg)}
+.cc-form{margin-top:0}
+.cc-statut{color:var(--muted);margin:0}
+.cc-resultat,.cc-verification{display:grid;gap:var(--s-2);padding-top:var(--s-3);border-top:1px solid var(--line)}
+.cc-resultat h3,.cc-verification h3{font-size:var(--fs-l)}
+.cc-resultat p,.cc-verification p{margin:0}
+.cc-gagnants{margin:0;padding-left:1.4em;display:grid;gap:var(--s-2);color:var(--fg)}
+.cc-empreinte{font-size:var(--fs-xs);overflow-wrap:anywhere;word-break:break-all;color:var(--fg)}
+.cc-reglement{margin-top:var(--s-4);border-top:1px solid var(--line);padding-top:var(--s-2)}
+.cc-reglement summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--sky);overflow-wrap:anywhere}
+.cc-reglement .prose{margin-top:var(--s-3)}
+.cc-reglement .prose p{font-size:var(--fs-s)}
+.cc-donnees{color:var(--muted);font-size:var(--fs-s);max-width:760px}
+.cc-concours .msg{color:var(--fg);margin-top:0}
+.cc-partage{display:grid;gap:var(--s-2);padding-top:var(--s-3);border-top:1px solid var(--line)}
+.cc-partage-avant{border-top-color:var(--turf)}
+.cc-partage-options .btns{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.cc-partage-options,.cc-retour-copie{display:grid;gap:var(--s-2);min-width:0}
+.cc-partage-note{margin:0;color:var(--muted);font-size:var(--fs-s)}
+.cc-retour-copie .msg{overflow-wrap:anywhere}
+.cc-partage-options[hidden]{display:none}

@@ -21,7 +21,7 @@ const MENU = [
   ["carte.html", "Ma carte"],
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["premier-tournoi.html", "Ton premier tournoi"], ["competition.html", "Jouer en compétition"],
     ["actus-pro.html", "Actus pro"],
-    ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
+    ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"], ["concours.html", "Jeu concours"]] },
   ["espace.html", "Mon espace"],
 ];
 // Bouton d'appel : [page, libellé, libellé court affiché quand la place manque sur ordinateur (le libellé complet reste lu)]

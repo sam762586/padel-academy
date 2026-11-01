@@ -113,6 +113,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 6. `2026-10-26-journal-01` à `-03` (après `20261026_matchs.sql`, déjà exécuté), puis ajoute `"journal"` à `PA_SUPABASE.activees`.
 7. `2026-10-27-progression-01` et `-02` (après les migrations espace), puis ajoute `"progression"` à `PA_SUPABASE.activees`.
 8. `2026-10-27-diagnostic-01` et `-02` (après les migrations journal), puis ajoute `"diagnostic"` à `PA_SUPABASE.activees`.
+9. `2026-11-01-concours-01` à `-17` (section « Jeu concours », en fin de fichier), puis, avec l'accord écrit de Samuel, ajoute `"concours"` à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
@@ -364,3 +365,86 @@ Le même lot planifie aussi la **purge quotidienne** `purger_donnees()` (accord 
 Pour arrêter : `select cron.unschedule('actualiser-tournois-ref');` et/ou `select cron.unschedule('purger-donnees');`. Le remplissage à la main (`node scripts/generer-tournois-ref.js`) reste possible à tout moment ; les deux donnent les mêmes lignes.
 
 Notes : si l'extension `http` n'était pas proposée sur le projet, l'alternative est `pg_net` (asynchrone : la réponse arrive dans `net._http_response` et doit être lue par un second job) ; à me redemander. Le robot doit publier `tournois.json` avant le mardi 5 h UTC ; sinon les tournois de la semaine précédente sont simplement remis à jour (sans perte).
+
+# Jeu concours (concours.html) — PRÉPARÉ LE 01/11/2026, NON APPLIQUÉ
+
+Concours gratuits avec tirage au sort. Participation réservée aux joueurs connectés (pas au compte admin de l'organisateur), une seule par compte et par concours, deux cases obligatoires (« 18 ans ou accord des parents », « règlement accepté »), retrait possible tant que le concours est ouvert. Le site décrit les concours (titre, lot, textes) dans son fichier de données ; la base garde seulement les dates (pour refuser une participation hors période) et le tirage.
+
+Ce que la base garantit :
+- `concours` : lisible par tous ; créé et modifié par l'admin seulement. Depuis le site (`CONCOURS_FIGE`) : une fois commencé, la date de début et le nombre de lots ne changent plus, la date de fin peut seulement être repoussée, le concours ne se supprime plus ; une fois fini, la date de fin ne change plus ; une fois tiré, plus rien ne change. Le SQL Editor reste le recours en cas d'erreur de saisie.
+- `concours_participations` : chacun ne voit que sa ligne (l'admin voit tout) ; ajout seulement pour soi, pendant le concours, cases cochées ; aucun e-mail ni pseudo copié. Suppression pendant le concours seulement (le joueur pour lui, ou l'admin). Messages : `CONCOURS_INCONNU`, `ORGANISATEUR_EXCLU`, `PARTICIPATION_EXCLUE`, `CONCOURS_PAS_COMMENCE`, `CONCOURS_TERMINE`, `CASES_NON_COCHEES` ; doublon = erreur `23505` (« tu participes déjà »).
+- `admin_exclure_participation(id, user_id, motif)` : exclusion pour fraude (comptes multiples…), jusqu'au tirage ; la participation est supprimée et l'exclusion gardée dans `concours_exclusions` (lisible par le joueur concerné et par l'admin) ; le joueur ne peut plus se réinscrire à ce concours.
+- `concours_nb_participants(id)` (un nombre) et `concours_resume(id)` (participants, exclusions) : publics, sans dire qui ; figés au moment du tirage.
+- `admin_tirer_au_sort(id, graine)` : admin seulement, après la fin, une seule fois ; renvoie les `user_id` des gagnants.
+- `admin_designer_remplacant(id)` : si un gagnant ne répond pas ou renonce, le participant suivant du même classement (rang suivant) ; renvoie son `user_id`.
+- `concours_gagnants` : le gagnant (ou remplaçant) voit sa ligne (« Tu as gagné ») et lui seul peut accepter que son pseudo soit affiché (`affiche_publiquement`) ; liste publique par `concours_gagnants_publics(id)` (rang, pseudo du profil seulement après accord, empreinte de tirage ; jamais d'identifiant ni d'e-mail).
+- `admin_contact_gagnants(id)` : admin seulement, rang + `user_id` + e-mail + pseudo (lus dans `auth.users` et `profiles` au moment de l'appel, jamais copiés).
+- Purge chaque nuit (3 h 45 UTC) : participations, exclusions et gagnants supprimés 60 jours après le tirage ; pour un concours jamais tiré, participations et exclusions supprimées 90 jours après la fin. Suppression du compte : tout part en cascade (`delete_my_account()` inchangée).
+
+## Tirage vérifiable (à écrire dans le règlement)
+
+La graine est **le résultat du premier tirage EuroMillions qui a lieu après le jour de fin du concours** (heure de Paris) : personne ne le connaît pendant les inscriptions, personne ne le choisit. Format exact, numéros et étoiles **dans l'ordre de sortie**, sans zéro devant :
+
+```
+AAAA-MM-JJ:n1-n2-n3-n4-n5:e1-e2      exemple : 2026-12-01:3-14-25-36-47:2-9
+```
+
+(5 numéros différents de 1 à 50, 2 étoiles différentes de 1 à 12, date = jour du tirage EuroMillions.) La base refuse une graine mal écrite (`GRAINE_INCORRECTE`), datée du jour de fin ou avant, ou d'une date future (`GRAINE_DATE_INCORRECTE`). Il n'y a plus de graine au hasard ni de graine secrète.
+
+Calcul : chaque participant reçoit l'empreinte SHA-256 de « graine:user_id » ; les plus petites empreintes gagnent (rang 1 = la plus petite), les suivantes donnent les remplaçants. La graine, le nombre de participants et d'exclusions, et les empreintes des gagnants sont publics : un participant peut calculer sa propre empreinte et vérifier qu'elle est plus grande que celle du dernier gagnant.
+
+## Étapes pour Samuel
+
+1. **Prérequis** : `schema.sql` et `schema-partenaires.sql` (pour `est_admin()`), et `2026-10-30-auto-01-extensions` (pg_cron) déjà exécutés : c'est le cas.
+2. **Exécuter les 17 fichiers, un par un, dans l'ordre** (SQL Editor, coller le fichier, *Run* ; chacun est relançable sans risque) :
+   1. `2026-11-01-concours-01-table-concours`
+   2. `2026-11-01-concours-02-fonction-concours-avant-modification`
+   3. `2026-11-01-concours-03-trigger-concours`
+   4. `2026-11-01-concours-04-table-participations`
+   5. `2026-11-01-concours-05-table-exclusions`
+   6. `2026-11-01-concours-06-fonction-participations-avant-insertion`
+   7. `2026-11-01-concours-07-trigger-participations`
+   8. `2026-11-01-concours-08-fonction-nb-participants`
+   9. `2026-11-01-concours-09-fonction-resume`
+   10. `2026-11-01-concours-10-table-gagnants`
+   11. `2026-11-01-concours-11-fonction-admin-tirer-au-sort`
+   12. `2026-11-01-concours-12-fonction-admin-designer-remplacant`
+   13. `2026-11-01-concours-13-fonction-admin-exclure-participation`
+   14. `2026-11-01-concours-14-fonction-gagnants-publics`
+   15. `2026-11-01-concours-15-fonction-admin-contact-gagnants`
+   16. `2026-11-01-concours-16-fonction-purger-concours`
+   17. `2026-11-01-concours-17-planification` (job `purger-concours`)
+3. **Créer un concours** (même identifiant que dans le fichier de données du site, heures de Paris écrites en clair ; vérifie bien avant le début : ensuite les dates et le nombre de lots sont figés depuis le site) :
+
+   ```sql
+   insert into public.concours (id, titre, date_debut, date_fin, nb_gagnants)
+   values ('2026-11-raquette', 'Une raquette à gagner', '2026-11-01 00:00 Europe/Paris', '2026-11-30 23:59:59 Europe/Paris', 1);
+   ```
+
+4. **Contrôler** :
+   - `select public.concours_nb_participants('2026-11-raquette');` répond `0`, et `select * from public.concours_resume('2026-11-raquette');` répond `0 | 0` ;
+   - `select * from cron.job;` : une ligne `purger-concours` (`45 3 * * *`) en plus des deux existantes ;
+   - *Table Editor* : `concours`, `concours_participations`, `concours_exclusions`, `concours_gagnants` affichent « RLS enabled ».
+5. **Activer côté site** : ajouter `"concours"` à `PA_SUPABASE.activees` (`assets/js/supabase-config.js`) **seulement après** les étapes 2 à 4, et seulement avec ton accord écrit (ce n'est pas fait).
+6. **Les fonctions admin depuis le SQL Editor** : chaque appel se fait avec cette première ligne, dans la même exécution (elle te fait agir comme ton compte admin, uniquement pour cette exécution) :
+
+   ```sql
+   select set_config('request.jwt.claims', json_build_object('sub', (select id from auth.users where email = 'toi@exemple.fr'))::text, true);
+   ```
+
+   - **avant le tirage, si fraude** : `select public.admin_exclure_participation('2026-11-raquette', '<user_id>', 'Comptes multiples');`
+   - **tirage**, le lendemain du tirage EuroMillions qui suit la fin (ou plus tard) : `select * from public.admin_tirer_au_sort('2026-11-raquette', '2026-12-01:3-14-25-36-47:2-9');`
+   - **e-mail des gagnants** : `select * from public.admin_contact_gagnants('2026-11-raquette');`
+   - **gagnant injoignable** : `select public.admin_designer_remplacant('2026-11-raquette');` puis à nouveau `admin_contact_gagnants`.
+   - à publier ensuite : `select graine, nb_participants, nb_exclusions from public.concours where id = '2026-11-raquette';`
+
+Pour arrêter la purge : `select cron.unschedule('purger-concours');`. Vérification hors ligne : `node scripts/verifier-concours-sql.mjs`.
+
+## Ce qui change pour le site (dev-front, `concours.html`)
+
+Tout appel conditionné à `PA_SUPABASE.activees.includes("concours")` :
+- compteur (sans compte) : `rpc("concours_nb_participants", { p_concours })`, ou `rpc("concours_resume", { p_concours })` pour participants et exclusions ;
+- participer : `from("concours_participations").insert({ concours_id, atteste_majeur_ou_accord: true, accepte_reglement: true })` (pas d'upsert, pas de `cree_le`) ; `23505` = déjà inscrit ; messages à traduire (liste ci-dessus) ;
+- « Je participe déjà ? » : `select("concours_id,cree_le").eq("concours_id", id)` (la RLS ne renvoie que sa ligne) ; retrait : `delete().eq("concours_id", id)` ; exclu : `from("concours_exclusions").select("concours_id,motif,exclu_le")` ;
+- « Tu as gagné » : `from("concours_gagnants").select("concours_id,rang,affiche_publiquement").eq("concours_id", id)` ; accord pour le pseudo : `update({ affiche_publiquement: true })` ;
+- résultat public : `rpc("concours_gagnants_publics", { p_concours })`, et `from("concours").select("id,date_debut,date_fin,nb_gagnants,tire_le,graine,nb_participants,nb_exclusions")`.
