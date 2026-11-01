@@ -20,6 +20,7 @@ const MENU = [
   ["simulateur-3d.html", "Tactique 3D"],
   ["carte.html", "Ma carte"],
   { id: "competition", nom: "Compétition", liens: [["tournois.html", "Trouver un tournoi"], ["premier-tournoi.html", "Ton premier tournoi"], ["competition.html", "Jouer en compétition"],
+    ["actus-pro.html", "Actus pro"],
     ["bareme.html", "Barème des points"], ["partenaires.html", "Trouver un partenaire"]] },
   ["espace.html", "Mon espace"],
 ];

@@ -1,0 +1,198 @@
+{
+ "status": true,
+ "data": {
+  "rounds": [
+   {
+    "name": "R64"
+   },
+   {
+    "name": "R32"
+   },
+   {
+    "name": "R16"
+   },
+   {
+    "name": "Quarterfinals"
+   },
+   {
+    "name": "Semifinals"
+   },
+   {
+    "name": "Final"
+   }
+  ],
+  "type": "MAJOR",
+  "slug": "kuwait-p1-2",
+  "status": "F",
+  "contestants": {
+   "80": {
+    "players": [
+     {
+      "title": "Fernandez Sanchez"
+     },
+     {
+      "title": "Calvo Santamaria"
+     }
+    ]
+   },
+   "125": {
+    "players": [
+     {
+      "title": "Triay Pons"
+     },
+     {
+      "title": "Brea Senesi"
+     }
+    ]
+   },
+   "126": {
+    "players": [
+     {
+      "title": "Sanchez Fallada"
+     },
+     {
+      "title": "Ustero Prieto"
+     }
+    ]
+   },
+   "127": {
+    "players": [
+     {
+      "title": "Josemaria Martin"
+     },
+     {
+      "title": "Gonzalez Fernandez"
+     }
+    ]
+   }
+  },
+  "matches": [
+   {
+    "roundIndex": 4,
+    "order": 0,
+    "sides": [
+     {
+      "contestantId": "125",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": true
+       },
+       {
+        "mainScore": "2",
+        "isWinner": true
+       },
+       {
+        "mainScore": "7",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     },
+     {
+      "contestantId": "80",
+      "scores": [
+       {
+        "mainScore": "4",
+        "isWinner": false
+       },
+       {
+        "mainScore": "6",
+        "isWinner": false
+       },
+       {
+        "mainScore": "6",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     }
+    ]
+   },
+   {
+    "roundIndex": 4,
+    "order": 1,
+    "sides": [
+     {
+      "contestantId": "126",
+      "scores": [
+       {
+        "mainScore": "4",
+        "isWinner": true
+       },
+       {
+        "mainScore": "7",
+        "isWinner": true
+       },
+       {
+        "mainScore": "7",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     },
+     {
+      "contestantId": "127",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": false
+       },
+       {
+        "mainScore": "6",
+        "isWinner": false
+       },
+       {
+        "mainScore": "6",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     }
+    ]
+   },
+   {
+    "roundIndex": 5,
+    "order": 0,
+    "sides": [
+     {
+      "contestantId": "125",
+      "scores": [
+       {
+        "mainScore": "3",
+        "isWinner": true
+       },
+       {
+        "mainScore": "6",
+        "isWinner": true
+       },
+       {
+        "mainScore": "6",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     },
+     {
+      "contestantId": "126",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": false
+       },
+       {
+        "mainScore": "1",
+        "isWinner": false
+       },
+       {
+        "mainScore": "1",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     }
+    ]
+   }
+  ]
+ }
+}

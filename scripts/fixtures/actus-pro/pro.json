@@ -1,0 +1,42 @@
+{
+  "maj": "2026-07-15T22:30:00.000Z",
+  "source": "https://premierpadel.com/en/tournaments",
+  "tournois": [
+    {
+      "id": "1", "nom": "TEST  ALPHA P2", "categorie": "P2", "ville": "SAN  JOSÉ ", "pays": "Spain",
+      "date_debut": "2026-03-01", "date_fin": "2026-03-08", "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/alpha-p2?a=1&b=2",
+      "resultats": {
+        "hommes": { "vainqueurs": ["Coello", "Tapia"], "finalistes": ["Chingotto", "Galan"], "score": "6-4 6-2" },
+        "femmes": { "vainqueurs": ["Dupont & <Fils>", "Triay Pons"], "finalistes": ["Brea Senesi", "Ustero Prieto"], "score": "3-6 6-1 6-4" }
+      }
+    },
+    {
+      "id": "2", "nom": "QATAR MAJOR", "categorie": "Major", "ville": "DOHA", "pays": "Qatar",
+      "date_debut": "2026-04-06", "date_fin": "2026-04-11", "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/qatar-major-2",
+      "resultats": null
+    },
+    {
+      "id": "3", "nom": "COMUNIDAD DE MADRID P1", "categorie": "P1", "ville": "MADRID", "pays": "Spain",
+      "date_debut": "2026-06-28", "date_fin": "2026-07-05", "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/madrid-p1",
+      "resultats": { "hommes": { "vainqueurs": ["Galan", "Chingotto"], "finalistes": ["Nieto", "Yanguas"], "score": "6-4 5-7 6-4" }, "femmes": null }
+    },
+    {
+      "id": "4", "nom": "LONDON P1", "categorie": "P1", "ville": "LONDON", "pays": "Great Britain",
+      "date_debut": "2026-07-12", "date_fin": "2026-07-19", "statut": "en_cours",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/london-p1", "resultats": null
+    },
+    {
+      "id": "5", "nom": "TOURNOI D'ESPAGNE II", "categorie": "Finals", "ville": "SAINT-JEAN-DE-LUZ", "pays": "France",
+      "date_debut": "2026-12-10", "date_fin": "2026-12-13", "statut": "a_venir",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/finals", "resultats": null
+    },
+    {
+      "id": "6", "nom": "DUBAI P1", "categorie": "P1", "ville": "KUWAIT", "pays": "Kuwait",
+      "date_debut": "2026-11-28", "date_fin": "2026-12-05", "statut": "a_venir",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/dubai-p1-3", "resultats": null
+    }
+  ]
+}

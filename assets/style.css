@@ -1816,3 +1816,31 @@ main h1{view-transition-name:titre-page}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;animation-delay:0s !important;transition-duration:.01ms !important;transition-delay:0s !important;scroll-behavior:auto !important}
   :is(.btn,.card):hover{transform:none}
 }
+
+/* ---------- Actus pro (actus-pro.html, contenu écrit par scripts/generer-pro.js depuis assets/data/pro.json) ---------- */
+.pro-tete{padding-bottom:var(--s-6)}
+.pro-tete .sec-head{margin-bottom:0}
+.pro-grille{display:grid;gap:var(--s-4);grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
+.pro-intro{color:var(--muted);max-width:42em;margin:var(--s-3) 0 var(--s-5)}
+#a-la-une h2,#calendrier h2{margin-bottom:var(--s-5)}
+.pro-tournoi:hover{transform:none}
+.pro-tournoi h3{font-size:var(--fs-xl);overflow-wrap:anywhere}
+.pro-tournoi .pro-lieu{color:var(--muted);font-size:var(--fs-s)}
+.pro-une{border-color:rgba(var(--turf-rgb),.45)}
+.pro-finales{display:grid;gap:var(--s-3)}
+.pro-finale{border-top:1px solid var(--line);padding-top:var(--s-3)}
+.pro-finale h4{font-family:var(--body);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.14em;font-weight:700;color:var(--sand);margin-bottom:var(--s-2)}
+.pro-finale dl{display:grid;gap:var(--s-1);margin:0}
+.pro-finale dl div{display:grid;grid-template-columns:7.5em 1fr;gap:var(--s-2)}
+.pro-finale dt{color:var(--dim);font-size:var(--fs-s)}
+.pro-finale dd{margin:0;color:var(--fg);overflow-wrap:anywhere}
+.pro-finale .pro-score{font-variant-numeric:tabular-nums;font-weight:700}
+.card p.pro-absent,.pro-absent{color:var(--muted);font-style:italic}
+.pro-lien{margin-top:auto}
+.pro-lien a{display:inline-flex;align-items:center;min-height:44px;color:var(--sky);font-weight:700}
+.pro-calendrier{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.pro-calendrier li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);padding:var(--s-3) var(--s-4);border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass)}
+.pro-calendrier time{font-weight:700;color:var(--fg);min-width:11em}
+.pro-calendrier .pro-lieu{color:var(--muted)}
+.pro-source{font-size:var(--fs-s);color:var(--muted);margin-top:var(--s-5);max-width:48em}
+.pro-source+.pro-source{margin-top:var(--s-2)}

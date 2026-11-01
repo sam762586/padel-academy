@@ -17,3 +17,16 @@ $Reglages = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatt
 Register-ScheduledTask -TaskName $Nom -Action $Action -Trigger $Declencheur -Settings $Reglages `
   -Description "Collecte hebdomadaire des tournois Ten'Up, génération des pages, commit et publication automatique si aucun autre commit n'attend (apprendre-padel.fr)" -Force | Out-Null
 Get-ScheduledTask -TaskName $Nom | Select-Object TaskName, State, @{n="Prochaine exécution";e={(Get-ScheduledTaskInfo $_).NextRunTime}}
+
+# Seconde tâche : résultats pros (Premier Padel) chaque jour à 5 h, avant la tâche du lundi 6 h
+# (scripts\maj-quotidienne.bat : robot -> actus-pro.html -> commit -> push automatique aux mêmes conditions).
+# Désinstaller : Unregister-ScheduledTask -TaskName "Apprendre Padel - Actus pro" -Confirm:$false
+$NomPro = "Apprendre Padel - Actus pro"
+$BatPro = Join-Path $PSScriptRoot "maj-quotidienne.bat"
+$ActionPro = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$BatPro`"" -WorkingDirectory (Split-Path -Parent $PSScriptRoot)
+$DeclencheurPro = New-ScheduledTaskTrigger -Daily -At 5am
+$ReglagesPro = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+  -ExecutionTimeLimit (New-TimeSpan -Hours 2) -MultipleInstances IgnoreNew
+Register-ScheduledTask -TaskName $NomPro -Action $ActionPro -Trigger $DeclencheurPro -Settings $ReglagesPro `
+  -Description "Résultats pros Premier Padel : collecte quotidienne, page actus-pro, commit et publication automatique si aucun autre commit n'attend (apprendre-padel.fr)" -Force | Out-Null
+Get-ScheduledTask -TaskName $NomPro | Select-Object TaskName, State, @{n="Prochaine exécution";e={(Get-ScheduledTaskInfo $_).NextRunTime}}

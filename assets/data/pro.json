@@ -1,0 +1,801 @@
+{
+  "maj": "2026-11-01T03:34:35.428Z",
+  "source": "https://premierpadel.com/en/tournaments",
+  "tournois": [
+    {
+      "id": "309",
+      "nom": "RIYADH SEASON P1",
+      "categorie": "P1",
+      "ville": "RIYADH",
+      "pays": "Saudi Arabia",
+      "date_debut": "2026-02-07",
+      "date_fin": "2026-02-14",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/riyadh-season-p1-4",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Chingotto",
+            "Galan"
+          ],
+          "score": "6-4 6-2"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Ustero Prieto",
+            "Sanchez Fallada"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "3-6 6-1 6-4"
+        }
+      }
+    },
+    {
+      "id": "259",
+      "nom": "GIJÓN P2",
+      "categorie": "P2",
+      "ville": "GIJÓN",
+      "pays": "Spain",
+      "date_debut": "2026-03-01",
+      "date_fin": "2026-03-08",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/gijon-p2-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Tapia",
+            "Coello"
+          ],
+          "score": "7-5 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "score": "6-4 6-7 6-3"
+        }
+      }
+    },
+    {
+      "id": "260",
+      "nom": "CANCÚN P2",
+      "categorie": "P2",
+      "ville": "CANCÚN",
+      "pays": "Mexico",
+      "date_debut": "2026-03-15",
+      "date_fin": "2026-03-22",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/cancun-p2-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Lebron",
+            "Augsburger"
+          ],
+          "score": "6-7 6-3 7-5"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "7-6 6-1"
+        }
+      }
+    },
+    {
+      "id": "261",
+      "nom": "MIAMI P1",
+      "categorie": "P1",
+      "ville": "MIAMI",
+      "pays": "United States",
+      "date_debut": "2026-03-22",
+      "date_fin": "2026-03-29",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/miami-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Tapia",
+            "Coello"
+          ],
+          "score": "7-5 3-6 6-3"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "6-3 4-6 7-5"
+        }
+      }
+    },
+    {
+      "id": "284",
+      "nom": "QATAR MAJOR",
+      "categorie": "Major",
+      "ville": "DOHA",
+      "pays": "Qatar",
+      "date_debut": "2026-04-06",
+      "date_fin": "2026-04-11",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/qatar-major-2",
+      "resultats": {
+        "hommes": null,
+        "femmes": null
+      }
+    },
+    {
+      "id": "285",
+      "nom": "NEWGIZA P2",
+      "categorie": "P2",
+      "ville": "GIZA",
+      "pays": "Egypt",
+      "date_debut": "2026-04-11",
+      "date_fin": "2026-04-18",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/newgiza-p2-3",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Stupaczuk",
+            "Yanguas"
+          ],
+          "score": "6-4 6-1"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Gonzalez Fernandez",
+            "Josemaria Martin"
+          ],
+          "finalistes": [
+            "Brea Senesi",
+            "Triay Pons"
+          ],
+          "score": "6-4 5-7 6-4"
+        }
+      }
+    },
+    {
+      "id": "286",
+      "nom": "BRUSSELS P2",
+      "categorie": "P2",
+      "ville": "BRUSSELS",
+      "pays": "Belgium",
+      "date_debut": "2026-04-19",
+      "date_fin": "2026-04-26",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/brussels-p2-3",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Lebron",
+            "Augsburger"
+          ],
+          "finalistes": [
+            "Coello",
+            "Tapia"
+          ],
+          "score": "2-6 6-3 6-3"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Gonzalez Fernandez",
+            "Josemaria Martin"
+          ],
+          "finalistes": [
+            "Brea Senesi",
+            "Triay Pons"
+          ],
+          "score": "7-5 6-2"
+        }
+      }
+    },
+    {
+      "id": "265",
+      "nom": "ASUNCION P2",
+      "categorie": "P2",
+      "ville": "ASUNCIÓN",
+      "pays": "Paraguay",
+      "date_debut": "2026-05-03",
+      "date_fin": "2026-05-10",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/asuncion-p2-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Tapia",
+            "Coello"
+          ],
+          "score": "6-3 7-5"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "4-6 6-3 6-3"
+        }
+      }
+    },
+    {
+      "id": "264",
+      "nom": "BUENOS AIRES P1",
+      "categorie": "P1",
+      "ville": "BUENOS AIRES",
+      "pays": "Argentina",
+      "date_debut": "2026-05-10",
+      "date_fin": "2026-05-17",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/buenos-aires-p1-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Chingotto",
+            "Galan"
+          ],
+          "finalistes": [
+            "Coello",
+            "Tapia"
+          ],
+          "score": "6-2 6-1"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "6-3 7-5"
+        }
+      }
+    },
+    {
+      "id": "289",
+      "nom": "ITALY MAJOR",
+      "categorie": "Major",
+      "ville": "ROMA",
+      "pays": "Italy",
+      "date_debut": "2026-05-31",
+      "date_fin": "2026-06-07",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/italy-major-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Galan",
+            "Chingotto"
+          ],
+          "score": "7-5 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "score": "6-1 7-5"
+        }
+      }
+    },
+    {
+      "id": "279",
+      "nom": "VALENCIA P1",
+      "categorie": "P1",
+      "ville": "VALENCIA",
+      "pays": "Spain",
+      "date_debut": "2026-06-06",
+      "date_fin": "2026-06-14",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/valencia-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Galan",
+            "Chingotto"
+          ],
+          "score": "6-7 6-1 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "finalistes": [
+            "Fernandez Sanchez",
+            "Araujo"
+          ],
+          "score": "6-4 3-6 6-2"
+        }
+      }
+    },
+    {
+      "id": "291",
+      "nom": "VALLADOLID P2",
+      "categorie": "P2",
+      "ville": "VALLADOLID",
+      "pays": "Spain",
+      "date_debut": "2026-06-21",
+      "date_fin": "2026-06-28",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/valladolid-p2-3",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Galan",
+            "Chingotto"
+          ],
+          "score": "6-4 6-3"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "finalistes": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "score": "6-4 6-2"
+        }
+      }
+    },
+    {
+      "id": "281",
+      "nom": "BORDEAUX P2",
+      "categorie": "P2",
+      "ville": "BORDEAUX",
+      "pays": "France",
+      "date_debut": "2026-06-28",
+      "date_fin": "2026-07-05",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/bordeaux-p2-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Galan",
+            "Chingotto"
+          ],
+          "score": "5-7 7-6 6-2"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Icardo Alcorisa",
+            "Jensen"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "3-6 6-1 6-1"
+        }
+      }
+    },
+    {
+      "id": "266",
+      "nom": "ANDALUCIA MALAGA P1",
+      "categorie": "P1",
+      "ville": "MALAGA",
+      "pays": "Spain",
+      "date_debut": "2026-07-11",
+      "date_fin": "2026-07-19",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/andalucia-malaga-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Lebron",
+            "Augsburger"
+          ],
+          "score": "6-2 6-2"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "7-5 3-6 7-6"
+        }
+      }
+    },
+    {
+      "id": "267",
+      "nom": "PRETORIA P1",
+      "categorie": "P1",
+      "ville": "PRETORIA",
+      "pays": "South Africa",
+      "date_debut": "2026-07-26",
+      "date_fin": "2026-08-02",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/pretoria-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Leal",
+            "Guerrero"
+          ],
+          "score": "6-2 5-7 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Fernandez Sanchez",
+            "Calvo Santamaria"
+          ],
+          "score": "6-2 6-7 7-6"
+        }
+      }
+    },
+    {
+      "id": "268",
+      "nom": "LONDON P1",
+      "categorie": "P1",
+      "ville": "LONDON",
+      "pays": "Great Britain",
+      "date_debut": "2026-08-02",
+      "date_fin": "2026-08-09",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/london-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Chingotto",
+            "Galan"
+          ],
+          "score": "6-3 5-7 7-5"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Fernandez Sanchez",
+            "Calvo Santamaria"
+          ],
+          "finalistes": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "score": "7-5 6-3"
+        }
+      }
+    },
+    {
+      "id": "296",
+      "nom": "COMUNIDAD DE MADRID P1",
+      "categorie": "P1",
+      "ville": "MADRID",
+      "pays": "Spain",
+      "date_debut": "2026-08-29",
+      "date_fin": "2026-09-06",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/comunidad-de-madrid-p1",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Galan",
+            "Chingotto"
+          ],
+          "finalistes": [
+            "Nieto",
+            "Yanguas"
+          ],
+          "score": "6-4 5-7 6-4"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "6-7 6-3 6-3"
+        }
+      }
+    },
+    {
+      "id": "270",
+      "nom": "PARIS MAJOR",
+      "categorie": "Major",
+      "ville": "PARIS",
+      "pays": "France",
+      "date_debut": "2026-09-06",
+      "date_fin": "2026-09-13",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/paris-major",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Galan",
+            "Chingotto"
+          ],
+          "score": "6-3 4-6 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "finalistes": [
+            "Fernandez Sanchez",
+            "Calvo Santamaria"
+          ],
+          "score": "6-2 6-0"
+        }
+      }
+    },
+    {
+      "id": "299",
+      "nom": "CUPRA ROTTERDAM  PREMIER PADEL P2",
+      "categorie": "P2",
+      "ville": "ROTTERDAM",
+      "pays": "Netherlands",
+      "date_debut": "2026-09-27",
+      "date_fin": "2026-10-04",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/rotterdam-p2-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Stupaczuk",
+            "Sanz"
+          ],
+          "score": "6-3 6-2"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "6-4 6-4"
+        }
+      }
+    },
+    {
+      "id": "273",
+      "nom": "GERMANY P2",
+      "categorie": "P2",
+      "ville": "DUSSELDORF",
+      "pays": "Germany",
+      "date_debut": "2026-10-04",
+      "date_fin": "2026-10-11",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/germany-p2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Stupaczuk",
+            "Sanz"
+          ],
+          "score": "6-2 7-6"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Calvo Santamaria",
+            "Fernandez Sanchez"
+          ],
+          "finalistes": [
+            "Ustero Prieto",
+            "Sanchez Fallada"
+          ],
+          "score": "6-3 6-0"
+        }
+      }
+    },
+    {
+      "id": "274",
+      "nom": "MILANO P1",
+      "categorie": "P1",
+      "ville": "MILANO",
+      "pays": "Italy",
+      "date_debut": "2026-10-10",
+      "date_fin": "2026-10-18",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/milano-p1-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Tapia",
+            "Coello"
+          ],
+          "finalistes": [
+            "Augsburger",
+            "Lebron"
+          ],
+          "score": "4-6 6-3 6-2"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "7-6 6-3"
+        }
+      }
+    },
+    {
+      "id": "302",
+      "nom": "KUWAIT MAJOR",
+      "categorie": "Major",
+      "ville": "KUWAIT",
+      "pays": "Kuwait",
+      "date_debut": "2026-10-23",
+      "date_fin": "2026-10-31",
+      "statut": "termine",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/kuwait-p1-2",
+      "resultats": {
+        "hommes": {
+          "vainqueurs": [
+            "Coello",
+            "Tapia"
+          ],
+          "finalistes": [
+            "Tello",
+            "Arce Simo"
+          ],
+          "score": "6-1 6-1"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Triay Pons",
+            "Brea Senesi"
+          ],
+          "finalistes": [
+            "Sanchez Fallada",
+            "Ustero Prieto"
+          ],
+          "score": "3-6 6-1 6-1"
+        }
+      }
+    },
+    {
+      "id": "303",
+      "nom": "DUBAI P1",
+      "categorie": "P1",
+      "ville": "DUBAI",
+      "pays": "United Arab Emirates",
+      "date_debut": "2026-11-08",
+      "date_fin": "2026-11-15",
+      "statut": "a_venir",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/dubai-p1-3",
+      "resultats": {
+        "hommes": null,
+        "femmes": null
+      }
+    },
+    {
+      "id": "276",
+      "nom": "MEXICO MAJOR",
+      "categorie": "Major",
+      "ville": "ACAPULCO",
+      "pays": "Mexico",
+      "date_debut": "2026-11-23",
+      "date_fin": "2026-11-29",
+      "statut": "a_venir",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/mexico-major",
+      "resultats": {
+        "hommes": null,
+        "femmes": null
+      }
+    },
+    {
+      "id": "277",
+      "nom": "PREMIER PADEL FINALS",
+      "categorie": "Finals",
+      "ville": "BARCELONA",
+      "pays": "Spain",
+      "date_debut": "2026-12-10",
+      "date_fin": "2026-12-13",
+      "statut": "a_venir",
+      "url_source": "https://premierpadel.com/en/tournaments-detail/premier-padel-finals-3",
+      "resultats": {
+        "hommes": null,
+        "femmes": null
+      }
+    }
+  ]
+}

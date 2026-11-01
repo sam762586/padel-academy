@@ -21,10 +21,11 @@ En cas de doute sur ce qu'une suite couvre : lire son en-tête dans `scripts/ver
 | raquettes (`raquettes.js`) | `node --check assets/js/raquettes.js`, `appliquer-gabarit.js` | raquettes, corrections |
 | compteur (`score.html`) | — | score, journal |
 | tournois (robot, `assets/data/`, `generer-pages.js`) | `node scripts/verifier-json.js` → `node scripts/generer-pages.js` | json, pages, tournois, accueil, seo |
+| actus pro (`scrape-pro.js`, `pro.json`, `generer-pro.js`) | `node scripts/generer-pro.js` | pro, actus-pro, seo |
 | `sw.js` ou la liste SHELL | changer `CACHE` dans sw.js | cache |
 | images, polices | `appliquer-gabarit.js` si un lien change | performance, design, seo |
 | migration SQL (`supabase/migrations/`) | aucune exécution en ligne ; vérification sur Postgres en mémoire (modèle `verifier-academie-sql.mjs`) | academie-sql, securite-sql + la vérification du lot, revue de `securite` |
 | nouvelle page | copier le squelette d'une page existante, `appliquer-gabarit.js`, sitemap par le générateur | design, menu, seo, performance |
 | avant toute publication | — | toutes : `node scripts/tout-verifier.cjs` |
 
-Ne jamais modifier à la main : `simulateur-3d-<id>.html`, `assets/3d/affiches/`, `tournoi/`, `tournois/`, `sitemap.xml`, `assets/js/quiz-tactique-donnees.js`, `assets/js/academie-questions.js`, les blocs `<!-- prerendu:… -->`, le menu et le pied de page des pages.
+Ne jamais modifier à la main : `simulateur-3d-<id>.html`, `assets/3d/affiches/`, `tournoi/`, `tournois/`, `sitemap.xml`, `assets/js/quiz-tactique-donnees.js`, `assets/js/academie-questions.js`, le bloc `<!-- pro:… -->` de `actus-pro.html`, les blocs `<!-- prerendu:… -->`, le menu et le pied de page des pages.

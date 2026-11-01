@@ -46,3 +46,6 @@ Journal : `scripts/logs/maj-hebdo.log`. Essai sur quelques départements : `scri
 
 Le PC doit être allumé et Microsoft Edge installé. Pour tout générer d'un coup (toute la France) : `node scripts/generer-pages.js --tout`.
 
+### Mise à jour quotidienne des actus pro
+`scripts\maj-quotidienne.bat` tourne chaque jour à 5 h : robot Premier Padel (`scripts/scrape-pro.js` → `assets/data/pro.json`), génération de `actus-pro.html` (`scripts/generer-pro.js`), commit des deux seuls fichiers, puis publication automatique avec les mêmes garde-fous que le lundi (seul commit en avance sur `origin/main`, rien en retard, jamais de `--force`). Pas de push non plus si la collecte du lundi est en cours (`scripts\maj-tournois.lock`) : celui du lendemain rattrape. Journal : `scripts/logs/maj-quotidienne.log` ; verrou : `scripts\maj-pro.lock`. La tâche « Apprendre Padel - Actus pro » est créée par le même `installer-maj-tournois.ps1`.
+

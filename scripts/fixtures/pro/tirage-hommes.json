@@ -1,0 +1,174 @@
+{
+ "status": true,
+ "data": {
+  "rounds": [
+   {
+    "name": "R64"
+   },
+   {
+    "name": "R32"
+   },
+   {
+    "name": "R16"
+   },
+   {
+    "name": "Quarterfinals"
+   },
+   {
+    "name": "Semifinals"
+   },
+   {
+    "name": "Final"
+   }
+  ],
+  "type": "MAJOR",
+  "slug": "kuwait-p1-2",
+  "status": "F",
+  "contestants": {
+   "14943": {
+    "players": [
+     {
+      "title": "Tello"
+     },
+     {
+      "title": "Arce Simo"
+     }
+    ]
+   },
+   "14945": {
+    "players": [
+     {
+      "title": "Coello"
+     },
+     {
+      "title": "Tapia"
+     }
+    ]
+   },
+   "14977": {
+    "players": [
+     {
+      "title": "Alonso"
+     },
+     {
+      "title": "Goñi Lacabe"
+     }
+    ]
+   },
+   "16221": {
+    "players": [
+     {
+      "title": "Libaak"
+     },
+     {
+      "title": "Alfonso"
+     }
+    ]
+   }
+  },
+  "matches": [
+   {
+    "roundIndex": 4,
+    "order": 0,
+    "sides": [
+     {
+      "contestantId": "14945",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": true
+       },
+       {
+        "mainScore": "6",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     },
+     {
+      "contestantId": "16221",
+      "scores": [
+       {
+        "mainScore": "2",
+        "isWinner": false
+       },
+       {
+        "mainScore": "2",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     }
+    ]
+   },
+   {
+    "roundIndex": 4,
+    "order": 1,
+    "sides": [
+     {
+      "contestantId": "14977",
+      "scores": [
+       {
+        "mainScore": "4",
+        "isWinner": false
+       },
+       {
+        "mainScore": "3",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     },
+     {
+      "contestantId": "14943",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": true
+       },
+       {
+        "mainScore": "6",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     }
+    ]
+   },
+   {
+    "roundIndex": 5,
+    "order": 0,
+    "sides": [
+     {
+      "contestantId": "14945",
+      "scores": [
+       {
+        "mainScore": "6",
+        "isWinner": true
+       },
+       {
+        "mainScore": "6",
+        "isWinner": true
+       }
+      ],
+      "isWinner": true
+     },
+     {
+      "contestantId": "14943",
+      "scores": [
+       {
+        "mainScore": "1",
+        "isWinner": false
+       },
+       {
+        "mainScore": "1",
+        "isWinner": false
+       }
+      ],
+      "isWinner": false
+     }
+    ]
+   }
+  ]
+ }
+}
