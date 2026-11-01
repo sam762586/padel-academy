@@ -12,7 +12,7 @@ Le site est servi par GitHub Pages depuis la branche `main` de github.com/sam762
 ## 1. État
 - `git branch --show-current` : si ce n'est pas `main`, demande comment intégrer avant d'aller plus loin.
 - `git status --short` : les modifications non commitées NE partent PAS (elles peuvent venir d'une autre session en cours). Liste-les ; si Samuel veut les publier, elles passent d'abord par la compétence `chef`.
-- `git fetch origin`, puis `git log --oneline origin/main..HEAD` (ce qui va partir) et `git log --oneline HEAD..origin/main` (ce qui manque en local). Rien à publier : dis-le et arrête-toi. En retard sur origin/main : demande avant `git pull --rebase`.
+- `git fetch origin`, puis `git log --oneline origin/main..HEAD` (ce qui va partir) et `git log --oneline HEAD..origin/main` (ce qui manque en local). Rien à publier : dis-le et arrête-toi. En retard sur origin/main : si tous les commits manquants sont de `github-actions[bot]` (mises à jour automatiques des actus et des tournois, `git log --format=%an HEAD..origin/main`), fais `git pull --rebase origin main` sans demander (conflit : `git rebase --abort`, arrête-toi et explique) ; sinon demande avant `git pull --rebase`.
 
 ## 2. Contrôles (tous obligatoires)
 1. `node scripts/tout-verifier.cjs` (toutes les suites). Code 1 : stop, envoie `testeur` diagnostiquer et rends la liste des échecs. Code 2 : dis quelles suites n'ont pas tourné et pourquoi, et demande à Samuel s'il publie quand même.
