@@ -46,8 +46,11 @@ function nav(actif, prefixe = "") {
   // Lien d'évitement (WCAG 2.4.1) : premier élément focalisable, mène à <main id="contenu"> posé par appliquer-gabarit.js
   // (pages de la racine) et par generer-pages.js (pages tournois) ; il fait partie du bloc menu remplacé par appliquer-gabarit.js,
   // donc jamais dupliqué. Hamburger : nom fixe « Menu », l'état est porté par aria-expanded (nav.js garde ce nom).
+  // Script en ligne : pose .nav-js avant le premier rendu (nav.js est en defer) pour que le menu replié ne fasse pas sauter
+  // la page (CLS 0,93 → 0, audit du 03/11/2026). Sans JavaScript, il ne s'exécute pas et le menu reste déplié. Si nav.js n'a
+  // pas tourné à la fin du chargement (fichier bloqué, réseau coupé), la classe est retirée : menu déplié plutôt que bouton mort.
   return `<a class="evitement" href="#contenu">Aller au contenu</a>
-<nav class="nav" aria-label="Navigation principale">
+<nav class="nav" aria-label="Navigation principale"><script>document.documentElement.classList.add("nav-js");addEventListener("load",function(){if(!window.PA_NAV)document.documentElement.classList.remove("nav-js")})</script>
   <div class="wrap">
     <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-256.webp" width="74" height="38" alt="" decoding="async"><span class="brand-texte">Apprendre <span>Padel</span></span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>

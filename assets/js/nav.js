@@ -36,7 +36,8 @@
     location.replace(racine+'connexion.html'+q+h);
     return;
   }
-  document.documentElement.classList.add('nav-js');
+  // .nav-js est déjà posée par le script en ligne du gabarit (avant le premier rendu) ; PA_NAV lui dit que nav.js a bien tourné.
+  document.documentElement.classList.add('nav-js');window.PA_NAV=true;
   var btn=document.querySelector('.nav-toggle'), ul=document.getElementById('nav-menu');
   if(btn&&ul){
     var groupes=[].slice.call(ul.querySelectorAll('.nav-groupe'));
