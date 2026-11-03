@@ -73,7 +73,7 @@ function footer(prefixe = "") {
    Une page publiée ne peut donc jamais être servie avec un ancien style ou un ancien script gardé en cache
    (service worker, navigateur) : quand le fichier change, son adresse change. Empreinte calculée sur le contenu
    aux fins de ligne normalisées (identique sous Windows et sous Linux). assets/data/ n'est pas versionné (jamais mis en cache).
-   Feuilles de style propres à une page (assets/<nom>.css) : versionnées de la même façon.
+   Feuilles de style propres à une page (assets/<nom>.css) ou à un groupe de pages (assets/css/<nom>.css) : versionnées de la même façon.
    Modules ES (simulateur 3D) : la carte d'import de la page (<script type="importmap">) est réécrite par carteModules(),
    chaque module y reçoit son « ?v=<empreinte> », y compris ceux qu'il importe lui-même (imports relatifs). */
 const fs = require("fs");
@@ -106,8 +106,34 @@ const SANS_DEFER = /(?:^|\/)anti-cadre\.js(?:\?|$)/;
 function differer(html) {
   return html.replace(/<script src="((?!https?:)[^"]+)"( defer)?><\/script>/g, (m, src) => `<script src="${src}"${SANS_DEFER.test(src) ? "" : " defer"}></script>`);
 }
+/* Feuilles de style par groupe de pages (lot 3b de l'audit du 03/11) : assets/style.css garde les jetons (:root) et les composants
+   communs ; ce qui ne sert qu'à une page ou à un petit groupe est dans assets/css/<nom>.css, chargé APRÈS style.css, dans l'ordre
+   d'ORDRE_FEUILLES (la cascade en dépend : une règle sortie de style.css doit rester derrière les règles communes qu'elle surchargeait).
+   Source unique : appliquer-gabarit.js (pages de la racine) et generer-pages.js (tournoi/, tournois/) posent les liens d'après cette table ;
+   scripts/verifier-feuilles.cjs contrôle qu'une page qui utilise une classe d'une feuille la charge. */
+const ORDRE_FEUILLES = ["tournois", "contenu", "joueur", "compte", "technique-tactique", "accueil"];
+const FEUILLES = {
+  accueil: ["index.html"],
+  tournois: ["tournois.html", "compte.html", "tournoi/*", "tournois/*"],
+  joueur: ["espace.html", "academie.html", "entrainement.html", "score.html"],
+  compte: ["compte.html", "partenaires.html", "connexion.html", "concours.html"],
+  contenu: ["materiel.html", "bareme.html", "niveau.html", "actus-pro.html", "clubs.html", "videos.html", "lexique.html", "conseils.html", "premier-tournoi.html", "regles.html", "competition.html", "tutos.html", "technique.html", "tactique.html", "entrainement.html", "carte.html"],
+  "technique-tactique": ["technique.html", "tactique.html", "tutos.html", "academie.html"],
+};
+// Feuilles à charger pour une page ("index.html", "tournoi/282417.html"…), dans l'ordre de la cascade
+function feuillesDe(page) {
+  return ORDRE_FEUILLES.filter(nom => FEUILLES[nom].some(p => p.endsWith("/*") ? page.startsWith(p.slice(0, -1)) : p === page));
+}
+// Pose (ou corrige) les liens vers ces feuilles juste après celui de style.css ; « prefixe » : "", "../" ou "/" selon la page
+function poserFeuilles(html, page, prefixe = "") {
+  const sansFeuilles = html.replace(/<link rel="stylesheet" href="[^"]*assets\/css\/[\w-]+\.css[^"]*">\n?/g, "");
+  const motif = /(<link rel="stylesheet" href="[^"]*assets\/style\.css[^"]*">)\n?/;
+  if (!motif.test(sansFeuilles)) return sansFeuilles;
+  const liens = feuillesDe(page).map(nom => `<link rel="stylesheet" href="${prefixe}assets/css/${nom}.css">\n`).join("");
+  return sansFeuilles.replace(motif, (m, lienStyle) => lienStyle + "\n" + liens);
+}
 function versionner(html) {
-  return differer(html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:[\w-]+\.css|js\/[\w-]+\.js|vendor\/[\w.-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
+  return differer(html.replace(/(href|src)="((?:\.\.\/)*|\/)?(assets\/(?:(?:css\/)?[\w-]+\.css|js\/[\w-]+\.js|vendor\/[\w.-]+\.js))(?:\?v=[0-9a-f]+)?"/g,
     (m, attr, prefixe, fichier) => `${attr}="${prefixe || ""}${fichier}?v=${empreinte(fichier)}"`))
     .replace(/<script type="importmap">[\s\S]*?<\/script>/, () => `<script type="importmap">${carteModules()}</script>`);
 }
@@ -131,4 +157,4 @@ function poserMain(html) {
   if (!motif.test(html)) throw new Error("menu ou pied de page introuvable : <main> non posé");
   return html.replace(motif, (m, menu, corps) => `${menu}\n${MAIN_OUVERT}\n${corps}\n</main>\n<footer>`);
 }
-module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, SDK_SUPABASE, empreinte, carteModules, poserMain, MAIN_OUVERT };
+module.exports = { NOM_SITE, AUTEUR, MENU, APPEL, SECTIONS, section, PAGES_MENU, nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, SDK_SUPABASE, empreinte, carteModules, poserMain, MAIN_OUVERT, FEUILLES, ORDRE_FEUILLES, feuillesDe, poserFeuilles };

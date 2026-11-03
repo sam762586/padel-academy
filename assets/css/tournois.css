@@ -1,0 +1,191 @@
+/* Tournois : liste et filtres (tournois.html), carte de France, favoris, fiches et listes générées (tournoi/, tournois/), communauté sur la fiche, et les pages qui les réutilisent.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : tournois.html, compte.html, tournoi/*.html, tournois/*.html.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+/* TOURNOIS */
+.tfiltres{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:16px;background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:20px;align-items:end}
+.tfiltres label:not(.tchip),.tfiltres legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.tfiltres fieldset{border:0;margin:0;padding:0;min-width:0}
+.tfiltres input[type=search],.tfiltres input[type=date],.tfiltres select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.tfiltres input:focus-visible,.tfiltres select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tperiode{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tperiode>div{min-width:0}
+@media (max-width:420px){.tperiode{grid-template-columns:minmax(0,1fr)}}
+.tcompteur{font-family:var(--display);font-size:1.8rem;text-transform:uppercase;color:var(--sand);line-height:1}
+.tliste{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.tcard{display:flex;flex-direction:column;gap:8px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.tcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tcard h3{font-size:1.35rem;line-height:1.05;overflow-wrap:anywhere}
+.tbadge{flex:none;font-family:var(--display);font-weight:900;font-size:1.1rem;padding:2px 10px;border-radius:8px;background:var(--sand);color:#1a1200}
+.tlieu{color:var(--muted);font-size:.92rem;overflow-wrap:anywhere}
+.tinfos{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;color:#fff;font-weight:600;font-size:.9rem}
+.tlimite{font-size:.85rem;color:var(--muted)}
+.tlimite.proche{color:var(--sand);font-weight:700}
+.tlimite.clos{color:var(--coral);font-weight:700}
+.tlien{margin-top:auto;padding-top:6px;color:var(--turf);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+/* TOURNOIS : zone, pagination */
+.tgroupe-large{grid-column:1 / -1}
+.tzone{display:grid;gap:12px}
+.tpanneau label{display:block}
+.tville{position:relative}
+.tsuggest{list-style:none;margin:6px 0 0;padding:4px;position:absolute;left:0;right:0;z-index:5;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-s);box-shadow:var(--shadow);max-height:260px;overflow-y:auto}
+.tsuggest button{display:block;width:100%;min-height:40px;text-align:left;background:none;border:0;color:var(--fg);font-family:var(--body);font-size:.95rem;padding:10px 12px;border-radius:8px;cursor:pointer}
+.tsuggest button:hover,.tsuggest button:focus-visible{background:var(--glass-2)}
+/* liste qui défile : cadre à l'intérieur, jamais rogné */
+.tzone input[type=text]{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
+.tzone input[type=range]{width:100%;min-height:40px;margin:0;accent-color:var(--turf)}
+.tzone output{color:var(--sand);font-weight:800}
+.tbarre-btns{display:flex;gap:10px;flex-wrap:wrap}
+.tdetail{color:var(--dim);font-size:.8rem;margin-top:6px}
+.tdist{color:var(--turf)}
+.tplus:empty{display:none}
+.tplus{display:flex;flex-direction:column;gap:8px}
+.tplus-wrap{display:flex;justify-content:center;margin-top:20px}
+.carte-bloc{margin:0 0 24px;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass)}
+.carte-tete{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.carte-titre{font-size:1.6rem}
+.carte-corps{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:16px 24px;align-items:start;margin-top:12px}
+.carte-svg-wrap{position:relative;min-width:0;max-width:640px;width:100%;margin:0 auto}
+.carte-zone svg{display:block;width:100%;height:auto;max-width:100%;touch-action:manipulation}
+.carte-dep{fill:var(--carte-0);stroke:var(--carte-trait);stroke-width:.8;stroke-linejoin:round;cursor:pointer;transition:fill .15s}
+.carte-dep[data-classe="1"]{fill:var(--carte-1)}
+.carte-dep[data-classe="2"]{fill:var(--carte-2)}
+.carte-dep[data-classe="3"]{fill:var(--carte-3)}
+.carte-dep[data-classe="4"]{fill:var(--carte-4)}
+.carte-dep:hover{stroke:#fff;stroke-width:1.4}
+.carte-dep:focus{outline:none}
+.carte-dep:focus-visible{stroke:var(--sand);stroke-width:2.4}
+.carte-dep.carte-sel{stroke:var(--sand);stroke-width:2.6}
+.carte-bulle{position:absolute;z-index:3;pointer-events:none;white-space:nowrap;max-width:100%;padding:6px 10px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font-size:.82rem;font-weight:700;box-shadow:var(--shadow)}
+.carte-bulle[hidden]{display:none}
+.carte-legende{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.82rem;color:var(--muted)}
+.carte-legende li{display:inline-flex;align-items:center;gap:6px}
+.carte-legende i{width:16px;height:16px;border-radius:4px;border:1px solid var(--line-2);display:inline-block}
+.carte-legende i[data-classe="0"]{background:var(--carte-0)}
+.carte-legende i[data-classe="1"]{background:var(--carte-1)}
+.carte-legende i[data-classe="2"]{background:var(--carte-2)}
+.carte-legende i[data-classe="3"]{background:var(--carte-3)}
+.carte-legende i[data-classe="4"]{background:var(--carte-4)}
+.carte-note{color:var(--dim);font-size:.8rem;margin-top:8px}
+.carte-note:empty{display:none}
+.tliens{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:auto}
+.tliens .tlien{margin-top:0}
+.tliens .tpartenaire{color:var(--sand)}
+@media (max-width:700px){
+  .carte-corps{grid-template-columns:minmax(0,1fr)}
+  .carte-bloc{padding:12px}
+}
+/* ===== Favoris tournois (tournois.html) ===== */
+.tcard-coin{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tfav{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--field-line);border-radius:50%;background:rgba(0,0,0,.25);color:var(--sand);font-size:1.35rem;line-height:1;cursor:pointer;padding:0}
+.tfav[aria-pressed="true"]{background:rgba(255,181,71,.16);border-color:var(--sand)}
+.tfav:hover{border-color:var(--sand)}
+.tfav:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tcal{background:none;border:0;padding:0;font-family:var(--body);cursor:pointer;color:var(--sky);min-height:40px}
+.tcal:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.tliens .tlien{min-height:40px;display:inline-flex;align-items:center}
+.tmes{margin-bottom:28px;padding:18px;border:1px solid rgba(255,181,71,.35);border-radius:var(--r);background:rgba(255,181,71,.05)}
+.tmes-titre{font-size:clamp(1.8rem,4.5vw,2.4rem)}
+.tmes-aide{color:var(--muted);font-size:.9rem;margin:8px 0 14px;max-width:60em}
+.tcard.tpasse{opacity:.6}
+.cat-badge.cat-p25{background:var(--cat-p25)}
+.cat-badge.cat-p50{background:var(--cat-p50)}
+.cat-badge.cat-p100{background:var(--cat-p100)}
+.cat-badge.cat-p250{background:var(--cat-p250)}
+.cat-badge.cat-p500{background:var(--cat-p500)}
+.cat-badge.cat-p1000,.cat-badge.cat-p2000,.cat-badge.cat-p3000{background:var(--cat-p1000)}
+.cat-badge-xl{font-size:clamp(1.8rem,6vw,2.6rem);padding:6px 14px;border-radius:12px}
+.gen-fil ol{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:4px 8px;font-size:.85rem;color:var(--dim)}
+.gen-fil li+li::before{content:"›";margin-right:8px;color:var(--dim)}
+.gen-fil a{color:var(--muted)}
+.gen-tete{margin-bottom:28px}
+.gen-tete h1{font-size:clamp(2.2rem,6vw,3.6rem)}
+.gen-tete-ligne{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.gen-lieu{font-size:1.15rem;font-weight:700;margin:12px 0 0}
+.gen-dates{color:var(--muted);margin:4px 0 0}
+.gen-distance{margin:14px 0 0;color:var(--muted)}
+.gen-distance b{font-family:var(--display);font-size:clamp(2.4rem,8vw,3.4rem);font-weight:900;color:var(--turf);margin-right:8px;line-height:1}
+.gen-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.gen-actions .btn{min-height:48px}
+.gen-intro{color:var(--muted);max-width:46em;margin-top:12px}
+.gen-bloc{margin-top:36px}
+.gen-bloc h2{font-size:clamp(1.8rem,4.5vw,2.4rem);margin-bottom:14px}
+.gen-bloc h2:not(:first-child){margin-top:28px}
+.gen-bareme table{font-variant-numeric:tabular-nums;overflow-wrap:normal}
+.gen-bareme th span{display:block;font-size:.7rem;color:var(--dim);font-weight:600}
+.gen-infos{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.gen-liens{margin:0;padding-left:20px;display:grid;gap:6px}
+.gen-liens-ligne{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.gen-liens-ligne a{display:inline-flex;align-items:center;min-height:40px;padding:6px 12px;border:1px solid var(--line-2);border-radius:999px;text-decoration:none;color:var(--fg)}
+.gen-dep{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:24px;align-items:start;margin-bottom:20px}
+.gen-carte{margin:0}
+.gen-carte svg{width:100%;max-height:360px;display:block}
+.gen-carte path{fill:rgba(var(--turf-rgb),.08);stroke:var(--turf);stroke-width:.6}
+.gen-carte circle{fill:var(--cat-p100);stroke:var(--bg);stroke-width:.3}
+.gen-carte figcaption{font-size:.8rem;color:var(--dim);margin-top:6px}
+.gen-filtres{display:grid;gap:14px}
+.gen-filtres fieldset{border:0;margin:0;padding:0;min-width:0}
+.gen-filtres legend,.gen-filtres label:not(.tchip){display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.gen-filtres-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gen-filtres-dates>div{min-width:0}
+.gen-filtres input[type=date]{width:100%;min-width:0;min-height:44px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:9px 10px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.gen-liste{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.gen-item[hidden]{display:none}
+.gen-item a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 14px;min-height:56px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);text-decoration:none;color:var(--fg)}
+.gen-item a:hover{border-color:var(--line-2)}
+.gen-item-texte{display:grid;min-width:0}
+.gen-item-texte b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-item-texte span{color:var(--muted);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gen-item-date{color:var(--muted);font-size:.85rem;text-align:right;white-space:nowrap}
+@media (max-width:700px){
+  .gen-dep{grid-template-columns:1fr}
+  .gen-item a{grid-template-columns:auto minmax(0,1fr)}
+  .gen-item-date{grid-column:2;text-align:left}
+}
+@media (max-width:420px){.gen-filtres-dates{grid-template-columns:minmax(0,1fr)}}
+.tcard-lien{color:inherit;text-decoration:none}
+.tcard-lien:hover{text-decoration:underline}
+.tliens .tfiche{color:var(--fg)}
+/* ===== Communauté sur la fiche tournoi (J'y vais, annonces, avis) ===== */
+#ft-communaute>div+div{margin-top:26px}
+.ct-titre{font-size:1.4rem;text-transform:uppercase;margin-bottom:8px}
+.ct-compte{margin:0 0 10px;color:var(--muted)}
+.ct-compte b{font-family:var(--display);font-size:2.2rem;font-weight:900;color:var(--fg);margin-right:6px}
+.ct-joueurs{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.ct-joueur{display:inline-flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1px solid var(--line-2);border-radius:999px;font-size:.9rem}
+.ct-joueur.moi{border-color:var(--turf)}
+.ct-initiale{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--turf);color:var(--accent-fg);font-weight:800}
+.ct-jyvais{background:var(--cat-p100);color:var(--cat-fg);border-color:var(--cat-p100);min-height:48px}
+.ct-jyvais[aria-pressed="true"]{background:transparent;color:var(--fg);border-color:var(--line-2)}
+.ct-annonces{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
+.ct-annonces li{padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass)}
+.ct-annonces p{margin:6px 0 0;color:var(--muted)}
+.ct-club{margin:0 0 14px}
+.ct-club b{color:var(--sand);font-size:1.15rem}
+.ct-avis{padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass);margin-bottom:10px}
+.ct-avis-tete{margin:0;color:var(--muted)}
+.ct-avis-tete b{color:var(--fg)}
+.ct-notes{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;font-size:.92rem}
+.ct-etoiles{color:var(--sand);letter-spacing:.1em}
+.ct-avis-texte{margin:8px 0 0}
+.ct-signaler{margin-top:8px}
+.ct-signaler summary{cursor:pointer;color:var(--dim);min-height:44px;display:flex;align-items:center}
+.ct-signaler select{min-height:44px;margin:6px 8px 6px 0;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:8px}
+.ct-form{display:grid;gap:12px;padding:16px;border:1px solid var(--line-2);border-radius:var(--r);margin-top:12px;max-width:640px}
+.ct-form h4{font-size:1.2rem;text-transform:uppercase}
+.ct-form fieldset{border:0;margin:0;padding:0;min-width:0}
+.ct-form legend,.ct-label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.ct-charte{display:flex;gap:8px;align-items:flex-start}
+.ct-charte input{width:22px;height:22px;margin-top:2px}
+.ct-form .btn{min-height:48px;justify-self:start}
+/* Tournois : états du chargement (chargement, erreur) — le squelette réserve la place de la liste */
+.tetat-chargement{min-height:70vh}
+.tetat-squelette{display:grid;gap:12px;margin-top:8px}
+.tetat-squelette i{display:block;height:132px;border-radius:var(--r);border:1px solid var(--line);background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(255,255,255,.07),rgba(255,255,255,.03));background-size:200% 100%;animation:tetat-lueur 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.tetat-squelette i{animation:none}}
+.tetat-erreur{margin:12px 0;padding:16px 18px;border:1px solid rgba(255,93,74,.45);border-radius:var(--r);background:rgba(255,93,74,.08)}
+.tetat-erreur p{margin:0;color:var(--muted)}
+.tetat-erreur b{color:var(--fg)}
+/* Tournois : la date de mise à jour arrive avec les données ; deux lignes réservées pour que la page ne bouge pas */
+#tournois-maj{display:block;min-height:3.2em}

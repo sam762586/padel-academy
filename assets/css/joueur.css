@@ -1,0 +1,384 @@
+/* Espace joueur : Mon espace, Mon académie, Mon plan, compteur de match (score.html), diagnostic, défi, exercices.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : espace.html, academie.html, entrainement.html, score.html.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+.week{display:grid;grid-template-columns:auto auto 1fr;gap:16px;align-items:start;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;transition:opacity .2s}
+.week.done{opacity:.55}
+.week.done h3{text-decoration:line-through}
+.wnum{font-family:var(--display);font-weight:900;font-size:2rem;color:var(--sand);line-height:1}
+.wbody{min-width:0}
+.wbody h3{font-size:1.4rem}
+.wobj{color:var(--muted);font-size:.93rem;margin-top:4px}
+.wobj b,.wbody details b{color:#fff}
+.wbody details{margin-top:8px}
+.wbody summary{cursor:pointer;color:var(--turf);font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;list-style:none}
+.wbody summary::before{content:"+ "}
+.wbody details[open] summary::before{content:"– "}
+.wbody details p{color:var(--muted);font-size:.92rem;margin-top:8px}
+.wcheck{position:relative;display:block;width:26px;height:26px;cursor:pointer;margin-top:4px}
+.wcheck input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;z-index:1;cursor:pointer}
+.wcheck input:disabled{cursor:wait}
+.plan-actions{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.plan-actions .btn{white-space:normal;text-align:left;max-width:100%}
+.wcheck span{position:absolute;inset:0;border:2px solid var(--field-line);border-radius:7px;transition:all .15s}
+.wcheck input:checked+span{background:var(--turf);border-color:var(--turf)}
+.wcheck input:checked+span::after{content:"";position:absolute;left:8px;top:3px;width:6px;height:12px;border:solid var(--accent-fg);border-width:0 3px 3px 0;transform:rotate(45deg)}
+.wcheck input:focus-visible+span{outline:3px solid var(--sand);outline-offset:2px}
+@media (max-width:600px){.week{grid-template-columns:auto 1fr}.wnum{grid-column:2}.wbody{grid-column:1 / span 2}}
+.sc-carte{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:20px;max-width:640px}
+.sc-carte fieldset{border:0;margin:18px 0 0;padding:0;min-width:0}
+.sc-carte legend,.sc-carte label:not(.tchip){display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.sc-noms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sc-noms input{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
+.sc-noms input:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.sc-gros{width:100%;min-height:56px;margin-top:22px;justify-content:center}
+.sc-tableau{background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r);padding:8px 14px;max-width:640px}
+.sc-ligne{display:grid;grid-template-columns:18px minmax(0,1fr) auto 44px 56px;align-items:center;gap:10px;padding:10px 0}
+.sc-ligne+.sc-ligne{border-top:1px solid var(--line)}
+.sc-entete{padding:2px 0 0;font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700}
+.sc-entete .sc-jeux,.sc-entete .sc-pts,.sc-entete .sc-sets{font-family:var(--body);font-size:.62rem;font-weight:700;color:var(--dim);letter-spacing:.1em}
+.sc-entete+.sc-ligne{border-top:0}
+#sc-tableau{scroll-margin-top:76px}
+.sc-service{color:var(--sand);font-size:.9rem;grid-column:1}
+.sc-nom{grid-column:2;font-weight:700;font-size:1.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-sets{grid-column:3;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.08em}
+.sc-jeux{grid-column:4;text-align:center;font-family:var(--display);font-size:2rem;font-weight:800;color:var(--fg)}
+.sc-pts{grid-column:5;text-align:center;font-family:var(--display);font-size:2.6rem;font-weight:900;color:var(--turf);line-height:1}
+.sc-situation{min-height:1.6em;margin:10px 0 0;color:var(--sand);font-weight:700}
+.sc-gagnants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;max-width:640px}
+.sc-point{min-height:112px;border:0;border-radius:var(--r);background:var(--turf);color:var(--accent-fg);font-family:var(--body);font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;touch-action:manipulation}
+.sc-point span{font-family:var(--display);font-size:1.9rem;font-weight:900;letter-spacing:.02em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-point.b{background:var(--sky)}
+.sc-point:active{transform:scale(.98)}
+.sc-point:focus-visible,.sc-motifs button:focus-visible,.sc-histo:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.sc-motifs{margin-top:14px;max-width:640px}
+.sc-motifs-titre{font-weight:800;margin:0 0 10px}
+.sc-motifs-grille{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sc-motifs-grille button{min-height:56px;border:1px solid var(--field-line);border-radius:var(--r-s);background:var(--glass-2);color:var(--fg);font-family:var(--body);font-weight:700;font-size:1rem;cursor:pointer;padding:8px;touch-action:manipulation}
+.sc-motifs-grille button:active{background:var(--turf);color:var(--accent-fg)}
+.sc-retour{width:100%;min-height:56px;margin-top:8px;justify-content:center}
+.sc-outils{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.sc-outils .btn{min-height:48px}
+.sc-confirmation{margin-top:12px;padding:14px;border:1px solid var(--coral);border-radius:var(--r-s);max-width:640px}
+.sc-confirmation p{margin:0 0 10px}
+.sc-confirmation .btn{min-height:48px;margin:4px 6px 0 0}
+.sc-recap-vainqueur{font-family:var(--display);font-size:1.8rem;font-weight:900;text-transform:uppercase;color:var(--turf);margin:14px 0 0;line-height:1}
+.sc-recap-score{font-family:var(--display);font-size:2.4rem;font-weight:800;margin:6px 0 0;line-height:1;font-variant-numeric:tabular-nums}
+.sc-bloc{margin-top:20px}
+.sc-bloc h3{font-size:1.2rem;text-transform:uppercase;margin-bottom:8px}
+.sc-barre{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr) auto;align-items:center;gap:10px;margin:6px 0;font-size:.9rem}
+.sc-barre-nom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.sc-barre-piste{height:12px;border-radius:999px;background:var(--glass-2);overflow:hidden}
+.sc-barre-rempli{display:block;height:100%;border-radius:999px;background:var(--turf)}
+.sc-barre-rempli.b{background:var(--sky)}
+.sc-barre-val{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sc-serie{margin-top:18px;font-weight:700}
+.sc-historique{list-style:none;margin:10px 0 14px;padding:0;display:grid;gap:8px;max-width:640px}
+.sc-histo{width:100%;min-height:56px;display:grid;grid-template-columns:4.2em minmax(0,1fr) auto;align-items:center;gap:10px;text-align:left;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);color:var(--fg);font-family:var(--body);font-size:.95rem;padding:8px 12px;cursor:pointer}
+.sc-histo-date{color:var(--dim);font-weight:700;font-size:.8rem;text-transform:uppercase}
+.sc-histo-noms{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-histo-score{font-weight:800;font-variant-numeric:tabular-nums}
+@media (max-width:420px){
+  .sc-ligne{grid-template-columns:14px minmax(0,1fr) auto 40px 52px;gap:8px}
+  .sc-histo{grid-template-columns:minmax(0,1fr) auto}
+  .sc-histo-date{grid-column:1 / -1}
+}
+/* ===== Tableau de bord « Mon padel » (compte.html) ===== */
+.mp{margin-bottom:24px}
+.mp-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin-top:14px}
+.mp-bloc{background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:var(--r-s);padding:16px;min-width:0}
+.mp-bloc h3{font-size:1.15rem;text-transform:uppercase;margin-bottom:10px}
+.mp-bloc .btns{margin-top:12px}
+.mp-chiffres{display:grid;gap:10px}
+.mp-chiffre b{display:block;font-family:var(--display);font-size:2.6rem;font-weight:900;line-height:1;color:var(--turf)}
+.mp-chiffre.alerte b{color:var(--coral)}
+.mp-chiffre span{color:var(--muted);font-size:.9rem}
+.mp-liste{margin:12px 0 0;padding-left:18px;font-size:.92rem}
+.mp-liste li+li{margin-top:4px}
+.mp-form-rang{display:grid;gap:10px}
+.mp-form-rang fieldset{border:0;margin:0;padding:0;min-width:0}
+.mp-form-rang label:not(.tchip),.mp-form-rang legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.mp-form-rang input[type=number]{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem}
+.mp-form-rang input:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.mp-form-rang .btn{min-height:48px;justify-content:center}
+.mp-palier-ligne{margin:12px 0 0}
+.mp-tendance{margin:0 0 10px}
+.mp-sens{font-weight:800}
+.mp-sens.hausse{color:var(--turf)}
+.mp-sens.baisse{color:var(--coral)}
+.mp-sens.stable{color:var(--sand)}
+.mp-matchs{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mp-matchs li{display:grid;grid-template-columns:28px minmax(0,1fr) 64px 3em;align-items:center;gap:10px;font-size:.9rem}
+.mp-issue{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;background:var(--glass-2);color:var(--muted)}
+.mp-issue.v{background:var(--turf);color:var(--accent-fg)}
+.mp-issue.d{background:var(--coral);color:#1a0603}
+.mp-match-texte{display:grid;min-width:0}
+.mp-match-date{color:var(--dim);font-size:.75rem;font-weight:700;text-transform:uppercase}
+.mp-match-noms{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-match-score{font-weight:800;font-variant-numeric:tabular-nums}
+.mp-pct{height:10px;border-radius:999px;background:var(--glass-2);overflow:hidden}
+.mp-pct-rempli{display:block;height:100%;background:var(--turf);border-radius:999px}
+.mp-pct-val{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+/* ===== Espace joueur (espace.html) ===== */
+.esp-statut{margin-bottom:12px}
+.esp-sommaire{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.esp-sommaire a{display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border:1px solid var(--line-2);border-radius:999px;color:var(--fg);text-decoration:none;font-weight:700;font-size:.9rem}
+.esp-sommaire a:hover{border-color:var(--turf)}
+.esp-carte{scroll-margin-top:80px}
+#mon-padel{scroll-margin-top:80px}
+.esp-titre{font-size:clamp(1.8rem,4.5vw,2.4rem);margin-bottom:12px}
+.esp-form{display:grid;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.esp-form h3{font-size:1.15rem;text-transform:uppercase}
+.esp-ligne{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:12px}
+.esp-ligne>div{min-width:0}
+.esp-form label:not(.tchip),.esp-form legend{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px;padding:0}
+.esp-form fieldset{border:0;margin:0;padding:0;min-width:0}
+.esp-form input[type=text],.esp-form input[type=number],.esp-form input[type=date],.esp-form select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.esp-form input:focus-visible,.esp-form select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.esp-form .btn{min-height:48px;justify-self:start}
+.esp-form [hidden]{display:none}
+.esp-objectifs{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.esp-objectif{padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.esp-objectif.atteint{border-color:var(--turf)}
+.esp-objectif-tete{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.esp-badge{padding:2px 10px;border-radius:999px;background:var(--turf);color:var(--accent-fg);font-weight:800;font-size:.8rem}
+.esp-barre{height:12px;border-radius:999px;background:var(--glass-2);overflow:hidden;margin:10px 0 6px}
+.esp-barre span{display:block;height:100%;border-radius:999px;background:var(--turf)}
+.esp-objectif-details{margin:0;color:var(--muted);font-size:.92rem}
+.esp-total{margin:0 0 6px;color:var(--muted)}
+.esp-total b{font-family:var(--display);font-size:2.6rem;font-weight:900;color:var(--turf);margin-right:6px;line-height:1}
+#esp-resultats{margin-top:16px}
+#esp-resultats tr.dim td{color:var(--dim)}
+#esp-resultats .x{min-width:40px;min-height:40px}
+.esp-graphe{position:relative;margin-top:12px}
+.esp-courbe{display:block;width:100%;height:auto}
+.esp-grille{stroke:var(--line);stroke-width:1}
+.esp-axe{fill:var(--dim);font-family:var(--body);font-size:12px}
+.esp-ligne{fill:none;stroke:var(--turf);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.esp-point{fill:var(--turf);stroke:var(--bg);stroke-width:2}
+.esp-point.actif{r:7}
+.esp-survol{fill:transparent;cursor:crosshair}
+.esp-survol:focus-visible{outline:2px solid var(--sand)}
+.esp-bulle{position:absolute;margin:0;padding:6px 10px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg);font-size:.85rem;font-weight:700;white-space:nowrap;pointer-events:none}
+.esp-donnees{margin-top:12px}
+.esp-donnees summary{cursor:pointer;color:var(--muted);min-height:44px;display:flex;align-items:center}
+.sc-noms+.sc-noms{margin-top:12px}
+/* Espace joueur : matchs */
+.esp-periodes{margin-bottom:14px}
+.esp-tuiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:10px;margin-bottom:12px}
+.esp-tuile{padding:12px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.esp-tuile b{display:block;font-family:var(--display);font-size:2rem;font-weight:900;line-height:1;color:var(--fg)}
+.esp-tuile span{color:var(--muted);font-size:.85rem}
+.esp-sous-titre{font-size:1.1rem;text-transform:uppercase;margin:18px 0 8px}
+.esp-types{color:var(--muted);margin:12px 0 0}
+.esp-types b{color:var(--fg)}
+.esp-journal{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.esp-journal-texte{display:grid;min-width:0}
+.esp-journal-texte span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.esp-journal .x{min-width:40px;min-height:40px}
+.esp-journal .x,#esp-resultats .x{display:grid;place-items:center;background:transparent;border:1px solid var(--line-2);border-radius:10px;color:var(--muted);font-size:1rem;cursor:pointer}
+.esp-journal .x:hover,#esp-resultats .x:hover{border-color:var(--coral);color:var(--coral)}
+.esp-journal .x:focus-visible,#esp-resultats .x:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.esp-tbl-compact table{width:100%;min-width:0}
+.esp-tbl-compact th,.esp-tbl-compact td{padding:8px 10px;white-space:nowrap}
+.esp-tbl-compact td:first-child{white-space:normal}
+/* Espace joueur : exercices recommandés */
+.ex-theme{margin-top:18px}
+.ex-theme h3{font-size:1.25rem;text-transform:uppercase;margin-bottom:6px}
+.ex-raisons{margin:0 0 10px;padding-left:18px;color:var(--muted);font-size:.9rem}
+.ex-carte{padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2);margin-top:10px}
+.ex-tete{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ex-tete h4{font-size:1.1rem;text-transform:uppercase}
+.ex-meta{color:var(--sand);font-weight:700;font-size:.85rem;white-space:nowrap}
+.ex-carte p{margin:8px 0 0}
+.ex-pied{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px}
+.ex-pied a{min-height:40px;display:inline-flex;align-items:center}
+.ex-fait{min-height:44px}
+.ex-fait[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+/* Compteur : liste « Type de match » au même style que les champs (.sc-noms input) */
+.sc-noms select{width:100%;min-width:0;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:11px 12px;font-family:var(--body);font-size:1rem;color-scheme:dark}
+.sc-noms select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.bord-bloc{padding:16px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2);display:grid;gap:8px;align-content:start;min-width:0}
+.bord-bloc h3{margin:0;font-size:1.15rem;text-transform:uppercase}
+.bord-bloc p{margin:0}
+.bord-bloc>a:not(.btn){color:var(--turf);font-weight:700;font-size:.9rem;justify-self:start;padding-block:4px}
+.bord-programme{grid-column:1 / -1}
+.bord-bloc .bord-palier{font-family:var(--display);font-size:2.4rem;font-weight:900;color:var(--turf);line-height:1}
+.bord-avert{font-size:.85rem;color:var(--muted);border-left:3px solid var(--sand);padding-left:10px}
+.bord-puces{display:flex;flex-wrap:wrap;gap:8px}
+.bord-puce{font:inherit;font-size:.88rem;font-weight:600;color:var(--muted);background:none;border:1px solid var(--field-line);border-radius:999px;padding:9px 14px;min-height:44px;cursor:pointer}
+.bord-puce[aria-pressed="true"]{border-color:var(--turf);background:var(--turf);color:var(--accent-fg);font-weight:800}
+.bord-puce:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.bord-liste{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.bord-ex{display:grid;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-s)}
+.bord-prochain{border-color:var(--turf);background:rgba(var(--turf-rgb),.06)}
+.bord-fait{opacity:.7}
+.bord-etiquette{justify-self:start;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-fg);background:var(--turf);border-radius:999px;padding:3px 9px}
+.bord-meta{color:var(--sand);font-weight:700;font-size:.85rem}
+.bord-pourquoi{color:var(--muted);font-size:.9rem}
+.bord-fait-btn{justify-self:start;min-height:44px;margin-top:4px}
+.bord-fait-btn[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+.bord-liste-simple{margin:0;padding-left:18px;color:var(--muted);display:grid;gap:4px}
+.bord-chiffres{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.bord-chiffres li{display:flex;align-items:baseline;gap:8px}
+.bord-chiffres b{font-family:var(--display);font-size:1.6rem;color:var(--fg);min-width:1.6em}
+.bord-chiffres span{color:var(--muted)}
+/* Espace joueur : masqué le temps de vérifier la session (espace.js) */
+.esp-attente #espace{visibility:hidden}
+/* Diagnostic après match (diagnostic.js) : compteur et journal de l'espace */
+.dg-bloc{margin-top:16px;display:grid;gap:12px}
+.dg-bloc:empty{display:none}
+.dg-question{margin:0;font-family:var(--display);font-size:1.5rem;text-transform:uppercase;color:var(--fg)}
+.dg-form{display:grid;gap:14px;padding:16px;border:1px solid var(--line-2);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.dg-intro{margin:0;color:var(--muted)}
+.dg-groupe{border:0;margin:0;padding:0;display:grid;gap:8px}
+.dg-groupe legend{font-weight:800;font-size:.9rem;margin-bottom:6px;color:var(--fg)}
+.dg-champ{display:grid;gap:6px}
+.dg-champ label{font-weight:800;font-size:.9rem}
+.dg-champ textarea:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.dg-resume{display:grid;gap:4px;color:var(--muted)}
+.dg-resume p{margin:0}
+.dg-recos{display:grid;gap:10px}
+.dg-recos-titre{margin:4px 0 0;font-size:1.1rem;text-transform:uppercase}
+.dg-avert{margin:0;font-size:.85rem;color:var(--muted);border-left:3px solid var(--sand);padding-left:10px}
+.dg-reco{display:grid;gap:6px;padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.dg-reco p{margin:0}
+.dg-reco-titre{font-weight:800;color:var(--turf)}
+.dg-reco-pourquoi,.dg-reco-consigne{color:var(--muted);font-size:.92rem}
+.dg-reco-actions a{color:var(--turf);font-weight:700;padding-block:6px}
+.dg-objectif{min-height:44px}
+.esp-bilan{min-height:40px;padding:6px 12px;font-size:.8rem;margin-left:auto}
+.esp-journal li.esp-bilan-panneau{display:block;padding:0 0 12px;border-top:0}
+.esp-journal li.esp-bilan-panneau[hidden]{display:none}
+/* bilan fermé : pas de barre vide sous le match */
+.esp-journal li:not(.esp-bilan-panneau){grid-template-columns:28px minmax(0,1fr) auto auto}
+/* Bilan dans le compteur : les puces gardent le style des choix (.opts), pas celui des étiquettes du formulaire du compteur */
+.sc-carte .dg-bloc .opts label{display:inline-block;font-size:.88rem;text-transform:none;letter-spacing:0;color:var(--muted);font-weight:600;margin:0;padding:9px 14px}
+.sc-carte .dg-bloc .opts label:has(input:checked){color:var(--accent-fg);font-weight:800}
+.sc-carte .dg-champ label{font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--fg);font-weight:800}
+.sc-carte .dg-groupe legend{font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--fg)}
+/* DÉFI DE LA SEMAINE (espace.html#esp-bloc-defi, defis.js) : carte comme les exercices recommandés, série en pastilles */
+.df-tete{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--s-2);margin:0 0 var(--s-3)}
+.df-theme{font-size:var(--fs-xs);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--turf)}
+.df-echeance{font-size:var(--fs-s);color:var(--muted)}
+.df-carte{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-4)}
+.df-carte h3{font-size:var(--fs-l);margin:0}
+.df-suivi{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3);margin-top:var(--s-4)}
+.df-serie{margin:0;font-weight:700}
+.df-semaines{display:flex;gap:6px;list-style:none;margin:0;padding:0}
+.df-pastille{width:14px;height:14px;border-radius:50%;border:1px solid var(--line-2);background:transparent}
+.df-pastille.ok{background:var(--turf);border-color:var(--turf)}
+.df-pastille.encours{outline:2px solid var(--sky);outline-offset:2px}
+/* CARNET DE MATCH (espace.html, Mes matchs) : filtres, export, tendance des points perdus */
+.esp-filtres{display:flex;flex-wrap:wrap;align-items:end;gap:var(--s-3);margin-bottom:var(--s-4)}
+.esp-filtres .champ{flex:1 1 160px}
+.esp-filtres .btn:disabled{opacity:.45;cursor:default;transform:none}
+.esp-tendance-texte{margin:var(--s-2) 0 0}
+/* MON ACADÉMIE (academie.html, academie.js) : dix cartes de niveau (grille FFT), niveau déclaré et historique */
+.ac-moi{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-5);scroll-margin-top:84px}
+.ac-moi-titre{font-size:clamp(1.4rem,3.6vw,2rem);margin:0 0 var(--s-2);outline:none}
+.ac-moi-num{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;border-radius:50%;background:var(--turf);color:var(--accent-fg);margin:0 .2em}
+.ac-moi-info{margin:0;color:var(--muted)}
+.ac-historique{margin-top:var(--s-3);color:var(--muted);font-size:var(--fs-s)}
+.ac-historique summary{cursor:pointer;color:var(--fg)}
+.ac-ancien{margin-top:var(--s-3)}
+.ac-niveaux{list-style:none;margin:0 0 var(--s-5);padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:var(--s-4)}
+.ac-carte{display:flex;flex-direction:column;gap:var(--s-3);background:var(--glass);border:1px solid var(--line);border-top:4px solid var(--sky);border-radius:var(--r);padding:var(--s-4);scroll-margin-top:84px}
+.ac-carte.ac-milieu{border-top-color:var(--sand)}
+.ac-carte.ac-haut{border-top-color:var(--coral)}
+.ac-carte.choisi{border-color:var(--turf);box-shadow:0 0 0 2px rgba(var(--turf-rgb),.35)}
+.ac-carte h3{display:flex;align-items:center;gap:var(--s-2);margin:0;font-size:var(--fs-xl)}
+.ac-num{display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:var(--bg-3);font-size:.9em}
+.ac-criteres{margin:0;padding-left:1.1em;display:grid;gap:var(--s-1)}
+.ac-criteres li{line-height:1.45}
+.ac-site{margin-top:auto;border-top:1px solid var(--line);padding-top:var(--s-3);color:var(--muted);font-size:var(--fs-s);display:grid;gap:var(--s-2)}
+.ac-site p{margin:0}
+.ac-choisir{justify-content:center}
+.ac-carte.choisi .ac-choisir{background:var(--turf);color:var(--accent-fg);border-color:var(--turf)}
+@media (max-width:720px){.ac-moi{padding:var(--s-4)}.ac-carte{padding:var(--s-4) var(--s-3)}}
+/* MON ACADÉMIE · Quiz adaptatif (academie-quiz.js) : réutilise les réponses et le schéma du quiz tactique (.qt-*) */
+.aq{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5);scroll-margin-top:84px}
+.aq-vide{margin:0}
+.aq-actions{display:flex;flex-wrap:wrap;gap:var(--s-3);margin:var(--s-4) 0 0}
+.aq-question{display:grid;gap:var(--s-4)}
+.aq-avec-schema{grid-template-columns:minmax(0,240px) minmax(0,1fr);align-items:start}
+.aq-avec-schema .aq-tete{grid-column:1/-1}
+.aq-scene .qt-schema{max-width:240px}
+.aq-avancement{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);margin:0 0 var(--s-2);font-size:var(--fs-s);color:var(--muted)}
+.aq-type{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--line-2)}
+.aq-barre{height:6px;border-radius:999px;background:var(--glass-2);overflow:hidden}
+.aq-barre span{display:block;height:100%;background:var(--turf);transition:width var(--t)}
+.aq-texte h3{margin:0 0 var(--s-4);font-size:var(--fs-l);line-height:1.35;outline:none}
+.aq-bilan h3{font-size:var(--fs-xl);margin:0 0 var(--s-3);outline:none}
+.aq-bilan h4{margin:var(--s-5) 0 var(--s-2)}
+.aq-erreurs{display:grid;gap:var(--s-3);padding-left:1.2em}
+.aq-erreurs p{margin:0 0 var(--s-1)}
+.aq-recos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:var(--s-3)}
+.aq-reco{background:var(--glass-2);border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-4)}
+.aq-reco h4{margin:0 0 var(--s-2)}
+.aq-reco p{margin:0 0 var(--s-2);font-size:var(--fs-s)}
+@media (max-width:720px){.aq{padding:var(--s-4)}.aq-avec-schema{grid-template-columns:1fr}.aq-scene .qt-schema{max-width:200px}}
+/* MON ACADÉMIE · Parcours (academie-parcours.js) : six blocs de recommandations */
+.ap-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:var(--s-4)}
+.ap-bloc{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-4);min-width:0}
+.ap-bloc h3{margin:0 0 var(--s-3);font-size:var(--fs-l)}
+.ap-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.ap-liste li{line-height:1.45}
+.ap-etat{font-size:var(--fs-xs);font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line-2);white-space:nowrap}
+.ap-a-travailler{color:var(--coral);border-color:rgba(255,107,87,.45)}
+.ap-acquis{color:var(--turf);border-color:rgba(var(--turf-rgb),.45)}
+.ap-competences .ap-liste li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s-2)}
+.ap-priorites{margin-top:var(--s-3)}
+.ap-priorites summary{cursor:pointer;font-weight:700}
+.ap-choix{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-2);margin-top:var(--s-2);font-size:var(--fs-s)}
+.ap-exos details summary{cursor:pointer}
+.ap-exos details p{font-size:var(--fs-s);margin:var(--s-2) 0}
+.ap-fait{padding:8px 14px;font-size:.74rem}
+.ap-defi .df-carte{padding:var(--s-3)}
+/* MON ACADÉMIE · phase 5 : choix rapide du niveau, reprise, sommaire */
+.ac-sommaire{margin:0 0 var(--s-4)}
+.ac-rapide{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr));gap:var(--s-2);margin-top:var(--s-3)}
+.ac-rapide-btn{display:flex;align-items:center;gap:var(--s-2);text-align:left;font:600 var(--fs-s)/1.3 var(--body);color:var(--fg);background:var(--glass-2);border:1px solid var(--field-line);border-radius:var(--r-s);padding:10px 12px;min-height:44px;cursor:pointer}
+.ac-rapide-btn b{display:inline-grid;place-items:center;min-width:1.8em;height:1.8em;border-radius:50%;background:var(--bg-3)}
+.ac-rapide-btn:hover{border-color:var(--turf)}
+.ac-rapide-btn[aria-pressed="true"]{border-color:var(--turf);background:rgba(var(--turf-rgb),.14)}
+.ac-rapide-btn[aria-pressed="true"] b{background:var(--turf);color:var(--accent-fg)}
+.ac-changer{margin-top:var(--s-3)}
+.ac-changer summary{cursor:pointer;font-weight:700}
+.ac-reprise{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3);margin:var(--s-3) 0 0}
+/* Ta semaine (Mon académie, Mon espace) et Mon niveau (tableau de bord) */
+.ac-semaine-carte{margin-top:var(--s-4);background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-4);scroll-margin-top:84px}
+.ac-semaine-carte.esp-carte{margin-top:0}
+.ac-semaine-titre{margin:0 0 var(--s-2)}
+.ac-semaine-niveau{margin:0 0 var(--s-3);font-weight:700}
+.ac-semaine-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.ac-semaine-liste>li{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr);gap:var(--s-2) var(--s-3);align-items:baseline;padding-top:var(--s-3);border-top:1px solid var(--line)}
+.ac-semaine-liste>li:first-child{border-top:0;padding-top:0}
+.ac-semaine-lib{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ac-semaine-prio{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.ac-semaine-liste details summary{cursor:pointer}
+@media (max-width:560px){.ac-semaine-liste>li{grid-template-columns:minmax(0,1fr);gap:4px}}
+.bord-niveaux{margin:0;display:grid;gap:var(--s-3)}
+.bord-niv dt{font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.bord-niv dd{margin:2px 0 0}
+.bord-niv-valeur{font-size:1.15rem;margin-right:.3em}
+.bord-niv .bord-palier{font-size:1.6rem;margin-right:.3em}
+/* Mon plan (entrainement.html) */
+.mon-plan{margin:var(--s-5) 0;background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-4)}
+.mon-plan h2{margin:0 0 var(--s-2)}
+.mp-intro{margin:0 0 var(--s-3);color:var(--muted)}
+.mp-liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.mp-semaine{padding:var(--s-3);border:1px solid var(--line);border-radius:var(--r-s);display:grid;gap:var(--s-2);min-width:0}
+.mp-semaine.done{border-color:var(--turf)}
+.mp-tete{display:flex;gap:var(--s-3);align-items:flex-start}
+.mp-tete h3{margin:0}
+.mp-tete p{margin:2px 0 0}
+.mp-num{flex:none;display:inline-grid;place-items:center;width:2em;height:2em;border-radius:50%;background:var(--turf);color:var(--accent-fg);font-weight:900}
+.mp-semaine .wobj{margin:0}
+.mp-semaine summary{cursor:pointer}
+.mp-valider{justify-self:start}
+.plan-generique-titre{margin:var(--s-5) 0 var(--s-3)}
+.esp-journal li.esp-confirmation{margin-top:calc(-1 * var(--s-1))}
+.esp-confirmation p{margin:0 0 var(--s-2);color:var(--fg);font-weight:600}
+.esp-confirmation p+.btns{margin-top:0}

@@ -1,0 +1,273 @@
+/* Accueil (index.html) : vitre, terrain, filet, tableau de score, parcours, balle qui suit le défilement.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : index.html.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+.hero h1 .ln{display:block}
+.hero h1 .hl{color:var(--turf);text-shadow:0 0 40px rgba(var(--turf-rgb),.45)}
+.hero p.lead{font-size:1.15rem;max-width:32em;margin-top:22px;color:var(--muted)}
+.hero .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+/* ACCUEIL */
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:16px}
+.home-grid .card h3{font-size:1.5rem}
+.home-grid .card .more{margin-top:auto;color:var(--turf);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em}
+/* ===== Accueil : « Cette semaine près de chez toi » ===== */
+.pdt{padding-block:56px}
+.pdt-aide{color:var(--muted);margin:0 0 14px}
+.pdt-aide b{color:var(--fg)}
+.pdt-changer{background:none;border:0;padding:6px 4px;min-height:40px;color:var(--sky);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.pdt-choix{max-width:360px}
+.pdt-choix label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-bottom:6px}
+.pdt-choix select{width:100%;min-height:48px;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem}
+/* Place réservée à la carte (dessinée à l'approche de l'écran par accueil-tournois.js) : même rapport que son tracé (viewBox 600 x 561), donc même hauteur une fois dessinée */
+.pdt-carte-zone{width:100%;max-width:520px;margin-top:18px;aspect-ratio:600/561}
+.pdt-carte{display:block;width:100%;max-width:520px;margin-top:18px}
+.pdt-carte-zone .pdt-carte{margin-top:0}
+.pdt-carte path{fill:rgba(var(--turf-rgb),.2);stroke:rgba(var(--bg-rgb),.9);stroke-width:.8;cursor:pointer;transition:fill .15s}
+.pdt-carte path:hover{fill:var(--turf)}
+.pdt-liste{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-width:760px}
+.pdt-liste a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;min-height:56px;padding:10px 14px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);color:var(--fg);text-decoration:none}
+.pdt-liste a:hover{border-color:var(--line-2)}
+.pdt-texte{display:grid;min-width:0}
+.pdt-texte b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdt-texte span{color:var(--muted);font-size:.88rem}
+.pdt-date{color:var(--muted);font-size:.85rem;white-space:nowrap}
+@media (max-width:480px){.pdt-liste a{grid-template-columns:auto minmax(0,1fr)}.pdt-date{grid-column:2}}
+.pdt .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+/* ---- Photos dans le contenu ---- */
+.home-grid .card .thumb{margin:-22px -22px 4px;aspect-ratio:16/9;overflow:hidden;border-bottom:1px solid var(--line)}
+.home-grid .card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.home-grid .card:hover .thumb img{transform:scale(1.05)}
+/* Bloc auteur (accueil) : emplacement de la photo prévu, initiale en attendant */
+.auteur-sec{padding-block:24px 64px}
+.profil-intermediaire{border-top-color:var(--sand)}
+.profil-competiteur{border-top-color:var(--coral)}
+.profil-tag{margin:0;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--turf)}
+.profil-intermediaire .profil-tag{color:var(--sand)}
+.profil-competiteur .profil-tag{color:var(--coral)}
+.profil-etapes{margin:0;padding-left:22px;display:grid;gap:4px;color:var(--muted)}
+.profil-etapes a{display:inline-block;padding-block:6px;color:var(--fg);font-weight:600}
+.profil-etapes a:hover,.profil-etapes a:focus-visible{color:var(--turf)}
+.outil{display:grid;gap:6px;align-content:start;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass);text-decoration:none;color:var(--muted);transition:border-color .15s}
+.outil b{color:var(--fg);font-family:var(--display);font-size:1.25rem;text-transform:uppercase}
+.outil:hover,.outil:focus-visible{border-color:var(--turf)}
+.progression-liste{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.progression-liste li{display:grid;gap:2px;padding:12px 14px;border-left:3px solid var(--turf);background:rgba(0,0,0,.2);border-radius:0 var(--r-s) var(--r-s) 0}
+.progression-liste span{color:var(--muted);font-size:.92rem}
+.nouveau-titre{margin:0 0 6px;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--sand)}
+/* Accueil mobile : cartes de contenus compactes (étiquette + titre), photo décorative de l'en-tête masquée */
+@media (max-width:600px){
+  .home-grid{gap:8px}
+  .home-grid .card{padding:14px 16px;gap:6px}
+  .home-grid .card p,.home-grid .card .more{display:none}
+  .home-grid .card h3{font-size:1.2rem}
+  .hero .hero-photo{display:none}
+}
+/* Accueil : les trois accès principaux tiennent sur une ligne sur ordinateur */
+@media (min-width:861px){.hero.photo .wrap{grid-template-columns:1.25fr .75fr}.hero .btns{gap:10px}.hero .btns .btn{padding:13px 16px;font-size:.8rem}}
+/* Accueil : vitrine du simulateur 3D (capture du simulateur, pas une photo) */
+.vitrine-3d{padding-block:56px;background:radial-gradient(900px 480px at 0% 50%,rgba(var(--terrain-rgb),.28),transparent 65%),var(--bg-2);border-block:1px solid var(--line)}
+.vitrine-3d .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.vitrine-3d-image{margin:0;border-radius:var(--r);overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow);background:var(--bg)}
+.vitrine-3d-image a{display:block}
+.vitrine-3d-image img{display:block;width:100%;height:auto}
+.vitrine-3d h2{margin:6px 0 12px}
+.vitrine-3d p{color:var(--muted)}
+.vitrine-3d-liste{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:10px}
+.vitrine-3d-liste li{display:grid;gap:2px;padding:10px 14px;border-left:3px solid var(--turf);background:rgba(0,0,0,.2);border-radius:0 var(--r-s) var(--r-s) 0}
+.vitrine-3d-liste span{color:var(--muted);font-size:.92rem}
+.vitrine-3d .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+@media (max-width:860px){.vitrine-3d{padding-block:40px}.vitrine-3d .wrap{grid-template-columns:1fr;gap:22px}}
+@media (max-width:600px){.vitrine-3d-liste{display:none}}
+.ac-accueil{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3);margin:0 0 var(--s-5)}
+.ac-accueil span{color:var(--muted);font-size:var(--fs-s)}
+/* ===== ACCUEIL VITRE (index.html, <body class="accueil-vitre">, assets/js/accueil-vitre.js) =====
+   Le terrain vu à travers la vitre : la scène du simulateur 3D fixe derrière la page (.vitre-scene, voile bleu nuit),
+   deux vitres latérales, les lignes du terrain et le filet entre les sections, « PADEL » géant décoratif (aria-hidden)
+   qui se remplit au défilement, une balle qui rebondit de vitre en vitre, des blocs en verre dépoli.
+   - Image de fond : chemins dans index.html (<picture> de .vitre-scene : portrait / paysage) ; flou léger sur ordinateur seulement.
+   - Verre (backdrop-filter) : à partir de 601 px seulement. Fond opaque (--bg-2) sous 600 px, si prefers-reduced-transparency,
+     ou sur un appareil modeste (classe .vitre-sobre sur <html>, posée par accueil-vitre.js).
+   - Défilement : animations CSS natives (animation-timeline). Sans prise en charge : état final fixe, balle masquée, aucun
+     calcul en JavaScript. Rien n'est animé sous prefers-reduced-motion.
+   - Contraste, calculé sur le pixel le plus clair des trois images (voile et halo compris, sans compter le flou) :
+     voile 86 % en haut → --fg 9,3:1, --muted 4,7:1 ; 92 % ensuite → --muted 5,6:1, --sky 5,1:1. Les blocs de texte longs
+     sont sur --bg-2 (--muted 7,1:1) ou sur verre à 72 % de bleu nuit (--muted 7,2:1). Liens : seulement dans les blocs. */
+.accueil-vitre{--vitre-voile:.86;--vitre-bord:color-mix(in srgb,var(--fg) 16%,transparent)}
+.vitre-scene{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg)}
+.vitre-scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.vitre-scene::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(var(--bg-rgb),var(--vitre-voile)) 0%,rgba(var(--bg-rgb),.92) 55%,rgba(var(--bg-rgb),.94) 100%),
+  radial-gradient(80% 60% at 50% 30%,rgba(var(--terrain-rgb),.12),transparent 70%)}
+.accueil-vitre main,.accueil-vitre footer{position:relative;z-index:1}
+.accueil-vitre main{--vitre-x:max(6px,calc(50% - var(--maxw) / 2 - 14px))}
+.accueil-vitre :is(.hero,.vitrine-3d,.pdt,section){background:transparent;border:0}
+.accueil-vitre footer{background:var(--bg)}
+/* Les deux vitres latérales, sur toute la hauteur du contenu */
+.accueil-vitre main::before,.accueil-vitre main::after{content:"";position:absolute;top:0;bottom:0;width:2px;border-radius:2px;pointer-events:none;z-index:-1;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--fg) 40%,transparent),color-mix(in srgb,var(--fg) 12%,transparent) 30%,color-mix(in srgb,var(--fg) 12%,transparent) 70%,color-mix(in srgb,var(--fg) 40%,transparent))}
+.accueil-vitre main::before{left:var(--vitre-x)}
+.accueil-vitre main::after{right:var(--vitre-x)}
+/* Lignes du terrain entre les sections : ligne de service + ligne centrale (un « T », vers le bas ou, .haut, vers le haut) */
+.vitre-ligne{position:relative;height:72px;margin-inline:calc(var(--vitre-x) + 1px)}
+.vitre-ligne::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:color-mix(in srgb,var(--fg) 50%,transparent)}
+.vitre-ligne::after{content:"";position:absolute;left:calc(50% - 1px);width:2px;top:50%;height:50%;background:color-mix(in srgb,var(--fg) 50%,transparent);transform-origin:top}
+.vitre-ligne.haut::after{top:0;transform-origin:bottom}
+.vitre-ligne span,.vitre-filet span{position:absolute;font:800 var(--fs-xs)/1 var(--body);letter-spacing:.2em;text-transform:uppercase}
+.vitre-ligne span{left:var(--s-3);top:calc(50% - 22px);color:var(--muted)}
+/* Le filet : maillage entre deux poteaux, étiquette corail au centre */
+.vitre-filet{position:relative;height:56px;margin:var(--s-5) calc(var(--vitre-x) - 6px)}
+.vitre-filet::before{content:"";position:absolute;left:6px;right:6px;top:14px;height:26px;border-top:4px solid var(--fg);
+  background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--fg) 26%,transparent) 0 1px,transparent 1px 9px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--fg) 26%,transparent) 0 1px,transparent 1px 9px)}
+.vitre-filet::after{content:"";position:absolute;inset:6px 0 8px;border-inline:8px solid var(--bg-3);border-radius:3px}
+.vitre-filet span{left:50%;top:16px;translate:-50% 0;white-space:nowrap;padding:5px 12px;border-radius:var(--r-pill);background:var(--coral);color:var(--cat-fg)}
+/* Le verre : fond opaque par défaut (téléphone), verre dépoli à partir de 601 px */
+.vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil){
+  background:var(--bg-2);border:1px solid var(--vitre-bord);border-radius:var(--r);box-shadow:inset 0 1px 0 var(--vitre-bord),var(--shadow)}
+.accueil-vitre :is(.vitre-panneaux .profil){border-top:4px solid var(--turf)}
+.accueil-vitre .vitre-panneaux .profil-intermediaire{border-top-color:var(--sand)}
+.accueil-vitre .vitre-panneaux .profil-competiteur{border-top-color:var(--coral)}
+.accueil-vitre :is(.outil,.home-grid .card,.nouveau){background:var(--bg-2);border-color:var(--vitre-bord)}
+@media (min-width:601px){
+  .vitre-scene img{filter:blur(4px) saturate(1.1);transform:scale(1.04)}
+  .vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil){
+    background:rgba(var(--bg-rgb),.72);-webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2)}
+  .accueil-vitre :is(.outil,.home-grid .card,.nouveau){background:rgba(var(--bg-rgb),.8)}
+}
+@media (prefers-reduced-transparency:reduce){
+  .accueil-vitre{--vitre-voile:.94}
+  .vitre-scene img{filter:none}
+  .vitre-score,.accueil-vitre :is(.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil,.outil,.home-grid .card,.nouveau){background:var(--bg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+.vitre-sobre .vitre-scene img{filter:none}
+.vitre-sobre :is(.vitre-score,.vitrine-3d .wrap>div,.pdt .wrap,.progression,.auteur,.vitre-panneaux .profil,.outil,.home-grid .card,.nouveau){background:var(--bg-2);-webkit-backdrop-filter:none;backdrop-filter:none}
+.accueil-vitre .vitrine-3d .wrap>div{padding:var(--s-5) var(--s-4)}
+.accueil-vitre .pdt .wrap{margin-inline:16px;padding:var(--s-5) var(--s-4)}
+.accueil-vitre .pdt .eyebrow{color:var(--coral)}
+.accueil-vitre .pdt .eyebrow::before{background:var(--coral)}
+/* ---------- Haut de page : « PADEL » géant, titre, accès, tableau de score ---------- */
+.hero.vitre-hero{padding-block:var(--s-5) var(--s-6)}
+.vitre-hero .wrap{display:grid;gap:0;grid-template-columns:minmax(0,1fr);grid-template-areas:"marque" "surtitre" "padel" "titre" "lead" "btns" "score";align-items:end}
+/* Le logo de Samuel (version sombre sans signature : la signature intégrée à l'image ferait 5 px de haut à cette taille)
+   et la signature écrite dans la police du site, séparés par un filet vert énergie. Ce n'est pas le titre (le h1 reste dessous). */
+.vitre-marque{grid-area:marque;display:flex;align-items:center;gap:var(--s-4);margin-bottom:var(--s-4)}
+.vm-logo{display:block;flex:none;width:150px;height:auto}
+.vm-signature{padding-left:var(--s-4);border-left:2px solid var(--turf);font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:var(--fs-l);line-height:1.15;color:var(--fg)}
+.vm-signature span{display:block}
+.vm-signature span:last-child{color:var(--turf)}
+.vitre-hero .eyebrow{grid-area:surtitre}
+.vitre-hero h1{grid-area:titre;font-size:clamp(2.1rem,4.6vw,3.6rem)}
+.vitre-hero .lead{grid-area:lead;margin-top:var(--s-4);font-size:var(--fs-l);color:var(--muted);max-width:34em}
+.vitre-hero .btns{grid-area:btns;margin-top:var(--s-5)}
+.vitre-padel{grid-area:padel;display:grid;margin:var(--s-3) 0 var(--s-4);font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:min(36vw,34vh,29.5rem);line-height:.78;letter-spacing:-.01em;user-select:none}
+.vitre-padel>span{grid-area:1/1;white-space:nowrap}
+.vp-contour{color:transparent;-webkit-text-stroke:2px var(--turf)}
+.vp-plein{color:var(--turf);clip-path:inset(0)}
+/* Tableau de score : quatre chiffres réels (stats.json, pastille de présence), un filet de couleur par sujet */
+.vitre-score{grid-area:score;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:var(--s-6) 0 0;overflow:hidden}
+.vitre-score>div{--c:var(--turf);display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:var(--s-1);min-width:0;padding:var(--s-4);border-top:1px solid var(--line-2);box-shadow:inset 0 3px 0 var(--c)}
+.vitre-score>div:nth-child(-n+2){border-top:0}
+.vitre-score>div:nth-child(even){border-left:1px solid var(--line-2)}
+.vitre-score .vs-tournois{--c:var(--coral)}
+.vitre-score .vs-questions{--c:var(--sand)}
+.vitre-score .vs-joueurs{--c:var(--sky)}
+.vitre-score dt{font-size:var(--fs-xs);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.3}
+.vitre-score dd{margin:0;display:flex;align-items:center;gap:var(--s-2);font-family:var(--display);font-weight:900;font-size:clamp(2rem,9vw,2.8rem);line-height:1;color:var(--fg);font-variant-numeric:tabular-nums}
+/* La pastille de présence (presence.js) devient le point devant le nombre ; sa phrase reste lue par l'annonce aria-live */
+.vitre-score p.presence-ligne{margin:0;min-height:0;font:inherit;line-height:1}
+.vitre-score [data-presence-texte]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.vitre-score .presence{gap:0}
+.vitre-score .presence::before{flex-basis:12px;width:12px;height:12px;border:2px solid var(--line-2)}
+.vitre-score .presence.presence-active::before{border-color:var(--turf)}
+/* ---------- Choix du parcours : trois cartes de joueur, un panneau à la fois (sans JS : liens et trois panneaux) ---------- */
+.vitre-choix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2.5vw,28px);max-width:880px;margin:0 auto var(--s-5);perspective:1100px}
+.vitre-carte{--c:var(--turf);display:grid;align-content:start;gap:var(--s-2);justify-items:center;min-width:0;min-height:44px;padding:var(--s-2) 0 var(--s-3);border-radius:var(--r);text-align:center;text-decoration:none;color:var(--fg)}
+.vitre-carte[data-profil="intermediaire"]{--c:var(--sand)}
+.vitre-carte[data-profil="competiteur"]{--c:var(--coral)}
+.vc-img{position:relative;display:block;width:100%;aspect-ratio:2/3;border-radius:5%/3.3%;box-shadow:var(--shadow);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 30%,var(--bg-3)),var(--bg-2) 70%);transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .3s,filter .3s}
+.vc-img canvas{display:block;width:100%;height:100%;border-radius:inherit}
+.vc-img::after{content:"";position:absolute;inset:-5px;border-radius:7%/4.6%;border:3px solid transparent;transition:border-color .2s}
+.vc-nom{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(1.1rem,3.6vw,2rem);line-height:1}
+.vc-sous{font-size:clamp(.75rem,2vw,.9rem);color:var(--muted);line-height:1.3}
+.vc-etat{min-height:1em;font:800 var(--fs-xs)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.vitre-carte[aria-selected="false"] .vc-img{opacity:.7;filter:saturate(.55)}
+.vitre-carte[aria-selected="true"] .vc-img{transform:translateY(-10px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.vitre-carte[aria-selected="true"] .vc-img::after{border-color:var(--c)}
+.vitre-carte:hover .vc-img{opacity:1;filter:none}
+.vitre-carte:focus-visible{outline:3px solid var(--focus);outline-offset:6px}
+.accueil-vitre .vitre-panneaux{grid-template-columns:minmax(0,1fr);gap:var(--s-4);max-width:880px;margin:0 auto var(--s-6);view-transition-name:panneau-parcours}
+.vitre-panneaux .profil[hidden]{display:none}
+.vitre-panneaux .profil-etapes{grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:var(--s-1) var(--s-6)}
+.vitre-parcours .ac-accueil{max-width:880px;margin:0 auto}
+::view-transition-group(panneau-parcours){animation-duration:.3s}
+/* ---------- La balle qui accompagne le défilement, de vitre en vitre (navigateurs compatibles, mouvement autorisé) ---------- */
+.vitre-balle{display:none;position:fixed;left:0;top:0;width:14px;height:14px;z-index:0;pointer-events:none;
+  --g:max(10px,calc(50vw - var(--maxw) / 2 - 10px));--d:min(calc(100vw - 24px),calc(50vw + var(--maxw) / 2 - 10px))}
+.vitre-balle i{display:block;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--turf-hover),var(--turf) 45%,var(--turf-deep));box-shadow:0 0 22px rgba(var(--turf-rgb),.6)}
+@keyframes vitre-balle{
+  0%{translate:var(--d) 22vh;rotate:0deg}6%{translate:calc((var(--g) + var(--d)) / 2) 12vh;scale:1.7}12.5%{translate:var(--g) 40vh;scale:1}
+  18%{translate:calc((var(--g) + var(--d)) / 2) 26vh;scale:1.6}25%{translate:var(--d) 60vh;scale:1}31%{translate:calc((var(--g) + var(--d)) / 2) 36vh;scale:1.7}
+  37.5%{translate:var(--g) 70vh;scale:1}44%{translate:calc((var(--g) + var(--d)) / 2) 30vh;scale:1.8}50%{translate:var(--d) 50vh;scale:1}
+  56%{translate:calc((var(--g) + var(--d)) / 2) 22vh;scale:1.6}62.5%{translate:var(--g) 45vh;scale:1}69%{translate:calc((var(--g) + var(--d)) / 2) 28vh;scale:1.7}
+  75%{translate:var(--d) 66vh;scale:1}81%{translate:calc((var(--g) + var(--d)) / 2) 38vh;scale:1.6}87.5%{translate:var(--g) 58vh;scale:1}
+  94%{translate:calc((var(--g) + var(--d)) / 2) 40vh;scale:1.5}100%{translate:calc((var(--g) + var(--d)) / 2) 78vh;scale:1;rotate:1600deg}}
+@keyframes vitre-remplir{from{clip-path:inset(82% 0 0 0)}to{clip-path:inset(0)}}
+@keyframes vitre-trait-x{from{transform:scaleX(0)}}
+@keyframes vitre-trait-y{from{transform:scaleY(0)}}
+@supports (animation-timeline:scroll()){
+  @media (prefers-reduced-motion:no-preference){
+    .vitre-balle{display:block;animation:vitre-balle linear both;animation-timeline:scroll(root)}
+    .vp-plein{animation:vitre-remplir linear both;animation-timeline:scroll(root);animation-range:0 70vh}
+    .vitre-ligne::before{animation:vitre-trait-x linear both;animation-timeline:view();animation-range:entry 30% cover 50%}
+    .vitre-ligne::after{animation:vitre-trait-y linear both;animation-timeline:view();animation-range:cover 40% cover 60%}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .vitre-balle{display:none}
+  .vp-plein,.vitre-ligne::before,.vitre-ligne::after{animation:none}
+  .vc-img,.vc-img::after{transition:none}
+  .vitre-carte[aria-selected="true"] .vc-img{transform:none}
+}
+/* ---------- Tablette et ordinateur ---------- */
+@media (min-width:601px){
+  .vitre-score{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .vitre-score>div:nth-child(n){border-top:0;border-left:0}
+  .vitre-score>div+div{border-left:1px solid var(--line-2)}
+  .vitre-balle{width:18px;height:18px}
+  .vitre-ligne span{left:var(--s-5)}
+}
+@media (min-width:861px){
+  .hero.vitre-hero{padding-block:var(--s-6) var(--s-7)}
+  .vitre-hero .wrap{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"marque surtitre" "padel padel" "titre score" "lead score" "btns btns";column-gap:var(--s-7)}
+  .vitre-marque{margin-bottom:var(--s-2)}
+  .vm-logo{width:240px}
+  .vm-signature{font-size:var(--fs-xl)}
+  .vitre-hero .eyebrow{justify-self:end;margin-bottom:var(--s-2)}
+  .vitre-score{grid-template-columns:repeat(2,minmax(0,1fr));margin:0;align-self:end}
+  .vitre-score>div{padding:var(--s-5)}
+  .vitre-score>div:nth-child(n){border-left:0;border-top:1px solid var(--line-2)}
+  .vitre-score>div:nth-child(-n+2){border-top:0}
+  .vitre-score>div:nth-child(even){border-left:1px solid var(--line-2)}
+  .accueil-vitre .vitrine-3d .wrap>div{padding:var(--s-6)}
+  .accueil-vitre .pdt .wrap{max-width:calc(var(--maxw) - 32px);margin-inline:auto;padding:var(--s-6)}
+}
+@media (max-width:600px){
+  .vitre-ligne{height:48px}
+  .vitre-ligne span{top:calc(50% - 20px)}
+  .vitre-filet{margin-block:var(--s-3)}
+  .accueil-vitre .pdt,.accueil-vitre .vitrine-3d{padding-block:var(--s-5)}
+  .vitre-score{margin-top:var(--s-5)}
+}
+@media (max-width:480px){
+  .vitre-hero .btns .btn{width:100%;justify-content:center}
+}
+@media (max-width:360px){
+  .vitre-marque{gap:var(--s-3)}
+  .vm-logo{width:124px}
+  .vm-signature{padding-left:var(--s-3);font-size:var(--fs-m)}
+}
+.accueil-vitre .qj-carte{border-color:var(--vitre-bord)}
+.accueil-vitre .qj-sec .wrap{margin-inline:16px}

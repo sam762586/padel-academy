@@ -1,0 +1,151 @@
+/* Technique et tactique : schémas des coups, quiz tactique, tableau tactique, diagnostic de paire.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : technique.html, tactique.html, tutos.html, academie.html.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+.card .meta{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.82rem;color:var(--dim);border-top:1px solid var(--line);padding-top:12px;margin-top:auto;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.card .meta b{color:var(--fg);font-weight:600;text-transform:none;letter-spacing:0;font-size:.9rem}
+.coup-3d{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px;border:1px solid var(--line-2);border-radius:999px;color:var(--turf);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;text-decoration:none;position:relative;z-index:1}
+.coup-3d:hover,.coup-3d:focus-visible{border-color:var(--turf);background:rgba(var(--turf-rgb),.08)}
+.court-box{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.court-box svg{width:100%;height:auto;display:block;max-width:100%}
+.phase-text{display:none}
+.phase-text.on{display:block;animation:fade .3s ease}
+.phase-text h3{margin:12px 0 10px;font-size:1.9rem}
+.phase-text p{color:var(--muted)}
+.phase-text ul{padding-left:0;margin:14px 0 0;list-style:none;display:grid;gap:10px}
+.phase-text li{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);padding:10px 14px;font-size:.93rem;color:var(--muted)}
+.phase-text li b{color:#fff}
+/* TUTOS */
+.tuto{display:grid;grid-template-columns:minmax(260px,.9fr) minmax(0,1.1fr);gap:20px;align-items:start}
+.tuto-ctl{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:16px}
+.tuto-ctl .q{font-family:var(--display);font-size:1.4rem;text-transform:uppercase;letter-spacing:.02em;color:#fff}
+.rules-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px;margin-top:16px}
+.rule{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:var(--r-s);padding:14px 16px;font-size:.88rem}
+.rule span{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;font-weight:700}
+.rule b{display:block;color:#fff;margin-top:6px;font-weight:600}
+@media (max-width:860px){.tuto{grid-template-columns:1fr}}
+.card.card-geste{grid-column:1/-1}
+.sch-hote{margin-top:10px}
+.sch-sol{fill:#1c7f4a}
+.sch-vitre{fill:rgba(var(--sky-rgb),.22);stroke:var(--sky);stroke-width:1.5}
+.sch-grille{fill:none;stroke:var(--sky);stroke-width:1.5;stroke-dasharray:3 3;opacity:.7}
+.sch-vitre-l{stroke:var(--sky);stroke-width:4;opacity:.75;fill:none}
+.sch-filet{stroke:#eaf2ff;stroke-width:4;fill:none}
+.sch-cour{stroke:#fff;stroke-width:3}
+.sch-ligne{stroke:#fff;stroke-width:2.5;fill:none}
+.sch-lab{fill:#c3cddc;font:700 13px var(--body);letter-spacing:.08em}
+.sch-note{font:700 15px var(--body)}
+.sch-fig path,.sch-fig circle,.sch-fig ellipse{fill:none;stroke-width:3;stroke-linecap:round}
+.sch-fig.sch-toi *{stroke:var(--turf)}
+.sch-fig.sch-adv *{stroke:#c3cddc}
+.sch-pion.sch-toi circle{fill:var(--turf);stroke:var(--accent-fg);stroke-width:2}
+.sch-pion.sch-toi text{fill:var(--accent-fg);font:800 9px var(--body)}
+.sch-pion.sch-adv circle{fill:#fff;stroke:var(--accent-fg);stroke-width:2}
+.sch-ghost{fill:none;stroke-width:2;stroke-dasharray:4 5;opacity:.45}
+.sch-trace{fill:none;stroke-width:4;stroke-linecap:butt;stroke-dasharray:1 1;stroke-dashoffset:1}
+.sch-ghost,.sch-trace{fill:none}
+.sch-note{stroke:none}
+.sch-balle{fill:#f5f04a;stroke:var(--accent-fg);stroke-width:1.5}
+.sch-mk{opacity:0;transition:opacity .3s}
+.sch-mk.vu{opacity:1}
+.sch-mk circle{fill:var(--bg-2);stroke:var(--turf);stroke-width:2}
+.sch-mk text{fill:#fff;font:800 13px var(--body);stroke:none}
+.sch-mk.cur circle{fill:var(--turf)}
+.sch-mk.cur text{fill:var(--accent-fg)}
+.sch-ctl{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.sch-b{padding:9px 14px;font-size:.78rem}
+.sch-b[aria-pressed="true"]{border-color:var(--turf);color:var(--turf)}
+.sch-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.sch-steps li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;color:var(--muted);padding:8px 10px;border-radius:var(--r-s);border:1px solid transparent}
+.sch-steps li.cur{color:var(--fg);background:var(--glass-2);border-color:var(--turf)}
+.sch-n{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--turf);color:#fff;font:800 .8rem/20px var(--body);text-align:center}
+.sch-steps li.cur .sch-n{background:var(--turf);color:var(--accent-fg)}
+.sch.sch-statique .sch-ctl{display:none}
+.sch.sch-statique .sch-balle{display:none}
+.sch.sch-statique .sch-trace{stroke-dashoffset:0!important;opacity:1!important}
+@media (prefers-reduced-motion:reduce){.sch-mk{transition:none}.sch-mk{opacity:1}}
+/* ===== COMPOSANTS COMMUNS (design system v3) =====
+   À réutiliser pour toute nouvelle page ou nouvel outil, plutôt que de redéfinir un style local.
+   - Focus clavier : contour sable sur tout élément interactif (les composants peuvent le préciser) ;
+   - .btn (.primary, .ghost, .solid) : états survol, appui, désactivé ([disabled], [aria-disabled="true"]), chargement ([aria-busy="true"]) ;
+   - .champ : libellé + champ (input, select, textarea) + aide (.champ-aide) + erreur (.champ-erreur, et .champ.invalide) ;
+   - .msg (.msg-info, .msg-ok, .msg-alerte, .msg-erreur) : messages dans la page, avec role="status" ou role="alert" ;
+   - .chargement : indicateur de chargement (texte + rond qui tourne ; fixe si mouvement réduit) ;
+   - .lvl[data-l] : badge de difficulté (Débutant, Intermédiaire, Avancé) ; .tag : catégorie de contenu ; .cat-* : catégorie de tournoi ;
+   - .icone : pictogramme SVG en ligne (trait, couleur du texte). */
+/* Page Technique : objectif du coup en tête de carte */
+.card .coup-obj{color:var(--fg);font-size:.92rem}
+.card .coup-obj b{color:var(--turf)}
+.st-sol{fill:rgba(var(--terrain-rgb),.55);stroke:rgba(255,255,255,.7);stroke-width:1.2}
+.st-ligne{stroke:rgba(255,255,255,.55);stroke-width:.8}
+.st-filet{stroke:var(--fg);stroke-width:2}
+.st-nous{fill:var(--turf);stroke:var(--bg);stroke-width:1.5}
+.st-eux{fill:var(--coral);stroke:var(--bg);stroke-width:1.5}
+.st-txt{fill:var(--accent-fg);font:800 7px var(--body);text-anchor:middle}
+.st-balle{fill:none;stroke:#fff;stroke-width:1.4;stroke-dasharray:3 3}
+.st-mvt{stroke:var(--turf);stroke-width:2}
+.st-pointe{fill:#fff}
+.st-trou{stroke:var(--coral);stroke-width:2;stroke-dasharray:4 3}
+.qt-consigne{color:var(--muted);margin:0 0 var(--s-4)}
+.qt-nb{opacity:.7;font-weight:600}
+.qt-record{color:var(--muted);font-size:var(--fs-s);min-height:1.4em}
+.qt-scene{margin:0}
+.qt-trace{fill:none;stroke:var(--sand);stroke-width:.08;stroke-dasharray:.25 .2}
+.qt-joueur text{font:700 .62px var(--body);fill:var(--fg);text-anchor:middle}
+.qt-nous circle{fill:var(--turf);stroke:var(--navy);stroke-width:.08}
+.qt-eux circle{fill:var(--coral);stroke:var(--navy);stroke-width:.08}
+.qt-balle circle{fill:var(--sand);stroke:var(--navy);stroke-width:.05}
+.qt-ombre{fill:rgba(0,0,0,.35)}
+.qt-balle text{font:700 .55px var(--body);fill:var(--sand)}
+.qt-legende{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-3);justify-content:center;font-size:var(--fs-xs);color:var(--muted);margin:var(--s-2) 0 0}
+.qt-legende span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.qt-l-nous::before{background:var(--turf)}
+.qt-l-eux::before{background:var(--coral)}
+.qt-l-balle::before{background:var(--sand)}
+.qt-avancement{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);font-size:var(--fs-s);color:var(--muted);margin:0 0 var(--s-3)}
+.qt-scenario{color:var(--muted);font-size:var(--fs-s);margin:0 0 var(--s-3)}
+.qt-scenario b{color:var(--fg)}
+.qt-texte h3{margin:0 0 var(--s-4);font-size:var(--fs-l);line-height:1.35}
+.qt-choix{display:grid;gap:var(--s-2)}
+.qt-correction:empty{display:none}
+.qt-correction{margin-top:var(--s-4)}
+.qt-actions{display:flex;flex-wrap:wrap;gap:var(--s-3);margin:var(--s-4) 0 0}
+.qt-fin h3{font-size:var(--fs-xl);margin:0 0 var(--s-3)}
+.tb-pion{cursor:grab;outline:none}
+.tb-pion:active{cursor:grabbing}
+.tb-pion text{font:700 .62px var(--body);fill:var(--fg);text-anchor:middle;pointer-events:none}
+.tb-pion:focus-visible circle{stroke:var(--focus);stroke-width:.14}
+.tb-pion.qt-balle circle{fill:var(--sand);stroke:var(--navy);stroke-width:.06}
+.tb-fleche{stroke-width:.1;stroke-linecap:round}
+.tb-pointe-depl{fill:var(--fg)}
+.tb-pointe-balle{fill:var(--sand)}
+.tb-outils{display:grid;gap:var(--s-4);min-width:0}
+.tb-label{display:block;font-size:var(--fs-xs);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 var(--s-2)}
+.tb-modes{margin:0}
+.tb-aide{color:var(--muted);font-size:var(--fs-s);margin:0}
+.tb-actions{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0}
+.tb-actions .btn:disabled{opacity:.45;cursor:default;transform:none}
+.tb-statut{min-height:1.4em;margin:0;font-size:var(--fs-s);color:var(--fg)}
+.tb-liste li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);padding:var(--s-2) var(--s-3);border:1px solid var(--line);border-radius:var(--r-s)}
+.tb-liste span{flex:1 1 8em;min-width:0;overflow-wrap:anywhere;font-weight:600}
+/* DIAGNOSTIC DE PAIRE (tactique.html#diagnostic-paire, diagnostic-paire.js) */
+.dp-bloc{margin-top:var(--s-7);scroll-margin-top:84px}
+.dp{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-5)}
+.dp-form{display:grid;gap:var(--s-4)}
+.dp-joueurs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4)}
+.dp-joueur{border:1px solid var(--line);border-radius:var(--r-s);padding:var(--s-3) var(--s-4) var(--s-4);margin:0;display:grid;gap:var(--s-3);min-width:0}
+.dp-joueur legend{font-weight:800;padding:0 var(--s-2)}
+.dp-paire{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-4)}
+.dp-form .btn{justify-self:start}
+.dp-resultat:empty{display:none}
+.dp-resultat{margin-top:var(--s-5);outline:none}
+.dp-resultat h3{margin:0 0 var(--s-4)}
+.dp-resultat h4{margin:var(--s-4) 0 var(--s-2)}
+.dp-priorites{display:grid;gap:var(--s-3);padding-left:1.3em}
+.dp-exo{display:block;color:var(--muted);font-size:var(--fs-s);margin-top:var(--s-1)}
+.dp-avertissement{margin-top:var(--s-4)}
+@media (max-width:720px){
+  .dp{padding:var(--s-4)}
+  .dp-joueurs,.dp-paire{grid-template-columns:1fr}
+}

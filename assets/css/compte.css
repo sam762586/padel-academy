@@ -1,0 +1,121 @@
+/* Compte et annonces : Mon padel, partenaires, connexion, jeu concours, formulaires du compte.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : compte.html, partenaires.html, connexion.html, concours.html.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+.acc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.acc-form label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-top:8px}
+.acc-form input,.acc-form select{width:100%;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:12px 14px;font-family:var(--body);font-size:1rem}
+.acc-form input:focus-visible,.acc-form select:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.acc-form .btn{justify-content:center;margin-top:12px}
+.acc-bar{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:12px}
+.acc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--turf-deep),var(--turf))}
+.acc-danger{border-color:rgba(255,93,74,.4)}
+/* PARTENAIRES : annonces « Trouver un partenaire » */
+.pt-large{max-width:980px;margin-bottom:16px}
+.acc-card.pt-large{max-width:980px}
+.acc-form textarea:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.pt-etapes{margin:12px 0 0;padding-left:20px;color:var(--muted);display:grid;gap:8px}
+.pt-aide{color:var(--dim);font-size:.82rem;margin-top:8px}
+.pt-h2{font-family:var(--display);font-size:1.8rem;text-transform:uppercase;color:var(--sand);line-height:1.1}
+.pt-filtre{display:flex;align-items:center;gap:10px}
+.pt-filtre label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700}
+.pt-filtre select{background:rgba(0,0,0,.25);border:1px solid var(--field-line);color:var(--fg);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem}
+.pt-resultats{list-style:none;margin:8px 0 0;padding:4px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r-s);max-height:320px;overflow-y:auto}
+.pt-resultats button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--fg);font-family:var(--body);font-size:.95rem;padding:10px 12px;border-radius:8px;cursor:pointer;overflow-wrap:anywhere}
+.pt-resultats button:hover,.pt-resultats button:focus-visible{background:var(--glass-2)}
+.pt-aucun{padding:10px 12px;color:var(--muted)}
+.pt-choisi{margin-top:14px;padding:14px;border:1px solid rgba(var(--turf-rgb),.35);border-radius:var(--r-s);background:rgba(var(--turf-rgb),.06)}
+.pt-choisi-titre{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--turf);font-weight:700;margin:0}
+.pt-choisi-nom{font-weight:700;overflow-wrap:anywhere;margin:6px 0 12px;color:var(--fg)}
+.pt-liste{display:grid;gap:14px}
+.pt-carte{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:18px;min-width:0}
+.pt-carte-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.pt-carte h3{font-size:1.25rem;overflow-wrap:anywhere}
+.pt-badges{display:flex;gap:6px;flex-wrap:wrap}
+.pt-badge{display:inline-block;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:4px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
+.pt-meta{color:var(--dim);font-size:.85rem;margin-top:6px;font-weight:600}
+.pt-profil{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.pt-profil li{font-size:.82rem;padding:4px 10px;border-radius:999px;background:var(--glass-2);color:var(--fg);overflow-wrap:anywhere}
+.pt-profil .pt-pseudo{font-weight:800;color:var(--turf)}
+.pt-message{margin-top:12px;color:var(--fg);white-space:pre-line;overflow-wrap:anywhere}
+.pt-retour{margin-top:10px;padding:10px 12px;border-left:3px solid var(--turf);background:rgba(var(--turf-rgb),.06);color:var(--fg);overflow-wrap:anywhere}
+.pt-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.pt-confirm{display:inline-flex;gap:10px;flex-wrap:wrap}
+.pt-inline{margin-top:12px;padding-top:4px;border-top:1px solid var(--line)}
+.pt-form{margin-top:8px}
+.pt-check{display:flex;gap:10px;align-items:flex-start;font-size:.9rem!important;text-transform:none!important;letter-spacing:0!important;color:var(--fg)!important;font-weight:500!important;cursor:pointer}
+.pt-check input{width:auto!important;margin-top:3px;accent-color:var(--turf);flex:none}
+.pt-consent{display:grid;gap:6px;margin-top:6px}
+.pt-sous-titre{font-family:var(--display);font-size:1.3rem;text-transform:uppercase;color:var(--sand);margin:20px 0 10px}
+.pt-sous-titre-petit{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700;margin-top:14px}
+.pt-carte-gestion{margin-bottom:12px}
+.pt-reponses{margin-top:6px}
+.pt-signalements{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+@media (max-width:480px){
+ .pt-carte{padding:14px}
+ .pt-filtre{width:100%}
+ .pt-filtre select{flex:1;min-width:0}
+}
+.pt-consent[hidden]{display:none}
+.esp-lien-carte .btn{min-height:48px}
+/* Page de connexion (connexion.html) */
+.cx-wrap{max-width:520px;margin:0 auto}
+.cx-onglets{display:flex;gap:6px;padding:6px;background:var(--glass);border:1px solid var(--line);border-radius:999px;margin-bottom:22px}
+.cx-onglet{flex:1;border:0;border-radius:999px;padding:12px 10px;background:transparent;color:var(--muted);font-family:var(--body);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+.cx-onglet.actif{background:var(--turf);color:var(--accent-fg)}
+.cx-champ{position:relative}
+.cx-champ input{width:100%;padding-right:96px}
+.cx-oeil{position:absolute;right:4px;top:50%;transform:translateY(-50%);min-height:44px;min-width:44px;border:0;border-radius:var(--r-s);background:transparent;color:var(--turf);font-family:var(--body);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;padding:6px 10px}
+.cx-aide{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.cx-aide a{color:var(--turf);font-weight:700}
+.cx-sep{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;margin:18px 0}
+.cx-sep::before,.cx-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.cx-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#1a1a1a;border-color:#fff}
+.cx-google svg{width:18px;height:18px}
+.cx-lien-magique{margin-top:16px}
+.cx-lien-magique summary{cursor:pointer;padding-block:11px;color:var(--turf);font-weight:700;font-size:.9rem}
+.cx-lien-magique form{margin-top:12px}
+.cx-pied{text-align:center;color:var(--dim);font-size:.82rem;margin-top:22px}
+/* ESPACE JOUEUR ET CONNEXION (report S3 en v3) : boutons-liens, cases à cocher, messages d'annonce, confirmations */
+/* Boutons qui remplacent d'anciens liens « # » de la connexion : apparence du lien commun (.esp-lien), cible de 44 px */
+.esp-lien.cx-lien{display:inline-flex;align-items:center;min-height:44px;padding-block:0;font-weight:700;text-underline-offset:3px;border-radius:6px;vertical-align:middle}
+.esp-lien.cx-lien:hover{text-decoration-thickness:2px}
+/* Afficher le mot de passe : l'état enfoncé se voit (fond et filet), pas seulement par le libellé */
+.cx-oeil[aria-pressed="true"]{background:rgba(var(--turf-rgb),.16);box-shadow:inset 0 0 0 1px var(--turf);color:var(--fg)}
+/* JEU CONCOURS (concours.html : contenu écrit par scripts/generer-concours.js, états par assets/js/concours.js).
+   Cartes .acc-card, messages .msg, boutons .btn, cases .cx-case et règlement dépliable : composants communs. */
+.cc-mention{max-width:760px;margin-bottom:var(--s-5)}
+.cc-etat{max-width:760px;margin-bottom:var(--s-4)}
+.cc-concours h2{font-size:var(--fs-xl);overflow-wrap:anywhere}
+.cc-dates{color:var(--fg);font-weight:600}
+.cc-infos{display:grid;gap:var(--s-2);margin:var(--s-3) 0 0}
+.cc-infos div{display:flex;flex-wrap:wrap;gap:var(--s-1) var(--s-3)}
+.cc-infos dt{color:var(--dim);font-size:var(--fs-s);font-weight:700;min-width:10em}
+.cc-infos dd{margin:0;color:var(--fg);flex:1 1 12em;min-width:0;overflow-wrap:anywhere}
+.cc-action{display:grid;gap:var(--s-3);margin-top:var(--s-4)}
+.cc-action:empty{display:none}
+.cc-compteur{min-height:1.6em;margin:0;color:var(--muted);font-weight:600}
+.cc-corps,.cc-retour,.cc-retour-pseudo{display:grid;gap:var(--s-3);min-width:0}
+.cc-corps .btns,.cc-confirmation .btns{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.cc-confirmation p{margin:0 0 var(--s-3);color:var(--fg)}
+.cc-form{margin-top:0}
+.cc-statut{color:var(--muted);margin:0}
+.cc-resultat,.cc-verification{display:grid;gap:var(--s-2);padding-top:var(--s-3);border-top:1px solid var(--line)}
+.cc-resultat h3,.cc-verification h3{font-size:var(--fs-l)}
+.cc-resultat p,.cc-verification p{margin:0}
+.cc-gagnants{margin:0;padding-left:1.4em;display:grid;gap:var(--s-2);color:var(--fg)}
+.cc-empreinte{font-size:var(--fs-xs);overflow-wrap:anywhere;word-break:break-all;color:var(--fg)}
+.cc-reglement{margin-top:var(--s-4);border-top:1px solid var(--line);padding-top:var(--s-2)}
+.cc-reglement summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--sky);overflow-wrap:anywhere}
+.cc-reglement .prose{margin-top:var(--s-3)}
+.cc-reglement .prose p{font-size:var(--fs-s)}
+.cc-donnees{color:var(--muted);font-size:var(--fs-s);max-width:760px}
+.cc-concours .msg{color:var(--fg);margin-top:0}
+.cc-partage{display:grid;gap:var(--s-2);padding-top:var(--s-3);border-top:1px solid var(--line)}
+.cc-partage-avant{border-top-color:var(--turf)}
+.cc-partage-options .btns{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.cc-partage-options,.cc-retour-copie{display:grid;gap:var(--s-2);min-width:0}
+.cc-partage-note{margin:0;color:var(--muted);font-size:var(--fs-s)}
+.cc-retour-copie .msg{overflow-wrap:anywhere}
+.cc-partage-options[hidden]{display:none}

@@ -1,4 +1,4 @@
-/* Vérification du design system v3 (assets/style.css) et de l'accueil :
+/* Vérification du design system v3 (assets/style.css et feuilles assets/css/*.css) et de l'accueil :
    1) tokens : couleurs de la marque (#101F35, #1674A6, #C8F14B, #F4F7FA) ; contraste ≥ 4,5:1 du texte (--fg, --muted, --dim,
       liens --sky, --turf, --sand, --erreur) sur les fonds --bg, --bg-2 et --bg-3, du texte des boutons d'action et des badges
       de catégorie ; le bleu terrain n'est pas utilisé comme couleur de texte ; plus aucune couleur de l'ancien thème ;
@@ -20,6 +20,9 @@ const contraste = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q -
 
 function tokens() {
   const css = fs.readFileSync(path.join(racine, 'assets/style.css'), 'utf8');
+  const feuilles = fs.readdirSync(path.join(racine, 'assets/css')).filter(f => f.endsWith('.css')).map(f => 'assets/css/' + f); // feuilles par groupe de pages (lot 3b)
+  const toutCss = css + '\n' + feuilles.map(f => fs.readFileSync(path.join(racine, f), 'utf8')).join('\n');
+  for (const f of feuilles) assert.ok(!/:root\s*\{/.test(fs.readFileSync(path.join(racine, f), 'utf8')), f + ' : les jetons restent dans style.css');
   const bloc = css.slice(css.indexOf(':root{'), css.indexOf('}', css.indexOf(':root{')));
   const T = {};
   for (const m of bloc.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)) T[m[1]] = m[2].trim();
@@ -36,14 +39,14 @@ function tokens() {
   for (const c of ['p25', 'p50', 'p100', 'p250', 'p500', 'p1000', 'autre']) assert.ok(contraste(val('cat-fg'), val('cat-' + c)) >= 4.5, 'badge ' + c);
   // Le bleu terrain sert aux surfaces : trop sombre pour du texte sur le fond
   assert.ok(contraste(val('terrain'), val('bg')) < 4.5);
-  assert.ok(!/(^|[;{\s])color:\s*var\(--terrain\)/.test(css), 'bleu terrain utilisé comme couleur de texte');
+  assert.ok(!/(^|[;{\s])color:\s*var\(--terrain\)/.test(toutCss), 'bleu terrain utilisé comme couleur de texte');
   // Plus aucune couleur de l'ancien thème (hors badge P25, couleur de catégorie)
   const anciens = /#070b14|53,\s*226,\s*127|7,\s*11,\s*20|#5df09a|#06110b/i;
-  const fichiers = ['assets/style.css', 'assets/simulateur-3d.css', 'manifest.webmanifest', 'assets/img/icons/icon.svg', 'assets/img/icons/icon-maskable.svg',
+  const fichiers = ['assets/style.css', ...feuilles, 'assets/simulateur-3d.css', 'manifest.webmanifest', 'assets/img/icons/icon.svg', 'assets/img/icons/icon-maskable.svg',
     ...fs.readdirSync(racine).filter(f => f.endsWith('.html')),
     ...fs.readdirSync(path.join(racine, 'assets/js')).filter(f => f.endsWith('.js')).map(f => 'assets/js/' + f)];
   for (const f of fichiers) assert.ok(!anciens.test(fs.readFileSync(path.join(racine, f), 'utf8')), f + ' : couleur de l\'ancien thème');
-  assert.equal((css.match(/#35e27f/gi) || []).length, 1, '#35e27f réservé au badge P25');
+  assert.equal((toutCss.match(/#35e27f/gi) || []).length, 1, '#35e27f réservé au badge P25');
   const ratios = textes.map(t => `${t} ${contraste(val(t), val('bg')).toFixed(1)}`).join(', ');
   ok(`tokens : couleurs de la marque, contrastes AA sur les 3 fonds (sur --bg : ${ratios}), boutons et badges ; aucune couleur de l'ancien thème`);
 }
@@ -63,7 +66,7 @@ async function contexte(browser, viewport) {
 
 // Cohérence (lot 5) : composants définis une seule fois, intitulés du test de niveau et de Mon académie
 function coherence() {
-  const css = fs.readFileSync(path.join(racine, 'assets/style.css'), 'utf8'), css3d = fs.readFileSync(path.join(racine, 'assets/simulateur-3d.css'), 'utf8');
+  const css = ['assets/style.css', ...fs.readdirSync(path.join(racine, 'assets/css')).filter(f => f.endsWith('.css')).map(f => 'assets/css/' + f)].map(f => fs.readFileSync(path.join(racine, f), 'utf8')).join('\n'), css3d =fs.readFileSync(path.join(racine, 'assets/simulateur-3d.css'), 'utf8');
   const regles = c => c.replace(/\/\*[\s\S]*?\*\//g, '').match(/[^{}]+\{[^{}]*\}/g).map(r => r.trim());
   // Taille des boutons : seulement .btn (base), .btn.petit (règle commune) et le héros de l'accueil
   const tailles = regles(css).filter(r => /\.btn\b[^{]*\{[^}]*(padding|font-size)/.test(r.split(':not(.btn)').join('')) && !/^\.btn\{/.test(r) && !r.startsWith('.btn.petit,') && !r.startsWith('.hero .btns .btn{'));

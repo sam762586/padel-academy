@@ -6,7 +6,7 @@ En cas de doute sur ce qu'une suite couvre : lire son en-tête dans `scripts/ver
 
 | Si tu modifies… | Relance, dans cet ordre | Suites |
 |---|---|---|
-| `assets/style.css` | `node scripts/appliquer-gabarit.js` puis `node scripts/generer-pages.js` | design, menu, performance, cache, pages, corrections |
+| `assets/style.css`, `assets/css/*.css`, `FEUILLES` de `scripts/gabarit.js` | `node scripts/appliquer-gabarit.js` puis `node scripts/generer-pages.js` | design, feuilles, menu, performance, cache, pages, corrections |
 | un `assets/js/*.js` (hors 3D) | `node scripts/appliquer-gabarit.js` (+ `generer-pages.js` s'il sert aux pages tournois) | la suite de la fonctionnalité, cache, corrections |
 | menu ou pied de page (`scripts/gabarit.js`) | `appliquer-gabarit.js`, `generer-pages.js` | menu, pages, seo, connexion, design |
 | données pré-rendues (`coups.js`, `lexique.js`, `bareme.js`, `bareme-donnees.js`, `plan.js`) | `node scripts/prerendre-contenu.js`, `appliquer-gabarit.js` | seo, contenus, corrections (+ pages pour le barème) |

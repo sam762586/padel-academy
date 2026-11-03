@@ -117,7 +117,7 @@ const SEXES = { messieurs: "Messieurs", dames: "Dames", mixte: "Mixte" };
 const majuscule = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- Gabarit : nav et footer communs (scripts/gabarit.js) ---------- */
-const { NOM_SITE, nav: navGabarit, footer: footerGabarit, versionner, SDK_SUPABASE } = require("./gabarit");
+const { NOM_SITE, nav: navGabarit, footer: footerGabarit, versionner, poserFeuilles, SDK_SUPABASE } = require("./gabarit");
 /* supabase-js (110 Ko, hébergé sur le site) n'est chargé sur les fiches tournoi que si une fonction qui s'en sert est
    activée dans assets/js/supabase-config.js (PA_SUPABASE.activees) : « favoris » (synchronisation des étoiles) ou
    « communaute » (J'y vais, annonces, avis). Tant que la liste ne les contient pas, ces scripts ne font rien sans lui ;
@@ -135,7 +135,7 @@ function page({ chemin, titre, description, h1, corps, jsonLd = [], noindex = fa
   const url = SITE + chemin;
   const nav = navGabarit(navActif, pre);
   // style.css et scripts versionnés (?v=<empreinte>) : jamais un ancien fichier en cache avec une page neuve
-  return versionner(`<!doctype html>
+  return versionner(poserFeuilles(`<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -175,7 +175,7 @@ ${scripts.map(s => `<script src="${s.startsWith("http") ? s : pre + s}"></script
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
-`);
+`, chemin, pre));
 }
 const fil = (elements) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: elements.map(([nom, url], i) => ({ "@type": "ListItem", position: i + 1, name: nom, item: SITE + url })) });
 function filHtml(elements, pre) {

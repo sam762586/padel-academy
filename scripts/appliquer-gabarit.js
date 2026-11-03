@@ -9,7 +9,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, poserMain } = require("./gabarit");
+const { nav, footer, versionner, versionnerJs, SCRIPTS_DYNAMIQUES, poserMain, poserFeuilles } = require("./gabarit");
 
 const RACINE = path.join(__dirname, "..");
 const verifier = process.argv.includes("--verifier");
@@ -39,7 +39,8 @@ for (const f of fs.readdirSync(RACINE).filter(n => n.endsWith(".html")).sort()) 
   remplacer(/(?:<a class="evitement"[^>]*>[^<]*<\/a>\s*)?<nav class="nav"[\s\S]*?<\/nav>/, nav(f, prefixe));
   apres = poserMain(apres); // <main id="contenu"> entre le menu et le pied de page (rien si la page en a déjà un)
   remplacer(/<footer>[\s\S]*?<\/footer>/, footer(prefixe));
-  apres = versionner(apres); // style.css et scripts : ?v=<empreinte>
+  apres = poserFeuilles(apres, f, prefixe); // feuilles assets/css/*.css du groupe de la page (après style.css)
+  apres = versionner(apres); // style.css, feuilles et scripts : ?v=<empreinte>
   if (apres !== avant) {
     differentes.push(f);
     if (!verifier) fs.writeFileSync(fichier, apres);

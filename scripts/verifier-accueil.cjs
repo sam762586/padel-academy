@@ -30,7 +30,16 @@ const serveur=http.createServer((req,res)=>{
   page.on('console',m=>{if(m.type()==='error')erreurs.push(m.text());});
   page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(base))erreurs.push(r.status()+' '+r.url());});
   await page.goto(base+'/index.html');
+  // La carte (65 Ko + 96 tracés) n'est chargée qu'à l'approche de l'écran, mais sa place est réservée dès le départ (aucun décalage)
+  await page.waitForSelector('#pres-de-chez-toi .pdt-carte-zone',{state:'attached'});
+  await page.waitForTimeout(800);
+  assert.equal(await page.locator('#pres-de-chez-toi .pdt-carte path').count(),0,'carte dessinée au chargement alors que la section est loin de l\'écran');
+  const hauteurZone=await page.evaluate(()=>{const z=document.querySelector('#pres-de-chez-toi .pdt-carte-zone');return z.getBoundingClientRect().height;});
+  assert.ok(hauteurZone>200,'place de la carte non réservée : '+hauteurZone);
+  await page.evaluate(()=>document.getElementById('pres-de-chez-toi').scrollIntoView());
   await page.waitForFunction(()=>document.querySelectorAll('#pres-de-chez-toi .pdt-carte path').length>90);
+  const apres=await page.evaluate(()=>{const z=document.querySelector('#pres-de-chez-toi .pdt-carte-zone');return {h:z.getBoundingClientRect().height,svg:document.querySelector('#pres-de-chez-toi .pdt-carte').getBoundingClientRect().height};});
+  assert.ok(Math.abs(apres.h-hauteurZone)<1&&Math.abs(apres.svg-hauteurZone)<1.5,'la carte dessinée change la hauteur réservée : '+JSON.stringify({hauteurZone,...apres}));
   assert.ok(await page.isVisible('#pdt-dep'));
   assert.match(await page.textContent('#pdt-titre'),/Tes prochains tournois/);
   ok('accueil sans département : carte de France cliquable et liste déroulante');

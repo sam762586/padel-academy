@@ -18,6 +18,7 @@ function copie(){
  for(const f of ['index.html','sitemap.xml','tournois.html'])fs.copyFileSync(path.join(racine,f),path.join(dir,f));
  fs.cpSync(path.join(racine,'assets/js'),path.join(dir,'assets/js'),{recursive:true});
  fs.copyFileSync(path.join(racine,'assets/style.css'),path.join(dir,'assets/style.css')); // empreinte des liens versionnés
+ fs.cpSync(path.join(racine,'assets/css'),path.join(dir,'assets/css'),{recursive:true}); // feuilles par groupe de pages (liens versionnés des fiches)
  fs.cpSync(path.join(racine,'assets/vendor'),path.join(dir,'assets/vendor'),{recursive:true}); // SDK Supabase versionné sur les fiches (communauté ou favoris activés)
  fs.mkdirSync(path.join(dir,'assets/data/fiches'),{recursive:true});
  fs.mkdirSync(path.join(dir,'scripts/cache'),{recursive:true});

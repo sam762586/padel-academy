@@ -1,0 +1,154 @@
+/* Pages de contenu : sélecteur de raquette, test de niveau, actus pro, clubs, vidéos, lexique, conseils, règles, premier tournoi, photos et bandeaux.
+   Chargée APRÈS assets/style.css (l'ordre de la cascade compte : ces règles surchargent ou complètent les composants communs).
+   Pages : materiel, bareme, niveau, actus-pro, clubs, videos, lexique, conseils, premier-tournoi, regles, competition, tutos, technique, tactique, entrainement, carte.
+   Sortie de assets/style.css au lot 3b de l'audit du 03/11 ; les jetons (:root) et les composants communs restent dans style.css.
+   Contrôle : scripts/verifier-feuilles.cjs (chaque page qui utilise une classe de cette feuille la charge). */
+a.card.link:hover .h4{color:var(--turf)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr))}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:16px}
+/* RULES / LEXIQUE */
+.rules ol{counter-reset:r;list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))}
+.rules li{counter-increment:r;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 20px 72px;position:relative;min-width:0;color:var(--muted);font-size:.95rem}
+.rules li::before{content:counter(r,decimal-leading-zero);position:absolute;left:18px;top:16px;font-family:var(--display);font-weight:900;font-size:2.4rem;color:var(--coral);line-height:1}
+.rules li b{display:block;font-family:var(--display);font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em;color:#fff;margin-bottom:4px}
+dl.lex{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:0 28px;margin:0}
+dl.lex div{border-bottom:1px solid var(--line);padding:14px 0;min-width:0}
+dl.lex dt{font-family:var(--display);font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em;color:var(--sand)}
+dl.lex dd{margin:4px 0 0;font-size:.9rem;color:var(--muted)}
+/* SELECTOR */
+.selector{background:radial-gradient(900px 500px at 100% 0%,rgba(255,181,71,.14),transparent 60%),radial-gradient(800px 500px at 0% 100%,rgba(var(--turf-rgb),.1),transparent 60%),var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.rk:first-child{border-color:rgba(255,181,71,.5);background:linear-gradient(135deg,rgba(255,181,71,.1),var(--glass))}
+.rk .rank{font-family:var(--display);font-weight:900;font-size:3.2rem;line-height:.9;color:var(--sand);grid-row:span 3}
+.rk h3{font-size:1.6rem;color:#fff}
+.rk .brand-l{font-size:.68rem;text-transform:uppercase;letter-spacing:.18em;color:var(--turf);font-weight:800}
+.rk .why b{color:#fff}
+.rk .specs{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:.8rem;color:var(--dim);font-variant-numeric:tabular-nums;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.rk .specs b{color:var(--fg);font-weight:600;text-transform:none;letter-spacing:0;font-size:.88rem}
+.rk .price small{display:block;font-family:var(--body);font-size:.62rem;letter-spacing:.14em;color:var(--dim);font-weight:700;text-transform:uppercase}
+.bars{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px 10px;align-items:center;font-size:.72rem;color:var(--dim);max-width:460px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.results-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.results-head span{font-size:.78rem;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.vtag.go{background:var(--turf);color:var(--accent-fg)}
+.vtag.stop{background:var(--coral);color:#fff}
+.vtag.maybe{background:var(--sand);color:#1a1200}
+.steps.numbered{counter-reset:s}
+.steps.numbered li{counter-increment:s;padding-left:34px}
+.steps.numbered li::before{content:counter(s);width:22px;height:22px;top:0;border-radius:50%;background:var(--turf);color:var(--accent-fg);font-family:var(--display);font-weight:900;font-size:.95rem;display:flex;align-items:center;justify-content:center}
+.faq{display:grid;gap:8px}
+.faq details{background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);padding:14px 18px}
+.faq summary{cursor:pointer;min-height:44px;font-family:var(--display);font-size:1.25rem;text-transform:uppercase;letter-spacing:.02em;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.faq summary::after{content:"+";color:var(--turf);font-size:1.5rem}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);margin-top:10px;font-size:.95rem}
+/* QUIZ NIVEAU */
+.quizlvl{max-width:760px}
+.qcard,.qresult{background:var(--glass);border:1px solid var(--line-2);border-radius:var(--r);padding:28px;box-shadow:var(--shadow)}
+.qprog{display:flex;align-items:center;gap:14px;margin-bottom:18px;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:700}
+.qbar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--turf-deep),var(--turf));transition:width .3s}
+.qcard h3{font-size:1.8rem;margin-bottom:18px;text-transform:none;letter-spacing:0}
+.qopts{display:grid;gap:10px}
+.qresult .score{font-family:var(--display);font-size:1.4rem;color:var(--sand);margin-top:10px}
+.qresult p{color:var(--muted);margin-top:10px}
+.vidlinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr));gap:10px}
+.vl{display:flex;align-items:center;gap:12px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r-s);padding:12px 14px;text-decoration:none;color:#fff;font-weight:600;font-size:.92rem;transition:all .15s}
+.vl:hover{border-color:var(--coral);background:rgba(255,93,74,.08)}
+.vl .play{width:30px;height:30px;border-radius:50%;background:var(--coral);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;flex:none}
+.acc-save{margin-top:16px}
+.acc-save p{margin-top:10px}
+.photo-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:-10px 0 40px}
+.photo-row.two{grid-template-columns:repeat(2,1fr)}
+.photo-row figure{margin:0;position:relative;aspect-ratio:4/3;border-radius:var(--r-s);overflow:hidden;border:1px solid var(--line)}
+.photo-row img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-row figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;background:linear-gradient(180deg,transparent,rgba(var(--bg-rgb),.9));color:#fff;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em}
+.photo-row a{text-decoration:none}
+@media (max-width:860px){.photo-row{grid-template-columns:repeat(2,1fr);gap:10px}}
+/* Test de niveau v2 : rang FFT, notes et profil par thème */
+.qrang{display:grid;gap:12px;padding:14px;border:1px solid var(--line-2);border-radius:var(--r-s);background:rgba(0,0,0,.2)}
+.qrang-sexe{display:flex;gap:18px;flex-wrap:wrap}
+.qrang-sexe label{display:inline-flex;align-items:center;gap:6px;min-height:44px;cursor:pointer}
+.qrang-champ{display:grid;gap:6px;font-weight:700;font-size:.9rem}
+.qrang-champ input{min-height:44px;padding:8px 12px;border-radius:var(--r-s);border:1px solid var(--field-line);background:rgba(0,0,0,.3);color:var(--fg);font:inherit;font-size:1rem;max-width:220px}
+.qrang .btn{justify-self:start}
+.qrang .acc-err:empty{display:none}
+.qresult .qnote{padding:10px 12px;border-left:3px solid var(--sand);background:rgba(255,181,71,.08);border-radius:0 var(--r-s) var(--r-s) 0}
+.qresult .qtitre{margin-top:18px}
+.qprofil{margin-top:16px}
+.qprofil summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.qprofil-liste{list-style:none;margin:6px 0 0;padding:0}
+.qprofil-liste li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.qprofil-liste b{color:var(--fg);white-space:nowrap}
+.qresult .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.marques-effacer{background:none;border:0;color:var(--turf);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;padding:9px 6px;text-decoration:underline}
+.rk-plus{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:6px 18px}
+.rk-plus summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:800;color:var(--turf)}
+.rk-plus ol{margin:0 0 12px;padding-left:24px;display:grid;gap:8px}
+.rk-plus li{color:var(--muted)}
+.rk-plus li>span{display:block}
+.rk-plus li b{color:var(--fg)}
+.rk-plus-meta{font-size:.85rem}
+.grille-blocs.quatre{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.tbl-legende{margin-top:var(--s-2);font-size:var(--fs-s);color:var(--dim)}
+.tbl-formats td:first-child{color:var(--fg);font-weight:700;white-space:nowrap}
+/* Liste d'erreurs numérotée (conseils.html) : la numérotation continue d'une famille à l'autre */
+section:has(.erreurs-liste){counter-reset:erreur}
+.erreurs-liste{list-style:none;margin:var(--s-3) 0 var(--s-6);padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:var(--s-3)}
+.erreurs-liste li{counter-increment:erreur;position:relative;padding-top:var(--s-4)}
+.erreurs-liste li::before{content:counter(erreur,decimal-leading-zero);display:block;font-family:var(--display);font-weight:900;font-size:2rem;line-height:1;color:var(--coral);margin-bottom:var(--s-2)}
+.erreurs-liste h3{margin-bottom:var(--s-2)}
+.erreurs-liste .correction{margin-top:var(--s-3);color:var(--fg)}
+.erreurs-liste .correction b{color:var(--turf)}
+/* Lexique : lien vers la page qui explique le terme */
+.lex-lien{font-weight:700;white-space:nowrap}
+.lex-lien::after{content:" →"}
+.etapes-guide li{counter-increment:etape-guide}
+.etapes-guide li::before{content:counter(etape-guide);display:grid;place-items:center;width:32px;height:32px;margin-bottom:var(--s-3);border-radius:50%;background:rgba(var(--turf-rgb),.16);color:var(--turf);font-weight:800}
+.etapes-guide h3{margin-bottom:var(--s-2)}
+/* ---------- Actus pro (actus-pro.html, contenu écrit par scripts/generer-pro.js depuis assets/data/pro.json) ---------- */
+.pro-tete{padding-bottom:var(--s-6)}
+.pro-tete .sec-head{margin-bottom:0}
+.pro-grille{display:grid;gap:var(--s-4);grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
+.pro-intro{color:var(--muted);max-width:42em;margin:var(--s-3) 0 var(--s-5)}
+.pro-tournoi:hover{transform:none}
+.pro-tournoi h3{font-size:var(--fs-xl);overflow-wrap:anywhere}
+.pro-tournoi .pro-lieu{color:var(--muted);font-size:var(--fs-s)}
+.pro-une{border-color:rgba(var(--turf-rgb),.45)}
+.pro-finales{display:grid;gap:var(--s-3)}
+.pro-finale{border-top:1px solid var(--line);padding-top:var(--s-3)}
+.pro-finale h4{font-family:var(--body);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.14em;font-weight:700;color:var(--sand);margin-bottom:var(--s-2)}
+.pro-finale dl{display:grid;gap:var(--s-1);margin:0}
+.pro-finale dl div{display:grid;grid-template-columns:7.5em 1fr;gap:var(--s-2)}
+.pro-finale dt{color:var(--dim);font-size:var(--fs-s)}
+.pro-finale dd{margin:0;color:var(--fg);overflow-wrap:anywhere}
+.pro-finale .pro-score{font-variant-numeric:tabular-nums;font-weight:700}
+.card p.pro-absent,.pro-absent{color:var(--muted);font-style:italic}
+.pro-lien{margin-top:auto}
+.pro-lien a{display:inline-flex;align-items:center;min-height:44px;color:var(--sky);font-weight:700}
+.pro-calendrier{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-2)}
+.pro-calendrier li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);padding:var(--s-3) var(--s-4);border:1px solid var(--line);border-radius:var(--r-s);background:var(--glass)}
+.pro-calendrier time{font-weight:700;color:var(--fg);min-width:11em}
+.pro-calendrier .pro-lieu{color:var(--muted)}
+.pro-source{font-size:var(--fs-s);color:var(--muted);margin-top:var(--s-5);max-width:48em}
+.pro-source+.pro-source{margin-top:var(--s-2)}
+/* Emplacements : résultat du test de niveau (sous le palier, avant les conseils) et question du jour (sous la série, carte compacte) */
+.qresult .pa-partage{margin-top:var(--s-4)}
+/* PAGE « POUR LES CLUBS » (clubs.html, assets/js/clubs.js) : composants communs (.grille-blocs > .bloc, .champ, .exemple, .btn, .msg).
+   .clubs-demo : aperçu du widget (Shadow DOM, assets/js/widget-tournois.js, jamais stylé d'ici) ; hauteur réservée pour le titre,
+   5 tournois et le lien de pied : la liste arrive après le chargement sans décaler le reste. Seul p.apprendre-padel-pied[slot=pied]
+   est dans la page (lien de bas de liste). */
+.clubs-widget .champ{max-width:28em}
+.clubs-demo{min-height:36rem;margin-top:var(--s-4);min-width:0}
+/* mesuré : 5 tournois ≈ 580 px à 390 px de large, 700 px à 320, 460 px sur ordinateur */
+@media (max-width:359px){.clubs-demo{min-height:44rem}}
+@media (min-width:700px){.clubs-demo{min-height:29rem}}
+.clubs-demo .apprendre-padel-pied{margin:0;overflow-wrap:anywhere}
+.clubs-code{margin-top:var(--s-3)}
+.clubs-actions{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-top:var(--s-4)}
+.clubs-actions .btn{max-width:100%;justify-content:center;text-align:center}
+.clubs-retour{display:grid;gap:var(--s-2);margin-top:var(--s-3);min-width:0}
+.clubs-retour:empty{display:none}
+.clubs-retour .msg{margin:0;color:var(--fg);font-size:var(--fs-s);overflow-wrap:anywhere}
+.clubs-texte{display:grid;gap:var(--s-3);color:var(--fg);overflow-wrap:anywhere}
+.clubs-texte p{margin:0}
+#clubs .grille-blocs{margin-top:var(--s-5)}
+#clubs>.wrap>h2{font-size:clamp(1.8rem,4vw,2.6rem)}

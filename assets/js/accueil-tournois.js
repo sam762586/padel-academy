@@ -1,7 +1,7 @@
 /* ACCUEIL : « Cette semaine près de chez toi »
    Département mémorisé (pa-mon-departement, choisi ici, sur la page Tournois ou une page département) :
    les 5 prochains tournois (assets/data/prochains/<dep>.json, écrit par scripts/generer-pages.js).
-   Sinon : carte de France cliquable (carte-france.js, chargée seulement dans ce cas) + liste déroulante. */
+   Sinon : carte de France cliquable (carte-france.js, chargée seulement dans ce cas, et seulement quand la section approche de l'écran) + liste déroulante. */
 const AT_CLE_DEPARTEMENT="pa-mon-departement";
 const AT_NB=5;
 
@@ -33,12 +33,9 @@ const AT_NB=5;
   if(window.CARTE_FRANCE)return Promise.resolve();
   return new Promise((ok,ko)=>{const s=document.createElement("script");s.src="assets/js/carte-france.js";s.onload=ok;s.onerror=ko;document.body.appendChild(s);});
  }
- async function afficherCarte(){
-  titre.textContent="Tes prochains tournois";
-  contenu.textContent="";
-  contenu.append(el("p","pdt-aide","Choisis ton département : on te montre les prochains tournois, et le site s'en souvient."),selecteur(null));
-  try{await chargerCarte();}catch(e){return;}
-  if(typeof CARTE_FRANCE==="undefined")return;
+ // Carte : sa place est réservée tout de suite (rapport 600/561 du tracé, voir .pdt-carte-zone dans accueil.css : aucun décalage) ;
+ // le script de 65 Ko et les 96 tracés ne sont chargés et dessinés que lorsque la section approche de l'écran (deux écrans d'avance).
+ function dessinerCarte(zone){
   const NS="http://www.w3.org/2000/svg",svg=document.createElementNS(NS,"svg");
   svg.setAttribute("viewBox","0 0 "+CARTE_FRANCE_VIEWBOX.join(" "));svg.setAttribute("class","pdt-carte");
   svg.setAttribute("aria-hidden","true"); // la liste déroulante est l'équivalent accessible
@@ -47,7 +44,21 @@ const AT_NB=5;
    const t=document.createElementNS(NS,"title");t.textContent=d.code+" · "+d.nom;p.appendChild(t);
    p.addEventListener("click",()=>choisir(d.code));svg.appendChild(p);
   });
-  contenu.appendChild(svg);
+  zone.appendChild(svg);
+ }
+ async function remplirCarte(zone){
+  try{await chargerCarte();}catch(e){return;}
+  if(typeof CARTE_FRANCE==="undefined"||!zone.isConnected||zone.firstChild)return;
+  dessinerCarte(zone);
+ }
+ function afficherCarte(){
+  titre.textContent="Tes prochains tournois";
+  contenu.textContent="";
+  const zone=el("div","pdt-carte-zone");zone.setAttribute("aria-hidden","true");
+  contenu.append(el("p","pdt-aide","Choisis ton département : on te montre les prochains tournois, et le site s'en souvient."),selecteur(null),zone);
+  if(!("IntersectionObserver" in window)){remplirCarte(zone);return;}
+  const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();remplirCarte(zone);}},{rootMargin:"1700px 0px"});
+  io.observe(zone);
  }
  let derniereDemande=0;
  async function afficher(dep){
