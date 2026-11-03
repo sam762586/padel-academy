@@ -62,7 +62,7 @@ if errorlevel 1 (
   goto fin
 )
 
-rem 3. Generation des pages (tournoi/, tournois/, sitemap.xml, assets/data/prochains/)
+rem 3. Generation des pages (tournoi/, tournois/, sitemap.xml, assets/data/prochains/, index/, tournois-apercu)
 node scripts\generer-pages.js %* >> "%JOURNAL%" 2>&1
 if errorlevel 1 (
   echo %date% %time% Generation des pages en echec : aucun commit.>> "%JOURNAL%"

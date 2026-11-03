@@ -44,7 +44,7 @@ jobs:
       - name: Commit et publication
         run: |
           set -eu
-          CHEMINS="assets/data/pro.json actus-pro.html sitemap.xml tournois.html assets/data/prochains assets/data/stats.json assets/data/clubs.json assets/data/pages-tournois.js tournoi tournois scripts/cache/pages-empreintes.json scripts/cache/tournois-archive.json"
+          CHEMINS="assets/data/pro.json actus-pro.html sitemap.xml tournois.html assets/data/prochains assets/data/index assets/data/tournois-apercu.json assets/data/tournois-apercu.js assets/data/stats.json assets/data/clubs.json assets/data/pages-tournois.js tournoi tournois scripts/cache/pages-empreintes.json scripts/cache/tournois-archive.json"
           git add -A -- $CHEMINS
           if git diff --cached --quiet; then
             echo "Aucun changement : rien à commiter."

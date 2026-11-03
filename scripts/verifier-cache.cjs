@@ -44,6 +44,17 @@ ok('pages de la racine : style et scripts tous versionnés');
  assert.ok(/pageReseauDabord\(event\)/.test(sw2)&&/navigation \? pageReseauDabord/.test(sw2),'navigations : network-first');
 }
 ok('pages du menu toutes dans le SHELL ; navigations en network-first');
+{
+ // Données des tournois légers : reconnues avec ?v=, une version gardée, repli sur la précédente marquée hors connexion
+ const swd=fs.readFileSync(path.join(racine,'sw.js'),'utf8');
+ const estDonnee=eval('('+swd.match(/const estDonnee = (chemin => .*);\r?\n/)[1]+')');
+ for(const c of ['/assets/data/tournois-apercu.json','/assets/data/tournois.json','/assets/data/index/75.json','/assets/data/index/2A.json','/assets/data/index/971.json'])
+  assert.ok(estDonnee(c),c+' : non reconnu par estDonnee');
+ for(const c of ['/assets/data/index/7.json','/assets/data/index/75.js','/assets/data/tournois-apercu.js','/assets/data/autre.json'])
+  assert.ok(!estDonnee(c),c+' : reconnu à tort');
+ assert.ok(swd.includes('searchParams.has("v")) await retirerAnciennesVersions'),'reseauDabord : une seule version gardée');
+ assert.ok(swd.includes('await cache.match(requete, { ignoreSearch: true })'),'reseauDabord : repli sur la dernière version connue');
+}
 ok('academie-sync : compte.js versionné ; SHELL complet, sans fichier absent ; prochains en network-first');
 
 // Serveur : le site réel, sauf index.html et style.css qui changent à la « publication »
@@ -61,6 +72,8 @@ const serveur=http.createServer((req,res)=>{
  }
  const p=path.resolve(racine,rel);
  if(!p.startsWith(racine+path.sep)){res.writeHead(403);res.end();return;}
+ // Données légères des tournois : maquette si le fichier n'existe pas encore (le test vise le service worker, pas les données)
+ if(/^assets\/data\/(tournois-apercu|index\/[0-9AB]{2,3})\.json$/.test(rel)&&!fs.existsSync(p)){res.setHeader('Content-Type','application/json');res.end('[]');return;}
  fs.readFile(p,(e,b)=>{if(e){res.writeHead(404);res.end();return;}
   res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.webp':'image/webp','.webmanifest':'application/manifest+json'})[path.extname(p)]||'text/plain');res.end(b);
  });
@@ -118,6 +131,23 @@ const serveur=http.createServer((req,res)=>{
   assert.ok(r.ok()&&(await page.title()).length>0,'actus-pro.html hors connexion');
   ok('hors connexion : actus-pro.html servie depuis le cache');
   await ctx.setOffline(false);
+  // Données versionnées : v=aaaa puis v=bbbb (une seule gardée), puis hors connexion avec v=cccc absent -> dernière marquée
+  await page.goto(base+'/index.html');
+  const lire=(u)=>page.evaluate(async u=>{try{const r=await fetch(u);return {ok:r.ok,depuis:r.headers.get('X-Depuis-Cache')};}catch(e){return {err:String(e)};}},u);
+  for(const f of ['assets/data/tournois-apercu.json','assets/data/index/75.json','assets/data/tournois.json']){
+   assert.equal((await lire('/'+f+'?v=aaaaaaaaaa')).ok,true,f+' v1');
+   assert.equal((await lire('/'+f+'?v=bbbbbbbbbb')).ok,true,f+' v2');
+  }
+  const gardees=await page.evaluate(async()=>{const noms=await caches.keys();const c=await caches.open(noms.find(n=>n.startsWith('pa-')));return (await c.keys()).map(r=>r.url).filter(u=>/tournois(-apercu)?\.json|index\/75\.json/.test(u));});
+  assert.equal(gardees.length,3,'une seule version par fichier : '+gardees.join(' '));
+  assert.ok(gardees.every(u=>u.endsWith('v=bbbbbbbbbb')));
+  await ctx.setOffline(true);
+  for(const f of ['assets/data/tournois-apercu.json','assets/data/index/75.json','assets/data/tournois.json']){
+   const r=await lire('/'+f+'?v=cccccccccc');
+   assert.deepEqual(r,{ok:true,depuis:'1'},f+' hors connexion : dernière version marquée attendue');
+  }
+  await ctx.setOffline(false);
+  ok('données des tournois : une version gardée par fichier, hors connexion la précédente est servie, marquée X-Depuis-Cache');
   console.log('TOTAL '+nb+' contrôles réussis.');
  }finally{await browser.close();serveur.close();}
 })().catch(e=>{console.error(e);serveur.close();process.exitCode=1;});

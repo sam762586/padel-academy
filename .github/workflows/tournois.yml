@@ -95,6 +95,8 @@ jobs:
           path: |
             assets/data/tournois.json
             assets/data/prochains
+            assets/data/index
+            assets/data/tournois-apercu.json
             tournois
           retention-days: 7
 

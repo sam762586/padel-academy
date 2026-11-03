@@ -293,6 +293,7 @@ const partiel = !!depsDemandes && !tout;
 // L'archive ne garde que le périmètre publié (sinon plusieurs Mo réécrits chaque semaine)
 const perimetreArchive = new Set(tout ? publies : [...DEPARTEMENTS_PUBLIES, ...(depsDemandes || [])]);
 for (const id of Object.keys(archive)) if (!perimetreArchive.has(archive[id].t.dep)) delete archive[id];
+let empreintesDonnees = null;
 const dansPerimetre = t => publies.includes(t.dep);
 const tous = Object.values(archive).filter(a => dansPerimetre(a.t));
 const aVenir = t => (t.date_fin || t.date_debut) >= aujourdhui;
@@ -509,6 +510,46 @@ if (!partiel) {
   }
   fs.readdirSync(dossierProchains).filter(f => !attendus.has(f)).forEach(f => fs.unlinkSync(path.join(dossierProchains, f)));
 
+  /* ---------- Index par département et aperçu (tournois.html n'a plus besoin du fichier national à l'entrée) ----------
+     index/<dep>.json : les entrées de tournois.json de ce département, inchangées, même ordre, terminés compris.
+     tournois-apercu.json : les 100 premiers tournois non terminés + totaux. Copies .js pour l'ouverture en file://.
+     Les empreintes (10 hex de sha256) vont dans window.PA_PAGES_TOURNOIS.empreintes pour versionner les URL. */
+  const sha10 = c => crypto.createHash("sha256").update(c).digest("hex").slice(0, 10);
+  const ecrireSiChange = (f, c) => { if (!fs.existsSync(f) || fs.readFileSync(f, "utf8") !== c) fs.writeFileSync(f, c); };
+  const entete = { genere_le: donnees.genere_le, source: donnees.source, periode: donnees.periode };
+  const dossierIndex = path.join(RACINE, "assets/data/index");
+  fs.mkdirSync(dossierIndex, { recursive: true });
+  const parDepTous = {};
+  donnees.tournois.forEach(t => { (parDepTous[t.dep] = parDepTous[t.dep] || []).push(t); });
+  const attendusIndex = new Set(), empreintesIndex = {};
+  // "hors-dep" : entrées sans département reconnu (ex. dep vide), pour que l union des index reste égale à tournois.json
+  parDepTous["hors-dep"] = donnees.tournois.filter(t => !DEPARTEMENTS.has(t.dep));
+  for (const dep of [...[...DEPARTEMENTS.keys()].sort(), "hors-dep"]) {
+    const contenu = JSON.stringify({ ...entete, dep: dep === "hors-dep" ? "" : dep, tournois: parDepTous[dep] || [] }) + "\n";
+    ecrireSiChange(path.join(dossierIndex, dep + ".json"), contenu);
+    ecrireSiChange(path.join(dossierIndex, dep + ".js"), `// Généré par scripts/generer-pages.js.\n(window.TOURNOIS_INDEX=window.TOURNOIS_INDEX||{})[${JSON.stringify(dep)}]=${contenu.trim()};
+`);
+    attendusIndex.add(dep + ".json"); attendusIndex.add(dep + ".js");
+    empreintesIndex[dep] = sha10(contenu);
+  }
+  fs.readdirSync(dossierIndex).filter(f => !attendusIndex.has(f)).forEach(f => fs.unlinkSync(path.join(dossierIndex, f)));
+  // Aperçu : même règle que tournois.js (estTermine : date_fin, sinon date_debut, avant aujourd'hui) ; tri date puis nom comme le fichier national
+  const nonTermines = donnees.tournois.filter(aVenir);
+  const parDepApercu = {};
+  nonTermines.forEach(t => { parDepApercu[t.dep] = (parDepApercu[t.dep] || 0) + 1; });
+  const apercu = {
+    ...entete, apercu: true, total: nonTermines.length,
+    par_dep: Object.fromEntries(Object.keys(parDepApercu).sort().map(d => [d, parDepApercu[d]])),
+    categories: [...new Set(nonTermines.map(t => t.categorie).filter(Boolean))].sort(),
+    limite_inscription: nonTermines.some(t => "limite_inscription" in t),
+    tournois: [...nonTermines].sort(parDate).slice(0, 100),
+  };
+  const contenuApercu = JSON.stringify(apercu) + "\n";
+  ecrireSiChange(path.join(RACINE, "assets/data/tournois-apercu.json"), contenuApercu);
+  ecrireSiChange(path.join(RACINE, "assets/data/tournois-apercu.js"), "// Généré par scripts/generer-pages.js.\nwindow.TOURNOIS_APERCU=" + contenuApercu.trim() + ";\n");
+  empreintesDonnees = { national: sha10(fs.readFileSync(path.join(RACINE, "assets/data/tournois.json"))), apercu: sha10(contenuApercu), index: empreintesIndex };
+  console.log(`index/ : ${(attendusIndex.size / 2) - 1} départements + hors-dep ; tournois-apercu.json : ${(Buffer.byteLength(contenuApercu) / 1024).toFixed(1)} Ko, ${apercu.tournois.length} tournois sur ${apercu.total} à venir`);
+
   /* ---------- Chiffres réels pour l'accueil : assets/data/stats.json ----------
      À venir = date de fin (sinon de début) >= aujourd'hui. Semaine = à venir ET commence au plus tard dans 7 jours
      (aujourd'hui inclus). Départements = ceux qui ont au moins un tournoi à venir. Coups et questions sont lus
@@ -592,7 +633,7 @@ donnees.tournois.filter(t => typeof t.lat === "number" && typeof t.lng === "numb
 });
 const centres = Object.fromEntries(Object.keys(sommes).sort().map(d => [d, [+(sommes[d][0] / sommes[d][2]).toFixed(3), +(sommes[d][1] / sommes[d][2]).toFixed(3)]]));
 const nomsDeps = Object.fromEntries([...DEPARTEMENTS.entries()]);
-const pagesJs = `/* Généré par scripts/generer-pages.js : départements qui ont leurs pages tournoi/<id>.html et tournois/<dep>.html,\n   noms et centres approximatifs des départements (moyenne des lieux de tournoi). */\nwindow.PA_PAGES_TOURNOIS={departements:${JSON.stringify(depsPublies)},noms:${JSON.stringify(nomsDeps)},centres:${JSON.stringify(centres)}};\n`;
+const pagesJs = `/* Généré par scripts/generer-pages.js : départements qui ont leurs pages tournoi/<id>.html et tournois/<dep>.html,\n   noms et centres approximatifs des départements (moyenne des lieux de tournoi). */\nwindow.PA_PAGES_TOURNOIS={departements:${JSON.stringify(depsPublies)},empreintes:${JSON.stringify(empreintesDonnees)},noms:${JSON.stringify(nomsDeps)},centres:${JSON.stringify(centres)}};\n`;
 fs.writeFileSync(path.join(RACINE, "assets/data/pages-tournois.js"), pagesJs);
 
 /* ---------- tournois.html : liens en HTML vers les pages départements et région × catégorie ----------

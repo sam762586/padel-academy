@@ -2,7 +2,8 @@
    - Shell (pages HTML, CSS, JS, icônes) : mis en cache à l'installation. Les pages (navigations) sont en « network-first » :
      la version du serveur dès la première visite (le site est mis à jour chaque jour), copie du cache au-delà de 4 s ou hors
      connexion (la requête réseau continue alors et met le cache à jour). CSS, scripts, polices et images : « stale-while-revalidate ».
-   - Données des tournois (assets/data/tournois.json) et fiches (assets/data/fiches/*.json) et « près de chez toi » (assets/data/prochains/*.json),
+   - Données des tournois (assets/data/tournois.json, tournois-apercu.json, index/<dep>.json : versionnés ?v=, une seule version gardée,
+     à défaut de la version demandée hors connexion on sert la dernière connue, marquée X-Depuis-Cache) et fiches (assets/data/fiches/*.json) et « près de chez toi » (assets/data/prochains/*.json),
      chiffres de l'accueil (stats.json), banque de la question du jour (questions-jour.json, précachée) et noms de clubs de la carte de joueur (clubs.json, précaché) : « network-first »
      avec repli sur le cache. Les fiches ne sont mises en cache qu'une fois consultées.
    - Simulateur 3D (assets/3d/ : moteur, modèle, scénarios, environ 1,5 Mo) : jamais précaché, « network-first »
@@ -15,7 +16,7 @@
      donc une page neuve n'est jamais servie avec un ancien style. Les anciennes versions sont retirées du cache ;
      hors connexion, à défaut de la bonne version, on sert la dernière connue.
    Pour publier une nouvelle version du shell : changer CACHE (ex. "pa-v2"), les anciens caches sont supprimés à l'activation. */
-const CACHE = "pa-v52-clubs";
+const CACHE = "pa-v53-tournois-legers";
 const DELAI_PAGE = 4000; // ms : au-delà, une page déjà en cache est servie sans attendre le réseau
 
 // Shell précaché. Une ressource absente (page pas encore créée) ne bloque pas l'installation.
@@ -55,7 +56,7 @@ self.addEventListener("activate", event => {
 });
 
 // Données : index des tournois, chiffres de l'accueil (stats.json), fiches détaillées et tournois proches par département
-const estDonnee = chemin => chemin.endsWith("/assets/data/tournois.json") || chemin.endsWith("/assets/data/stats.json") || chemin.endsWith("/assets/data/questions-jour.json") || chemin.endsWith("/assets/data/clubs.json") || /\/assets\/data\/(fiches|prochains)\/[0-9AB]{2,3}\.json$/.test(chemin);
+const estDonnee = chemin => chemin.endsWith("/assets/data/tournois.json") || chemin.endsWith("/assets/data/tournois-apercu.json") || /\/assets\/data\/index\/[0-9AB]{2,3}\.json$/.test(chemin) || chemin.endsWith("/assets/data/stats.json") || chemin.endsWith("/assets/data/questions-jour.json") || chemin.endsWith("/assets/data/clubs.json") || /\/assets\/data\/(fiches|prochains)\/[0-9AB]{2,3}\.json$/.test(chemin);
 
 // Réponse du cache, marquée pour que la page sache qu'elle est hors connexion
 function marquerDepuisCache(reponse) {
@@ -68,10 +69,15 @@ async function reseauDabord(requete) {
   const cache = await caches.open(CACHE);
   try {
     const reponse = await fetch(requete);
-    if (reponse.ok) await cache.put(requete, reponse.clone());
+    if (reponse.ok) {
+      await cache.put(requete, reponse.clone());
+      // fichier versionné (?v=…) : une seule version gardée par chemin
+      if (new URL(requete.url).searchParams.has("v")) await retirerAnciennesVersions(cache, requete.url);
+    }
     return reponse;
   } catch (erreur) {
-    const copie = await cache.match(requete);
+    // version demandée absente : dernière version connue du même chemin
+    const copie = await cache.match(requete) || await cache.match(requete, { ignoreSearch: true });
     if (copie) return marquerDepuisCache(copie);
     throw erreur;
   }

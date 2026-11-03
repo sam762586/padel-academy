@@ -132,7 +132,8 @@ const CONFIG_ACTIVE=fs.readFileSync(path.join(__dirname,'..','assets/js/supabase
   // Favori inconnu (tournoi retiré de la liste) : signalé, sans plantage
   await page.evaluate(i=>localStorage.setItem('pa-tournois-favoris',JSON.stringify([i,'999999999','<script>'])),id);
   await page.reload();await page.waitForSelector('#tournois-mes-liste .tcard');
-  assert.match(await page.textContent('#tournois-mes-note'),/1 favori n'est plus dans la liste/);
+  // L'identifiant absent de l'aperçu fait charger le fichier national en arrière-plan : on attend la note
+  await page.waitForFunction(()=>/1 favori n'est plus dans la liste/.test(document.getElementById('tournois-mes-note').textContent));
   await page.locator('#tournois-mes-liste button.tfav').click();
   assert.equal(await page.locator('#tournois-mes-liste .tcard').count(),0);
   assert.equal(await page.locator(`#tournois-liste .tcard[data-id="${id}"] button.tfav`).getAttribute('aria-pressed'),'false');

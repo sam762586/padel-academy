@@ -58,6 +58,10 @@ const serveur=http.createServer((req,res)=>{
   // Page Tournois : cartes reliées aux fiches des départements publiés
   await page.goto(base+'/tournois.html');
   await page.waitForSelector('#tournois-liste .tcard');
+  // Département mémorisé sur l'accueil (33) : la page s'ouvre sur ce département ; on passe à toute la France
+  assert.equal(await page.inputValue('#zone-dep'),'33');
+  await page.click('label.tchip:has(input[name=zone-mode][value=france])');
+  await page.waitForFunction(()=>new Set([...document.querySelectorAll('#tournois-liste .tlieu')].map(p=>(p.textContent.match(/\(([0-9AB]{2,3})\)/)||[])[1])).size>1);
   const infos=await page.evaluate(()=>{
    const pubs=new Set(window.PA_PAGES_TOURNOIS.departements);
    return [...document.querySelectorAll('#tournois-liste .tcard')].map(c=>({lien:c.querySelector('a.tcard-lien')?.getAttribute('href')||null,dep:(c.querySelector('.tlieu')?.textContent.match(/\(([0-9AB]{2,3})\)/)||[])[1],pub:null})).map(x=>({...x,pub:pubs.has(x.dep)}));

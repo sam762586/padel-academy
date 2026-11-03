@@ -1,6 +1,15 @@
 /* TOURNOIS : tournois de padel de toute la France, avec choix de la zone.
-   Données : assets/data/tournois.json (index léger, ~7 800 tournois), copie assets/data/tournois.js en file://.
-   Détails : assets/data/fiches/<dep>.json (copie .js en file://), chargés à la demande par département.
+   Données (générées par scripts/generer-pages.js, URL versionnées ?v=<empreinte> de window.PA_PAGES_TOURNOIS.empreintes,
+   sans ?v si pages-tournois.js manque ; copies .js pour le file:// et en repli si le .json est illisible) :
+   - assets/data/tournois-apercu.json (~25 Ko) : 100 prochains tournois + total, nombre par département, catégories.
+     C'est l'entrée en « Toute la France » sans filtre (liste, compteur, carte).
+   - assets/data/index/<dep>.json : tous les tournois d'un département. Entrée quand la zone retenue est un département
+     (état enregistré, sinon pa-mon-departement) ; un index par département visité, gardé en mémoire.
+   - assets/data/tournois.json (~2 Mo, ~8 000 tournois) : seulement quand il le faut (filtre ou recherche en France,
+     tri décroissant, « Voir plus » au-delà de l'aperçu, ville + rayon, autour de moi, favoris absents des fichiers chargés).
+     Une fois là, il sert pour tout. Pendant son chargement, message dans la liste (place gardée) ; en cas d'échec,
+     message et vue partielle (fichiers déjà chargés).
+   Détails : assets/data/fiches/<dep>.json (copie .js en file://), chargés quand une carte approche de l'écran.
    Zone : département exact, ville + rayon (autocomplétion IGN Géoplateforme) ou « autour de moi » (géolocalisation au clic).
    Carte : tracés des départements dans assets/js/carte-france.js (chargé avant ce fichier), coloriés selon le nombre de tournois.
    Hors connexion : le service worker (sw.js) renvoie la dernière liste connue avec l'en-tête X-Depuis-Cache.
@@ -49,12 +58,13 @@ const TOURNOIS_DEPARTEMENTS=[
    document.body.appendChild(s);
   });
  }
- async function chargerJson(){
+ async function chargerJson(url){
   const ctrl=typeof AbortController==="function"?new AbortController():null;
   const minuteur=ctrl?setTimeout(()=>ctrl.abort(),DELAI_MS):null;
   try{
    let r;
-   try{ r=await fetch("assets/data/tournois.json",{cache:"no-cache",signal:ctrl?ctrl.signal:undefined}); }
+   // URL versionnée (?v=) : le navigateur peut garder le fichier tant que l'empreinte ne change pas
+   try{ r=await fetch(url,{signal:ctrl?ctrl.signal:undefined}); }
    catch(e){ throw Object.assign(new Error("fetch"),{type:e&&e.name==="AbortError"?"delai":"reseau"}); }
    if(!r.ok) throw Object.assign(new Error("http "+r.status),{type:"http"});
    const horsConnexion=r.headers.get("X-Depuis-Cache")==="1"; // copie du service worker, hors connexion
@@ -63,38 +73,82 @@ const TOURNOIS_DEPARTEMENTS=[
    return {donnees:d,horsConnexion};
   }finally{ if(minuteur) clearTimeout(minuteur); }
  }
+ // ----- Sources des tournois : "apercu", "index:<dep>" ou "national" -----
+ const empreinte=h=>typeof h==="string"&&/^[0-9a-f]{6,40}$/.test(h)?"?v="+h:"";
+ function decrireSource(cle){
+  const e=(window.PA_PAGES_TOURNOIS||{}).empreintes||null;
+  if(cle==="national") return {chemin:"assets/data/tournois",v:empreinte(e&&e.national),lire:()=>window.TOURNOIS_DATA};
+  if(cle==="apercu") return {chemin:"assets/data/tournois-apercu",v:empreinte(e&&e.apercu),lire:()=>window.TOURNOIS_APERCU};
+  const dep=cle.slice(6); // "index:76"
+  return {chemin:"assets/data/index/"+dep,v:empreinte(e&&e.index&&e.index[dep]),lire:()=>(window.TOURNOIS_INDEX||{})[dep]};
+ }
+ const donneesValides=d=>!!d&&typeof d==="object"&&Array.isArray(d.tournois);
+ const promesses={}; // cle -> promesse en cours ou réussie (retirée en cas d'échec : « Réessayer » relance)
+ function chargerSource(cle){
+  if(promesses[cle]) return promesses[cle];
+  const s=decrireSource(cle);
+  const p=(async()=>{
+   let resultat=null,premiereErreur=null;
+   if(enHttp){ try{ resultat=await chargerJson(s.chemin+".json"+s.v); }catch(e){ premiereErreur=e; } }
+   if(!resultat||!donneesValides(resultat.donnees)){
+    // Repli : copie .js (indispensable en file://, utile si le .json est illisible)
+    try{ await chargerScript(s.chemin+".js"+s.v); }catch(e){}
+    if(donneesValides(s.lire())) resultat={donnees:s.lire(),horsConnexion:false};
+   }
+   if(!resultat||!donneesValides(resultat.donnees)) throw Object.assign(new Error("source "+cle),{type:premiereErreur&&premiereErreur.type||(resultat?"format":"reseau")});
+   return resultat;
+  })();
+  promesses[cle]=p;
+  p.catch(()=>{ if(promesses[cle]===p) delete promesses[cle]; });
+  return p;
+ }
+ const CLE_STOCKAGE="pa-tournois-filtres";
+ const depConnu=d=>typeof d==="string"&&TOURNOIS_DEPARTEMENTS.some(x=>x[0]===d);
+ // Zone de départ : l'état enregistré s'il existe (département seulement en mode « dep »),
+ // sinon le département mémorisé (accueil, page département…) : on ouvre alors ce département
+ function zoneDeDepart(){
+  let enregistre=null;
+  try{ enregistre=JSON.parse(localStorage.getItem(CLE_STOCKAGE)||"null"); }catch(e){}
+  if(enregistre&&typeof enregistre==="object"){
+   const z=enregistre.zone;
+   return {enregistre:true,dep:z&&z.mode==="dep"&&depConnu(z.dep)?z.dep:""};
+  }
+  let dep="";
+  try{ dep=localStorage.getItem("pa-mon-departement")||""; }catch(e){}
+  return {enregistre:false,dep:depConnu(dep)?dep:""};
+ }
+ const estLisible=t=>!!t&&!!t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||"");
  async function charger(){
   if(demarre||enCours) return;
   enCours=true;etat("chargement");
   try{
-   let resultat=null,premiereErreur=null;
-   if(enHttp){ try{ resultat=await chargerJson(); }catch(e){ premiereErreur=e; } }
-   if(!resultat||!donneesValides(resultat.donnees)){
-    // Repli : copie .js (indispensable en file://, utile si le .json est illisible)
-    try{ await chargerScript("assets/data/tournois.js"); }catch(e){}
-    if(donneesValides(window.TOURNOIS_DATA)) resultat={donnees:window.TOURNOIS_DATA,horsConnexion:false};
-   }
-   if(!resultat||!donneesValides(resultat.donnees)){ erreur(premiereErreur&&premiereErreur.type||(resultat?"format":"reseau")); return; }
-   demarrer(resultat.donnees,resultat.horsConnexion);
+   // Entrée légère : l'index du département retenu (+ l'aperçu pour la carte et les catégories), sinon l'aperçu seul
+   const depart=zoneDeDepart();
+   const cles=depart.dep?["index:"+depart.dep,"apercu"]:["apercu"];
+   const reponses=await Promise.allSettled(cles.map(chargerSource));
+   if(reponses[0].status==="rejected"){ erreur(reponses[0].reason&&reponses[0].reason.type); return; }
+   const charge={};
+   cles.forEach((c,i)=>{ if(reponses[i].status==="fulfilled") charge[c]=reponses[i].value; });
+   demarrer(charge,depart);
   }finally{ enCours=false; }
  }
- const donneesValides=d=>!!d&&typeof d==="object"&&Array.isArray(d.tournois);
  const boutonReessayer=document.getElementById("tournois-reessayer");
  if(boutonReessayer) boutonReessayer.addEventListener("click",charger);
  charger();
 
-function demarrer(donnees,horsConnexion){
+function demarrer(charge,depart){
  const contenu=document.getElementById("tournois-contenu");
- const valables=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
- if(!valables.length){ etat("vide"); return; }
- try{ initialiser(donnees,contenu,!!horsConnexion); demarre=true; etat("contenu"); }
+ const apercu=charge.apercu?charge.apercu.donnees:null;
+ const nombre=Object.values(charge).reduce((n,r)=>n+r.donnees.tournois.filter(estLisible).length,0);
+ // Vraie absence : rien dans les fichiers reçus, et l'aperçu (s'il est là) annonce 0 tournoi en France
+ if(!nombre&&(apercu?!(apercu.total>0):!depart.dep)){ etat("vide"); return; }
+ try{ initialiser(charge,contenu,depart); demarre=true; etat("contenu"); }
  catch(e){ console.error("Tournois : affichage impossible",e); erreur("format"); }
 }
 
-function initialiser(donnees,contenu,horsConnexion){
+function initialiser(charge,contenu,depart){
  contenu.hidden=false;
 
- const CLE_STOCKAGE="pa-tournois-filtres";
  const PAGE=50; // nombre de cartes ajoutées à chaque « Voir plus »
  const URL_IGN="https://data.geopf.fr/geocodage/search";
  const MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
@@ -104,12 +158,12 @@ function initialiser(donnees,contenu,horsConnexion){
  const dateLocale=iso=>{const p=iso.split("-");return new Date(+p[0],+p[1]-1,+p[2]);};
  const versIso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
  const aujourdhui=versIso(new Date());
- // Tous les tournois lisibles (y compris terminés) : « Mes tournois » doit retrouver les favoris passés
- const tousLesTournois=donnees.tournois.filter(t=>t&&t.nom&&/^\d{4}-\d{2}-\d{2}$/.test(t.date_debut||""));
  // Le fichier n'est régénéré qu'une fois par semaine : les tournois terminés (date de fin, sinon de début,
- // avant aujourd'hui sur l'appareil) sont retirés ici, avant tout calcul (liste, carte, compteurs, filtres).
+ // avant aujourd'hui sur l'appareil) sont retirés de chaque source, avant tout calcul (liste, carte, compteurs, filtres).
  const estTermine=t=>(t.date_fin||t.date_debut)<aujourdhui;
- const tournois=tousLesTournois.filter(t=>!estTermine(t));
+ // Sources chargées : {tous (lisibles, terminés compris : « Mes tournois » retrouve les favoris passés), aVenir, donnees}
+ const sources={apercu:null,national:null,index:{}};
+ const parId=new Map(); // id -> tournoi, toutes sources confondues (favoris passés compris)
  const favoris=window.PA_FAVORIS||null; // favoris.js (étoiles, « Mes tournois », calendrier)
  const depsAvecFiches=new Set(((window.PA_PAGES_TOURNOIS||{}).departements)||[]);
  const aUneFiche=t=>!!t.id&&/^\d+$/.test(String(t.id))&&depsAvecFiches.has(t.dep);
@@ -142,13 +196,19 @@ function initialiser(donnees,contenu,horsConnexion){
 
  // ----- En-tête -----
  const maj=document.getElementById("tournois-maj");
- const dateGeneree=donnees.genere_le?new Date(donnees.genere_le):null;
- let texteMaj="";
- if(dateGeneree&&!isNaN(dateGeneree)) texteMaj+=(horsConnexion?"Hors connexion : liste du ":"Mis à jour le ")+dateGeneree.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+". ";
- else if(horsConnexion) texteMaj+="Hors connexion : liste enregistrée. ";
- if(donnees.periode&&donnees.periode.du&&donnees.periode.au&&/^\d{4}-/.test(donnees.periode.du)&&/^\d{4}-/.test(donnees.periode.au)) texteMaj+="Tournois du "+formaterJour(donnees.periode.du<aujourdhui?aujourdhui:donnees.periode.du)+" au "+formaterJour(donnees.periode.au)+". ";
- maj.textContent=texteMaj;
- if(donnees.source) document.getElementById("tournois-source").textContent=donnees.source;
+ let horsConnexionVu=false; // une des sources vient de la copie du service worker (hors connexion)
+ function majEntete(donnees,horsConnexion){
+  const dateGeneree=donnees.genere_le?new Date(donnees.genere_le):null;
+  let texteMaj="";
+  if(dateGeneree&&!isNaN(dateGeneree)) texteMaj+=(horsConnexion?"Hors connexion : liste du ":"Mis à jour le ")+dateGeneree.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})+". ";
+  else if(horsConnexion) texteMaj+="Hors connexion : liste enregistrée. ";
+  if(donnees.periode&&donnees.periode.du&&donnees.periode.au&&/^\d{4}-/.test(donnees.periode.du)&&/^\d{4}-/.test(donnees.periode.au)) texteMaj+="Tournois du "+formaterJour(donnees.periode.du<aujourdhui?aujourdhui:donnees.periode.du)+" au "+formaterJour(donnees.periode.au)+". ";
+  maj.textContent=texteMaj;
+  if(donnees.source) document.getElementById("tournois-source").textContent=donnees.source;
+ }
+ const chargeInitial=Object.values(charge);
+ horsConnexionVu=chargeInitial.some(r=>r.horsConnexion);
+ majEntete(chargeInitial[0].donnees,horsConnexionVu);
 
  // ----- Éléments -----
  const formulaire=document.getElementById("tournois-filtres");
@@ -176,20 +236,48 @@ function initialiser(donnees,contenu,horsConnexion){
  const panneaux={dep:document.getElementById("zone-panneau-dep"),ville:document.getElementById("zone-panneau-ville"),moi:document.getElementById("zone-panneau-moi")};
  const panneauRayon=document.getElementById("zone-panneau-rayon");
 
- function creerCase(zone,nom,valeur,libelle){
+ function creerCase(zone,nom,valeur,libelle,avant){
   const label=document.createElement("label");label.className="tchip";
   const input=document.createElement("input");input.type="checkbox";input.name=nom;input.value=valeur;
   const span=document.createElement("span");span.textContent=libelle;
-  label.append(input,span);zone.appendChild(label);
+  label.append(input,span);zone.insertBefore(label,avant||null);
  }
- // Catégories construites depuis les données, triées par valeur numérique (P25 < P100 < ... < P3000)
+ // Catégories construites depuis les données (liste nationale de l'aperçu + sources chargées),
+ // triées par valeur numérique (P25 < P100 < ... < P3000). Une catégorie apparue avec une nouvelle source
+ // est insérée à sa place, sans toucher aux cases existantes (cochées ou non).
  const ordreCategorie=c=>{const m=/^P(\d+)$/.exec(c);return m?+m[1]:1e9;};
- [...new Set(tournois.map(t=>t.categorie).filter(Boolean))]
-  .sort((a,b)=>ordreCategorie(a)-ordreCategorie(b)||a.localeCompare(b))
-  .forEach(c=>creerCase(zoneCategories,"categorie",c,c));
- if(!zoneCategories.children.length) zoneCategories.parentNode.hidden=true;
+ const compareCategories=(a,b)=>ordreCategorie(a)-ordreCategorie(b)||a.localeCompare(b);
+ const sourcesChargees=()=>[sources.national,sources.apercu,...Object.values(sources.index)].filter(Boolean);
+ function majCategories(){
+  const presentes=new Set([...zoneCategories.querySelectorAll("input")].map(i=>i.value));
+  const toutes=new Set();
+  const listeApercu=sources.apercu&&sources.apercu.donnees.categories;
+  if(Array.isArray(listeApercu)) listeApercu.forEach(c=>{if(typeof c==="string"&&c) toutes.add(c);});
+  sourcesChargees().forEach(s=>s.aVenir.forEach(t=>{if(t.categorie) toutes.add(String(t.categorie));}));
+  [...toutes].filter(c=>!presentes.has(c)).sort(compareCategories).forEach(c=>{
+   const suivante=[...zoneCategories.children].find(l=>compareCategories(l.querySelector("input").value,c)>0);
+   creerCase(zoneCategories,"categorie",c,c,suivante);
+  });
+  zoneCategories.parentNode.hidden=!zoneCategories.children.length;
+ }
+ // Case « inscriptions ouvertes » : seulement si des tournois annoncent une date limite
+ function majCaseOuvertes(){
+  const avecLimite=!!(sources.apercu&&sources.apercu.donnees.limite_inscription)||sourcesChargees().some(s=>s.aVenir.some(t=>t.limite_inscription));
+  caseOuvertes.closest("label").style.display=avecLimite?"":"none";
+ }
+ // Ajoute une source reçue : tournois lisibles, terminés retirés, favoris retrouvables, catégories complétées
+ function ajouterSource(cle,resultat){
+  const tous=resultat.donnees.tournois.filter(estLisible);
+  const s={tous,aVenir:tous.filter(t=>!estTermine(t)),donnees:resultat.donnees};
+  if(cle==="national") sources.national=s;
+  else if(cle==="apercu") sources.apercu=s;
+  else sources.index[cle.slice(6)]=s;
+  tous.forEach(t=>{const id=String(t.id||"");if(cle==="national"||!parId.has(id)) parId.set(id,t);});
+  if(resultat.horsConnexion&&!horsConnexionVu){horsConnexionVu=true;majEntete(resultat.donnees,true);}
+  majCategories();majCaseOuvertes();
+ }
+ Object.keys(charge).forEach(cle=>ajouterSource(cle,charge[cle]));
  SEXES.forEach(s=>creerCase(zoneSexes,"sexe",s[0],s[1]));
- if(!tournois.some(t=>t.limite_inscription)) caseOuvertes.closest("label").style.display="none";
  // Départements présents dans les données, en tête de liste de choix
  const optionTous=document.createElement("option");optionTous.value="";optionTous.textContent="Tous les départements";selectDep.appendChild(optionTous);
  TOURNOIS_DEPARTEMENTS.forEach(d=>{const o=document.createElement("option");o.value=d[0];o.textContent=d[0]+" · "+d[1];selectDep.appendChild(o);});
@@ -227,6 +315,8 @@ function initialiser(donnees,contenu,horsConnexion){
   }
  }
  try{ appliquerEtat(JSON.parse(localStorage.getItem(CLE_STOCKAGE)||"null")); }catch(e){}
+ // Première visite de la page (aucun état enregistré) : le département mémorisé sur le site est ouvert
+ if(!depart.enregistre&&depart.dep){zone.mode="dep";zone.dep=depart.dep;}
  function synchroniserZoneVersFormulaire(){
   const radio=document.querySelector("input[name=zone-mode][value="+zone.mode+"]");
   if(radio) radio.checked=true;
@@ -339,19 +429,26 @@ function initialiser(donnees,contenu,horsConnexion){
  const noteMes=document.getElementById("tournois-mes-note");
  const messageFavoris=document.getElementById("tournois-fav-msg");
  // Section « Mes tournois » : favoris à venir d'abord, puis ceux qui sont passés
+ let favorisCherches=false; // le fichier national n'est demandé qu'une fois pour les favoris
  function afficherMesTournois(){
   if(!favoris||!blocMes) return;
   const ids=favoris.liste();
   const connus=ids.map(id=>parId.get(id)).filter(Boolean);
+  // Favoris absents des fichiers chargés (autre département, aperçu) : le fichier national, en arrière-plan
+  const aChercher=connus.length<ids.length&&!sources.national;
+  if(aChercher&&!favorisCherches){favorisCherches=true;demarrerChargement("national");}
+  const enRecherche=aChercher&&!!promesses.national;
   const aVenir=connus.filter(t=>!estTermine(t)).sort((a,b)=>a.date_debut<b.date_debut?-1:1);
   const passes=connus.filter(estTermine).sort((a,b)=>a.date_debut<b.date_debut?1:-1);
   blocMes.hidden=!ids.length;
   listeMes.textContent="";
   const cartes=[...aVenir,...passes].map(t=>{const c=creerCarte(t);if(passes.includes(t))c.classList.add("tpasse");listeMes.appendChild(c);return c;});
   enrichirCartes(cartes);
-  const inconnus=ids.length-connus.length;
+  // « Plus dans la liste » seulement quand la liste complète a été lue
+  const inconnus=sources.national?ids.length-connus.length:0;
   noteMes.textContent=(passes.length?passes.length+" tournoi"+(passes.length>1?"s":"")+" passé"+(passes.length>1?"s":"")+" : retire"+(passes.length>1?"-les":"-le")+" avec l'étoile. ":"")+
-   (inconnus?inconnus+" favori"+(inconnus>1?"s ne sont":" n'est")+" plus dans la liste (tournoi terminé ou retiré de Ten'Up).":"");
+   (inconnus?inconnus+" favori"+(inconnus>1?"s ne sont":" n'est")+" plus dans la liste (tournoi terminé ou retiré de Ten'Up).":"")+
+   (enRecherche?"Recherche de tes autres favoris…":"");
   noteMes.hidden=!noteMes.textContent;
  }
  function clicFavoriOuCalendrier(e){
@@ -399,8 +496,18 @@ function initialiser(donnees,contenu,horsConnexion){
   if(fiche.balles) ajouterTexte(zonePlus,"p","tlieu","Balles : "+fiche.balles);
   if(fiche.commentaire){const c=String(fiche.commentaire);ajouterTexte(zonePlus,"p","tlieu",c.length>180?c.slice(0,177)+"…":c);}
  }
- // Charge les fiches des départements des cartes données, puis enrichit les cartes
+ // Les fiches d'un département pèsent jusqu'à 250 Ko : on ne les charge que pour les cartes qui approchent de l'écran
+ const observateurCartes=typeof IntersectionObserver==="function"?new IntersectionObserver(entrees=>{
+  const visibles=entrees.filter(e=>e.isIntersecting).map(e=>e.target);
+  visibles.forEach(c=>observateurCartes.unobserve(c));
+  if(visibles.length) enrichirMaintenant(visibles);
+ },{rootMargin:"200px 0px"}):null;
  function enrichirCartes(cartes){
+  if(observateurCartes) cartes.forEach(c=>observateurCartes.observe(c));
+  else enrichirMaintenant(cartes);
+ }
+ // Charge les fiches des départements des cartes données, puis enrichit les cartes
+ function enrichirMaintenant(cartes){
   const parDep={};
   cartes.forEach(c=>{const t=parId.get(c.dataset.id);if(t&&t.dep) (parDep[t.dep]=parDep[t.dep]||[]).push(c);});
   Object.keys(parDep).forEach(dep=>{
@@ -410,7 +517,6 @@ function initialiser(donnees,contenu,horsConnexion){
    });
   });
  }
- const parId=new Map(tousLesTournois.map(t=>[String(t.id||""),t])); // favoris passés compris
 
  // ----- Filtrage, tri, rendu paginé -----
  let resultats=[], affiches=0;
@@ -430,44 +536,157 @@ function initialiser(donnees,contenu,horsConnexion){
   return true;
  }
  let recherche="";
- function afficher(){
+ // Filtres qui portent sur toute la France (la zone et le tri par distance sont traités à part)
+ const filtresActifs=etat=>!!(etat.categories.length||etat.sexes.length||etat.du||etat.au||etat.ouvertes||recherche);
+ // Source qu'il faut pour la vue demandée : l'aperçu ne suffit qu'en France, sans filtre, dates croissantes
+ function sourceVoulue(etat,point){
+  if(point) return "national";
+  if(zone.mode==="dep"&&zone.dep) return "index:"+zone.dep;
+  return filtresActifs(etat)||!etat.croissant?"national":"apercu";
+ }
+ // Liste de travail : le fichier national s'il est là (il contient tout), sinon la source voulue ; null = à charger
+ function choisirBase(cle){
+  if(sources.national) return {liste:sources.national.aVenir,apercu:false};
+  const s=cle==="apercu"?sources.apercu:cle.indexOf("index:")===0?sources.index[cle.slice(6)]:null;
+  return s?{liste:s.aVenir,apercu:cle==="apercu"}:null;
+ }
+ // Nombre de tournois à venir annoncé par l'aperçu, moins ceux de l'aperçu terminés depuis sa génération
+ function totalApercu(){
+  const a=sources.apercu;if(!a) return 0;
+  const total=Math.round(+a.donnees.total);
+  return Number.isFinite(total)?Math.max(a.aVenir.length,total-(a.tous.length-a.aVenir.length)):a.aVenir.length;
+ }
+
+ // ----- Chargement d'une source après l'entrée -----
+ const echecs={};      // cle -> type d'erreur, pour la vue (effacé par « Réessayer »)
+ const enCoursVue={};  // cle -> chargement en cours
+ let attente=null;     // source attendue par la vue (message dans la liste)
+ let voirPlusDemande=false; // « Voir plus » au-delà de l'aperçu : la suite vient du fichier national
+ function demarrerChargement(cle){
+  if(enCoursVue[cle]) return;
+  enCoursVue[cle]=true;
+  chargerSource(cle).then(r=>{ajouterSource(cle,r);return null;},e=>(e&&e.type)||"reseau").then(echec=>{
+   delete enCoursVue[cle];
+   const pourLaVue=attente===cle||(cle==="national"&&voirPlusDemande);
+   if(echec&&pourLaVue) echecs[cle]=echec;
+   if(cle==="national"){majEtoiles();afficherMesTournois();}
+   if(!pourLaVue) return;
+   const suite=voirPlusDemande&&!echec;
+   afficher({conserver:true});
+   if(suite&&affiches<resultats.length) ajouterCartes();
+  });
+ }
+ // Message dans la zone de liste pendant le chargement : la liste garde sa hauteur (pas de saut de mise en page)
+ function montrerAttente(cle){
+  if(attente!==cle||!liste.hasAttribute("aria-busy")){
+   liste.style.minHeight=Math.max(liste.offsetHeight,Math.round(window.innerHeight*.5))+"px";
+   liste.textContent="";
+   const p=document.createElement("p");p.className="chargement tattente";
+   p.textContent=cle==="national"?"Chargement de tous les tournois de France…":"Chargement des tournois du département…";
+   liste.appendChild(p);
+   liste.setAttribute("aria-busy","true");
+  }
+  attente=cle;resultats=[];affiches=0;
+  compteur.textContent="Recherche en cours…";
+  detailCompteur.hidden=true;messageAucun.hidden=true;
+  boutonPlus.disabled=true;
+ }
+ function finAttente(){
+  attente=null;
+  liste.style.minHeight="";liste.removeAttribute("aria-busy");
+  boutonPlus.disabled=false;boutonPlus.removeAttribute("aria-busy");
+ }
+ // Échec du chargement d'une source : message clair, la vue reste sur les fichiers déjà chargés
+ const messageSource=document.createElement("div");
+ messageSource.className="msg msg-erreur tsource-msg";messageSource.setAttribute("role","alert");messageSource.hidden=true;
+ const texteSource=document.createElement("p");
+ const boutonSource=document.createElement("button");boutonSource.type="button";boutonSource.className="btn ghost";boutonSource.textContent="Réessayer";
+ messageSource.append(texteSource,boutonSource);
+ liste.parentNode.insertBefore(messageSource,liste);
+ boutonSource.addEventListener("click",()=>{Object.keys(echecs).forEach(k=>delete echecs[k]);afficher();});
+ function majMessageSource(cle){
+  messageSource.hidden=!cle;
+  if(cle) texteSource.textContent=(cle==="national"?"La liste de toute la France n'a pas pu être chargée. ":"Les tournois de ce département n'ont pas pu être chargés. ")+
+   (MESSAGES_ERREUR[echecs[cle]]||MESSAGES_ERREUR.reseau)+" En attendant, seuls les tournois déjà chargés sont affichés.";
+ }
+ let totalAnnonce=0; // nombre de résultats annoncé (l'aperçu en annonce plus qu'il n'en contient)
+ function majBarre(etat,point){
+  boutonTri.textContent=tri==="date"?(etat.croissant?"Date : les plus proches d'abord":"Date : les plus lointains d'abord"):"Trier par date";
+  boutonTri.setAttribute("aria-pressed",String(tri==="date"));
+  boutonTriDistance.hidden=!point;
+  boutonTriDistance.setAttribute("aria-pressed",String(tri==="distance"));
+ }
+ // options.conserver : garder les cartes déjà affichées si elles restent en tête des résultats (passage aperçu → national)
+ function afficher(options){
+  const conserver=!!(options&&options.conserver);
+  if(!conserver) voirPlusDemande=false;
   const etat=lireEtat();
   // Département choisi : retenu pour l'accueil (« près de chez toi ») et les distances des fiches
   if(zone.mode==="dep"&&zone.dep){try{localStorage.setItem("pa-mon-departement",zone.dep);}catch(e){}}
   recherche=sansAccent(etat.texte.trim());
   const point=pointDeReference();
+  if(tri==="distance"&&!point) tri="date";
+  try{ localStorage.setItem(CLE_STOCKAGE,JSON.stringify(lireEtat())); }catch(e){}
+  majBarre(etat,point);
+  const cle=sourceVoulue(etat,point);
+  let base=choisirBase(cle),degradee=false;
+  if(!base){
+   if(!(cle in echecs)){
+    // Source à charger : message dans la liste, les filtres restent utilisables
+    majMessageSource(null);montrerAttente(cle);majCarte(etat);demarrerChargement(cle);
+    return;
+   }
+   // Échec : vue partielle sur les fichiers déjà chargés
+   const repli=(zone.mode==="dep"&&sources.index[zone.dep])||sources.apercu;
+   base={liste:repli?repli.aVenir:[],apercu:false};degradee=true;
+  }
+  const etaitEnAttente=attente!==null;
+  finAttente();
+  // « Voir plus » vers le fichier national en échec : message, le bouton permet de réessayer
+  majMessageSource(degradee?cle:base.apercu&&echecs.national?"national":null);
+  const tournois=base.liste;
   let sansPosition=0;
   // Distance de chaque tournoi au point choisi (null si pas de point ou pas de coordonnées)
   tournois.forEach(t=>{t.distance_km=point&&aPosition(t)?distanceKm(point.lat,point.lng,t.lat,t.lng):null;});
   if(point) sansPosition=tournois.filter(t=>!aPosition(t)).length;
-  if(tri==="distance"&&!point) tri="date";
+  const precedents=resultats.slice(0,affiches);
   resultats=tournois.filter(t=>correspond(t,etat,point));
   majCarte(etat);
   const sens=etat.croissant?1:-1;
   if(tri==="distance") resultats.sort((a,b)=>a.distance_km-b.distance_km||(a.date_debut<b.date_debut?-1:1));
   else resultats.sort((a,b)=>(a.date_debut<b.date_debut?-1:a.date_debut>b.date_debut?1:0)*sens);
-  liste.textContent="";affiches=0;
-  ajouterCartes();
-  compteur.textContent=resultats.length.toLocaleString("fr-FR")+" tournoi"+(resultats.length>1?"s":"");
+  totalAnnonce=base.apercu?Math.max(resultats.length,totalApercu()):resultats.length;
+  // Mêmes tournois en tête (même identifiant, même ordre) : les cartes affichées restent, rien n'est recréé
+  const garder=conserver&&!etaitEnAttente&&precedents.length>0&&precedents.length<=resultats.length&&
+   precedents.every((t,i)=>String(t.id||"")===String(resultats[i].id||""));
+  if(garder) majPlus();
+  else{ liste.textContent="";affiches=0;ajouterCartes(); }
+  compteur.textContent=totalAnnonce.toLocaleString("fr-FR")+" tournoi"+(totalAnnonce>1?"s":"")+(degradee?" (liste partielle)":"");
   detailCompteur.textContent=point&&sansPosition?sansPosition.toLocaleString("fr-FR")+" tournoi"+(sansPosition>1?"s":"")+" sans position connue "+(sansPosition>1?"ne sont":"n'est")+" pas pris en compte pour la distance.":"";
   detailCompteur.hidden=!detailCompteur.textContent;
-  boutonTri.textContent=tri==="date"?(etat.croissant?"Date : les plus proches d'abord":"Date : les plus lointains d'abord"):"Trier par date";
-  boutonTri.setAttribute("aria-pressed",String(tri==="date"));
-  boutonTriDistance.hidden=!point;
-  boutonTriDistance.setAttribute("aria-pressed",String(tri==="distance"));
-  messageAucun.hidden=resultats.length>0;
-  try{ localStorage.setItem(CLE_STOCKAGE,JSON.stringify(lireEtat())); }catch(e){}
+  messageAucun.hidden=totalAnnonce>0;
  }
- // Ajoute la page suivante de cartes (50 à la fois)
+ // Bouton « Voir plus » : restants d'après le nombre annoncé
+ function majPlus(){
+  const restants=totalAnnonce-affiches;
+  boutonPlus.hidden=restants<=0;
+  boutonPlus.textContent="Voir plus ("+restants.toLocaleString("fr-FR")+" restant"+(restants>1?"s":"")+")";
+ }
+ // Ajoute la page suivante de cartes (50 à la fois, jamais plus)
  function ajouterCartes(){
+  if(affiches>=resultats.length&&totalAnnonce>affiches){
+   // Aperçu épuisé : la suite est dans le fichier national (bouton en chargement, cartes gardées)
+   voirPlusDemande=true;delete echecs.national;
+   boutonPlus.disabled=true;boutonPlus.setAttribute("aria-busy","true");boutonPlus.textContent="Chargement…";
+   demarrerChargement("national");
+   return;
+  }
   const fragment=document.createDocumentFragment();
   const nouvelles=[];
   resultats.slice(affiches,affiches+PAGE).forEach(t=>{const c=creerCarte(t);fragment.appendChild(c);nouvelles.push(c);});
   affiches=Math.min(resultats.length,affiches+PAGE);
   liste.appendChild(fragment);
-  const restants=resultats.length-affiches;
-  boutonPlus.hidden=restants<=0;
-  boutonPlus.textContent="Voir plus ("+restants.toLocaleString("fr-FR")+" restant"+(restants>1?"s":"")+")";
+  majPlus();
   enrichirCartes(nouvelles);
  }
 
@@ -535,8 +754,15 @@ function initialiser(donnees,contenu,horsConnexion){
  }
  function choisirDepartement(code){
   zone.mode="dep";zone.dep=code;
+  depInfo=code;
   synchroniserZoneVersFormulaire();messageDeZone("",false);afficher();
-  if(carteInfo) carteInfo.textContent=code+" · "+(nomsDep.get(code)||"")+" sélectionné : "+libelleTournois(comptes.get(code)||0)+" avec les filtres actuels.";
+ }
+ // Département choisi sur la carte : son nombre est écrit quand il est connu (l'index peut être en chargement)
+ let depInfo="";
+ function majInfoCarte(){
+  if(!carteInfo||!depInfo) return;
+  if(zone.mode!=="dep"||zone.dep!==depInfo){depInfo="";return;}
+  carteInfo.textContent=attente?"":depInfo+" · "+(nomsDep.get(depInfo)||"")+" sélectionné : "+libelleTournois(comptes.get(depInfo)||0)+" avec les filtres actuels.";
  }
  const texteBulle=code=>code+" · "+(nomsDep.get(code)||"")+" : "+libelleTournois(comptes.get(code)||0);
  // Bulle d'information : suit la souris, ou se place au-dessus du tracé au clavier
@@ -556,12 +782,22 @@ function initialiser(donnees,contenu,horsConnexion){
  function majCarte(etat){
   if(!traces.size) return;
   comptes.clear();
-  let sansDep=0,max=0;
-  tournois.forEach(t=>{
-   if(!correspond(t,etat,null,true)) return;
-   if(!t.dep||!nomsDep.has(t.dep)){sansDep++;return;}
-   comptes.set(t.dep,(comptes.get(t.dep)||0)+1);
-  });
+  let sansDep=0,max=0,approche=false;
+  if(sources.national){
+   sources.national.aVenir.forEach(t=>{
+    if(!correspond(t,etat,null,true)) return;
+    if(!t.dep||!nomsDep.has(t.dep)){sansDep++;return;}
+    comptes.set(t.dep,(comptes.get(t.dep)||0)+1);
+   });
+  }else{
+   // Sans le fichier national : nombres par département de l'aperçu (sans filtres), moins les tournois terminés depuis…
+   const a=sources.apercu,pd=a&&a.donnees.par_dep&&typeof a.donnees.par_dep==="object"?a.donnees.par_dep:{};
+   Object.keys(pd).forEach(d=>{const n=Math.max(0,Math.round(+pd[d])||0);if(nomsDep.has(d)) comptes.set(d,n);else sansDep+=n;});
+   if(a) a.tous.forEach(t=>{if(!estTermine(t)) return;if(nomsDep.has(t.dep)) comptes.set(t.dep,Math.max(0,(comptes.get(t.dep)||0)-1));else sansDep=Math.max(0,sansDep-1);});
+   // … et compte exact, avec les filtres, pour les départements dont l'index est chargé
+   Object.keys(sources.index).forEach(d=>{if(nomsDep.has(d)) comptes.set(d,sources.index[d].aVenir.filter(t=>correspond(t,etat,null,true)).length);});
+   approche=filtresActifs(etat)&&[...traces.keys()].some(d=>!sources.index[d]);
+  }
   comptes.forEach(n=>{if(n>max) max=n;});
   // Seuils strictement croissants, répartis sur le maximum observé
   const s1=Math.max(1,Math.ceil(max*.1)),s2=Math.max(s1+1,Math.ceil(max*.3)),s3=Math.max(s2+1,Math.ceil(max*.6));
@@ -588,9 +824,11 @@ function initialiser(donnees,contenu,horsConnexion){
    li.append(pastille,document.createTextNode(texte));carteLegende.appendChild(li);
   });
   const outremer="Les départements d'outre-mer se choisissent dans la liste « Département ».";
-  carteNote.textContent=sansDep
+  carteNote.textContent=(approche?"Tes filtres ne sont comptés que pour les départements déjà ouverts ; les autres montrent tous leurs tournois à venir. ":"")+
+   (sansDep
    ?libelleTournois(sansDep)+" "+(sansDep>1?"n'ont":"n'a")+" pas encore de département connu et "+(sansDep>1?"ne sont comptés":"n'est compté")+" sur aucun département. "+outremer
-   :outremer;
+   :outremer);
+  majInfoCarte();
  }
  construireCarte();
 
