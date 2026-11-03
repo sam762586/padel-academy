@@ -52,7 +52,7 @@ function nav(actif, prefixe = "") {
   return `<a class="evitement" href="#contenu">Aller au contenu</a>
 <nav class="nav" aria-label="Navigation principale"><script>document.documentElement.classList.add("nav-js");addEventListener("load",function(){if(!window.PA_NAV)document.documentElement.classList.remove("nav-js")})</script>
   <div class="wrap">
-    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-256.webp" width="74" height="38" alt="" decoding="async"><span class="brand-texte">Apprendre <span>Padel</span></span></a>
+    <a class="brand" href="${prefixe === "/" ? "/" : prefixe + "index.html"}"><img class="brand-logo" src="${prefixe}assets/img/logo/monogramme-sombre-148.webp" width="74" height="38" alt="" decoding="async"><span class="brand-texte">Apprendre <span>Padel</span></span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu"><span></span><span></span><span></span></button>
     <ul id="nav-menu">${MENU.map(entree).join("")}<li><a class="cta" href="${prefixe}${APPEL[0]}"><span class="cta-long">${APPEL[1]}</span><span class="cta-court" aria-hidden="true">${APPEL[2]}</span></a></li></ul>
   </div>

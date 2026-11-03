@@ -34,7 +34,7 @@ const SHELL = [
   "assets/js/tournois.js", "assets/js/tuto-couple.js", "assets/js/tuto-lob.js", "assets/js/tuto-monter.js", "assets/js/videos.js",
   "assets/js/partenaires.js", "assets/js/score.js", "assets/js/bareme-donnees.js", "assets/js/mon-padel.js", "assets/js/favoris.js", "assets/js/joueur-sync.js", "assets/js/espace.js", "assets/js/journal.js", "assets/js/exercices-donnees.js", "assets/js/exercices.js", "assets/js/progression.js", "assets/js/diagnostic.js", "assets/js/accueil-tournois.js", "assets/js/connexion.js", "assets/js/anti-cadre.js", "assets/js/communaute-tournoi.js", "assets/js/mesure-audience.js", "assets/js/presence.js", "assets/js/accueil-vitre.js", "assets/js/question-jour.js", "assets/js/concours-donnees.js", "assets/js/concours.js", "assets/js/clubs.js", "assets/js/widget-tournois.js", "assets/data/pages-tournois.js", "assets/data/stats.json", "assets/data/questions-jour.json", "assets/data/clubs.json",
   "assets/img/icons/icon-192.png", "assets/img/icons/icon-512.png", "assets/img/icons/icon-maskable-512.png",
-  "assets/img/logo/monogramme-sombre-256.webp" // monogramme du menu (toutes les pages)
+  "assets/img/logo/monogramme-sombre-148.webp" // monogramme du menu (toutes les pages)
 ];
 
 self.addEventListener("install", event => {

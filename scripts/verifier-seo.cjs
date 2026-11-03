@@ -74,6 +74,24 @@ for (const p of indexables) {
 }
 ok(`plan des titres sans saut ; maillage : ${indexables.length - LEGALES.length} pages renvoient chacune vers 3 autres pages au moins`);
 
+// 2 ter) un titre sr-only ne doit pas être le premier enfant d'un conteneur que le JS du site réécrit
+// (innerHTML, replaceChildren, textContent) : il disparaîtrait et le plan des titres sauterait un niveau dans le DOM réel.
+{
+  const dirJs = path.join(racine, "assets", "js");
+  const reecrits = new Set();
+  const SEULEMENT_MASQUES = new Set(["pt-connexion"]); // le script le masque ou l'affiche, sans toucher à son contenu
+  for (const fj of fs.readdirSync(dirJs).filter(n => n.endsWith(".js"))) {
+    const src = fs.readFileSync(path.join(dirJs, fj), "utf8");
+    if (!/innerHTML\s*=|replaceChildren|textContent\s*=/.test(src)) continue;
+    for (const m of src.matchAll(/getElementById\(\s*["'`]([\w-]+)["'`]|querySelector\(\s*["'`]#([\w-]+)/g)) reecrits.add(m[1] || m[2]);
+    // identifiants construits ("coups-" + clé) : on retient aussi ceux du préfixe
+    for (const m of src.matchAll(/getElementById\(\s*["'`]([\w-]+-)["'`]\s*\+/g)) for (const q of pages) for (const n of q.h.matchAll(/\sid="([^"]+)"/g)) if (n[1].startsWith(m[1])) reecrits.add(n[1]);
+  }
+  for (const p of pages) for (const m of p.h.matchAll(/<(\w+)[^>]*\sid="([^"]+)"[^>]*>\s*<h[2-6][^>]*class="[^"]*sr-only/g))
+    assert.ok(SEULEMENT_MASQUES.has(m[2]) || !reecrits.has(m[2]), p.f + " : titre sr-only dans #" + m[2] + ", réécrit par un script ; le placer juste avant le conteneur");
+  ok("titres sr-only : aucun dans un conteneur réécrit par un script");
+}
+
 // 3) liens internes
 const ids = {};
 const idsDe = f => ids[f] || (ids[f] = new Set([...lire(f).matchAll(/\sid="([^"]+)"/g)].map(m => m[1])));

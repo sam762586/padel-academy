@@ -64,7 +64,7 @@ ne contient pas la trace de chaque téléchargement. Si une photo ne vient pas d
 
 | Fichier | Source | Auteur | Licence | État |
 |---|---|---|---|---|
-| `simulateur-3d.webp`, `simulateur-3d-640.webp` | origine à retrouver (probablement une capture du simulateur 3D du site) | à confirmer | à confirmer | origine à retrouver |
+| `simulateur-3d.webp`, `simulateur-3d-640.webp`, `simulateur-3d-480.webp`, `simulateur-3d-320.webp` (déclinaisons du 03/11/2026, redimensionnées depuis `simulateur-3d.webp`) | origine à retrouver (probablement une capture du simulateur 3D du site) | à confirmer | à confirmer | origine à retrouver |
 
 ## Icônes et image de partage
 
@@ -77,7 +77,7 @@ ne contient pas la trace de chaque téléchargement. Si une photo ne vient pas d
 
 | Fichier | Source | Auteur | Licence | État |
 |---|---|---|---|---|
-| `logo-sombre*`, `logo-clair*`, `monogramme-sombre*`, `favicon-32.png` | logo d'Apprendre Padel, nettoyé et décliné le 30/10/2026 | Samuel, éditeur du site | création de Samuel, éditeur du site, 30/10/2026, droits réservés | documenté |
+| `logo-sombre*`, `logo-clair*`, `monogramme-sombre*` (dont `-148` ajouté le 03/11/2026, redimensionné depuis le 512), `favicon-32.png` | logo d'Apprendre Padel, nettoyé et décliné le 30/10/2026 | Samuel, éditeur du site | création de Samuel, éditeur du site, 30/10/2026, droits réservés | documenté |
 | `og-image.png`, `icon-512.png`, `icons/icon-192.png`, `icons/icon-512.png`, `icons/icon-maskable-512.png`, `favicon.png` et `apple-touch-icon.png` (racine) | régénérés le 30/10/2026 depuis le monogramme du logo (`scripts/build-icones.js`) ; remplacent les anciennes icônes (balle seule) | Samuel, éditeur du site | création de Samuel, éditeur du site, 30/10/2026, droits réservés | documenté |
 
 ## Rappel des autres registres
