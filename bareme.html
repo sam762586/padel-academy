@@ -22,7 +22,7 @@
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/big-shoulders-display-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css?v=b5db0f402e">
-<link rel="stylesheet" href="assets/css/contenu.css?v=b70c177d67">
+<link rel="stylesheet" href="assets/css/contenu.css?v=a5e60649c0">
 <style>
 .bsel{width:100%;background:rgba(0,0,0,.25);color:var(--fg);border:1px solid var(--line-2);border-radius:var(--r-s);padding:10px 12px;font-family:var(--body);font-size:1rem}
 .bareme-tbl table{min-width:0}
@@ -75,6 +75,7 @@
           <div class="range"><input type="range" id="b-place" aria-label="Ma place finale" min="1" max="32" step="1" value="5"><output id="b-place-out" for="b-place">5e</output></div>
         </fieldset>
         <div class="verdict" id="b-verdict" style="min-height:0"></div>
+        <figure class="bar-graph" id="b-graph" data-cat="P100" data-nb="16" data-sexe="messieurs" data-place="5"><noscript><p class="bar-sans-js">Le graphique a besoin de JavaScript : les points de chaque place sont dans le <a href="#b-table">barème complet</a>.</p></noscript></figure>
         <label for="sim-date">Date du tournoi</label>
         <input type="date" id="sim-date" class="bsel" required>
         <p id="sim-message" role="status" class="acc-msg" hidden></p>
@@ -137,7 +138,8 @@
 </footer>
 
 <script src="assets/js/bareme-donnees.js?v=4720c55275" defer></script>
-<script src="assets/js/bareme.js?v=3963120696" defer></script>
+<script src="assets/js/bareme-graphique.js?v=cf1f7cc046" defer></script>
+<script src="assets/js/bareme.js?v=615ba0276e" defer></script>
 <script src="assets/js/nav.js?v=6e9fdc5547" defer></script>
 <script data-goatcounter="https://apprendre-padel.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

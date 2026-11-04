@@ -152,3 +152,21 @@ section:has(.erreurs-liste){counter-reset:erreur}
 .clubs-texte p{margin:0}
 #clubs .grille-blocs{margin-top:var(--s-5)}
 #clubs>.wrap>h2{font-size:clamp(1.8rem,4vw,2.6rem)}
+/* BARÈME : graphique des points par place (bareme.html, assets/js/bareme-graphique.js), sous le résultat « N points ».
+   Hauteur fixe réservée avant le dessin (aucun décalage) ; le SVG prend la place laissée par la légende.
+   Fond --bg (et non la carte --glass) : barres --terrain à 3,21:1 sur --bg (2,85:1 seulement sur la carte). */
+.bar-graph{position:relative;margin:0;height:300px;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:var(--s-2);padding:var(--s-3);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-s);overflow:hidden;min-width:0}
+.bar-svg{display:block;width:100%;height:100%;min-height:0;touch-action:pan-y;font-family:var(--body)}
+.bar-grille line{stroke:var(--line);stroke-width:1}
+.bar-tic{stroke:var(--line-2);stroke-width:1}
+.bar-axe{fill:var(--dim);font-size:var(--fs-xs)}
+.bar-valeur{fill:var(--fg);font-size:var(--fs-s);font-weight:800;paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.bar-barre{fill:var(--terrain)}
+.bar-barre.choisie{fill:var(--turf)}
+.bar-barre.survol{fill:var(--sky)}
+.bar-legende{font-size:var(--fs-xs);color:var(--muted);line-height:1.45}
+.bar-legende b{color:var(--fg)}
+.bar-pastille{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--turf);vertical-align:-1px}
+.bar-bulle{position:absolute;left:0;top:0;z-index:1;pointer-events:none;white-space:nowrap;padding:var(--s-1) var(--s-2);border-radius:var(--r-s);background:var(--bg-3);border:1px solid var(--line-2);color:var(--fg);font-size:var(--fs-xs);font-weight:700}
+.bar-sans-js{margin:0;color:var(--muted);font-size:var(--fs-s)}
+@media (prefers-reduced-motion:no-preference){.bar-barre{transition:fill var(--t)}}

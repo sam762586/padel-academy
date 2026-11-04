@@ -5,7 +5,11 @@ function renderTable(){
  const cat=document.getElementById("b-cat").value;
  const sexe=document.querySelector('input[name="b-sexe"]:checked').value;
  const nb=+document.getElementById("b-nb").value;
- const place=+document.getElementById("b-place").value;
+ // Borne de la place avant de la lire : le tableau dames s'arrête à « 25e et plus »
+ const sel=document.getElementById("b-place"), donnees=BAREME[cat];
+ const maxPlace=donnees&&donnees.messieurs&&sexe==="dames"?25:32;
+ if(sel.max!=maxPlace){sel.max=maxPlace;}
+ const place=+sel.value;
  const wrap=document.getElementById("b-table"), v=document.getElementById("b-verdict"), note=document.getElementById("b-note");
  let rows="", mine=null, header="";
  const data=BAREME[cat];
@@ -32,14 +36,17 @@ function renderTable(){
  const lbl=PLACE_LABEL(place-1);
  v.innerHTML=mine===null?`<span class="vtag stop">Place inexistante</span><p>Avec ${nb} paires, il n'y a pas de ${place}e place dans un ${cat}. Réduis la place ou augmente le nombre de paires.</p>`
   :`<span class="vtag go">${mine} point${mine>1?'s':''}</span><p><b>${cat}</b>, ${lbl}${Array.isArray(data)&&Array.isArray(data[0])?`, ${nb} paires inscrites`:(data.messieurs?`, tableau ${sexe}`:'')} → <b>${mine} pts</b> au classement.</p>`;
- const sel=document.getElementById("b-place");
- const maxPlace=Array.isArray(data)&&Array.isArray(data[0])?32:Array.isArray(data)?32:(sexe==="messieurs"?32:25);
- if(sel.max!=maxPlace){sel.max=maxPlace;}
  document.getElementById("b-place-out").textContent=lbl;
  document.getElementById("b-nb-out").textContent=nb+" paires";
  const nbRow=document.getElementById("b-nb-row"), sxRow=document.getElementById("b-sexe-row");
  nbRow.style.display=(Array.isArray(data)&&Array.isArray(data[0]))?"":"none";
  sxRow.style.display=data.messieurs?"":"none";
+ // Graphique : le choix passe par les attributs du <figure>, le dessin par bareme-graphique.js (s'il est chargé)
+ const fig=document.getElementById("b-graph");
+ if(fig){
+  fig.dataset.cat=cat;fig.dataset.nb=String(nb);fig.dataset.sexe=sexe;fig.dataset.place=String(place);
+  if(window.PA_BAREME_GRAPHIQUE)window.PA_BAREME_GRAPHIQUE.dessiner(fig);
+ }
 }
 ["b-cat","b-nb","b-place"].forEach(id=>document.getElementById(id).addEventListener("input",renderTable));
 document.querySelectorAll('input[name="b-sexe"]').forEach(i=>i.addEventListener("change",renderTable));
