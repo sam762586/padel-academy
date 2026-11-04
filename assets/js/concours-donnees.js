@@ -10,6 +10,11 @@
      nb_gagnants nombre de gagnants tirés au sort (entier de 1 à 20)
      tire        facultatif : true une fois le tirage fait (aucune donnée personnelle ici : les gagnants, leurs
                  empreintes et leur pseudo s'ils l'acceptent viennent de la base, rpc concours_gagnants_publics)
+     annule      facultatif : {le:"AAAA-MM-JJ",motif:"…"} si l'organisateur annule le jeu (règlement, article 7.3) ;
+                 le = jour de l'annulation, motif = fin de la phrase « Jeu annulé le 4 novembre 2026, <motif>. »
+                 (ex. "à la suite d'un problème technique", 200 caractères au plus). Le concours reste dans le tableau
+                 (historique) ; la page affiche l'annulation, plus aucune participation n'est proposée, et le
+                 générateur n'affiche plus de SQL d'insertion. Jamais avec tire:true.
    Après toute modification : node scripts/generer-concours.js (écrit la page et affiche le SQL à exécuter dans
    Supabase), puis node scripts/appliquer-gabarit.js. Aucun concours inventé : le tableau reste vide tant que
    l'organisateur n'en lance pas un.
@@ -19,5 +24,6 @@
 */
 const CONCOURS=[
   {id:"2026-11-pack-nox",titre:"Ton pack Nox offert",lot:"un t-shirt de padel Nox Team 2026 (taille au choix du gagnant) et 2 tubes de 3 balles Nox Pro Titanium",valeur:47.89,
-   date_debut:"2026-11-01",date_fin:"2026-11-30",nb_gagnants:1},
+   date_debut:"2026-11-01",date_fin:"2026-11-30",nb_gagnants:1,
+   annule:{le:"2026-11-04",motif:"à la suite d'un problème technique"}},
 ];

@@ -11,7 +11,11 @@
       dans le navigateur, plus grande que celle du dernier gagnant), jamais l'identifiant d'un autre joueur ;
       durée d'affichage (tant que non tiré, puis 60 jours après le tirage) ; partage facultatif (navigator.share, sinon
       liens WhatsApp, Facebook, X et « Copier le lien », aucune requête tierce) ; notes internes du règlement retirées et
-      espaces insécables ; 320 px sans débordement ; aucune erreur console.
+      espaces insécables ; 320 px sans débordement ; aucune erreur console ;
+   3) concours annulé (champ annule, règlement article 7.3) : générateur (statut, excuses, dates « prévues », plus de lien
+      de participation ni de SQL d'insertion, annule invalide refusé) ; dans Edge : statut affiché, aucun formulaire,
+      bouton « Je participe », compteur ni partage, aucune insertion ni rpc ; joueur qui avait participé : « Tu avais
+      participé. » et retrait (ou renvoi vers l'organisateur si la base le refuse).
    Lancer depuis la racine du site : node scripts/verifier-concours.cjs */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),os=require('node:os'),crypto=require('node:crypto');
@@ -28,6 +32,9 @@ const sha=t=>crypto.createHash('sha256').update(t,'utf8').digest('hex');
 /* ---------- Données de test ---------- */
 const OUVERT={id:'2026-11-raquette',titre:'La raquette <de> Noël & "toi"',lot:"une raquette d'essai",valeur:249.95,date_debut:'2026-11-01',date_fin:'2026-11-30',nb_gagnants:1};
 const PASSE={id:'2026-10-sac',titre:"Le sac d'octobre",lot:'un sac de padel',valeur:60,date_debut:'2026-10-01',date_fin:'2026-10-15',nb_gagnants:2,tire:true};
+const ANNULE={...OUVERT,annule:{le:'2026-11-04',motif:"à la suite d'un problème technique"}};
+const STATUT_ANNULE="Jeu annulé le 4 novembre 2026, à la suite d'un problème technique (article 7.3 du règlement).";
+const EXCUSE_ANNULE="Désolé pour ce contretemps : aucun tirage n'aura lieu. Ta participation reste enregistrée, tu peux la retirer quand tu veux depuis cette page.";
 const fixture=liste=>'const CONCOURS='+JSON.stringify(liste)+';\n';
 const GRAINE='2026-12-01:3-14-25-36-47:2-9';
 // Deux comptes : le gagnant est celui dont l'empreinte « graine:id » est la plus petite
@@ -36,6 +43,7 @@ const GAGNANT=IDS[0],PERDANT=IDS[1];
 
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'concours-'));
 const PAGE_TEST=path.join(tmp,'concours.html'),DONNEES_TEST=path.join(tmp,'donnees.js');
+const PAGE_ANNULE=path.join(tmp,'concours-annule.html'),DONNEES_ANNULE=path.join(tmp,'donnees-annule.js');
 
 function testerGenerateur(){
  // Données du site : concours lancés par l'organisateur seulement, fonction non activée sans son accord écrit
@@ -102,7 +110,9 @@ function testerGenerateur(){
 
  const invalides=[
   [{...OUVERT,id:'raquette'}],[{...OUVERT,date_fin:'2026-10-01'}],[{...OUVERT,valeur:'250'}],[{...OUVERT,nb_gagnants:0}],
-  [{...OUVERT,titre:'Le {lot}'}],[{...OUVERT,gagnants_publics:['Zoé']}],[{...OUVERT,tire:'oui'}],[OUVERT,OUVERT],[{...OUVERT,date_debut:'2026-02-30'}]
+  [{...OUVERT,titre:'Le {lot}'}],[{...OUVERT,gagnants_publics:['Zoé']}],[{...OUVERT,tire:'oui'}],[OUVERT,OUVERT],[{...OUVERT,date_debut:'2026-02-30'}],
+  [{...OUVERT,annule:true}],[{...OUVERT,annule:{le:'2026-11-31',motif:'test'}}],[{...OUVERT,annule:{le:'2026-11-04',motif:''}}],
+  [{...OUVERT,annule:{le:'2026-11-04',motif:'test',par:'moi'}}],[{...ANNULE,tire:true}]
  ];
  for(const liste of invalides){
   fs.writeFileSync(DONNEES_TEST,fixture(liste));
@@ -112,7 +122,26 @@ function testerGenerateur(){
   assert.equal(fs.readFileSync(PAGE_TEST,'utf8'),html,'page modifiée malgré des données invalides');
  }
  fs.writeFileSync(DONNEES_TEST,fixture([PASSE,OUVERT]));
- ok('données invalides (id, dates, valeur, gagnants, champ {…}, doublon, gagnants_publics, tire non booléen) : code 1, page inchangée');
+ ok('données invalides (id, dates, valeur, gagnants, champ {…}, doublon, gagnants_publics, tire non booléen, annule mal formé ou avec tire) : code 1, page inchangée');
+
+ // Concours annulé : statut et excuses à la place du lien de participation, aucun SQL d'insertion pour lui
+ fs.copyFileSync(path.join(racine,'concours.html'),PAGE_ANNULE);
+ fs.writeFileSync(DONNEES_ANNULE,fixture([PASSE,ANNULE]));
+ r=generer(['--donnees',DONNEES_ANNULE,'--page',PAGE_ANNULE]);
+ assert.equal(r.status,0,r.stderr);
+ const ha=fs.readFileSync(PAGE_ANNULE,'utf8');
+ const article=ha.slice(ha.indexOf('id="concours-2026-11-raquette"'),ha.indexOf('id="concours-2026-10-sac"')).replace(/\u00a0/g,' ');
+ assert.ok(article.includes('<p class="msg msg-alerte cc-annule">'+STATUT_ANNULE+'</p>'),"statut d'annulation absent");
+ assert.ok(article.includes('<p class="cc-excuse">'+EXCUSE_ANNULE+'</p>'),'excuses absentes');
+ assert.match(article,/data-action data-annule>/);
+ assert.match(article,/Prévu du 1er novembre 2026 au 30 novembre 2026 inclus/);
+ assert.ok(!/Pour participer|connexion\.html/.test(article.slice(article.indexOf('data-action'),article.indexOf('<details'))),'lien de participation pour un concours annulé');
+ assert.match(ha,/id="concours-2026-10-sac"[\s\S]*Pour participer, <a href="connexion\.html/,'concours non annulé : lien gardé');
+ assert.match(r.stdout,/Concours 2026-11-raquette annulé le 2026-11-04 : aucun SQL d'insertion\./);
+ assert.ok(!/values \('2026-11-raquette'/.test(r.stdout),"SQL d'insertion pour un concours annulé");
+ assert.match(r.stdout,/values \('2026-10-sac'/);
+ assert.ok(!/application\/ld\+json[^<]*"(?:Event|Offer)"/.test(ha),'données structurées Event ou Offer émises');
+ ok('générateur, concours annulé : « '+STATUT_ANNULE+" », excuses, dates « prévues », plus de lien de participation ni de SQL d'insertion, aucune donnée Event/Offer");
 }
 
 /* ---------- Faux Supabase (règles des migrations concours-01 à 10) ----------
@@ -141,6 +170,7 @@ const FAUX=`(function(){
    if(op==='insert'){
     const c=base.concours.find(x=>x.id===ligne.concours_id);
     if(!c)return erreur('CONCOURS_INCONNU','P0001');
+    if(c.annule_le)return erreur('CONCOURS_ANNULE','P0001'); // concours-18 à 24 : annulation enregistrée en base
     if(Date.now()<Date.parse(c.date_debut))return erreur('CONCOURS_PAS_COMMENCE','P0001');
     if(!ouvert(c))return erreur('CONCOURS_TERMINE','P0001');
     if((base.concours_exclusions||[]).some(e=>e.concours_id===ligne.concours_id&&e.user_id===u))return erreur('PARTICIPATION_EXCLUE','P0001');
@@ -197,17 +227,17 @@ const serveur=http.createServer((req,res)=>{
  const adresse='http://127.0.0.1:'+serveur.address().port;
  const browser=await chromium.launch({channel:'msedge',headless:true});
  const erreurs=[];
- const pageTest=fs.readFileSync(PAGE_TEST,'utf8');
+ const pageTest=fs.readFileSync(PAGE_TEST,'utf8'),pageAnnule=fs.readFileSync(PAGE_ANNULE,'utf8');
  // Nouveau contexte : page de test (concours de la fixture) ou page publiée, faux Supabase, base et utilisateur choisis
  const tiers=[]; // requêtes vers un autre domaine : aucune ne doit viser un réseau social
- const ouvrir=async({date='2026-11-15T10:00:00+01:00',active=true,publiee=false,utilisateur=null,etat=null,largeur=390,init=null}={})=>{
+ const ouvrir=async({date='2026-11-15T10:00:00+01:00',active=true,publiee=false,utilisateur=null,etat=null,largeur=390,init=null,annule=false}={})=>{
   const ctx=await browser.newContext({serviceWorkers:'block',viewport:{width:largeur,height:844},isMobile:true,hasTouch:true});
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/,r=>{tiers.push(r.request().url());return r.fulfill({contentType:'text/javascript',body:''});});
   await ctx.route('**/assets/vendor/supabase-*.js*',r=>r.fulfill({contentType:'text/javascript',body:FAUX}));
   await ctx.route('**/assets/js/supabase-config.js*',r=>r.fulfill({contentType:'text/javascript',body:active?CONFIG_ACTIVE:CONFIG}));
   if(!publiee){
-   await ctx.route('**/concours.html',r=>r.fulfill({contentType:'text/html; charset=utf-8',body:pageTest}));
-   await ctx.route('**/assets/js/concours-donnees.js*',r=>r.fulfill({contentType:'text/javascript',body:fixture([PASSE,OUVERT])}));
+   await ctx.route('**/concours.html',r=>r.fulfill({contentType:'text/html; charset=utf-8',body:annule?pageAnnule:pageTest}));
+   await ctx.route('**/assets/js/concours-donnees.js*',r=>r.fulfill({contentType:'text/javascript',body:fixture([PASSE,annule?ANNULE:OUVERT])}));
   }
   const page=await ctx.newPage();
   await page.clock.install({time:new Date(date)});
@@ -239,6 +269,13 @@ const serveur=http.createServer((req,res)=>{
   }else{
    assert.equal(await page.locator('#cc-aucun').count(),0,'concours publié : pas de « Aucun concours »');
    assert.ok(await page.locator('[id^="concours-"]').count()>=1,'concours publié : carte du concours absente');
+  }
+  // Concours du site annulé : statut écrit dans la page publiée, rien pour participer
+  if(/annule:\{le:"\d{4}-\d{2}-\d{2}"/.test(lire('assets/js/concours-donnees.js'))){
+   assert.ok(await page.locator('[data-annule] .cc-annule').count()>=1,'concours du site annulé : statut absent de la page publiée');
+   assert.match((await page.locator('[data-annule] .cc-annule').first().textContent()).replace(/\u00a0/g,' '),/^Jeu annulé le \d{1,2}(er)? [a-zéû]+ \d{4}, .+ \(article 7\.3 du règlement\)\.$/);
+   assert.equal(await page.locator('main form, main button:has-text("Je participe"), main button:has-text("Partager le concours")').count(),0);
+   ok('page publiée : concours annulé, statut « Jeu annulé le … (article 7.3 du règlement) », aucun formulaire ni partage');
   }
   assert.match(await page.textContent('#cc-mention'),/^Jeu gratuit sans obligation d'achat\. Participation réservée aux joueurs connectés, une par compte\. Tirage au sort\. Règlement ci-dessous\.$/);
   assert.ok(await page.locator('a[href="confidentialite.html#jeu-concours"]').count()>=1);
@@ -386,6 +423,15 @@ const serveur=http.createServer((req,res)=>{
   assert.equal(await page.locator(action+' form').count(),0);
   ok("jeu ouvert, participation écartée : motif affiché, pas de formulaire pour se réinscrire");
   await ctx.close();
+  // Page encore en cache (concours pas annulé dans ses données) mais annulé en base : refus lisible, rien d'enregistré
+  ({ctx,page}=await ouvrir({utilisateur:PERDANT,etat:{concours:[{...LIGNE,annule_le:'2026-11-04T10:00:00Z'}],concours_participations:[],concours_gagnants:[]}}));
+  await page.waitForSelector(action+' form');
+  await page.check('#cc-case-reglement');await page.check('#cc-case-age');
+  await page.click(action+' button[type=submit]');
+  await attendre(page,/Ce jeu a été annulé : il n'est plus possible de participer\./);
+  assert.equal((await base(page)).concours_participations.length,0);
+  ok("annulé en base, page en cache : « Ce jeu a été annulé : il n'est plus possible de participer. », rien d'enregistré");
+  await ctx.close();
 
   // Durée d'affichage : 60 jours après le TIRAGE (tire_le), pas après la fin du jeu
   const tireTard={...tire,concours:[{...tire.concours[0],tire_le:'2027-01-20T20:00:00Z'}]};
@@ -457,6 +503,74 @@ const serveur=http.createServer((req,res)=>{
   await attendre(page,/Le jeu est terminé/);
   assert.equal(await page.locator(action+' button:has-text("Partager le concours")').count(),0);
   ok('jeu terminé : pas de bouton de partage');
+  await ctx.close();
+
+  /* Concours annulé (règlement, article 7.3) */
+  const verifierAnnule=async(page,{participe=false}={})=>{
+   await attendre(page,/Jeu annulé le 4 novembre 2026/);
+   await page.waitForTimeout(400);
+   const t=await texte(page);
+   assert.ok(t.includes(STATUT_ANNULE),"statut d'annulation");
+   assert.ok(t.includes(EXCUSE_ANNULE),'excuses');
+   assert.equal(await page.locator(action+' form').count(),0,'formulaire pour un concours annulé');
+   assert.equal(await page.locator(action+' button:has-text("Je participe"), '+action+' button:has-text("Partager le concours"), '+action+' .cc-partage, '+action+' .cc-compteur').count(),0,'participation, partage ou compteur pour un concours annulé');
+   assert.equal(await page.locator(action+' a[href^="connexion.html"]').count(),0,'lien de connexion pour participer');
+   const j=await journal(page);
+   assert.ok(!j.some(x=>x.op==='insert'),'insertion de participation pour un concours annulé');
+   assert.ok(!j.some(x=>x.rpc),'rpc appelée pour un concours annulé : '+JSON.stringify(j.filter(x=>x.rpc)));
+   assert.ok(!j.some(x=>x.table&&x.table!=='concours_participations'),'table lue autre que sa participation');
+   assert.equal(/Tu avais participé\./.test(t),participe,'« Tu avais participé. »');
+   return t;
+  };
+  // Non connecté : statut seul, aucune requête
+  ({ctx,page}=await ouvrir({annule:true}));
+  await verifierAnnule(page);
+  assert.ok(!(await journal(page)).some(x=>x.table),'participation lue sans compte');
+  assert.equal(await page.locator('#cc-etat').isHidden(),true);
+  assert.equal(await page.textContent('#concours-2026-10-sac [data-action]'),'Jeu terminé, tirage au sort fait.');
+  await largeurOk(page,390);
+  ok('annulé, non connecté : « '+STATUT_ANNULE+' » et excuses, aucun formulaire, « Je participe », compteur ni partage, aucune requête ; 390 px');
+  await ctx.close();
+  // Fonction non activée : statut, aucun appel à la base
+  ({ctx,page}=await ouvrir({annule:true,active:false,utilisateur:PERDANT,etat:{concours:[{...LIGNE}],concours_participations:participations,concours_gagnants:[]}}));
+  await verifierAnnule(page);
+  assert.deepEqual((await journal(page)).filter(x=>x.table||x.rpc),[],'appel à la base sans activation');
+  ok('annulé, fonction non activée : statut affiché, aucun appel à la base');
+  await ctx.close();
+  // Connecté sans participation : rien de plus
+  ({ctx,page}=await ouvrir({annule:true,utilisateur:GAGNANT,etat:{concours:[{...LIGNE}],concours_participations:participations.filter(p=>p.user_id!==GAGNANT),concours_gagnants:[]}}));
+  await verifierAnnule(page);
+  assert.equal(await page.locator(action+' button').count(),0);
+  ok('annulé, connecté sans participation : statut seul, aucun bouton');
+  await ctx.close();
+  // Connecté, avait participé : « Tu avais participé. », retrait (la base l'accepte avant la date de fin prévue)
+  ({ctx,page}=await ouvrir({annule:true,utilisateur:PERDANT,largeur:320,etat:{concours:[{...LIGNE}],concours_participations:participations,concours_gagnants:[]}}));
+  await attendre(page,/Tu avais participé\./);
+  await verifierAnnule(page,{participe:true});
+  await largeurOk(page,320);
+  await page.click(action+' button:has-text("Retirer ma participation")');
+  await attendre(page,/Ta participation est retirée\./);
+  assert.deepEqual((await base(page)).concours_participations.map(p=>p.user_id),[GAGNANT],'seule la participation du joueur est retirée');
+  assert.ok(!/Tu avais participé/.test(await texte(page)));
+  assert.equal(await page.locator(action+' form').count(),0,"formulaire après retrait d'un concours annulé");
+  assert.ok(!(await journal(page)).some(x=>x.op==='insert'||x.rpc));
+  ok('annulé, joueur qui avait participé : « Tu avais participé. », retrait possible (« Ta participation est retirée. »), pas de formulaire ensuite ; 320 px');
+  await ctx.close();
+  // Retrait refusé par la base (après la date de fin prévue) : renvoi vers l'organisateur, rien de supprimé
+  ({ctx,page}=await ouvrir({annule:true,date:'2026-12-05T10:00:00+01:00',utilisateur:PERDANT,etat:{concours:[{...LIGNE}],concours_participations:participations,concours_gagnants:[]}}));
+  await attendre(page,/Tu avais participé\./);
+  await page.click(action+' button:has-text("Retirer ma participation")');
+  await attendre(page,/Retrait impossible depuis cette page : écris à l'organisateur \(adresse à l'article 1 du règlement\)/);
+  assert.equal((await base(page)).concours_participations.length,2);
+  assert.equal(await page.isEnabled(action+' button:has-text("Retirer ma participation")'),true);
+  ok("annulé, retrait refusé par la base : « Retrait impossible depuis cette page : écris à l'organisateur », participation gardée, bouton réactivé");
+  await ctx.close();
+  // Plus de 90 jours après la date de fin prévue (participations purgées) : plus mis en avant
+  ({ctx,page}=await ouvrir({annule:true,date:'2027-03-15T10:00:00+01:00'}));
+  await page.waitForFunction(()=>!document.getElementById('cc-etat').hidden);
+  assert.ok((await texte(page)).includes(STATUT_ANNULE));
+  assert.equal(await page.locator('#concours-2026-11-raquette.cc-vedette').count(),0);
+  ok('annulé, plus de 90 jours après la date de fin prévue : statut gardé, plus mis en avant, « Aucun concours en ce moment »');
   await ctx.close();
 
   // Espaces insécables dans les textes de la page (hors règlement, déjà contrôlé)

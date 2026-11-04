@@ -3,7 +3,9 @@
    (texte entre les deux lignes « --- », champs {titre} {lot} {valeur} {date_debut} {date_fin} {nb_gagnants},
    et les accords {gagnants_designes} {regle_gagnants}).
    Pour chaque concours : titre, dates, lot, valeur indicative, nombre de gagnants, gagnants publics, et règlement complet
-   rempli (dépliable). Aucun concours : « Aucun concours en ce moment, reviens bientôt. »
+   rempli (dépliable). Concours annulé (champ annule, règlement article 7.3) : « Jeu annulé le … » et excuses à la place
+   du lien de participation, dates « prévues », aucun SQL d'insertion. La page n'émet aucune donnée structurée Event
+   ni Offer (seulement le fil d'Ariane) : rien à retirer pour un concours annulé. Aucun concours : « Aucun concours en ce moment, reviens bientôt. »
    Le contenu va entre <!-- concours:debut --> et <!-- concours:fin --> ; tout est échappé ; relancer sans changement
    ne modifie pas la page. Données invalides : code 1, rien n'est écrit.
    La partie interactive (participation, retrait, compteur, gagnant) est faite par assets/js/concours.js.
@@ -23,7 +25,11 @@ const CHAMPS = ["titre", "lot", "valeur", "date_debut", "date_fin", "nb_gagnants
 const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 // Mêmes règles que la table public.concours (concours-01) : id « AAAA-MM-nom », titre de 120 caractères au plus, 1 à 20 gagnants
 const ID_VALIDE = /^[0-9]{4}-[0-9]{2}-[a-z0-9-]{1,40}$/;
-const AUCUN = '<p class="msg msg-info cc-aucun" id="cc-aucun">Aucun concours en ce moment, reviens bientôt.</p>';
+// Annulation (règlement, article 7.3) : texte écrit dans la page, lisible sans JavaScript ; concours.js y ajoute seulement,
+// pour le joueur connecté qui avait participé, « Tu avais participé. » et le retrait (toujours permis par la base pour
+// un concours annulé, migrations concours-18 à 24) ; participations supprimées 90 jours après la date de fin (article 6.3).
+const EXCUSE_ANNULE = "Désolé pour ce contretemps : aucun tirage n'aura lieu. Ta participation reste enregistrée, tu peux la retirer quand tu veux depuis cette page.";
+const AUCUN ='<p class="msg msg-info cc-aucun" id="cc-aucun">Aucun concours en ce moment, reviens bientôt.</p>';
 
 /* ---------- Lecture ---------- */
 function lireOptions(argv) {
@@ -72,7 +78,7 @@ function erreursDonnees(liste) {
   liste.forEach((c, i) => {
     const nom = `concours n°${i + 1}${c && typeof c.id === "string" ? " (" + c.id + ")" : ""}`;
     if (!c || typeof c !== "object") { e.push(nom + " : objet attendu"); return; }
-    const inconnus = Object.keys(c).filter(k => !["id", "tire", ...CHAMPS].includes(k));
+    const inconnus = Object.keys(c).filter(k => !["id", "tire", "annule", ...CHAMPS].includes(k));
     if (inconnus.length) e.push(`${nom} : champ inconnu ${inconnus.join(", ")}`);
     if (typeof c.id !== "string" || !ID_VALIDE.test(c.id)) e.push(nom + " : id attendu au format AAAA-MM-nom (minuscules, chiffres, tirets), ex. 2026-12-raquette");
     else if (ids.has(c.id)) e.push(nom + " : id en double"); else ids.add(c.id);
@@ -85,6 +91,16 @@ function erreursDonnees(liste) {
     if (!Number.isInteger(c.nb_gagnants) || c.nb_gagnants < 1 || c.nb_gagnants > 20) e.push(nom + " : nb_gagnants attendu (entier de 1 à 20)");
     // Aucune donnée personnelle dans le fichier : les gagnants viennent de la base (rpc concours_gagnants_publics)
     if ("tire" in c && typeof c.tire !== "boolean") e.push(nom + " : tire attendu (true ou false, facultatif)");
+    // Annulation (article 7.3) : jour et motif, jamais avec un tirage fait
+    if ("annule" in c) {
+      const a = c.annule;
+      if (!a || typeof a !== "object" || Array.isArray(a) || Object.keys(a).some(k => k !== "le" && k !== "motif")) e.push(nom + ' : annule attendu sous la forme {le:"AAAA-MM-JJ",motif:"…"}');
+      else {
+        if (!dateValide(a.le)) e.push(nom + " : annule.le attendu au format AAAA-MM-JJ");
+        if (!texteValide(a.motif, 200)) e.push(nom + " : annule.motif attendu (1 à 200 caractères, sans { })");
+      }
+      if (c.tire === true) e.push(nom + " : annule et tire ne vont pas ensemble (un jeu annulé n'est pas tiré)");
+    }
   });
   return e;
 }
@@ -143,15 +159,22 @@ function titreReglement(md, valeurs) {
 function rendreConcours(c, md) {
   const v = valeursChamps(c), id = echapper(c.id);
   const gagnants = c.tire ? "\n    <div><dt>Tirage au sort</dt><dd>fait : graine, empreintes des gagnants et pseudos acceptés dans le résultat ci-dessous</dd></div>" : "";
+  // Annulé : statut et excuses à la place du lien de participation (data-annule : lu par concours.js)
+  const action = c.annule
+    ? `<div class="cc-action" data-action data-annule>
+    <p class="msg msg-alerte cc-annule">Jeu annulé le ${echapper(dateLongue(c.annule.le))}, ${echapper(c.annule.motif)} (article 7.3 du règlement).</p>
+    <p class="cc-excuse">${echapper(EXCUSE_ANNULE)}</p>
+  </div>`
+    : `<div class="cc-action" data-action><p>Pour participer, <a href="connexion.html?suite=concours.html">connecte-toi à ton compte</a> pendant la période du jeu.</p></div>`;
   return `<article class="acc-card cc-concours" id="concours-${id}" data-concours="${id}" aria-labelledby="cc-titre-${id}">
   <h2 id="cc-titre-${id}">${echapper(c.titre)}</h2>
-  <p class="cc-dates">Du ${echapper(v.date_debut)} au ${echapper(v.date_fin)} inclus (heure de Paris).</p>
+  <p class="cc-dates">${c.annule ? "Prévu du" : "Du"} ${echapper(v.date_debut)} au ${echapper(v.date_fin)} inclus (heure de Paris).</p>
   <dl class="cc-infos">
     <div><dt>Lot</dt><dd>${echapper(c.lot)}</dd></div>
     <div><dt>Valeur indicative</dt><dd>${echapper(v.valeur)} € TTC</dd></div>
     <div><dt>Nombre de gagnants</dt><dd>${c.nb_gagnants} gagnant${c.nb_gagnants > 1 ? "s" : ""}, tiré${c.nb_gagnants > 1 ? "s" : ""} au sort</dd></div>${gagnants}
   </dl>
-  <div class="cc-action" data-action><p>Pour participer, <a href="connexion.html?suite=concours.html">connecte-toi à ton compte</a> pendant la période du jeu.</p></div>
+  ${action}
   <details class="cc-reglement">
     <summary>${titreReglement(md, v)}</summary>
     <div class="prose">
@@ -201,9 +224,12 @@ function principal(argv) {
   }
   if (nouveau !== html) fs.writeFileSync(o.page, nouveau);
   console.log(`${nom} : ${liste.length} concours, ${nouveau !== html ? "page écrite" : "inchangée"}.`);
-  if (liste.length) {
+  // Concours annulé : plus de SQL d'insertion (le blocage des participations côté serveur est une migration à part)
+  liste.filter(c => c.annule).forEach(c => console.log(`\nConcours ${c.id} annulé le ${c.annule.le} : aucun SQL d'insertion.`));
+  const aInserer = liste.filter(c => !c.annule);
+  if (aInserer.length) {
     console.log("\nSQL à exécuter dans Supabase (SQL Editor), après les migrations 2026-11-01-concours-* :\n");
-    liste.forEach(c => console.log(sqlInsertion(c) + "\n"));
+    aInserer.forEach(c => console.log(sqlInsertion(c) + "\n"));
   }
   return 0;
 }

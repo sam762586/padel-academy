@@ -12,6 +12,10 @@
    États du concours mis en avant : non activé (« bientôt disponible », aucun appel à la base tant que "concours" n'est
    pas dans PA_SUPABASE.activees), pas de compte possible (hors ligne, fichier ouvert en local), à venir, non connecté,
    formulaire (deux cases obligatoires), « Tu participes » avec retrait, terminé en attente du tirage, tiré (« Tu as gagné »).
+   Concours annulé (champ annule, règlement article 7.3) : statut et excuses écrits dans la page par le générateur, gardés
+   tels quels ; plus de formulaire, de compteur ni de partage, aucune écriture de participation. Joueur connecté : lecture
+   de sa propre participation seulement ; s'il avait participé, « Tu avais participé. » et le bouton de retrait (la base
+   peut le refuser : on renvoie alors vers l'organisateur). Un concours annulé n'est jamais « ouvert » ni « à venir ».
    Concours tiré (règlement, article 3) : graine (colonne publique concours.graine), méthode, empreintes des gagnants
    (rpc concours_gagnants_publics : pseudo seulement après accord) ; le gagnant peut cocher « afficher mon pseudo »
    (update de affiche_publiquement sur sa ligne) ; le joueur connecté qui a participé voit son empreinte SHA-256 de
@@ -39,6 +43,8 @@
   CONCOURS_TERMINE:"Le jeu est terminé\u00a0: les participations sont closes.",
   CASES_NON_COCHEES:"Coche les deux cases pour participer.",
   PARTICIPATION_EXCLUE:"Ta participation à ce concours a été écartée\u00a0: tu ne peux pas t'y inscrire à nouveau.",
+  // concours-18 à 24 (annulation) : déclencheur, ou refus RLS de l'insertion
+  CONCOURS_ANNULE:"Ce jeu a été annulé : il n'est plus possible de participer.",
   ORGANISATEUR_EXCLU:"Le compte de l'organisateur ne peut pas participer au jeu."
  };
 
@@ -89,21 +95,76 @@
   if(maintenant<instantParis(c.date_fin,23,59,59)) return "ouvert";
   return "termine";
  }
+ const estAnnule=c=>!!(c&&c.annule&&c.annule.le);
+ // Jour de clôture : annulation, sinon date de fin (sert à choisir le dernier concours clos)
+ const clotureDe=c=>estAnnule(c)?c.annule.le:c.date_fin;
  const zoneDe=c=>{
   const article=[...racine.querySelectorAll("article[data-concours]")].find(a=>a.dataset.concours===c.id);
   return article?article.querySelector("[data-action]"):null;
  };
 
+ /* ---------- Concours annulé (règlement, article 7.3) ----------
+    Le statut et les excuses viennent de la page (générateur) ; ici, seulement la participation du joueur connecté,
+    lue sur sa propre ligne (RLS), et son retrait. Aucune insertion, aucun compteur, aucun partage. Affiché tant que
+    les participations existent (article 6.3 : 90 jours après la date de fin prévue), puis simple statut. */
+ function concoursAnnule(){
+  const zone=zoneDe(vedette);
+  if(Date.now()-instantParis(vedette.date_fin,23,59,59)>90*864e5){
+   zone.closest("article").classList.remove("cc-vedette");
+   aucunConcours();
+   return;
+  }
+  const perso=el("div","cc-corps");
+  const retourAnnule=el("div","cc-retour");
+  zone.append(perso,retourAnnule);
+  const ecrire=(texte,genre)=>retourAnnule.replaceChildren(texte?message(texte,genre,genre==="erreur"?"alert":"status"):"");
+  const lienRetrait="Retrait impossible depuis cette page : écris à l'organisateur (adresse à l'article 1 du règlement), il supprimera ta participation.";
+  let jeton=0;
+  async function maj(){
+   const mien=++jeton;
+   perso.replaceChildren();
+   if(!(ACTIVE&&C&&C.actif&&C.client)) return;
+   try{ await C.ready; }catch(e){}
+   if(mien!==jeton||!C.user) return;
+   let participe=false;
+   try{
+    const r=await C.client.from("concours_participations").select("concours_id").eq("concours_id",vedette.id).maybeSingle();
+    if(r.error) return; // lecture impossible : le texte général de la page suffit
+    participe=!!r.data;
+   }catch(e){ return; }
+   if(mien!==jeton||!participe) return;
+   const retirer=bouton("Retirer ma participation","ghost");
+   retirer.addEventListener("click",async()=>{
+    occuper(retirer,"Retrait…"); ecrire("");
+    let r;
+    try{ r=await C.client.from("concours_participations").delete().eq("concours_id",vedette.id).select("concours_id"); }
+    catch(e){ r={error:e}; }
+    if(r.error||!Array.isArray(r.data)||!r.data.length){
+     liberer(retirer);
+     ecrire(navigator.onLine===false?"Pas de connexion internet : réessaie quand tu seras en ligne.":lienRetrait,"erreur");
+     return;
+    }
+    perso.replaceChildren();
+    ecrire("Ta participation est retirée.","ok");
+   });
+   perso.replaceChildren(message("Tu avais participé.","info"),ligneBoutons(retirer));
+  }
+  maj();
+  if(C&&typeof C.onChange==="function") C.onChange(()=>{ ecrire(""); maj(); });
+ }
+
  /* ---------- Choix du concours mis en avant ---------- */
  const maintenant=Date.now();
- const ouverts=LISTE.filter(c=>phase(c,maintenant)==="ouvert");
- const aVenir=LISTE.filter(c=>phase(c,maintenant)==="avenir").sort((a,b)=>a.date_debut<b.date_debut?-1:1);
- // Terminés : le plus récent est candidat ; la date du tirage, connue de la base seulement, décide ensuite (majVedette)
- const recents=LISTE.filter(c=>phase(c,maintenant)==="termine").sort((a,b)=>a.date_fin<b.date_fin?1:-1);
+ const ouverts=LISTE.filter(c=>!estAnnule(c)&&phase(c,maintenant)==="ouvert");
+ const aVenir=LISTE.filter(c=>!estAnnule(c)&&phase(c,maintenant)==="avenir").sort((a,b)=>a.date_debut<b.date_debut?-1:1);
+ // Terminés ou annulés : le plus récemment clos est candidat ; pour un terminé, la date du tirage, connue de la base
+ // seulement, décide ensuite (majVedette)
+ const recents=LISTE.filter(c=>estAnnule(c)||phase(c,maintenant)==="termine").sort((a,b)=>clotureDe(a)<clotureDe(b)?1:-1);
  const vedette=ouverts[0]||aVenir[0]||recents[0]||null;
 
  // Autres concours : leur état en une ligne, à la place du lien de connexion écrit pour la lecture sans JavaScript
- LISTE.filter(c=>c!==vedette).forEach(c=>{
+ // (annulé : le statut écrit par le générateur reste tel quel)
+ LISTE.filter(c=>c!==vedette&&!estAnnule(c)).forEach(c=>{
   const zone=zoneDe(c);
   if(!zone) return;
   const ph=phase(c,maintenant);
@@ -117,9 +178,10 @@
  const zone=zoneDe(vedette);
  if(!zone) return;
  zone.closest("article").classList.add("cc-vedette");
+ const C=window.PA_COMPTE||null;
+ if(estAnnule(vedette)){ concoursAnnule(); return; }
 
  /* ---------- Concours mis en avant ---------- */
- const C=window.PA_COMPTE||null;
  const finTexte=dateLongue(vedette.date_fin);
  let tour=0; // chaque nouvel affichage annule les réponses en retard du précédent
 

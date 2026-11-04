@@ -1,4 +1,5 @@
-/* Vérification des migrations PRÉPARÉES du jeu concours (supabase/migrations/2026-11-01-concours-01 à 17), sans toucher
+/* Vérification des migrations du jeu concours (supabase/migrations/2026-11-01-concours-01 à 17, puis l'annulation
+   2026-11-04-concours-18 à 24), sans toucher
    à la base en ligne : Postgres en mémoire (pglite), avec ce que fournit Supabase recréé (auth.users, auth.uid(), rôles
    authenticated et anon, droits par défaut, pg_cron simulé), profiles + est_admin() (schema-partenaires.sql) et la vraie
    fonction delete_my_account() de schema.sql. Trois joueurs (A, B, C) et un admin.
@@ -10,6 +11,10 @@
    même classement ; le gagnant voit sa ligne, l'autre non ; pseudo public seulement après accord du gagnant lui-même ;
    contact réservé à l'admin, e-mail jamais copié ; purge (60 jours après le tirage, 90 jours après la fin sans tirage) ;
    job pg_cron unique ; suppression du compte en cascade ; fonctions SECURITY DEFINER en search_path vide.
+   Annulation (18 à 24, par-dessus 01 à 17) : tout ce qui précède repasse avec les fonctions remplacées ; 2026-11-pack-nox
+   annulé par concours-24 (relançable, date conservée) ; participer refusé (CONCOURS_ANNULE, et règle RLS seule) ; tirage
+   et remplaçant refusés ; le joueur retire sa participation, même après la fin, pas celle d'un autre ; concours annulé
+   figé depuis le site ; annulation lisible par tous, non modifiable depuis le site ; aucune ligne supprimée.
    Outil : @electric-sql/pglite (hors site, installé sans l'ajouter au package.json :
    cd ../padel-academy/scripts && npm install --no-save @electric-sql/pglite@0.2.12).
    Lancer depuis la racine du site : node scripts/verifier-concours-sql.mjs */
@@ -57,6 +62,18 @@ const migrations = fs.readdirSync(path.join(racine, 'supabase/migrations')).filt
 assert.equal(migrations.length, 17, '17 fichiers concours');
 migrations.forEach((m, i) => assert.ok(m.startsWith('2026-11-01-concours-' + String(i + 1).padStart(2, '0') + '-'), 'numérotation ' + m));
 for (let fois = 0; fois < 2; fois++) for (const m of migrations) await db.exec(lire('supabase/migrations/' + m));
+const annulation = fs.readdirSync(path.join(racine, 'supabase/migrations')).filter(f => f.startsWith('2026-11-04-concours-')).sort();
+assert.equal(annulation.length, 7, '7 fichiers d’annulation');
+annulation.forEach((m, i) => assert.ok(m.startsWith('2026-11-04-concours-' + (18 + i) + '-'), 'numérotation ' + m));
+for (let fois = 0; fois < 2; fois++) for (const m of annulation) await db.exec(lire('supabase/migrations/' + m));
+for (const m of annulation) {
+  const t = lire('supabase/migrations/' + m);
+  assert.match(t, /^-- Concours · annulation \d\/7 \(concours-\d+\) — /, m + ' : en-tête commenté');
+  assert.doesNotMatch(t, /\$\$/, m + ' : tag $fn$');
+  assert.doesNotMatch(t.replace(/\$fn\$[\s\S]*?\$fn\$/g, '').split('\n').filter(l => !/^\s*--/.test(l)).join('\n'), /\bdelete\s+from\b|\btruncate\b|\bdrop table\b|\bdrop column\b|\binsert into\b/i, m + ' : aucune suppression ni ajout de ligne hors des corps de fonction');
+  if (/security definer/.test(t)) assert.match(t, /set search_path = ''/, m + ' : SECURITY DEFINER en search_path vide');
+}
+ok('7 migrations d’annulation concours-18 à 24 rejouables (deux passages, par-dessus 01 à 17 : toutes les vérifications suivantes passent avec les fonctions remplacées), en-têtes, tag $fn$, aucune suppression ni ajout de ligne');
 for (const m of migrations) {
   const t = lire('supabase/migrations/' + m);
   assert.match(t, /^-- Concours · \d+\/17 — /, m + ' : en-tête commenté');
@@ -168,6 +185,54 @@ await echoue(B, participer, ['2026-11-vide', true, true], /CONCOURS_TERMINE/);
 assert.equal((await en(B, `delete from concours_participations where concours_id = '2026-11-raquette'`)).affectedRows || 0, 0, 'plus de retrait après la fin');
 assert.equal((await en(ADM, `delete from concours_participations where concours_id = '2026-11-raquette'`)).affectedRows || 0, 0, 'admin : plus de suppression directe après la fin');
 await echoue(ADM, `update concours set date_fin = date_fin + interval '1 day' where id = '2026-11-raquette'`, [], /CONCOURS_FIGE/);
+
+// Annulation (concours-18 à 24) : « Ton pack Nox offert » annulé pour un problème technique, rien n'est supprimé
+const NOX = '2026-11-pack-nox';
+assert.equal((await su(`select count(*)::int n from concours where annule_le is not null`)).rows[0].n, 0, 'concours-24 sans la ligne : rien d’annulé');
+await su(`insert into concours (id, titre, date_debut, date_fin, nb_gagnants) values ($1, 'Ton pack Nox offert', now() - interval '3 days', now() + interval '26 days', 1)`, [NOX]);
+await en(A, participer, [NOX, true, true]);
+await en(B, participer, [NOX, true, true]);
+await su(`insert into concours_exclusions (concours_id, user_id, motif) values ($1, $2, 'Trace de test')`, [NOX, ADM]);
+const lignes = async () => (await su(`select (select count(*) from concours)::int c, (select count(*) from concours_participations)::int p, (select count(*) from concours_exclusions)::int e, (select count(*) from concours_gagnants)::int g`)).rows[0];
+const avant = await lignes();
+const annuler = lire('supabase/migrations/2026-11-04-concours-24-annuler-pack-nox.sql');
+await db.exec(annuler);
+const nox = (await su(`select annule_le, motif_annulation from concours where id = $1`, [NOX])).rows[0];
+assert.ok(nox.annule_le instanceof Date && nox.motif_annulation === 'Problème technique', 'pack Nox annulé, motif « Problème technique »');
+await db.exec(annuler);
+assert.equal((await su(`select annule_le from concours where id = $1`, [NOX])).rows[0].annule_le.getTime(), nox.annule_le.getTime(), 'relancer concours-24 garde la date d’annulation');
+for (let fois = 0; fois < 2; fois++) for (const m of annulation) await db.exec(lire('supabase/migrations/' + m));
+assert.deepEqual(await lignes(), avant, 'annulation (et migrations 18 à 24 relancées) : aucune ligne supprimée ni ajoutée');
+assert.equal((await su(`select count(*)::int n from concours where annule_le is not null`)).rows[0].n, 1, 'seul le pack Nox est annulé');
+assert.deepEqual((await en(null, `select motif_annulation, annule_le is not null a from concours where id = $1`, [NOX])).rows, [{ motif_annulation: 'Problème technique', a: true }], 'annulation lisible sans compte');
+await assert.rejects(su(`update concours set annule_le = now() where id = '2026-11-oublie'`), /check constraint/, 'annulation sans motif refusée');
+await assert.rejects(su(`update concours set annule_le = now(), motif_annulation = 'x' where id = '2026-11-oublie'`), /check constraint/, 'motif trop court refusé');
+await echoue(ADM, `update concours set annule_le = null, motif_annulation = null where id = $1`, [NOX], /permission denied/);
+await echoue(ADM, `update concours set annule_le = now(), motif_annulation = 'Depuis le site' where id = '2026-11-oublie'`, [], /permission denied/);
+await echoue(ADM, `update concours set titre = 'Autre' where id = $1`, [NOX], /CONCOURS_FIGE/);
+await echoue(ADM, `update concours set date_fin = date_fin + interval '1 day' where id = $1`, [NOX], /CONCOURS_FIGE/);
+await echoue(ADM, `delete from concours where id = $1`, [NOX], /CONCOURS_FIGE/);
+await echoue(C, participer, [NOX, true, true], /CONCOURS_ANNULE/);
+await su(`alter table concours_participations disable trigger concours_participations_avant_insertion`);
+try { await echoue(C, participer, [NOX, true, true], /row-level security/); } finally { await su(`alter table concours_participations enable trigger concours_participations_avant_insertion`); }
+assert.equal(await n(null, `select concours_nb_participants($1) n`, [NOX]), 2, 'compteur inchangé');
+assert.equal((await en(A, `delete from concours_participations where user_id = $1 and concours_id = $2`, [B, NOX])).affectedRows || 0, 0, 'A ne retire pas B');
+assert.equal((await en(B, `delete from concours_participations where concours_id = $1`, [NOX])).affectedRows, 1, 'B retire sa participation au concours annulé');
+await echoue(B, participer, [NOX, true, true], /CONCOURS_ANNULE/);
+await su(`update concours set date_debut = now() - interval '10 days', date_fin = now() - interval '3 days' where id = $1`, [NOX]);
+assert.equal((await en(ADM, `delete from concours_participations where concours_id = $1`, [NOX])).affectedRows || 0, 0, 'admin : aucune suppression directe après la fin, même annulé');
+await echoue(ADM, `select u::text from admin_tirer_au_sort($1, $2) u`, [NOX, GRAINE], /CONCOURS_ANNULE/);
+await db.exec(`begin; select set_config('request.jwt.claims', json_build_object('sub', (select id from auth.users where email = 'admin@exemple.fr'))::text, true);`);
+await assert.rejects(db.query(`select public.admin_tirer_au_sort($1, $2)`, [NOX, GRAINE]), /CONCOURS_ANNULE/, 'SQL Editor avec préambule : tirage refusé aussi');
+await db.exec(`rollback;`);
+await echoue(ADM, `select admin_designer_remplacant($1)::text u`, [NOX], /CONCOURS_ANNULE/);
+assert.equal((await su(`select tire_le from concours where id = $1`, [NOX])).rows[0].tire_le, null, 'pack Nox jamais tiré');
+assert.equal(await n(A, `select count(*)::int n from concours_participations where concours_id = $1`, [NOX]), 1, 'A voit toujours sa participation conservée');
+assert.deepEqual(await lignes(), { ...avant, p: avant.p - 1 }, 'seul le retrait volontaire de B a enlevé une ligne');
+assert.equal((await en(A, `delete from concours_participations where concours_id = $1`, [NOX])).affectedRows, 1, 'A peut encore se retirer après la fin du concours annulé');
+assert.deepEqual(await lignes(), { ...avant, p: avant.p - 2 }, 'seuls les deux retraits volontaires ont enlevé des lignes');
+await su(`delete from concours_exclusions where concours_id = $1`, [NOX]);
+ok('annulation du pack Nox (concours-24, relançable, date conservée) : rien de supprimé ; lisible par tous, non modifiable ni annulable depuis le site, motif obligatoire ; participer refusé (CONCOURS_ANNULE, et RLS seule sans déclencheur) ; tirage (site et SQL Editor) et remplaçant refusés (CONCOURS_ANNULE) ; chacun retire sa seule participation, même après la fin ; l’admin ne supprime rien de plus');
 
 // I3 : tirage et graine EuroMillions
 const tirer = `select u::text from admin_tirer_au_sort($1, $2) u`;
