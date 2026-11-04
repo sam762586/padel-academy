@@ -1,10 +1,11 @@
--- Concours · annulation 3/7 (concours-20) — Remplace concours-06 (même déclencheur, concours-07 inchangé) : nouveau
+-- Concours · annulation 3/8 (concours-20) — Remplace concours-06 (même déclencheur, concours-07 inchangé) : nouveau
 -- message CONCOURS_ANNULE quand on essaie de participer à un concours annulé (avant les contrôles de dates). La règle RLS
--- d'ajout (concours-21) refuse aussi ce cas : ce déclencheur ne sert qu'à donner un message clair. Le reste est identique.
+-- d'ajout (concours-21) refuse aussi ce cas : ce déclencheur ne sert qu'à donner un message clair. search_path vide (noms
+-- complets public.) ; le reste est identique.
 create or replace function public.concours_participations_avant_insertion()
 returns trigger
 language plpgsql
-set search_path = public
+set search_path = ''
 as $fn$
 declare
   c record;

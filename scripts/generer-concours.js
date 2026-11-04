@@ -28,7 +28,11 @@ const ID_VALIDE = /^[0-9]{4}-[0-9]{2}-[a-z0-9-]{1,40}$/;
 // Annulation (règlement, article 7.3) : texte écrit dans la page, lisible sans JavaScript ; concours.js y ajoute seulement,
 // pour le joueur connecté qui avait participé, « Tu avais participé. » et le retrait (toujours permis par la base pour
 // un concours annulé, migrations concours-18 à 24) ; participations supprimées 90 jours après la date de fin (article 6.3).
-const EXCUSE_ANNULE = "Désolé pour ce contretemps : aucun tirage n'aura lieu. Ta participation reste enregistrée, tu peux la retirer quand tu veux depuis cette page.";
+const EXCUSE_ANNULE = "Désolé pour ce contretemps : aucun tirage n'aura lieu. Si tu as participé, ta participation reste enregistrée : tu peux la retirer depuis cette page.";
+// Mention courte en tête de page (#cc-mention, hors bloc généré) : réécrite par le générateur selon le concours le plus récent
+const MENTION = "Jeu gratuit sans obligation d'achat. Participation réservée aux joueurs connectés, une par compte. Tirage au sort. Règlement ci-dessous.";
+const MENTION_ANNULE = "Jeu annulé : aucun tirage n'aura lieu. Règlement ci-dessous.";
+const MENTION_RE = /(<p class="msg cc-mention" id="cc-mention">)[^<]*(<\/p>)/;
 const AUCUN ='<p class="msg msg-info cc-aucun" id="cc-aucun">Aucun concours en ce moment, reviens bientôt.</p>';
 
 /* ---------- Lecture ---------- */
@@ -178,7 +182,8 @@ function rendreConcours(c, md) {
   <details class="cc-reglement">
     <summary>${titreReglement(md, v)}</summary>
     <div class="prose">
-${rendreReglement(md, v)}
+${c.annule ? `<p class="cc-reglement-annule">Ce jeu a été annulé le ${echapper(dateLongue(c.annule.le))} (article 7.3) : aucun tirage n'aura lieu.</p>
+` : ""}${rendreReglement(md, v)}
     </div>
   </details>
 </article>`;
@@ -187,6 +192,15 @@ ${rendreReglement(md, v)}
 function rendreBloc(liste, md) {
   if (!liste.length) return AUCUN;
   return typographieHtml(liste.slice().sort((a, b) => a.date_debut < b.date_debut ? 1 : a.date_debut > b.date_debut ? -1 : 0).map(c => rendreConcours(c, md)).join("\n"));
+}
+// Concours le plus récent (date de début) annulé : mention « Jeu annulé » ; sinon (ou aucun concours) mention habituelle
+function rendreMention(liste) {
+  const recent = liste.slice().sort((a, b) => a.date_debut < b.date_debut ? 1 : a.date_debut > b.date_debut ? -1 : 0)[0];
+  return typographie(echapper(recent && recent.annule ? MENTION_ANNULE : MENTION));
+}
+function injecterMention(html, mention) {
+  if (!MENTION_RE.test(html)) throw new Error('paragraphe <p class="msg cc-mention" id="cc-mention"> introuvable');
+  return html.replace(MENTION_RE, (m, a, b) => a + mention + b);
 }
 function injecter(html, bloc) {
   const a = html.indexOf(DEBUT), b = html.indexOf(FIN);
@@ -213,7 +227,7 @@ function principal(argv) {
   try {
     md = lireReglement(o.reglement);
     html = fs.readFileSync(o.page, "utf8");
-    nouveau = injecter(html, rendreBloc(liste, md));
+    nouveau = injecterMention(injecter(html, rendreBloc(liste, md)), rendreMention(liste));
     if (/\{[a-z_]+\}/.test(nouveau.slice(nouveau.indexOf(DEBUT), nouveau.indexOf(FIN)))) throw new Error("champ {…} non rempli");
   } catch (e) { console.error("Génération impossible, rien n'est écrit : " + e.message); return 1; }
   const nom = path.relative(RACINE, o.page) || o.page;
@@ -235,4 +249,4 @@ function principal(argv) {
 }
 
 if (require.main === module) process.exitCode = principal(process.argv.slice(2));
-module.exports = { typographie, erreursDonnees, rendreBloc, rendreConcours, sqlInsertion, dateLongue, lireReglement, principal };
+module.exports = { MENTION, MENTION_ANNULE, typographie, erreursDonnees, rendreBloc, rendreConcours, sqlInsertion, dateLongue, lireReglement, principal };

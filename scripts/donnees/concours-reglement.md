@@ -28,7 +28,7 @@ Le jeu n'est ni parrainé, ni géré, ni associé à Facebook, Instagram, Google
 
 2.6. Sont exclus du jeu : l'organisateur, qui ne participe pas, et les personnes qui ont participé à l'organisation du jeu.
 
-2.7. Tant que le jeu est ouvert, tu peux retirer ta participation avec le bouton « Retirer ma participation » de la page « Jeu concours », en écrivant à l'organisateur, ou en supprimant ton compte (voir l'article 6.3). Tu peux ensuite participer de nouveau, tant que le jeu est ouvert.
+2.7. Tant que le jeu est ouvert, tu peux retirer ta participation avec le bouton « Retirer ma participation » de la page « Jeu concours », en écrivant à l'organisateur, ou en supprimant ton compte (voir l'article 6.3). Tu peux ensuite participer de nouveau, tant que le jeu est ouvert. Si le jeu est annulé (article 7.3), tu peux retirer ta participation tant que tes données sont conservées (article 6.3).
 
 ### Article 3. Désignation du ou des gagnants
 
@@ -80,7 +80,7 @@ Le jeu n'est ni parrainé, ni géré, ni associé à Facebook, Instagram, Google
 
 6.4. Le pseudo du gagnant n'est publié que s'il coche lui-même la case prévue : l'organisateur ne peut pas le faire à sa place.
 
-6.5. Tu peux accéder à tes données, les faire rectifier ou effacer, retirer ta participation tant que le jeu est ouvert, et saisir la CNIL, en écrivant à l'organisateur. Le détail se trouve dans la page [Confidentialité](confidentialite.html#jeu-concours).
+6.5. Tu peux accéder à tes données, les faire rectifier ou effacer, retirer ta participation tant que le jeu est ouvert, et saisir la CNIL, en écrivant à l'organisateur. Si le jeu est annulé (article 7.3), tu peux retirer ta participation tant que tes données sont conservées (article 6.3). Le détail se trouve dans la page [Confidentialité](confidentialite.html#jeu-concours).
 
 ### Article 7. Responsabilité
 

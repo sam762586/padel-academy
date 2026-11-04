@@ -114,7 +114,7 @@ Depuis le 1er septembre 2026, le P1500 est devenu P2000 et l'ancien P2000 est de
 7. `2026-10-27-progression-01` et `-02` (après les migrations espace), puis ajoute `"progression"` à `PA_SUPABASE.activees`.
 8. `2026-10-27-diagnostic-01` et `-02` (après les migrations journal), puis ajoute `"diagnostic"` à `PA_SUPABASE.activees`.
 9. `2026-11-01-concours-01` à `-17` (section « Jeu concours », en fin de fichier), puis, avec l'accord écrit de Samuel, ajoute `"concours"` à `PA_SUPABASE.activees`.
-10. `2026-11-04-concours-18` à `-24` (annulation du concours « Ton pack Nox offert », section « Jeu concours », « Annulation d'un concours ») : rien à ajouter à `PA_SUPABASE.activees`.
+10. `2026-11-04-concours-18` à `-25` (annulation du concours « Ton pack Nox offert », section « Jeu concours », « Annulation d'un concours ») : rien à ajouter à `PA_SUPABASE.activees`.
 
 # Espace joueur (espace.html)
 
@@ -452,12 +452,12 @@ Tout appel conditionné à `PA_SUPABASE.activees.includes("concours")` :
 
 ## Annulation d'un concours — PRÉPARÉ LE 04/11/2026, NON APPLIQUÉ (« Ton pack Nox offert » annulé : problème technique)
 
-Décision de Samuel : le concours `2026-11-pack-nox` est annulé et **rien n'est supprimé** (participations, exclusions conservées ; purge habituelle 90 jours après la fin, soit vers fin février 2027). Ce que la base garantit après les fichiers 18 à 24 :
+Décision de Samuel : le concours `2026-11-pack-nox` est annulé et **rien n'est supprimé** (participations, exclusions conservées ; purge habituelle 90 jours après la fin, soit vers fin février 2027). Ce que la base garantit après les fichiers 18 à 25 :
 - `concours` : deux colonnes, `annule_le` (date) et `motif_annulation` (3 à 200 caractères, obligatoire avec la date), lisibles par tous ; écrites depuis le SQL Editor seulement (le site, même en admin, ne peut ni annuler ni « désannuler ») ; un concours annulé est figé depuis le site (`CONCOURS_FIGE`).
 - Participer à un concours annulé : refusé, message `CONCOURS_ANNULE` (et la règle RLS d'ajout le refuse aussi).
-- Retrait : le joueur peut toujours retirer **sa** participation à un concours annulé, même après la date de fin ; l'admin n'a aucun droit de suppression en plus.
-- `admin_tirer_au_sort` et `admin_designer_remplacant` : refusés sur un concours annulé (`CONCOURS_ANNULE`).
-- Compteur, résumé, exclusion pour fraude, purge, suppression du compte : inchangés.
+- Retrait : le joueur peut toujours retirer **sa** participation à un concours annulé, même après la date de fin ; l'admin, lui, ne peut supprimer aucune participation d'un concours annulé (ni directement, ni par exclusion).
+- `admin_tirer_au_sort`, `admin_designer_remplacant` et `admin_exclure_participation` : refusés sur un concours annulé (`CONCOURS_ANNULE`).
+- Compteur, résumé, purge, suppression du compte : inchangés. Les deux déclencheurs remplacés (19, 20) tournent désormais en `search_path` vide, comme les fonctions admin.
 
 Étapes pour Samuel (SQL Editor, un fichier à la fois, *Run* ; chacun est relançable sans risque ; **dès que possible**, le concours étant ouvert jusqu'au 30/11 : tant que ce n'est pas fait, la base accepte encore les participations) :
 1. `2026-11-04-concours-18-colonnes-annulation`
@@ -466,20 +466,27 @@ Décision de Samuel : le concours `2026-11-pack-nox` est annulé et **rien n'est
 4. `2026-11-04-concours-21-politiques-participations`
 5. `2026-11-04-concours-22-fonction-admin-tirer-au-sort`
 6. `2026-11-04-concours-23-fonction-admin-designer-remplacant`
-7. `2026-11-04-concours-24-annuler-pack-nox` (**en dernier** : la seule ligne de données modifiée ; 1 ligne la première fois, 0 ensuite)
-8. **Contrôler** :
+7. `2026-11-04-concours-24-fonction-admin-exclure-participation`
+8. `2026-11-04-concours-25-annuler-pack-nox` (**en dernier** : la seule ligne de données modifiée ; 1 ligne la première fois, 0 ensuite)
+9. **Contrôler** :
 
    ```sql
    select id, annule_le, motif_annulation, tire_le, public.concours_nb_participants(id) as participants from public.concours where id = '2026-11-pack-nox';
    ```
 
-   attendu : `annule_le` rempli (date du jour), `motif_annulation` = `Problème technique`, `tire_le` vide, `participants` = le même nombre qu'avant l'étape 1 (note-le avant de commencer : rien n'est supprimé). Et :
+   attendu : `annule_le` rempli (date du jour), `motif_annulation` = `Problème technique`, `tire_le` vide, `participants` = le même nombre qu'avant l'étape 1 (note-le avant de commencer : rien n'est supprimé). Puis :
+
+   ```sql
+   select proname, proconfig from pg_proc where proname in ('concours_avant_modification', 'concours_participations_avant_insertion', 'admin_tirer_au_sort', 'admin_designer_remplacant', 'admin_exclure_participation') order by 1;
+   ```
+
+   attendu : cinq lignes, chacune avec `{"search_path=\"\""}` (search_path vide). Et :
 
    ```sql
    select polname from pg_policy where polrelid = 'public.concours_participations'::regclass order by 1;
    ```
 
    attendu : `concours_participations_delete`, `concours_participations_insert`, `concours_participations_select` (trois règles, RLS toujours active).
-9. Rien à ajouter à `PA_SUPABASE.activees`. Côté site (dev-front) : la page peut lire `annule_le,motif_annulation` dans `from("concours").select(...)` **seulement après l'étape 1** (avant, la colonne inconnue fait échouer la lecture) ; traduire `CONCOURS_ANNULE`.
+10. Rien à ajouter à `PA_SUPABASE.activees`. Côté site (dev-front) : la page peut lire `annule_le,motif_annulation` dans `from("concours").select(...)` **seulement après l'étape 1** (avant, la colonne inconnue fait échouer la lecture) ; traduire `CONCOURS_ANNULE`.
 
-Annuler un autre concours plus tard : même `update` que le fichier 24 avec son identifiant et son motif. Vérification hors ligne : `node scripts/verifier-concours-sql.mjs`.
+Annuler un autre concours plus tard : même `update` que le fichier 25 avec son identifiant et son motif. Vérification hors ligne : `node scripts/verifier-concours-sql.mjs`.

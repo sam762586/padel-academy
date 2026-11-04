@@ -1,4 +1,4 @@
--- Concours · annulation 5/7 (concours-22) — Remplace concours-11 : le tirage d'un concours annulé est refusé
+-- Concours · annulation 5/8 (concours-22) — Remplace concours-11 : le tirage d'un concours annulé est refusé
 -- (CONCOURS_ANNULE, après CONCOURS_DEJA_TIRE). Méthode, graine EuroMillions, droits et autres refus inchangés (voir les
 -- commentaires de concours-11).
 create or replace function public.admin_tirer_au_sort(p_concours text, p_graine text)

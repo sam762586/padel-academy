@@ -1,4 +1,4 @@
--- Concours · annulation 7/7 (concours-24) — Annulation du concours « Ton pack Nox offert » (2026-11-pack-nox), décidée
+-- Concours · annulation 8/8 (concours-25) — Annulation du concours « Ton pack Nox offert » (2026-11-pack-nox), décidée
 -- par Samuel le 04/11/2026, motif : problème technique. Une seule ligne de public.concours modifiée (annule_le,
 -- motif_annulation) ; aucune ligne supprimée : participations conservées (le joueur peut encore se retirer, concours-21),
 -- purge habituelle 90 jours après la fin (concours-16). Relançable : une fois annulé, la ligne n'est plus touchée (la date

@@ -1,4 +1,4 @@
--- Concours · annulation 6/7 (concours-23) — Remplace concours-12 : pas de remplaçant pour un concours annulé
+-- Concours · annulation 6/8 (concours-23) — Remplace concours-12 : pas de remplaçant pour un concours annulé
 -- (CONCOURS_ANNULE, avant CONCOURS_NON_TIRE ; cas d'un concours annulé après son tirage). Le reste est identique.
 create or replace function public.admin_designer_remplacant(p_concours text)
 returns uuid

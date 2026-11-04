@@ -1,4 +1,4 @@
--- Concours · annulation 1/7 (concours-18) — Colonnes d'annulation d'un concours (04/11/2026 : « Ton pack Nox offert »
+-- Concours · annulation 1/8 (concours-18) — Colonnes d'annulation d'un concours (04/11/2026 : « Ton pack Nox offert »
 -- annulé pour un problème technique). Annuler ne supprime rien : participations, exclusions et gagnants restent, la purge
 -- habituelle (concours-16) s'applique telle quelle (90 jours après la fin pour un concours jamais tiré).
 --   annule_le        : date de l'annulation (null = concours non annulé) ;

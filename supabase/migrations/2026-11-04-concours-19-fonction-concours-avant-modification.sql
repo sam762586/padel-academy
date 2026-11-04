@@ -1,10 +1,11 @@
--- Concours · annulation 2/7 (concours-19) — Remplace concours-02 (même déclencheur, concours-03 inchangé) : en plus, un
+-- Concours · annulation 2/8 (concours-19) — Remplace concours-02 (même déclencheur, concours-03 inchangé) : en plus, un
 -- concours annulé ne se modifie plus et ne se supprime plus depuis le site (CONCOURS_FIGE). Le SQL Editor (auth.uid()
--- vide) reste le recours, comme avant. Le reste est identique à concours-02.
+-- vide) reste le recours, comme avant. search_path vide (tout est écrit en nom complet : public., auth.) ; le reste est
+-- identique à concours-02.
 create or replace function public.concours_avant_modification()
 returns trigger
 language plpgsql
-set search_path = public
+set search_path = ''
 as $fn$
 begin
   if auth.uid() is null and tg_op = 'DELETE' then

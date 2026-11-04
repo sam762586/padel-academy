@@ -128,7 +128,7 @@
    if(mien!==jeton||!C.user) return;
    let participe=false;
    try{
-    const r=await C.client.from("concours_participations").select("concours_id").eq("concours_id",vedette.id).maybeSingle();
+    const r=await C.client.from("concours_participations").select("concours_id").eq("concours_id",vedette.id).eq("user_id",C.user.id).maybeSingle();
     if(r.error) return; // lecture impossible : le texte général de la page suffit
     participe=!!r.data;
    }catch(e){ return; }
@@ -137,7 +137,7 @@
    retirer.addEventListener("click",async()=>{
     occuper(retirer,"Retrait…"); ecrire("");
     let r;
-    try{ r=await C.client.from("concours_participations").delete().eq("concours_id",vedette.id).select("concours_id"); }
+    try{ r=await C.client.from("concours_participations").delete().eq("concours_id",vedette.id).eq("user_id",C.user.id).select("concours_id"); }
     catch(e){ r={error:e}; }
     if(r.error||!Array.isArray(r.data)||!r.data.length){
      liberer(retirer);
@@ -213,12 +213,12 @@
   return r.data||null;
  }
  async function lireParticipation(){
-  const r=await C.client.from("concours_participations").select("concours_id,cree_le").eq("concours_id",vedette.id).maybeSingle();
+  const r=await C.client.from("concours_participations").select("concours_id,cree_le").eq("concours_id",vedette.id).eq("user_id",C.user.id).maybeSingle();
   if(r.error) throw r.error;
   return !!r.data;
  }
  async function lireGain(){
-  const r=await C.client.from("concours_gagnants").select("concours_id,rang,affiche_publiquement,empreinte").eq("concours_id",vedette.id).maybeSingle();
+  const r=await C.client.from("concours_gagnants").select("concours_id,rang,affiche_publiquement,empreinte").eq("concours_id",vedette.id).eq("user_id",C.user.id).maybeSingle();
   if(r.error) throw r.error;
   return r.data||null;
  }
@@ -226,7 +226,7 @@
  // Table absente ou illisible : rien n'est affiché (l'erreur n'empêche pas le reste de la page)
  async function lireExclusion(){
   try{
-   const r=await C.client.from("concours_exclusions").select("concours_id,motif").eq("concours_id",vedette.id).maybeSingle();
+   const r=await C.client.from("concours_exclusions").select("concours_id,motif").eq("concours_id",vedette.id).eq("user_id",C.user.id).maybeSingle();
    return r.error?null:(r.data||null);
   }catch(e){ return null; }
  }
@@ -287,7 +287,7 @@
    const voulu=input.checked;
    input.disabled=true; etat.replaceChildren(el("p","chargement","Enregistrement…"));
    let r;
-   try{ r=await C.client.from("concours_gagnants").update({affiche_publiquement:voulu}).eq("concours_id",vedette.id).select("concours_id"); }
+   try{ r=await C.client.from("concours_gagnants").update({affiche_publiquement:voulu}).eq("concours_id",vedette.id).eq("user_id",C.user.id).select("concours_id"); }
    catch(e){ r={error:e}; }
    input.disabled=false;
    if(r.error||!Array.isArray(r.data)||!r.data.length){ input.checked=!voulu; etat.replaceChildren(message(messageErreur(r.error),"erreur","alert")); return; }
@@ -468,7 +468,7 @@
    oui.addEventListener("click",async()=>{
     occuper(oui,"Retrait…"); non.disabled=true;
     let r;
-    try{ r=await C.client.from("concours_participations").delete().eq("concours_id",vedette.id).select("concours_id"); }
+    try{ r=await C.client.from("concours_participations").delete().eq("concours_id",vedette.id).eq("user_id",C.user.id).select("concours_id"); }
     catch(e){ r={error:e}; }
     if(r.error||!Array.isArray(r.data)||!r.data.length){
      // Rien supprimé sans erreur : le jeu s'est fermé entre-temps (la base refuse le retrait après la fin)
