@@ -163,6 +163,9 @@ async function score(navigateur,base,erreurs){
  await pt.$eval('.sc-graph-barres',f=>f.scrollIntoView({block:'center',behavior:'instant'}));
  const zone=await pt.$eval('.sc-graph-barres .sc-barre-rempli',b=>{const r=b.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};});
  await pt.touchscreen.tap(zone.x,zone.y);
+ // Sous charge, un redessin (ResizeObserver) peut suivre l'appui et refermer la bulle : on attend, puis un second appui
+ const bulleVisible=()=>pt.waitForFunction(()=>{const b=document.querySelector('.sc-graph-barres .sc-bulle');return b&&!b.hidden;},null,{timeout:2000}).then(()=>true,()=>false);
+ if(!await bulleVisible()){await pt.touchscreen.tap(zone.x,zone.y);await bulleVisible();}
  const t=await pt.evaluate(()=>{const f=document.querySelector('.sc-graph-barres'),b=f.querySelector('.sc-bulle'),rf=f.getBoundingClientRect(),rb=b.getBoundingClientRect();
   return {texte:b.hidden?null:b.textContent,dedans:rb.left>=rf.left&&rb.right<=rf.right,survol:f.querySelectorAll('.sc-barre.survol').length};});
  assert.equal(t.texte,`Sam & Léo : ${cumul[0]} points sur ${total} (${Math.round(100*cumul[0]/total)} %)`);assert.ok(t.dedans,'bulle dans le cadre');assert.equal(t.survol,1);
