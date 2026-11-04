@@ -276,46 +276,61 @@ const ESP_MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sep
   return points;
  }
  function rendreProgression(){
-  const zone=$("esp-progression");zone.textContent="";
+  const zone=$("esp-progression");zone.textContent="";$("esp-bulle").hidden=true;
   const pts=pointsParMois(),max=Math.max(...pts.map(p=>p.total));
   if(!max){zone.append(el("p","acc-muted","La courbe apparaîtra dès que tu auras saisi des résultats de tournois datés."));return;}
   // Graduation lisible : 4 paliers ronds
   const pas=[10,20,25,50,100,200,250,500,1000,2000,2500,5000].find(p=>p*4>=max)||Math.ceil(max/4);
-  // Dessiné à la largeur réelle du cadre : le texte garde sa taille (12 px) sur mobile
-  const haut=pas*4,L=Math.max(300,Math.min(720,Math.round(zone.clientWidth)||640)),H=L<480?200:240,g=44,d=12,h=16,b=28;
-  const x=i=>g+i*(L-g-d)/11,y=v=>h+(H-h-b)*(1-v/haut);
-  const NS="http://www.w3.org/2000/svg",svg=document.createElementNS(NS,"svg");
-  svg.setAttribute("viewBox",`0 0 ${L} ${H}`);svg.setAttribute("class","esp-courbe");svg.setAttribute("role","img");
-  svg.setAttribute("aria-label","Classement estimé à la fin de chaque mois, des 12 derniers mois : de "+nombre(pts[0].total)+" à "+nombre(pts[11].total)+" points");
-  const ajouter=(nom,attrs,parent=svg)=>{const n=document.createElementNS(NS,nom);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));parent.appendChild(n);return n;};
-  for(let k=0;k<=4;k++){
-   ajouter("line",{x1:g,x2:L-d,y1:y(k*pas),y2:y(k*pas),class:"esp-grille"});
-   ajouter("text",{x:g-8,y:y(k*pas)+4,"text-anchor":"end",class:"esp-axe"}).textContent=nombre(k*pas);
-  }
-  const pasMois=L<480?3:2;
-  pts.forEach((p,i)=>{if((11-i)%pasMois===0)ajouter("text",{x:x(i),y:H-8,"text-anchor":"middle",class:"esp-axe"}).textContent=ESP_MOIS[p.mois.getMonth()];});
-  ajouter("polyline",{points:pts.map((p,i)=>x(i)+","+y(p.total)).join(" "),class:"esp-ligne"});
-  const bulle=$("esp-bulle");
-  pts.forEach((p,i)=>{
-   const point=ajouter("circle",{cx:x(i),cy:y(p.total),r:4.5,class:"esp-point"});
-   // Zone de survol plus large que le point (doigt ou souris)
-   const zoneSurvol=ajouter("rect",{x:x(i)-(L-g-d)/22,y:h,width:(L-g-d)/11,height:H-h-b,class:"esp-survol"});
-   const texte=ESP_MOIS[p.mois.getMonth()]+" "+p.mois.getFullYear()+" : "+nombre(p.total)+" points";
-   const montrer=()=>{point.classList.add("actif");bulle.textContent=texte;bulle.hidden=false;
-    // Centrée sur le point, mais toujours entièrement dans le cadre du graphique
-    const r=svg.getBoundingClientRect(),cadre=zone.getBoundingClientRect(),largeur=bulle.offsetWidth;
-    bulle.style.left=Math.max(0,Math.min(r.width-largeur,x(i)*r.width/L-largeur/2))+"px";bulle.style.top=(y(p.total)*r.height/H-44+r.top-cadre.top)+"px";};
-   const cacher=()=>{point.classList.remove("actif");bulle.hidden=true;};
-   zoneSurvol.addEventListener("mouseenter",montrer);
-   zoneSurvol.addEventListener("mouseleave",cacher);
-  });
-  zone.appendChild(svg);
-  // Équivalent en tableau (lecteurs d'écran, lecture précise)
+  const haut=pas*4,G=window.PA_GRAPHIQUE;
+  const moisTexte=p=>ESP_MOIS[p.mois.getMonth()]+" "+p.mois.getFullYear();
+  // Équivalent en tableau (lecteurs d'écran, lecture précise ; ouvert d'office si le graphique ne peut pas être dessiné)
   const details=el("details","esp-donnees");details.appendChild(el("summary","","Voir les données"));
   const tbl=el("div","tbl"),table=el("table");
   table.innerHTML="<thead><tr><th scope=\"col\">Fin du mois</th><th scope=\"col\">Classement estimé</th></tr></thead>";
-  const corps=el("tbody");pts.forEach(p=>{const tr=corps.insertRow();tr.insertCell().textContent=ESP_MOIS[p.mois.getMonth()]+" "+p.mois.getFullYear();tr.insertCell().textContent=nombre(p.total)+" pts";});
-  table.appendChild(corps);tbl.appendChild(table);details.appendChild(tbl);zone.appendChild(details);
+  const corps=el("tbody");pts.forEach(p=>{const tr=corps.insertRow();tr.insertCell().textContent=moisTexte(p);tr.insertCell().textContent=nombre(p.total)+" pts";});
+  table.appendChild(corps);tbl.appendChild(table);details.appendChild(tbl);
+  if(!G){details.open=true;zone.appendChild(details);return;}
+  // Cadre de hauteur fixe (assets/css/joueur.css) : dessiné à sa largeur réelle, le texte garde sa taille sur mobile
+  const figure=el("figure","esp-figure");
+  const svg=G.el("svg",{class:"esp-courbe",role:"img",focusable:"false"},figure);
+  zone.append(figure,details);
+  // Résumé lu par les lecteurs d'écran : premier mois, dernier mois, meilleur classement (le premier mois qui l'atteint)
+  const meilleur=pts.reduce((m,p)=>p.total>m.total?p:m,pts[0]),dernier=pts[pts.length-1];
+  svg.setAttribute("aria-label","Classement estimé à la fin de chaque mois, sur les 12 derniers mois : "+moisTexte(pts[0])+" "+nombre(pts[0].total)+" points, "+
+   moisTexte(dernier)+" "+nombre(dernier.total)+" points ; meilleur classement : "+nombre(meilleur.total)+" points ("+moisTexte(meilleur)+").");
+  const r=svg.getBoundingClientRect(),L=Math.round(r.width)||640,H=Math.round(r.height)||216,g=44,d=12,h=22,b=26;
+  svg.setAttribute("viewBox",`0 0 ${L} ${H}`);
+  const x=i=>g+i*(L-g-d)/11,y=v=>h+(H-h-b)*(1-v/haut);
+  const grille=G.el("g",{"aria-hidden":"true"},svg);
+  for(let k=0;k<=4;k++){
+   const yk=Math.round(y(k*pas))+.5;
+   G.el("line",{x1:g,x2:L-d,y1:yk,y2:yk,class:"esp-grille"},grille);
+   G.el("text",{x:g-8,y:yk+4,"text-anchor":"end",class:"esp-axe"},grille).textContent=nombre(k*pas);
+  }
+  const pasMois=L<480?3:2;
+  pts.forEach((p,i)=>{if((11-i)%pasMois===0)G.el("text",{x:x(i),y:H-6,"text-anchor":"middle",class:"esp-axe"},grille).textContent=ESP_MOIS[p.mois.getMonth()];});
+  G.el("polyline",{points:pts.map((p,i)=>x(i).toFixed(1)+","+y(p.total).toFixed(1)).join(" "),class:"esp-trace","aria-hidden":"true"},svg);
+  // Étiquette directe sur le dernier point seulement (les autres se lisent au survol ou dans le tableau)
+  const yDernier=y(dernier.total);
+  G.el("text",{x:x(11)+4,y:Math.max(14,yDernier-10),"text-anchor":"end",class:"esp-valeur","aria-hidden":"true"},svg).textContent=nombre(dernier.total)+" pts";
+  const bulle=$("esp-bulle"),cadre=bulle.parentElement;
+  let actif=null;
+  const cacher=()=>{if(actif)actif.classList.remove("actif");actif=null;bulle.hidden=true;};
+  pts.forEach((p,i)=>{
+   const point=G.el("circle",{cx:x(i),cy:y(p.total),r:4.5,class:"esp-point"+(i===11?" dernier":""),"aria-hidden":"true"},svg);
+   // Zone de survol : toute la colonne du mois (doigt ou souris), sans arrêt clavier (le tableau sert au clavier)
+   const zoneSurvol=G.el("rect",{x:x(i)-(L-g-d)/22,y:h,width:(L-g-d)/11,height:H-h-b,class:"esp-survol","aria-hidden":"true"},svg);
+   const montrer=()=>{
+    if(actif)actif.classList.remove("actif");
+    actif=point;point.classList.add("actif");
+    bulle.textContent=moisTexte(p)+" : "+nombre(p.total)+" points";bulle.hidden=false;
+    // Centrée au-dessus du point, toujours entièrement dans le cadre du graphique
+    G.placerBulle(cadre,svg,bulle,x(i),y(p.total)-8);
+   };
+   zoneSurvol.addEventListener("pointerenter",montrer);
+   zoneSurvol.addEventListener("pointerdown",montrer);
+   zoneSurvol.addEventListener("pointerleave",ev=>{if(ev.pointerType==="mouse")cacher();});
+  });
  }
 
  /* ---------- Mes matchs : statistiques par période, par partenaire, par type, journal ---------- */

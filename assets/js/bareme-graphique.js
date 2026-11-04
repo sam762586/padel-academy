@@ -3,13 +3,16 @@
    posés par renderTable() (bareme.js), et les points dans bareme-donnees.js (window.PA_BAREME, chargé avant).
    SVG construit avec createElementNS (aucune donnée en innerHTML), couleurs par classes CSS (assets/css/contenu.css, section barème).
    Redessiné quand la largeur du graphique change (ResizeObserver, un dessin par image au plus).
+   Outils SVG communs (éléments, graduation, barre arrondie, suivi de largeur, info-bulle) : graphique-svg.js, chargé avant.
    Exposé : window.PA_BAREME_GRAPHIQUE.dessiner(fig) et .places(cat, nb, sexe) (utilisé aussi par le test). */
 (function(){
- const SVG="http://www.w3.org/2000/svg";
+ const G=window.PA_GRAPHIQUE;
+ if(!G)return;
+ const {el,pasGrille,largeurTexte}=G;
  // Repères de l'axe horizontal : seulement les places qui ouvrent un tour (les autres se lisent au survol)
  const JALONS=[{place:1,texte:"V"},{place:2,texte:"F"},{place:3,texte:"½"},{place:5,texte:"¼"},{place:9,texte:"⅛"},{place:17,texte:"17e"},{place:25,texte:"25e"}];
  const MARGES={haut:22,droite:6,bas:22,gauche:30}; // px : étiquette de la barre choisie en haut, repères en bas, points à gauche
- const ECART=2, ARRONDI=4;
+ const ECART=2;
  const etats=new WeakMap(); // figure → {barres, geometrie, svg, bulle}
 
  // Places existantes pour un tableau : même règle que ptsFor (place > nombre de paires = inexistante), les null coupés
@@ -39,25 +42,7 @@
   if(d&&d.messieurs)return cat+", tableau "+sexe;
   return cat;
  }
- // Pas de graduation « rond » : environ 4 lignes de grille
- function pasGrille(max){
-  const brut=max/4,p=Math.pow(10,Math.floor(Math.log10(brut)));
-  for(const m of [1,2,2.5,5,10])if(m*p>=brut)return m*p;
-  return 10*p;
- }
- function el(nom,attributs,parent){
-  const n=document.createElementNS(SVG,nom);
-  for(const k in attributs)n.setAttribute(k,String(attributs[k]));
-  if(parent)parent.appendChild(n);
-  return n;
- }
- // Barre arrondie en haut seulement (côté donnée), base droite sur l'axe
- function cheminBarre(x,y,l,h){
-  const r=Math.max(0,Math.min(ARRONDI,l/2,h));
-  return `M${x},${y+h}V${y+r}A${r},${r} 0 0 1 ${x+r},${y}H${x+l-r}A${r},${r} 0 0 1 ${x+l},${y+r}V${y+h}Z`;
- }
  const pts=n=>n+" pt"+(n>1?"s":"");
- const largeurTexte=t=>t.length*7+6; // estimation (police --fs-xs) pour éviter que deux repères se chevauchent
 
  function preparer(fig){
   let etat=etats.get(fig);
@@ -83,14 +68,7 @@
   svg.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")cacher();});
   etat.cacher=cacher;
   // Redessin quand la largeur change (rotation, fenêtre) : un seul dessin par image
-  if(typeof ResizeObserver==="function"){
-   let attente=0,largeur=0;
-   new ResizeObserver(entrees=>{
-    const l=Math.round(entrees[0].contentRect.width);
-    if(l===largeur)return;largeur=l;
-    cancelAnimationFrame(attente);attente=requestAnimationFrame(()=>dessiner(fig));
-   }).observe(fig);
-  }
+  G.suivreLargeur(fig,l=>{if(l)dessiner(fig);});
   return etat;
  }
  function montrer(fig,etat,i){
@@ -100,13 +78,7 @@
   etat.bulle.textContent=b.libelle+" : "+pts(b.points);
   etat.bulle.hidden=false;
   // Position dans la figure : centre de la colonne, au-dessus de la barre, sans sortir du cadre
-  // (un élément SVG n'a pas d'offsetLeft : on mesure l'écart entre les deux boîtes)
-  const rs=etat.svg.getBoundingClientRect(),rf=fig.getBoundingClientRect();
-  const decalX=rs.left-rf.left-fig.clientLeft,decalY=rs.top-rf.top-fig.clientTop;
-  const lb=etat.bulle.offsetWidth,lf=fig.clientWidth;
-  const cx=decalX+g.gauche+i*g.pas+g.pas/2;
-  etat.bulle.style.left=Math.max(4,Math.min(lf-lb-4,cx-lb/2))+"px";
-  etat.bulle.style.top=Math.max(4,decalY+b.y-30)+"px";
+  G.placerBulle(fig,etat.svg,etat.bulle,g.gauche+i*g.pas+g.pas/2,b.y);
  }
 
  function dessiner(fig){
@@ -152,7 +124,7 @@
   barres.forEach((b,i)=>{
    const x=g.gauche+i*g.pas+ECART/2,y=Math.min(yDe(b.points),g.haut+g.hauteur-1),h=g.haut+g.hauteur-y;
    b.y=y;
-   b.noeud=el("path",{d:cheminBarre(x,y,lb,h),class:"bar-barre"+(b.place===choisie?" choisie":""),"data-place":b.place,"data-points":b.points},groupe);
+   b.noeud=el("path",{d:G.barreVerticale(x,y,lb,h),class:"bar-barre"+(b.place===choisie?" choisie":""),"data-place":b.place,"data-points":b.points},groupe);
   });
   // Repères de l'axe : jalons présents dans ce tableau, puis la dernière place ; pas de chevauchement
   const axe=el("g",{class:"bar-reperes","aria-hidden":"true"},svg);

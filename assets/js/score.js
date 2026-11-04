@@ -277,8 +277,11 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
  }
  // Bilan facultatif du match (diagnostic.js, chargé après ce fichier) : rattaché au match par sa clé
  function proposerBilan(m){const z=$("sc-diagnostic");if(z&&window.PA_DIAGNOSTIC)window.PA_DIAGNOSTIC.bloc(z,window.PA_DIAGNOSTIC.cleMatch(m));else if(z)z.textContent="";}
- // Récapitulatif : vainqueur, score, % de points, motifs en barres, plus longue série
+ // Récapitulatif : vainqueur, score, points gagnés (barres), courbe du match, points au service, motifs, plus longue série.
+ // Graphiques SVG dessinés avec graphique-svg.js (chargé avant) ; chaque valeur est aussi écrite en clair sur le graphique
+ // (étiquettes directes) et dans l'aria-label. Sans graphique-svg.js, les mêmes valeurs en liste de texte.
  function rendreRecap(match,zone){
+  suivis.forEach(o=>o.disconnect());suivis=[];
   const c=match.config,e=calculer(c,match.points),noms=[c.nomA,c.nomB];
   zone.textContent="";
   const titre=document.createElement("p");titre.className="sc-recap-vainqueur";
@@ -289,41 +292,207 @@ window.PA_SCORE={nouvelleCle:scNouvelleCle,MOTIFS:SC_MOTIFS,calculer,libellesPoi
   zone.append(titre,score,date);
   const total=e.stats.points[0]+e.stats.points[1];
   if(!total)return;
-  // Points gagnés : une barre par paire
-  const blocPoints=document.createElement("div");blocPoints.className="sc-bloc";
-  const h=document.createElement("h3");h.textContent="Points gagnés";blocPoints.appendChild(h);
-  [0,1].forEach(i=>blocPoints.appendChild(barre(noms[i],e.stats.points[i],total,`${e.stats.points[i]} (${Math.round(100*e.stats.points[i]/total)} %)`,i)));
-  zone.appendChild(blocPoints);
+  const pct=(a,n)=>Math.round(100*a/n)+" %";
+  // Points gagnés : une barre par paire (part du total)
+  zone.appendChild(blocBarres("Points gagnés",[0,1].map(i=>({libelle:noms[i],valeur:e.stats.points[i],part:e.stats.points[i]/total,paire:i,
+   texte:`${e.stats.points[i]} (${pct(e.stats.points[i],total)})`,detail:`${e.stats.points[i]} points sur ${total} (${pct(e.stats.points[i],total)})`})),SC_QUARTS));
+  // Courbe : points gagnés par chaque paire au fil du match (seulement les points pris en compte par le score)
+  const courbe=blocCourbe(c,match.points.slice(0,e.joues),noms);
+  if(courbe)zone.appendChild(courbe);
   // Points gagnés au service (utile pour voir qui tient sa mise en jeu)
-  const blocService=document.createElement("div");blocService.className="sc-bloc";
-  const hs=document.createElement("h3");hs.textContent="Points gagnés sur son service";blocService.appendChild(hs);
-  [0,1].forEach(i=>{const [gagnes,perdus]=e.stats.pointsService[i];const n=gagnes+perdus;
-   blocService.appendChild(barre(noms[i],gagnes,n||1,n?`${gagnes}/${n} (${Math.round(100*gagnes/n)} %)`:"–",i));});
-  zone.appendChild(blocService);
+  zone.appendChild(blocBarres("Points gagnés sur son service",[0,1].map(i=>{const [gagnes,perdus]=e.stats.pointsService[i];const n=gagnes+perdus;
+   return {libelle:noms[i],valeur:gagnes,part:n?gagnes/n:0,paire:i,texte:n?`${gagnes}/${n} (${pct(gagnes,n)})`:"–",
+    detail:n?`${gagnes} points gagnés sur ${n} servis (${pct(gagnes,n)})`:"aucun point servi"};}),SC_QUARTS));
   // Motifs : comment chaque paire a gagné ses points
   [0,1].forEach(i=>{
    const motifs=e.stats.motifs[i],nbAvecMotif=Object.values(motifs).reduce((s,n)=>s+n,0);
-   const bloc=document.createElement("div");bloc.className="sc-bloc";
-   const hm=document.createElement("h3");hm.textContent=`Points gagnés par ${noms[i]}`;bloc.appendChild(hm);
-   if(!nbAvecMotif){const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun motif renseigné.";bloc.appendChild(p);}
-   const max=Math.max(1,...Object.values(motifs));
+   const titreMotifs=`Points gagnés par ${noms[i]}`;
+   if(!nbAvecMotif){
+    const bloc=titreBloc(titreMotifs);
+    const p=document.createElement("p");p.className="acc-muted";p.textContent="Aucun motif renseigné.";
+    bloc.appendChild(p);zone.appendChild(bloc);return;
+   }
+   // Échelle commune aux motifs d'une paire : graduation ronde au-dessus du plus grand nombre
+   const max=Math.max(1,...Object.values(motifs)),pas=GR?GR.pasGrille(max):max,haut=Math.ceil(max/pas)*pas;
+   const graduations=[];for(let v=0;v<=haut+1e-9;v+=pas)graduations.push(v/haut);
    // Faute directe et double faute sont commises par l'autre paire : on le dit
    const libelle=m=>m.id==="faute"?"Faute directe de "+noms[1-i]:m.id==="double"?"Double faute de "+noms[1-i]:m.label;
-   SC_MOTIFS.filter(m=>motifs[m.id]).sort((x,y)=>motifs[y.id]-motifs[x.id]).forEach(m=>bloc.appendChild(barre(libelle(m),motifs[m.id],max,String(motifs[m.id]),i)));
-   zone.appendChild(bloc);
+   const lignes=SC_MOTIFS.filter(m=>motifs[m.id]).sort((x,y)=>motifs[y.id]-motifs[x.id]).map(m=>({libelle:libelle(m),valeur:motifs[m.id],part:motifs[m.id]/haut,paire:i,
+    texte:String(motifs[m.id]),detail:motifs[m.id]+" point"+(motifs[m.id]>1?"s":"")}));
+   zone.appendChild(blocBarres(titreMotifs,lignes,graduations));
   });
   const serie=document.createElement("p");serie.className="sc-serie";
   serie.textContent=`Plus longue série de points : ${noms[0]} ${e.stats.serie[0]} · ${noms[1]} ${e.stats.serie[1]}`;
   zone.appendChild(serie);
  }
- function barre(libelle,valeur,max,texte,paire){
-  const ligne=document.createElement("div");ligne.className="sc-barre";
-  const nom=document.createElement("span");nom.className="sc-barre-nom";nom.textContent=libelle;
-  const piste=document.createElement("span");piste.className="sc-barre-piste";
-  const rempli=document.createElement("span");rempli.className="sc-barre-rempli"+(paire===1?" b":"");
-  rempli.style.width=Math.round(100*valeur/max)+"%";piste.appendChild(rempli);
-  const val=document.createElement("span");val.className="sc-barre-val";val.textContent=texte;
-  ligne.append(nom,piste,val);return ligne;
+
+ /* --- Graphiques du récapitulatif (SVG) --- */
+ const GR=window.PA_GRAPHIQUE;
+ const SC_QUARTS=[0,.25,.5,.75,1]; // grille des barres en pourcentage
+ const SC_LARGEUR_DEFAUT=600; // px : largeur de dessin tant que l'écran de fin est caché (redessiné à la vraie largeur)
+ let suivis=[]; // observateurs de largeur des graphiques affichés (déconnectés quand le récap est refait)
+ function titreBloc(texte){const bloc=document.createElement("div");bloc.className="sc-bloc";const h=document.createElement("h3");h.textContent=texte;bloc.appendChild(h);return bloc;}
+ // Cadre commun : <figure> (fond --bg, hauteur du SVG fixée avant le dessin), SVG role="img", info-bulle aria-hidden
+ function cadreGraphique(classe,hauteur,aria){
+  const fig=document.createElement("figure");fig.className="sc-graph "+classe;
+  const svg=GR.el("svg",{class:"sc-svg",role:"img",focusable:"false","aria-label":aria});
+  svg.style.height=hauteur+"px";
+  const bulle=document.createElement("div");bulle.className="sc-bulle";bulle.setAttribute("aria-hidden","true");bulle.hidden=true;
+  fig.append(svg,bulle);
+  return {fig,svg,bulle};
+ }
+ // Suivi du pointeur (souris ou doigt) : viser(x, y) en px du SVG ; la bulle se cache quand la souris sort
+ function suivrePointeur(svg,viser,cacher){
+  const relatif=ev=>{const r=svg.getBoundingClientRect();viser(ev.clientX-r.left,ev.clientY-r.top);};
+  svg.addEventListener("pointermove",relatif);
+  svg.addEventListener("pointerdown",relatif);
+  svg.addEventListener("pointerleave",ev=>{if(ev.pointerType==="mouse")cacher();});
+ }
+ const largeurDe=svg=>Math.round(svg.getBoundingClientRect().width)||SC_LARGEUR_DEFAUT;
+
+ // Barres horizontales : nom à gauche et valeur à droite au-dessus de chaque barre (étiquettes directes), grille verticale discrète.
+ // lignes : {libelle, valeur, part (0 à 1 de la largeur), texte (affiché), detail (info-bulle), paire (0 ou 1 : couleur)}
+ function blocBarres(titre,lignes,graduations){
+  const bloc=titreBloc(titre);
+  const aria=titre+" : "+lignes.map(l=>l.libelle+" "+l.texte).join(", ")+".";
+  if(!GR){ // secours sans graphique : les mêmes valeurs en texte
+   const ul=document.createElement("ul");ul.className="sc-valeurs";
+   lignes.forEach(l=>{const li=document.createElement("li");li.textContent=l.libelle+" : "+l.texte;ul.appendChild(li);});
+   bloc.appendChild(ul);return bloc;
+  }
+  const LIGNE=38,HAUT=2,H=HAUT+lignes.length*LIGNE+2;
+  const {fig,svg,bulle}=cadreGraphique("sc-graph-barres",H,aria);
+  let survol=null;
+  const cacher=()=>{bulle.hidden=true;if(survol)survol.classList.remove("survol");survol=null;};
+  function dessiner(){
+   const L=largeurDe(svg),plot=L-2;
+   cacher();
+   while(svg.firstChild)svg.removeChild(svg.firstChild);
+   svg.setAttribute("viewBox",`0 0 ${L} ${H}`);
+   const grille=GR.el("g",{class:"sc-grille","aria-hidden":"true"},svg);
+   graduations.forEach(f=>{const x=Math.round(f*plot)+.5;GR.el("line",{x1:x,x2:x,y1:HAUT,y2:H-2},grille);});
+   lignes.forEach((l,k)=>{
+    const y=HAUT+k*LIGNE;
+    const g=GR.el("g",{class:"sc-barre"+(l.paire===1?" b":""),"data-valeur":l.valeur,"aria-hidden":"true"},svg);
+    const val=GR.el("text",{x:L-2,y:y+14,class:"sc-barre-val","text-anchor":"end"},g);val.textContent=l.texte;
+    const lv=val.getComputedTextLength?val.getComputedTextLength():0;
+    const nom=GR.el("text",{x:0,y:y+14,class:"sc-barre-nom"},g);
+    GR.ajuster(nom,l.libelle,Math.max(20,L-2-(lv>0?lv:GR.largeurTexte(l.texte,8))-12),7.5);
+    // Longueur : 1 px au moins pour une valeur non nulle, rien pour zéro
+    const longueur=l.valeur>0?Math.max(1,Math.min(1,l.part)*plot):0;
+    if(longueur)GR.el("path",{d:GR.barreHorizontale(0,y+20,longueur,12),class:"sc-barre-rempli"},g);
+    l.noeud=g;l.fin={x:Math.max(longueur,8),y:y+20};
+   });
+  }
+  suivrePointeur(svg,(x,y)=>{
+   const k=Math.floor((y-HAUT)/LIGNE);
+   if(k<0||k>=lignes.length||!lignes[k].noeud){cacher();return;}
+   const l=lignes[k];
+   if(survol)survol.classList.remove("survol");
+   survol=l.noeud;survol.classList.add("survol");
+   bulle.textContent=l.libelle+" : "+l.detail;bulle.hidden=false;
+   GR.placerBulle(fig,svg,bulle,l.fin.x,l.fin.y);
+  },cacher);
+  dessiner();
+  const obs=GR.suivreLargeur(fig,lg=>{if(lg)dessiner();});if(obs)suivis.push(obs);
+  bloc.appendChild(fig);
+  return bloc;
+ }
+
+ // Fins de set : numéro du point qui termine chaque set et score du set (le score est rejoué point par point)
+ function finsDeSet(config,liste){
+  const fins=[];let avant=0;
+  for(let k=1;k<=liste.length;k++){
+   const e=calculer(config,liste.slice(0,k));
+   if(e.sets.length>avant){avant=e.sets.length;const s=e.sets[avant-1];fins.push({k,numero:avant,score:s.superTb?`[${s.tb[0]}-${s.tb[1]}]`:`${s.a}-${s.b}`});}
+  }
+  return fins;
+ }
+ // Courbe : nombre de points gagnés par chaque paire après chaque point joué (ceux de l'une sont les points perdus de l'autre).
+ // Paire 1 en --turf trait plein avec un rond au bout, paire 2 en --sky pointillé avec un carré : pas seulement la couleur.
+ function blocCourbe(config,liste,noms){
+  const n=liste.length;
+  if(n<2||!GR)return null;
+  const cumul=[[0],[0]];
+  liste.forEach((p,k)=>{cumul[0].push(cumul[0][k]+(p.g===0?1:0));cumul[1].push(cumul[1][k]+(p.g===1?1:0));});
+  const fins=finsDeSet(config,liste),fin=[cumul[0][n],cumul[1][n]];
+  const aria=`Points gagnés au fil du match, ${n} points joués : ${noms[0]} ${fin[0]}, ${noms[1]} ${fin[1]}.`+
+   fins.map(f=>` Set ${f.numero} (${f.score}) terminé au point ${f.k} : ${noms[0]} ${cumul[0][f.k]}, ${noms[1]} ${cumul[1][f.k]}.`).join("");
+  const bloc=titreBloc("Points gagnés et perdus au fil du match");
+  const H=200;
+  const {fig,svg,bulle}=cadreGraphique("sc-graph-courbe",H,aria);
+  fig.dataset.points=String(n);
+  // Légende : clé de chaque trait (couleur et forme), mode d'emploi
+  const legende=document.createElement("figcaption");legende.className="sc-legende";
+  [0,1].forEach(i=>{
+   const cle=document.createElement("span");cle.className="sc-cle"+(i===1?" b":"");cle.setAttribute("aria-hidden","true");
+   const nom=document.createElement("b");nom.textContent=noms[i];
+   legende.append(cle," ",nom,i===0?" (trait plein) · ":" (pointillés). ");
+  });
+  legende.append("Chaque point gagné fait monter la courbe de sa paire. Touche ou survole la courbe pour lire le score.");
+  fig.appendChild(legende);
+  const max=Math.max(fin[0],fin[1]),pas=GR.pasGrille(max),haut=Math.ceil(max/pas)*pas;
+  let geo=null,repere=null;
+  const cacher=()=>{bulle.hidden=true;if(repere)repere.setAttribute("visibility","hidden");};
+  // Rond pour la paire 1, carré pour la paire 2
+  function marqueur(parent,i,x,y,classe){
+   return i===0?GR.el("circle",{cx:x,cy:y,r:4.5,class:classe,"data-paire":0},parent):GR.el("rect",{x:x-4,y:y-4,width:8,height:8,rx:1.5,class:classe,"data-paire":1},parent);
+  }
+  function dessiner(){
+   const L=largeurDe(svg);
+   while(svg.firstChild)svg.removeChild(svg.firstChild);
+   svg.setAttribute("viewBox",`0 0 ${L} ${H}`);
+   const m={haut:14,bas:22,gauche:30,droite:GR.largeurTexte(String(max))+8};
+   const g={x:k=>m.gauche+k*(L-m.gauche-m.droite)/n,y:v=>m.haut+(H-m.haut-m.bas)*(1-v/haut)};
+   geo=g;
+   const grille=GR.el("g",{class:"sc-grille","aria-hidden":"true"},svg);
+   for(let v=0;v<=haut+1e-9;v+=pas){
+    const y=Math.round(g.y(v))+.5;
+    GR.el("line",{x1:m.gauche,x2:L-m.droite,y1:y,y2:y},grille);
+    GR.el("text",{x:m.gauche-6,y:y+4,class:"sc-axe","text-anchor":"end"},grille).textContent=String(Math.round(v*10)/10);
+   }
+   // Fins de set : trait vertical et « S1 », « S2 » sous l'axe ; à droite, le nombre de points joués
+   const yBas=H-m.bas,finTexte=`${n} pts`,debutFin=L-m.droite-GR.largeurTexte(finTexte);
+   fins.filter(f=>f.k<n).forEach(f=>{
+    const x=Math.round(g.x(f.k))+.5;
+    GR.el("line",{x1:x,x2:x,y1:m.haut,y2:yBas,class:"sc-set"},grille);
+    if(x+12<debutFin)GR.el("text",{x,y:yBas+16,class:"sc-axe","text-anchor":"middle"},grille).textContent="S"+f.numero;
+   });
+   GR.el("text",{x:L-m.droite,y:yBas+16,class:"sc-axe","text-anchor":"end"},grille).textContent=finTexte;
+   // Les deux courbes, puis un repère au dernier point de chacune
+   [0,1].forEach(i=>{
+    GR.el("polyline",{points:cumul[i].map((v,k)=>g.x(k).toFixed(1)+","+g.y(v).toFixed(1)).join(" "),class:"sc-courbe"+(i===1?" b":""),"data-paire":i,"aria-hidden":"true"},svg);
+   });
+   const arrivees=GR.el("g",{"aria-hidden":"true"},svg);
+   [0,1].forEach(i=>marqueur(arrivees,i,g.x(n),g.y(fin[i]),"sc-marque"+(i===1?" b":"")));
+   // Étiquettes du dernier point seulement, écartées si les deux arrivées sont trop proches
+   let y0=g.y(fin[0])+4,y1=g.y(fin[1])+4;
+   if(Math.abs(y0-y1)<14){const milieu=(y0+y1)/2,dessus=fin[0]>=fin[1]?0:1;y0=milieu+(dessus===0?-7:7);y1=milieu+(dessus===0?7:-7);}
+   [[0,y0],[1,y1]].forEach(([i,y])=>{
+    GR.el("text",{x:g.x(n)+8,y:Math.max(12,Math.min(H-4,y)),class:"sc-courbe-valeur","data-paire":i},arrivees).textContent=String(fin[i]);
+   });
+   // Repère du survol : trait vertical et les deux marqueurs au point visé
+   repere=GR.el("g",{class:"sc-repere",visibility:"hidden","aria-hidden":"true"},svg);
+   GR.el("line",{x1:0,x2:0,y1:m.haut,y2:yBas,class:"sc-guide"},repere);
+   marqueur(repere,0,0,0,"sc-marque");marqueur(repere,1,0,0,"sc-marque b");
+   bulle.hidden=true;
+  }
+  suivrePointeur(svg,x=>{
+   if(!geo||!repere)return;
+   const pasX=geo.x(1)-geo.x(0),k=Math.max(0,Math.min(n,Math.round((x-geo.x(0))/pasX)));
+   const cx=geo.x(k),ya=geo.y(cumul[0][k]),yb=geo.y(cumul[1][k]);
+   repere.setAttribute("visibility","visible");
+   const [ligne,rond,carre]=repere.children;
+   ligne.setAttribute("x1",cx);ligne.setAttribute("x2",cx);
+   rond.setAttribute("cx",cx);rond.setAttribute("cy",ya);carre.setAttribute("x",cx-4);carre.setAttribute("y",yb-4);
+   bulle.textContent=k===0?"Début du match":`Point ${k} : ${noms[0]} ${cumul[0][k]} · ${noms[1]} ${cumul[1][k]}`;
+   bulle.hidden=false;
+   GR.placerBulle(fig,svg,bulle,cx,Math.min(ya,yb)-4);
+  },cacher);
+  dessiner();
+  const obs=GR.suivreLargeur(fig,lg=>{if(lg)dessiner();});if(obs)suivis.push(obs);
+  bloc.appendChild(fig);
+  return bloc;
  }
  $("sc-nouveau").addEventListener("click",()=>{afficherEcran(ecranReglages);info("");$("sc-nom-a").focus();});
  $("sc-revanche").addEventListener("click",()=>{if(matchFini)demarrer({...matchFini.config,debut:new Date().toISOString()});});
