@@ -403,13 +403,13 @@ function verifierGeneres(){
   // 17. Hors connexion : aperçu ou fichier national servis par le service worker (X-Depuis-Cache)
   ({ctx,page}=await ouvrir({reponse:r=>json(r,apercuDe(DONNEES),{'X-Depuis-Cache':'1'})}));
   await page.waitForSelector('#tournois-contenu:not([hidden])');
-  assert.match(await page.textContent('#tournois-maj'),/^Hors connexion : liste du /);
+  assert.match(await page.textContent('#tournois-maj'),/^Hors connexion\s: liste du /);
   await ctx.close();
   ({ctx,page}=await ouvrir({national:r=>json(r,DONNEES,{'X-Depuis-Cache':'1'})}));
   await page.waitForSelector('#tournois-contenu:not([hidden])');
   assert.match(await page.textContent('#tournois-maj'),/^Mis à jour le /);
   await page.click('#filtre-categories label:has-text("P100")');
-  await page.waitForFunction(()=>/^Hors connexion : liste du /.test(document.getElementById('tournois-maj').textContent));
+  await page.waitForFunction(()=>/^Hors connexion\s: liste du /.test(document.getElementById('tournois-maj').textContent));
   await ctx.close();
   ok('hors connexion : « Hors connexion : liste du … » pour l\'aperçu comme pour le fichier national');
   // 18. Vraies données : URL versionnées, poids à l'entrée, ouverture en file://
