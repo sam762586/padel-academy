@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-07T09:25:17.909Z",
+  "maj": "2026-11-08T09:41:48.396Z",
   "source": "https://premierpadel.com/en/tournaments",
   "tournois": [
     {
@@ -760,7 +760,7 @@
       "pays": "United Arab Emirates",
       "date_debut": "2026-11-08",
       "date_fin": "2026-11-15",
-      "statut": "a_venir",
+      "statut": "en_cours",
       "url_source": "https://premierpadel.com/en/tournaments-detail/dubai-p1-3",
       "resultats": {
         "hommes": null,
