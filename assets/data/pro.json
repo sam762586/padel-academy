@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-15T10:08:48.860Z",
+  "maj": "2026-11-16T10:21:33.323Z",
   "source": "https://premierpadel.com/en/tournaments",
   "tournois": [
     {
@@ -760,11 +760,31 @@
       "pays": "United Arab Emirates",
       "date_debut": "2026-11-08",
       "date_fin": "2026-11-15",
-      "statut": "en_cours",
+      "statut": "termine",
       "url_source": "https://premierpadel.com/en/tournaments-detail/dubai-p1-3",
       "resultats": {
-        "hommes": null,
-        "femmes": null
+        "hommes": {
+          "vainqueurs": [
+            "Augsburger",
+            "Lebron"
+          ],
+          "finalistes": [
+            "Libaak",
+            "Alfonso"
+          ],
+          "score": "7-6 5-7 6-3"
+        },
+        "femmes": {
+          "vainqueurs": [
+            "Fernandez Sanchez",
+            "Calvo Santamaria"
+          ],
+          "finalistes": [
+            "Josemaria Martin",
+            "Gonzalez Fernandez"
+          ],
+          "score": "7-5 6-1"
+        }
       }
     },
     {
