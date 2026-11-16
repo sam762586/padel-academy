@@ -1,2 +1,2 @@
 // Généré par scripts/generer-pages.js.
-(window.TOURNOIS_INDEX=window.TOURNOIS_INDEX||{})["58"]={"genere_le":"2026-11-09T13:10:42.451Z","source":"Ten'Up (FFT)","periode":{"du":"2026-11-09","au":"2027-02-09"},"dep":"58","tournois":[]};
+(window.TOURNOIS_INDEX=window.TOURNOIS_INDEX||{})["58"]={"genere_le":"2026-11-16T12:58:55.660Z","source":"Ten'Up (FFT)","periode":{"du":"2026-11-16","au":"2027-02-16"},"dep":"58","tournois":[]};
