@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-17T11:20:04.719Z",
+  "maj": "2026-11-18T10:53:11.013Z",
   "source": "https://premierpadel.com/en/tournaments",
   "tournois": [
     {
@@ -793,7 +793,7 @@
       "categorie": "Major",
       "ville": "ACAPULCO",
       "pays": "Mexico",
-      "date_debut": "2026-11-23",
+      "date_debut": "2026-11-21",
       "date_fin": "2026-11-29",
       "statut": "a_venir",
       "url_source": "https://premierpadel.com/en/tournaments-detail/mexico-major",
