@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-20T10:43:32.673Z",
+  "maj": "2026-11-21T10:27:08.606Z",
   "source": "https://premierpadel.com/en/tournaments",
   "tournois": [
     {
@@ -795,7 +795,7 @@
       "pays": "Mexico",
       "date_debut": "2026-11-21",
       "date_fin": "2026-11-29",
-      "statut": "a_venir",
+      "statut": "en_cours",
       "url_source": "https://premierpadel.com/en/tournaments-detail/mexico-major",
       "resultats": {
         "hommes": null,
