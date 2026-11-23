@@ -1,2 +1,0 @@
-// Généré par scripts/scrape-tenup.js.
-(window.TOURNOIS_FICHES=window.TOURNOIS_FICHES||{})["36"]={"318589":{"adresse":"Complexe Sportif Rue de Villers, 36250 ST MAUR","horaires":null,"balles":"HEAD / Padel Pro S","commentaire":null,"epreuves":[{"code":"DM","libelle":"DOUBLE MESSIEURS SENIOR","categorie":"P250","cut":"Interdit au top 1000","tarif":20,"tableau":12}]}};

@@ -529,6 +529,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/297006.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/297010.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -1022,7 +1028,7 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/303945.html</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1555,6 +1561,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/306915.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/306917.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -1610,12 +1622,6 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/307075.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/307080.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -3169,12 +3175,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/310295.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/310297.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -3201,6 +3201,12 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/310335.html</loc>
     <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/310348.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -3583,12 +3589,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/311495.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/311497.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -3865,12 +3865,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/311809.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/311810.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -4083,6 +4077,12 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/312541.html</loc>
     <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/312550.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -4591,6 +4591,84 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/313785.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313786.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313787.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313788.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313789.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313790.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313793.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313794.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313799.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313800.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313801.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313804.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/313805.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/313828.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -4940,12 +5018,6 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/314058.html</loc>
-    <lastmod>2026-10-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/314059.html</loc>
     <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -5511,6 +5583,18 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/314856.html</loc>
     <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/314862.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/314873.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6362,7 +6446,7 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/316775.html</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6417,6 +6501,18 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/316868.html</loc>
     <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/316874.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/316875.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6631,12 +6727,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/317356.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/317359.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -6668,7 +6758,7 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/317376.html</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6793,6 +6883,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/318092.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/318108.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -6825,6 +6921,12 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/318162.html</loc>
     <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/318165.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6878,7 +6980,7 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/318306.html</loc>
-    <lastmod>2026-11-02</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -6926,7 +7028,7 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/318378.html</loc>
-    <lastmod>2026-11-02</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -7123,19 +7225,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/319005.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/319006.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/319007.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -7148,18 +7238,6 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/319009.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/319010.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/319011.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -7178,12 +7256,6 @@
   </url>
   <url>
     <loc>https://apprendre-padel.fr/tournoi/319014.html</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/319015.html</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -7803,6 +7875,12 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/319844.html</loc>
     <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/319846.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -8593,30 +8671,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/321999.html</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/322000.html</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/322002.html</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://apprendre-padel.fr/tournoi/322006.html</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://apprendre-padel.fr/tournoi/322007.html</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -8689,6 +8743,24 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/322090.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322092.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322096.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/322161.html</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -8725,8 +8797,32 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/322176.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322186.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322187.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/322199.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322202.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -8823,6 +8919,12 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/322345.html</loc>
     <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/322346.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -9319,6 +9421,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/323292.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/323293.html</loc>
     <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -9331,8 +9439,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/323295.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/323296.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/323297.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -9495,6 +9615,24 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/323620.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/323626.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/323627.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/323628.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -9727,8 +9865,26 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/326595.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/326597.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/326598.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/326600.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -9763,6 +9919,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/326617.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/326653.html</loc>
     <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -9789,6 +9951,36 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/326874.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327158.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327163.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327166.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327167.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327169.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -10063,8 +10255,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/327828.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/327834.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327837.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -10255,6 +10459,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/327919.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/327921.html</loc>
     <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -10333,8 +10543,20 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/327941.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/327943.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327945.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -10351,6 +10573,18 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://apprendre-padel.fr/tournoi/327948.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327952.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://apprendre-padel.fr/tournoi/327953.html</loc>
     <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -10359,6 +10593,18 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/327954.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/327970.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328000.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -10375,13 +10621,19 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/328151.html</loc>
-    <lastmod>2026-11-16</lastmod>
+    <loc>https://apprendre-padel.fr/tournoi/328142.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://apprendre-padel.fr/tournoi/328152.html</loc>
+    <loc>https://apprendre-padel.fr/tournoi/328145.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328151.html</loc>
     <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -10389,6 +10641,582 @@
   <url>
     <loc>https://apprendre-padel.fr/tournoi/328153.html</loc>
     <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328289.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328291.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328293.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328491.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328492.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328539.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328544.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328545.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328546.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328547.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328548.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328702.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328706.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328713.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328719.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328883.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328885.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328886.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328889.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328890.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328891.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328892.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/328899.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329199.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329297.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329329.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329530.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329531.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329532.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329535.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329539.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329540.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329557.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329559.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329565.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329677.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/329681.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330019.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330020.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330024.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330026.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330031.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330032.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330039.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330071.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330072.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330076.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330078.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330080.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330083.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330086.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330089.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330099.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330101.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330103.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330106.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330110.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330111.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330112.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330114.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330115.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330116.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330119.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330150.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330270.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330275.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330478.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330484.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330493.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330527.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330533.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330545.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330547.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330550.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330572.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330575.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330581.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330585.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330587.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330596.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330600.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330628.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330631.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330632.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330805.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330819.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330823.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330824.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/330826.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331022.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331029.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331097.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331127.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331141.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331147.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://apprendre-padel.fr/tournoi/331148.html</loc>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
